@@ -2,34 +2,40 @@
 #include "ui_mainwindow.h"
 
 #include <random>
+#include <chrono>
 
 #include <QTimer>
 #include <QDateTime>
 #include <QNetworkAccessManager>
 #include <QUrlQuery>
+#include <QNetworkReply>
 #include <QJsonObject>
 #include <QJsonDocument>
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+
     this->request_telegram();
     this->timer_telegram = new QTimer(this);
     this->timer_telegram->setInterval(3000);
-    connect(timer_telegram, SIGNAL(timeout()), this, SLOT(request_telegram()));
+    connect(timer_telegram, &QTimer::timeout, this, &MainWindow::request_telegram);
     this->timer_telegram->start();
 
-    this->get_housekeeping_data();
+    this->get_env_data();
     this->timer_operation = new QTimer(this);
     this->timer_operation->setInterval(200);
-    connect(timer_operation, SIGNAL(timeout()), this, SLOT(process_timer()));
+    connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
     this->timer_operation->start();
 
     this->timer_cover = new QTimer(this);
     this->timer_cover->setInterval(10);
-    connect(timer_cover, SIGNAL(timeout()), this, SLOT(move_cover()));
+    connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);
 
     this->network_manager = new QNetworkAccessManager(this);
+    connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
+
     this->last_received = QDateTime::currentDateTimeUtc();
     this->display_cover_status();
 }
@@ -53,17 +59,22 @@ void MainWindow::on_cbManual_stateChanged(int enable) {
 
 void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    this->display_housekeeping_data();
+    this->display_env_data();
 }
 
-void MainWindow::display_housekeeping_data(void) {
+void MainWindow::display_sun_properties(void) {
+    ui->label_hor_az_value->setText(QString::asprintf("%4.1f°", this->sun_azimuth));
+    ui->label_hor_alt_value->setText(QString::asprintf("%4.1f°", this->sun_altitude));
+}
+
+void MainWindow::display_env_data(void) {
     ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
-    ui->lbTemperature->setText(QString::asprintf("Temperature: %2.1f °C", this->temperature));
-    ui->lbPressure->setText(QString::asprintf("Pressure: %5.0f Pa", this->pressure));
-    ui->lbHumidity->setText(QString::asprintf("Humidity: %2.1f%%", this->humidity));
+    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->temperature));
+    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->pressure / 1000));
+    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->humidity));
 }
 
-void MainWindow::get_housekeeping_data(void) {
+void MainWindow::get_env_data(void) {
     std::uniform_real_distribution<double> td(-20, 30);
     std::normal_distribution<double> pd(100000, 1000);
     std::uniform_real_distribution<double> hd(0, 100);
@@ -77,11 +88,10 @@ void MainWindow::get_housekeeping_data(void) {
 
 void MainWindow::send_heartbeat(void) {
     QUrl url = QUrl("http://192.168.153.128:4805/station/AGO/heartbeat/");
-    QNetworkRequest request(url);
 
+    QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    connect(this->network_manager, SIGNAL(finished(QNetworkReply *)), this, SLOT(handleEnd(QNetworkReply *)));
 
     QJsonObject json;
 
@@ -95,9 +105,23 @@ void MainWindow::send_heartbeat(void) {
     QByteArray message = document.toJson(QJsonDocument::Compact);
 
     ui->log->addItem(message);
-    this->network_manager->post(request, message);
+    QNetworkReply *reply = this->network_manager->post(request, message);
+
+    connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::heartbeat_error);
 }
 
+void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
+    ui->log->addItem(QString::asprintf("Heartbeat could not be sent: error %d", error));
+}
+
+void MainWindow::heartbeat_ok(QNetworkReply* reply) {
+    ui->log->addItem("Heartbeat sent, response: \"" + reply->readAll() + "\"");
+    reply->deleteLater();
+}
+
+void MainWindow::heartbeat_response(void) {
+    ui->log->addItem("Heartbeat response");
+}
 
 void MainWindow::handleEnd(QNetworkReply *a) {
     statusBar()->showMessage("POST request sent");
@@ -132,7 +156,8 @@ void MainWindow::move_cover(void) {
 }
 
 void MainWindow::request_telegram(void) {
-    this->get_housekeeping_data();
+    /* Currently a mockup */
+    this->get_env_data();
 }
 
 void MainWindow::display_cover_status(void) {

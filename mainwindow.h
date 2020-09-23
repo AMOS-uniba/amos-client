@@ -8,6 +8,7 @@
 #include <QTimer>
 #include <QSerialPort>
 #include <QNetworkAccessManager>
+#include <QNetworkReply>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -59,11 +60,15 @@ private slots:
     void process_timer(void);
     void request_telegram(void);
 
-    void display_housekeeping_data(void);
-    void get_housekeeping_data(void);
+    void display_sun_properties(void);
+    void display_env_data(void);
+    void get_env_data(void);
     void send_heartbeat(void);
 
     void handleEnd(QNetworkReply *a);
+    void heartbeat_ok(QNetworkReply *reply);
+    void heartbeat_error(QNetworkReply::NetworkError error);
+    void heartbeat_response(void);
 
     void on_button_send_heartbeat_pressed();
 
@@ -80,6 +85,9 @@ private:
     double temperature = 0;
     double pressure = 0;
     double humidity = 0;
+
+    double sun_azimuth = 0;
+    double sun_altitude = 0;
 
     CoverState cover_state = COVER_CLOSED;
     unsigned int cover_position = 0;
