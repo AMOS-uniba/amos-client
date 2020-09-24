@@ -23,6 +23,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(timer_telegram, &QTimer::timeout, this, &MainWindow::request_telegram);
     this->timer_telegram->start();
 
+    this->timer_heartbeat = new QTimer(this);
+    this->timer_heartbeat->setInterval(15 * 1000);
+    connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
+    this->timer_heartbeat->start();
+
     this->get_env_data();
     this->timer_operation = new QTimer(this);
     this->timer_operation->setInterval(200);
@@ -87,7 +92,7 @@ void MainWindow::get_env_data(void) {
 }
 
 void MainWindow::send_heartbeat(void) {
-    QUrl url = QUrl("http://192.168.153.128:4805/station/AGO/heartbeat/");
+    QUrl url = QUrl("http://192.168.0.176:4805/station/AGO/heartbeat/");
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
@@ -115,7 +120,7 @@ void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
 }
 
 void MainWindow::heartbeat_ok(QNetworkReply* reply) {
-    ui->log->addItem("Heartbeat sent, response: \"" + reply->readAll() + "\"");
+    ui->log->addItem("Heartbeat received (HTTP " + reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString() + "), response: \"" + reply->readAll() + "\"");
     reply->deleteLater();
 }
 

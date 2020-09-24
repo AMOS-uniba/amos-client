@@ -76,7 +76,7 @@ private slots:
     void move_cover(void);
 
 private:
-    QTimer *timer_operation, *timer_cover, *timer_telegram;
+    QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     QNetworkAccessManager *network_manager;
     Ui::MainWindow *ui;
 

@@ -95,8 +95,8 @@
    <widget class="QGroupBox" name="gbPosition">
     <property name="geometry">
      <rect>
-      <x>480</x>
-      <y>230</y>
+      <x>610</x>
+      <y>160</y>
       <width>181</width>
       <height>161</height>
      </rect>
@@ -134,8 +134,8 @@
    <widget class="QGroupBox" name="group_environment">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>180</y>
+      <x>20</x>
+      <y>170</y>
       <width>171</width>
       <height>91</height>
      </rect>
