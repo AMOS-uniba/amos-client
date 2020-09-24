@@ -62,7 +62,7 @@ private slots:
 
     void display_sun_properties(void);
     void display_env_data(void);
-    void get_env_data(void);
+    void fake_env_data(void);
     void send_heartbeat(void);
 
     void heartbeat_ok(QNetworkReply *reply);

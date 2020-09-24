@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
     this->timer_heartbeat->start();
 
-    this->get_env_data();
+    this->fake_env_data();
     this->timer_operation = new QTimer(this);
     this->timer_operation->setInterval(200);
     connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
@@ -64,6 +64,7 @@ void MainWindow::on_cbManual_stateChanged(int enable) {
 
 void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    ui->label_heartbeat->setText(QString::asprintf("%.3f s", (double) this->timer_heartbeat->remainingTime() / 1000));
     this->display_env_data();
 }
 
@@ -79,7 +80,7 @@ void MainWindow::display_env_data(void) {
     ui->label_hum->setText(QString::asprintf("%2.1f%%", this->humidity));
 }
 
-void MainWindow::get_env_data(void) {
+void MainWindow::fake_env_data(void) {
     std::uniform_real_distribution<double> td(-20, 30);
     std::normal_distribution<double> pd(100000, 1000);
     std::uniform_real_distribution<double> hd(0, 100);
@@ -158,7 +159,7 @@ void MainWindow::move_cover(void) {
 
 void MainWindow::request_telegram(void) {
     /* Currently a mockup */
-    this->get_env_data();
+    this->fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1041</width>
-    <height>585</height>
+    <width>1369</width>
+    <height>774</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -72,6 +72,9 @@
           <property name="text">
            <string>undefined</string>
           </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
          </widget>
         </item>
         <item>
@@ -95,8 +98,8 @@
    <widget class="QGroupBox" name="gbPosition">
     <property name="geometry">
      <rect>
-      <x>610</x>
-      <y>160</y>
+      <x>760</x>
+      <y>40</y>
       <width>181</width>
       <height>161</height>
      </rect>
@@ -116,19 +119,6 @@
     </property>
     <property name="text">
      <string>Enable manual control</string>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="button_send_heartbeat">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>360</y>
-      <width>101</width>
-      <height>23</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Send heartbeat</string>
     </property>
    </widget>
    <widget class="QGroupBox" name="group_environment">
@@ -196,24 +186,6 @@
       </widget>
      </item>
     </layout>
-   </widget>
-   <widget class="QListWidget" name="log">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>390</y>
-      <width>881</width>
-      <height>131</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Consolas</family>
-     </font>
-    </property>
-    <property name="uniformItemSizes">
-     <bool>true</bool>
-    </property>
    </widget>
    <widget class="QGroupBox" name="group_sun">
     <property name="geometry">
@@ -286,13 +258,92 @@
      </item>
     </layout>
    </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>460</y>
+      <width>981</width>
+      <height>251</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_heartbeat">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>50</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>? s</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_hb">
+       <property name="minimumSize">
+        <size>
+         <width>50</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Next heartbeat in</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1" colspan="4">
+      <widget class="QListWidget" name="log">
+       <property name="font">
+        <font>
+         <family>Consolas</family>
+        </font>
+       </property>
+       <property name="uniformItemSizes">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="button_send_heartbeat">
+       <property name="text">
+        <string>Send heartbeat</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1041</width>
+     <width>1369</width>
      <height>21</height>
     </rect>
    </property>
