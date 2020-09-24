@@ -65,7 +65,6 @@ private slots:
     void get_env_data(void);
     void send_heartbeat(void);
 
-    void handleEnd(QNetworkReply *a);
     void heartbeat_ok(QNetworkReply *reply);
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_response(void);

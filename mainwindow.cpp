@@ -128,10 +128,6 @@ void MainWindow::heartbeat_response(void) {
     ui->log->addItem("Heartbeat response");
 }
 
-void MainWindow::handleEnd(QNetworkReply *a) {
-    statusBar()->showMessage("POST request sent");
-}
-
 void MainWindow::move_cover(void) {
     switch (this->cover_state) {
         case COVER_OPENING: {
