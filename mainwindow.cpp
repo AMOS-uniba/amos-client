@@ -11,11 +11,11 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QMessageLogger>
+
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-
-    this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
 
     this->request_telegram();
     this->timer_telegram = new QTimer(this);
@@ -28,9 +28,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
     this->timer_heartbeat->start();
 
-    this->fake_env_data();
     this->timer_operation = new QTimer(this);
-    this->timer_operation->setInterval(200);
+    this->timer_operation->setInterval(100);
     connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
     this->timer_operation->start();
 
@@ -41,8 +40,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->network_manager = new QNetworkAccessManager(this);
     connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
 
-    this->last_received = QDateTime::currentDateTimeUtc();
     this->display_cover_status();
+
+    this->ui->lineedit_IP->setText(this->ip);
+    this->ui->lineedit_station_id->setText(this->station_id);
 }
 
 MainWindow::~MainWindow() {
@@ -55,16 +56,11 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_cbManual_stateChanged(int enable) {
-    if (enable) {
-        this->setWindowTitle("AMOS [manual mode]");
-    } else {
-        this->setWindowTitle("AMOS [automatic mode]");
-    }
 }
 
 void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    ui->label_heartbeat->setText(QString::asprintf("%.3f s", (double) this->timer_heartbeat->remainingTime() / 1000));
+    ui->label_heartbeat->setText(QString::asprintf("%.0f s", (double) this->timer_heartbeat->remainingTime() / 1000));
     this->display_env_data();
 }
 
@@ -74,78 +70,64 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
-    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->temperature));
-    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->pressure / 1000));
-    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->humidity));
-}
-
-void MainWindow::fake_env_data(void) {
-    std::uniform_real_distribution<double> td(-20, 30);
-    std::normal_distribution<double> pd(100000, 1000);
-    std::uniform_real_distribution<double> hd(0, 100);
-
-    this->temperature = td(this->generator);
-    this->pressure = pd(this->generator);
-    this->humidity = hd(this->generator);
-
-    this->last_received = QDateTime::currentDateTimeUtc();
+    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->status.dome_manager.last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
+    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->status.dome_manager.temperature));
+    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->status.dome_manager.pressure / 1000));
+    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->status.dome_manager.humidity));
 }
 
 void MainWindow::send_heartbeat(void) {
-    QUrl url = QUrl("http://192.168.0.176:4805/station/AGO/heartbeat/");
+    QString address = QString("http://%1:%2/station/%3/heartbeat/").arg(this->ip).arg(this->port).arg(this->station_id);
+    this->log_debug("About to send a heartbeat to " + address);
+
+    QUrl url(address);
 
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-
-    QJsonObject json;
-
-    json["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
-    json["temperature"] = this->temperature;
-    json["pressure"] = this->pressure;
-    json["humidity"] = this->humidity;
-
-    QJsonDocument document(json);
-
+    QJsonDocument document = this->status.message();
     QByteArray message = document.toJson(QJsonDocument::Compact);
 
-    ui->log->addItem(message);
+    this->log_debug(message);
     QNetworkReply *reply = this->network_manager->post(request, message);
 
     connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::heartbeat_error);
 }
 
 void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
-    ui->log->addItem(QString::asprintf("Heartbeat could not be sent: error %d", error));
+    this->log_debug(QString::asprintf("Heartbeat could not be sent: error %d", error));
 }
 
 void MainWindow::heartbeat_ok(QNetworkReply* reply) {
-    ui->log->addItem("Heartbeat received (HTTP " + reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString() + "), response: \"" + reply->readAll() + "\"");
+    log_debug("Heartbeat received (HTTP code " + reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString() + "), response: \"" + reply->readAll() + "\"");
     reply->deleteLater();
 }
 
 void MainWindow::heartbeat_response(void) {
-    ui->log->addItem("Heartbeat response");
+    this->log_debug("Heartbeat response");
+}
+
+void MainWindow::log_debug(const QString& message) {
+    ui->log->addItem("[" + QDateTime::currentDateTimeUtc().toString(Qt::ISODate) + "] " + message);
 }
 
 void MainWindow::move_cover(void) {
-    switch (this->cover_state) {
+    switch (this->status.dome_manager.cover_state) {
         case COVER_OPENING: {
-            if (this->cover_position < 400) {
-                this->cover_position += 1;
+            if (this->status.dome_manager.cover_position < 400) {
+                this->status.dome_manager.cover_position += 1;
             } else {
-                this->cover_state = COVER_OPEN;
+                this->status.dome_manager.cover_state = COVER_OPEN;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
             break;
         }
         case COVER_CLOSING: {
-            if (this->cover_position > 0) {
-                this->cover_position -= 1;
+            if (this->status.dome_manager.cover_position > 0) {
+                this->status.dome_manager.cover_position -= 1;
             } else {
-                this->cover_state = COVER_CLOSED;
+                this->status.dome_manager.cover_state = COVER_CLOSED;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
@@ -159,12 +141,12 @@ void MainWindow::move_cover(void) {
 
 void MainWindow::request_telegram(void) {
     /* Currently a mockup */
-    this->fake_env_data();
+    this->status.dome_manager.fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {
     QString status;
-    switch (this->cover_state) {
+    switch (this->status.dome_manager.cover_state) {
         case COVER_OPEN: {
             status = "Open";
             ui->button_cover->setText("Close");
@@ -188,7 +170,7 @@ void MainWindow::display_cover_status(void) {
             break;
         }
     }
-    ui->progress_cover->setValue(this->cover_position);
+    ui->progress_cover->setValue(this->status.dome_manager.cover_position);
     ui->label_cover_state->setText(status);
 }
 
@@ -197,13 +179,26 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->cover_state == COVER_CLOSED) {
-        this->cover_state = COVER_OPENING;
+    if (this->status.dome_manager.cover_state == COVER_CLOSED) {
+        this->status.dome_manager.cover_state = COVER_OPENING;
     }
-    if (this->cover_state == COVER_OPEN) {
-        this->cover_state = COVER_CLOSING;
+    if (this->status.dome_manager.cover_state == COVER_OPEN) {
+        this->status.dome_manager.cover_state = COVER_CLOSING;
     }
     this->display_cover_status();
     this->timer_cover->start();
     ui->button_cover->setEnabled(false);
+}
+
+void MainWindow::on_button_station_accept_clicked() {
+    this->ip = ui->lineedit_IP->text();
+    this->station_id = ui->lineedit_station_id->text();
+}
+
+void MainWindow::on_checkbox_manual_stateChanged(int enable) {
+    if (enable) {
+        this->setWindowTitle("AMOS [manual mode]");
+    } else {
+        this->setWindowTitle("AMOS [automatic mode]");
+    }
 }

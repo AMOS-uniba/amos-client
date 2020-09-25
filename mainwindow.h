@@ -10,39 +10,12 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
+#include "status.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
 
-
-enum CoverState {
-    COVER_OPEN,
-    COVER_OPENING,
-    COVER_CLOSING,
-    COVER_CLOSED
-};
-
-enum Telegram {
-    TELEGRAM_NOP,                       // do nothing, for testing
-    TELEGRAM_COVER_OPEN,                // open the cover
-    TELEGRAM_COVER_CLOSE,               // close the cover
-    TELEGRAM_FAN_ON,                    // turn on the fan
-    TELEGRAM_FAN_OFF,                   // turn off the fan
-    TELEGRAM_II_ON,                     // turn on image intensifier
-    TELEGRAM_II_OFF,                    // turn off image intensifier
-    TELEGRAM_SW_RESET                   // perform software reset
-};
-
-static QMap<Telegram, QChar> Telegrams = {
-    {TELEGRAM_NOP, '\x00'},
-    {TELEGRAM_COVER_OPEN, '\x01'},
-    {TELEGRAM_COVER_CLOSE, '\x02'},
-    {TELEGRAM_FAN_ON, '\x05'},
-    {TELEGRAM_FAN_OFF, '\x06'},
-    {TELEGRAM_II_ON, '\x07'},
-    {TELEGRAM_II_OFF, '\x08'},
-    {TELEGRAM_SW_RESET, '\x0b'}
-};
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -62,7 +35,6 @@ private slots:
 
     void display_sun_properties(void);
     void display_env_data(void);
-    void fake_env_data(void);
     void send_heartbeat(void);
 
     void heartbeat_ok(QNetworkReply *reply);
@@ -74,26 +46,25 @@ private slots:
     void on_button_cover_clicked();
     void move_cover(void);
 
+    void on_button_station_accept_clicked();
+
+    void log_debug(const QString& message);
+
+    void on_checkbox_manual_stateChanged(int arg1);
+
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     QNetworkAccessManager *network_manager;
     Ui::MainWindow *ui;
 
-    std::default_random_engine generator;
-
-    double temperature = 0;
-    double pressure = 0;
-    double humidity = 0;
-
     double sun_azimuth = 0;
     double sun_altitude = 0;
 
-    CoverState cover_state = COVER_CLOSED;
-    unsigned int cover_position = 0;
-    bool fan = false;
-    bool heating = false;
+    QString ip = "192.168.0.176";
+    unsigned short int port = 4805;
+    QString station_id = "AGO";
 
     void display_cover_status(void);
-    QDateTime last_received;
+    Status status;
 };
 #endif // MAINWINDOW_H
