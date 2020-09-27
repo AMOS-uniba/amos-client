@@ -55,9 +55,6 @@ void MainWindow::on_actionExit_triggered() {
     QApplication::quit();
 }
 
-void MainWindow::on_cbManual_stateChanged(int enable) {
-}
-
 void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     ui->label_heartbeat->setText(QString::asprintf("%.0f s", (double) this->timer_heartbeat->remainingTime() / 1000));

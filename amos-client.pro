@@ -14,12 +14,18 @@ SOURCES += \
     domemanager.cpp \
     main.cpp \
     mainwindow.cpp \
-    status.cpp
+    server.cpp \
+    station.cpp \
+    status.cpp \
+    universe.cpp
 
 HEADERS += \
     domemanager.h \
     mainwindow.h \
-    status.h
+    server.h \
+    station.h \
+    status.h \
+    universe.h
 
 FORMS += \
     mainwindow.ui

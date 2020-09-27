@@ -28,8 +28,6 @@ public:
 private slots:
     void on_actionExit_triggered();
 
-    void on_cbManual_stateChanged(int arg1);
-
     void process_timer(void);
     void request_telegram(void);
 

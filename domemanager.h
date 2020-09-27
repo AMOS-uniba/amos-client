@@ -17,7 +17,13 @@ enum CoverState {
 enum HeatingState {
     HEATING_ON,
     HEATING_OFF,
-    HEATING_PROBLEM,
+    HEATING_UNKNOWN,
+};
+
+enum IntensifierState {
+    II_ON,
+    II_OFF,
+    II_UNKNOWN,
 };
 
 enum Command {
@@ -53,7 +59,13 @@ static QMap<CoverState, QString> cover_code = {
 static QMap<HeatingState, QString> heating_code = {
     {HeatingState::HEATING_OFF, "0"},
     {HeatingState::HEATING_ON, "1"},
-    {HeatingState::HEATING_PROBLEM, "P"},
+    {HeatingState::HEATING_UNKNOWN, "?"},
+};
+
+static QMap<IntensifierState, QString> intensifier_code = {
+    {IntensifierState::II_OFF, "0"},
+    {IntensifierState::II_ON, "1"},
+    {IntensifierState::II_UNKNOWN, "?"},
 };
 
 
@@ -61,6 +73,7 @@ class DomeManager {
 private:
     const QString& get_cover_code(void) const;
     const QString& get_heating_code(void) const;
+    const QString& get_intensifier_code(void) const;
 
     std::default_random_engine generator;
 public:
@@ -69,10 +82,10 @@ public:
     double humidity;
 
     unsigned int cover_position = 0;
-    bool heating = false;
 
     CoverState cover_state = CoverState::COVER_CLOSED;
     HeatingState heating_state = HeatingState::HEATING_OFF;
+    IntensifierState intensifier_state = IntensifierState::II_OFF;
 
     DomeManager();
 
