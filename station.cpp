@@ -15,3 +15,13 @@ double Station::get_sun_azimuth(void) const {
 
     return 180;
 }
+
+QJsonObject Station::prepare_heartbeat(void) const {
+    QJsonObject json;
+
+    json["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    json["dome"] = this->dome_manager.json();
+    json["automatic"] = this->automatic;
+
+    return QJsonObject(json);
+}

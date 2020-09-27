@@ -10,7 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-#include "status.h"
+#include "station.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -63,6 +63,6 @@ private:
     QString station_id = "AGO";
 
     void display_cover_status(void);
-    Status status;
+    Station station;
 };
 #endif // MAINWINDOW_H

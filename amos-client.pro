@@ -16,7 +16,6 @@ SOURCES += \
     mainwindow.cpp \
     server.cpp \
     station.cpp \
-    status.cpp \
     universe.cpp
 
 HEADERS += \
@@ -24,7 +23,6 @@ HEADERS += \
     mainwindow.h \
     server.h \
     station.h \
-    status.h \
     universe.h
 
 FORMS += \

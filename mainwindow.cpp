@@ -67,10 +67,10 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->status.dome_manager.last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
-    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->status.dome_manager.temperature));
-    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->status.dome_manager.pressure / 1000));
-    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->status.dome_manager.humidity));
+    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station.dome_manager.last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
+    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->station.dome_manager.temperature));
+    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->station.dome_manager.pressure / 1000));
+    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->station.dome_manager.humidity));
 }
 
 void MainWindow::send_heartbeat(void) {
@@ -82,7 +82,7 @@ void MainWindow::send_heartbeat(void) {
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    QJsonDocument document = this->status.message();
+    QJsonDocument document = QJsonDocument(this->station.prepare_heartbeat());
     QByteArray message = document.toJson(QJsonDocument::Compact);
 
     this->log_debug(message);
@@ -109,22 +109,22 @@ void MainWindow::log_debug(const QString& message) {
 }
 
 void MainWindow::move_cover(void) {
-    switch (this->status.dome_manager.cover_state) {
+    switch (this->station.dome_manager.cover_state) {
         case COVER_OPENING: {
-            if (this->status.dome_manager.cover_position < 400) {
-                this->status.dome_manager.cover_position += 1;
+            if (this->station.dome_manager.cover_position < 400) {
+                this->station.dome_manager.cover_position += 1;
             } else {
-                this->status.dome_manager.cover_state = COVER_OPEN;
+                this->station.dome_manager.cover_state = COVER_OPEN;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
             break;
         }
         case COVER_CLOSING: {
-            if (this->status.dome_manager.cover_position > 0) {
-                this->status.dome_manager.cover_position -= 1;
+            if (this->station.dome_manager.cover_position > 0) {
+                this->station.dome_manager.cover_position -= 1;
             } else {
-                this->status.dome_manager.cover_state = COVER_CLOSED;
+                this->station.dome_manager.cover_state = COVER_CLOSED;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
@@ -138,37 +138,37 @@ void MainWindow::move_cover(void) {
 
 void MainWindow::request_telegram(void) {
     /* Currently a mockup */
-    this->status.dome_manager.fake_env_data();
+    this->station.dome_manager.fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {
-    QString status;
-    switch (this->status.dome_manager.cover_state) {
+    QString station;
+    switch (this->station.dome_manager.cover_state) {
         case COVER_OPEN: {
-            status = "Open";
+            station = "Open";
             ui->button_cover->setText("Close");
             break;
         }
         case COVER_OPENING: {
-            status = "Opening...";
+            station = "Opening...";
             break;
         }
         case COVER_CLOSED: {
-            status = "Closed";
+            station = "Closed";
             ui->button_cover->setText("Open");
             break;
         }
         case COVER_CLOSING: {
-            status = "Closing...";
+            station = "Closing...";
             break;
         }
         default: {
-            status = "undefined";
+            station = "undefined";
             break;
         }
     }
-    ui->progress_cover->setValue(this->status.dome_manager.cover_position);
-    ui->label_cover_state->setText(status);
+    ui->progress_cover->setValue(this->station.dome_manager.cover_position);
+    ui->label_cover_state->setText(station);
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -176,11 +176,11 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->status.dome_manager.cover_state == COVER_CLOSED) {
-        this->status.dome_manager.cover_state = COVER_OPENING;
+    if (this->station.dome_manager.cover_state == COVER_CLOSED) {
+        this->station.dome_manager.cover_state = COVER_OPENING;
     }
-    if (this->status.dome_manager.cover_state == COVER_OPEN) {
-        this->status.dome_manager.cover_state = COVER_CLOSING;
+    if (this->station.dome_manager.cover_state == COVER_OPEN) {
+        this->station.dome_manager.cover_state = COVER_CLOSING;
     }
     this->display_cover_status();
     this->timer_cover->start();
