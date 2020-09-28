@@ -12,6 +12,7 @@
 #include <QSettings>
 
 #include "station.h"
+#include "universe.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -69,7 +70,8 @@ private:
     QString station_id = "AGO";
 
     void display_cover_status(void);
-    Station station;
+    Station *station;
+    Universe *universe;
 
     QString format_message(const QString& message) const;
 };

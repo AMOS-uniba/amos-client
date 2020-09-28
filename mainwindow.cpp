@@ -17,6 +17,9 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    this->station = new Station();
+    this->universe = new Universe();
+
     this->create_timers();
 
     this->network_manager = new QNetworkAccessManager(this);
@@ -73,21 +76,22 @@ void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     ui->label_heartbeat->setText(QString::asprintf("%.0f s", (double) this->timer_heartbeat->remainingTime() / 1000));
     this->display_env_data();
+    this->display_sun_properties();
 
     this->setWindowTitle(this->settings->fileName());
     this->settings->sync();
 }
 
 void MainWindow::display_sun_properties(void) {
-    ui->label_hor_az_value->setText(QString::asprintf("%4.1f°", this->sun_azimuth));
-    ui->label_hor_alt_value->setText(QString::asprintf("%4.1f°", this->sun_altitude));
+    ui->label_hor_az_value->setText(QString::asprintf("%4.1f°", this->universe->get_sun_azimuth(*this->station)));
+    ui->label_hor_alt_value->setText(QString::asprintf("%4.1f°", this->universe->get_sun_altitude(*this->station)));
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station.dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
-    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->station.dome_manager.temperature));
-    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->station.dome_manager.pressure / 1000));
-    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->station.dome_manager.humidity));
+    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station->dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
+    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->station->dome_manager.temperature));
+    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->station->dome_manager.pressure / 1000));
+    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->station->dome_manager.humidity));
 }
 
 void MainWindow::send_heartbeat(void) {
@@ -99,7 +103,7 @@ void MainWindow::send_heartbeat(void) {
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    QJsonDocument document = QJsonDocument(this->station.prepare_heartbeat());
+    QJsonDocument document = QJsonDocument(this->station->prepare_heartbeat());
     QByteArray message = document.toJson(QJsonDocument::Compact);
 
     this->log_debug(message);
@@ -136,22 +140,22 @@ void MainWindow::log_error(const QString& message) {
 }
 
 void MainWindow::move_cover(void) {
-    switch (this->station.dome_manager.cover_state) {
+    switch (this->station->dome_manager.cover_state) {
         case CoverState::OPENING: {
-            if (this->station.dome_manager.cover_position < 400) {
-                this->station.dome_manager.cover_position += 1;
+            if (this->station->dome_manager.cover_position < 400) {
+                this->station->dome_manager.cover_position += 1;
             } else {
-                this->station.dome_manager.cover_state = CoverState::OPEN;
+                this->station->dome_manager.cover_state = CoverState::OPEN;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
             break;
         }
         case CoverState::CLOSING: {
-            if (this->station.dome_manager.cover_position > 0) {
-                this->station.dome_manager.cover_position -= 1;
+            if (this->station->dome_manager.cover_position > 0) {
+                this->station->dome_manager.cover_position -= 1;
             } else {
-                this->station.dome_manager.cover_state = CoverState::CLOSED;
+                this->station->dome_manager.cover_state = CoverState::CLOSED;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
@@ -165,12 +169,12 @@ void MainWindow::move_cover(void) {
 
 void MainWindow::request_telegram(void) {
     /* Currently a mockup */
-    this->station.dome_manager.fake_env_data();
+    this->station->dome_manager.fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {
     QString station;
-    switch (this->station.dome_manager.cover_state) {
+    switch (this->station->dome_manager.cover_state) {
         case CoverState::OPEN: {
             station = "Open";
             ui->button_cover->setText("Close");
@@ -194,7 +198,7 @@ void MainWindow::display_cover_status(void) {
             break;
         }
     }
-    ui->progress_cover->setValue(this->station.dome_manager.cover_position);
+    ui->progress_cover->setValue(this->station->dome_manager.cover_position);
     ui->label_cover_state->setText(station);
 }
 
@@ -203,11 +207,11 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->station.dome_manager.cover_state == CoverState::CLOSED) {
-        this->station.dome_manager.cover_state = CoverState::OPENING;
+    if (this->station->dome_manager.cover_state == CoverState::CLOSED) {
+        this->station->dome_manager.cover_state = CoverState::OPENING;
     }
-    if (this->station.dome_manager.cover_state == CoverState::OPEN) {
-        this->station.dome_manager.cover_state = CoverState::CLOSING;
+    if (this->station->dome_manager.cover_state == CoverState::OPEN) {
+        this->station->dome_manager.cover_state = CoverState::CLOSING;
     }
     this->display_cover_status();
     this->timer_cover->start();
@@ -233,7 +237,7 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
         this->setWindowTitle("AMOS [automatic mode]");
         this->log_debug("Switched to automatic mode");
     }
-    this->station.automatic = (bool) enable;
-    ui->group_control->setEnabled(this->station.automatic);
-    ui->button_send_heartbeat->setEnabled(this->station.automatic);
+    this->station->automatic = (bool) enable;
+    ui->group_control->setEnabled(this->station->automatic);
+    ui->button_send_heartbeat->setEnabled(this->station->automatic);
 }
