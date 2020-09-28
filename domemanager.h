@@ -6,76 +6,77 @@
 #ifndef DOMEMANAGER_H
 #define DOMEMANAGER_H
 
-enum CoverState {
-    COVER_OPEN,
-    COVER_OPENING,
-    COVER_CLOSING,
-    COVER_CLOSED,
-    COVER_SAFETY,
+enum class CoverState {
+    OPEN,
+    OPENING,
+    CLOSING,
+    CLOSED,
+    SAFETY,
 };
 
-enum HeatingState {
-    HEATING_ON,
-    HEATING_OFF,
-    HEATING_UNKNOWN,
+enum class HeatingState {
+    ON,
+    OFF,
+    UNKNOWN,
 };
 
-enum IntensifierState {
-    II_ON,
-    II_OFF,
-    II_UNKNOWN,
+enum class IntensifierState {
+    ON,
+    OFF,
+    UNKNOWN,
 };
 
 enum Command {
-    COMMAND_NOP,                       // do nothing, just for testing
-    COMMAND_COVER_OPEN,                // open the cover
-    COMMAND_COVER_CLOSE,               // close the cover
-    COMMAND_FAN_ON,                    // turn on the fan
-    COMMAND_FAN_OFF,                   // turn off the fan
-    COMMAND_II_ON,                     // turn on image intensifier
-    COMMAND_II_OFF,                    // turn off image intensifier
-    COMMAND_SW_RESET                   // perform software reset
+    NOP,                       // do nothing, just for testing
+    COVER_OPEN,                // open the cover
+    COVER_CLOSE,               // close the cover
+    FAN_ON,                    // turn on the fan
+    FAN_OFF,                   // turn off the fan
+    II_ON,                     // turn on image intensifier
+    II_OFF,                    // turn off image intensifier
+    SW_RESET                   // perform software reset
 };
 
 static QMap<Command, QChar> Commands = {
-    {COMMAND_NOP, '\x00'},
-    {COMMAND_COVER_OPEN, '\x01'},
-    {COMMAND_COVER_CLOSE, '\x02'},
-    {COMMAND_FAN_ON, '\x05'},
-    {COMMAND_FAN_OFF, '\x06'},
-    {COMMAND_II_ON, '\x07'},
-    {COMMAND_II_OFF, '\x08'},
-    {COMMAND_SW_RESET, '\x0b'}
+    {NOP, '\x00'},
+    {COVER_OPEN, '\x01'},
+    {COVER_CLOSE, '\x02'},
+    {FAN_ON, '\x05'},
+    {FAN_OFF, '\x06'},
+    {II_ON, '\x07'},
+    {II_OFF, '\x08'},
+    {SW_RESET, '\x0b'}
 };
 
 static QMap<CoverState, QString> cover_code = {
-    {CoverState::COVER_OPEN, "O"},
-    {CoverState::COVER_OPENING, ">"},
-    {CoverState::COVER_CLOSED, "C"},
-    {CoverState::COVER_CLOSING, "<"},
-    {CoverState::COVER_SAFETY, "S"},
+    {CoverState::OPEN, "O"},
+    {CoverState::OPENING, ">"},
+    {CoverState::CLOSED, "C"},
+    {CoverState::CLOSING, "<"},
+    {CoverState::SAFETY, "S"},
 };
 
 static QMap<HeatingState, QString> heating_code = {
-    {HeatingState::HEATING_OFF, "0"},
-    {HeatingState::HEATING_ON, "1"},
-    {HeatingState::HEATING_UNKNOWN, "?"},
+    {HeatingState::OFF, "0"},
+    {HeatingState::ON, "1"},
+    {HeatingState::UNKNOWN, "?"},
 };
 
 static QMap<IntensifierState, QString> intensifier_code = {
-    {IntensifierState::II_OFF, "0"},
-    {IntensifierState::II_ON, "1"},
-    {IntensifierState::II_UNKNOWN, "?"},
+    {IntensifierState::OFF, "0"},
+    {IntensifierState::ON, "1"},
+    {IntensifierState::UNKNOWN, "?"},
 };
 
 
 class DomeManager {
 private:
+    QDateTime last_received;
+    std::default_random_engine generator;
+
     const QString& get_cover_code(void) const;
     const QString& get_heating_code(void) const;
     const QString& get_intensifier_code(void) const;
-
-    std::default_random_engine generator;
 public:
     double temperature;
     double pressure;
@@ -83,14 +84,16 @@ public:
 
     unsigned int cover_position = 0;
 
-    CoverState cover_state = CoverState::COVER_CLOSED;
-    HeatingState heating_state = HeatingState::HEATING_OFF;
-    IntensifierState intensifier_state = IntensifierState::II_OFF;
+    CoverState cover_state = CoverState::CLOSED;
+    HeatingState heating_state = HeatingState::OFF;
+    IntensifierState intensifier_state = IntensifierState::OFF;
 
     DomeManager();
 
-    QDateTime last_received;
     void fake_env_data(void);
+    void fake_gizmo_data(void);
+
+    const QDateTime& get_last_received(void) const;
 
     void send_command(const Command& command) const;
     QJsonObject json(void) const;

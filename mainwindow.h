@@ -9,6 +9,7 @@
 #include <QSerialPort>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QSettings>
 
 #include "station.h"
 
@@ -26,6 +27,9 @@ public:
     ~MainWindow();
 
 private slots:
+    void load_settings(void);
+    void create_timers(void);
+
     void on_actionExit_triggered();
 
     void process_timer(void);
@@ -47,6 +51,7 @@ private slots:
     void on_button_station_accept_clicked();
 
     void log_debug(const QString& message);
+    void log_error(const QString& message);
 
     void on_checkbox_manual_stateChanged(int arg1);
 
@@ -54,6 +59,7 @@ private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     QNetworkAccessManager *network_manager;
     Ui::MainWindow *ui;
+    QSettings *settings;
 
     double sun_azimuth = 0;
     double sun_altitude = 0;
@@ -64,5 +70,7 @@ private:
 
     void display_cover_status(void);
     Station station;
+
+    QString format_message(const QString& message) const;
 };
 #endif // MAINWINDOW_H

@@ -17,6 +17,29 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
+    this->create_timers();
+
+    this->network_manager = new QNetworkAccessManager(this);
+    connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
+
+    this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
+    this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
+    this->load_settings();
+
+    this->display_cover_status();
+
+    this->ui->lineedit_IP->setText(this->ip);
+    this->ui->spinbox_port->setValue(this->port);
+    this->ui->lineedit_station_id->setText(this->station_id);
+}
+
+void MainWindow::load_settings(void) {
+    this->ip = this->settings->value("server/ip").toString();
+    this->port = this->settings->value("server/port").toInt();
+    this->station_id = this->settings->value("station/id").toString();
+}
+
+void MainWindow::create_timers(void) {
     this->request_telegram();
     this->timer_telegram = new QTimer(this);
     this->timer_telegram->setInterval(3000);
@@ -35,16 +58,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->timer_cover = new QTimer(this);
     this->timer_cover->setInterval(10);
-    connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);
-
-    this->network_manager = new QNetworkAccessManager(this);
-    connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
-
-    this->display_cover_status();
-
-    this->ui->lineedit_IP->setText(this->ip);
-    this->ui->lineedit_station_id->setText(this->station_id);
-}
+    connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);}
 
 MainWindow::~MainWindow() {
     delete ui;
@@ -59,6 +73,9 @@ void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     ui->label_heartbeat->setText(QString::asprintf("%.0f s", (double) this->timer_heartbeat->remainingTime() / 1000));
     this->display_env_data();
+
+    this->setWindowTitle(this->settings->fileName());
+    this->settings->sync();
 }
 
 void MainWindow::display_sun_properties(void) {
@@ -67,7 +84,7 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station.dome_manager.last_received.msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
+    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station.dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
     ui->label_temp->setText(QString::asprintf("%2.1f °C", this->station.dome_manager.temperature));
     ui->label_press->setText(QString::asprintf("%3.2f kPa", this->station.dome_manager.pressure / 1000));
     ui->label_hum->setText(QString::asprintf("%2.1f%%", this->station.dome_manager.humidity));
@@ -92,7 +109,7 @@ void MainWindow::send_heartbeat(void) {
 }
 
 void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
-    this->log_debug(QString::asprintf("Heartbeat could not be sent: error %d", error));
+    this->log_error(QString::asprintf("Heartbeat could not be sent: error %d", error));
 }
 
 void MainWindow::heartbeat_ok(QNetworkReply* reply) {
@@ -104,27 +121,37 @@ void MainWindow::heartbeat_response(void) {
     this->log_debug("Heartbeat response");
 }
 
+QString MainWindow::format_message(const QString& message) const {
+    return "[" + QDateTime::currentDateTimeUtc().toString(Qt::ISODate) + "] " + message;
+}
+
 void MainWindow::log_debug(const QString& message) {
-    ui->log->addItem("[" + QDateTime::currentDateTimeUtc().toString(Qt::ISODate) + "] " + message);
+    ui->log->addItem(this->format_message(message));
+}
+
+void MainWindow::log_error(const QString& message) {
+    QListWidgetItem *item = new QListWidgetItem(this->format_message(message));
+    item->setForeground(Qt::red);
+    ui->log->addItem(item);
 }
 
 void MainWindow::move_cover(void) {
     switch (this->station.dome_manager.cover_state) {
-        case COVER_OPENING: {
+        case CoverState::OPENING: {
             if (this->station.dome_manager.cover_position < 400) {
                 this->station.dome_manager.cover_position += 1;
             } else {
-                this->station.dome_manager.cover_state = COVER_OPEN;
+                this->station.dome_manager.cover_state = CoverState::OPEN;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
             break;
         }
-        case COVER_CLOSING: {
+        case CoverState::CLOSING: {
             if (this->station.dome_manager.cover_position > 0) {
                 this->station.dome_manager.cover_position -= 1;
             } else {
-                this->station.dome_manager.cover_state = COVER_CLOSED;
+                this->station.dome_manager.cover_state = CoverState::CLOSED;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
@@ -144,21 +171,21 @@ void MainWindow::request_telegram(void) {
 void MainWindow::display_cover_status(void) {
     QString station;
     switch (this->station.dome_manager.cover_state) {
-        case COVER_OPEN: {
+        case CoverState::OPEN: {
             station = "Open";
             ui->button_cover->setText("Close");
             break;
         }
-        case COVER_OPENING: {
+        case CoverState::OPENING: {
             station = "Opening...";
             break;
         }
-        case COVER_CLOSED: {
+        case CoverState::CLOSED: {
             station = "Closed";
             ui->button_cover->setText("Open");
             break;
         }
-        case COVER_CLOSING: {
+        case CoverState::CLOSING: {
             station = "Closing...";
             break;
         }
@@ -176,26 +203,37 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->station.dome_manager.cover_state == COVER_CLOSED) {
-        this->station.dome_manager.cover_state = COVER_OPENING;
+    if (this->station.dome_manager.cover_state == CoverState::CLOSED) {
+        this->station.dome_manager.cover_state = CoverState::OPENING;
     }
-    if (this->station.dome_manager.cover_state == COVER_OPEN) {
-        this->station.dome_manager.cover_state = COVER_CLOSING;
+    if (this->station.dome_manager.cover_state == CoverState::OPEN) {
+        this->station.dome_manager.cover_state = CoverState::CLOSING;
     }
     this->display_cover_status();
     this->timer_cover->start();
     ui->button_cover->setEnabled(false);
+
 }
 
 void MainWindow::on_button_station_accept_clicked() {
-    this->ip = ui->lineedit_IP->text();
     this->station_id = ui->lineedit_station_id->text();
+    this->ip = ui->lineedit_IP->text();
+    this->port = ui->spinbox_port->value();
+
+    this->settings->setValue("server/ip", this->ip);
+    this->settings->setValue("server/port", this->port);
+    this->settings->setValue("station/id", this->station_id);
 }
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
     if (enable) {
         this->setWindowTitle("AMOS [manual mode]");
+        this->log_debug("Switched to manual mode");
     } else {
         this->setWindowTitle("AMOS [automatic mode]");
+        this->log_debug("Switched to automatic mode");
     }
+    this->station.automatic = (bool) enable;
+    ui->group_control->setEnabled(this->station.automatic);
+    ui->button_send_heartbeat->setEnabled(this->station.automatic);
 }
