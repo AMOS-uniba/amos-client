@@ -82,7 +82,7 @@ void MainWindow::on_actionExit_triggered() {
 
 void MainWindow::process_timer(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    ui->label_heartbeat->setText(QString::asprintf("%.0f s", (double) this->timer_heartbeat->remainingTime() / 1000));
+    ui->label_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
     this->display_env_data();
     this->display_sun_properties();
 
@@ -91,17 +91,20 @@ void MainWindow::process_timer(void) {
 }
 
 void MainWindow::display_sun_properties(void) {
-    ui->lb_hor_altitude->setText(QString::asprintf("%.3f°", this->station->get_sun_altitude()));
-    ui->lb_hor_azimuth->setText(QString::asprintf("%.3f°", this->station->get_sun_azimuth()));
+    ui->lb_hor_altitude->setText(QString("%1°").arg(this->station->get_sun_altitude(), 3, 'f', 3));
+    ui->lb_hor_azimuth->setText(QString("%1°").arg(this->station->get_sun_azimuth(), 3, 'f', 3));
 
-    ui->lb_ecl_longitude->setText(QString::asprintf("%.3f°", Universe::compute_sun_ecl()[phi] * Deg));
+    ui->lb_eq_latitude->setText(QString("%1°").arg(Universe::compute_sun_equ()[theta] * Deg, 3, 'f', 3));
+    ui->lb_eq_longitude->setText(QString("%1°").arg(Universe::compute_sun_equ()[phi] * Deg, 3, 'f', 3));
+
+    ui->lb_ecl_longitude->setText(QString("%1°").arg(Universe::compute_sun_ecl()[phi] * Deg, 3, 'f', 3));
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString::asprintf("Environment (%.3f s)", (double) this->station->dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000));
-    ui->label_temp->setText(QString::asprintf("%2.1f °C", this->station->dome_manager.temperature));
-    ui->label_press->setText(QString::asprintf("%3.2f kPa", this->station->dome_manager.pressure / 1000));
-    ui->label_hum->setText(QString::asprintf("%2.1f%%", this->station->dome_manager.humidity));
+    ui->group_environment->setTitle(QString("Environment (%1 s)").arg((double) this->station->dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1));
+    ui->label_temp->setText(QString("%1 °C").arg(this->station->dome_manager.temperature, 3, 'f', 1));
+    ui->label_press->setText(QString("%1 kPa").arg(this->station->dome_manager.pressure / 1000, 5, 'f', 3));
+    ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager.humidity, 3, 'f', 1));
 }
 
 void MainWindow::send_heartbeat(void) {
@@ -123,7 +126,7 @@ void MainWindow::send_heartbeat(void) {
 }
 
 void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
-    this->log_error(QString::asprintf("Heartbeat could not be sent: error %d", error));
+    this->log_error(QString("Heartbeat could not be sent: error %1").arg(error));
 }
 
 void MainWindow::heartbeat_ok(QNetworkReply* reply) {

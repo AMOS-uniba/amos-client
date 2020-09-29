@@ -6,12 +6,12 @@ Station::Station() {
 }
 
 Polar Station::sun_position(const QDateTime& time) {
-    double alt, az, ra, de;
+    double alt, az;
     double mjd = Universe::mjd(time);
     double lmst = GMST(mjd) + this->longitude * Rad;
 
-    MiniSun((mjd + Universe::delta_t - MJD_J2000) / 36525.0, ra, de);
-    Equ2Hor(de, lmst - ra, this->latitude * Rad, alt, az);
+    Vec3D equatorial = Universe::compute_sun_equ(time);
+    Equ2Hor(equatorial[theta], lmst - equatorial[phi], this->latitude * Rad, alt, az);
 
     return Polar(az + pi, alt);
 }

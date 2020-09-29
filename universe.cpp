@@ -17,4 +17,7 @@ Vec3D Universe::compute_sun_ecl(const QDateTime& time) {
 }
 
 Vec3D Universe::compute_sun_equ(const QDateTime& time) {
+    double ra, dec;
+    MiniSun(Universe::julian_centuries(time), ra, dec);
+    return Vec3D(Polar(ra, dec));
 }
