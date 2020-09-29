@@ -40,8 +40,6 @@ void DomeManager::fake_gizmo_data(void) {
 QJsonObject DomeManager::json(void) const {
     QJsonObject message;
 
-    message["timestamp"] = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
-
     message["temperature"] = this->temperature;
     message["pressure"] = this->pressure;
     message["humidity"] = this->humidity;

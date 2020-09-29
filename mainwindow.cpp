@@ -34,12 +34,20 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->ui->lineedit_IP->setText(this->ip);
     this->ui->spinbox_port->setValue(this->port);
     this->ui->lineedit_station_id->setText(this->station_id);
+
+    this->ui->dsb_latitude->setValue(this->station->latitude);
+    this->ui->dsb_longitude->setValue(this->station->longitude);
+    this->ui->dsb_altitude->setValue(this->station->altitude);
 }
 
 void MainWindow::load_settings(void) {
     this->ip = this->settings->value("server/ip").toString();
     this->port = this->settings->value("server/port").toInt();
     this->station_id = this->settings->value("station/id").toString();
+
+    this->station->latitude = this->settings->value("station/latitude").toDouble();
+    this->station->longitude = this->settings->value("station/longitude").toDouble();
+    this->station->altitude = this->settings->value("station/altitude").toDouble();
 }
 
 void MainWindow::create_timers(void) {
@@ -83,8 +91,10 @@ void MainWindow::process_timer(void) {
 }
 
 void MainWindow::display_sun_properties(void) {
-    ui->label_hor_az_value->setText(QString::asprintf("%4.1f°", this->universe->get_sun_azimuth(*this->station)));
-    ui->label_hor_alt_value->setText(QString::asprintf("%4.1f°", this->universe->get_sun_altitude(*this->station)));
+    ui->lb_hor_altitude->setText(QString::asprintf("%.3f°", this->station->get_sun_altitude()));
+    ui->lb_hor_azimuth->setText(QString::asprintf("%.3f°", this->station->get_sun_azimuth()));
+
+    ui->lb_ecl_longitude->setText(QString::asprintf("%.3f°", Universe::compute_sun_ecl()[phi] * Deg));
 }
 
 void MainWindow::display_env_data(void) {
@@ -224,9 +234,16 @@ void MainWindow::on_button_station_accept_clicked() {
     this->ip = ui->lineedit_IP->text();
     this->port = ui->spinbox_port->value();
 
+    this->station->latitude = ui->dsb_latitude->value();
+    this->station->longitude = ui->dsb_longitude->value();
+    this->station->altitude = ui->dsb_altitude->value();
+
     this->settings->setValue("server/ip", this->ip);
     this->settings->setValue("server/port", this->port);
     this->settings->setValue("station/id", this->station_id);
+    this->settings->setValue("station/latitude", this->station->latitude);
+    this->settings->setValue("station/longitude", this->station->longitude);
+    this->settings->setValue("station/altitude", this->station->altitude);
 }
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1292</width>
-    <height>839</height>
+    <width>896</width>
+    <height>852</height>
    </rect>
   </property>
   <property name="font">
@@ -24,6 +24,9 @@
      <widget class="QCheckBox" name="checkbox_manual">
       <property name="text">
        <string>Enable manual control</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -116,18 +119,38 @@
          <string>Sun</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_6">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_hor_az">
+         <item row="5" column="0">
+          <widget class="QLabel" name="lb_eq_lon">
            <property name="text">
-            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth (observer)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <string>Longitude (equatorial)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_hor_az_value">
+         <item row="5" column="1">
+          <widget class="QLabel" name="lb_eq_longitude">
+           <property name="text">
+            <string>???°</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="lb_hor_altitude">
+           <property name="text">
+            <string>???°</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="lb_hor_azimuth">
            <property name="text">
             <string>???°</string>
            </property>
@@ -137,7 +160,7 @@
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_hor_alt">
+          <widget class="QLabel" name="lb_hor_alt">
            <property name="text">
             <string>Altitude (observer)</string>
            </property>
@@ -146,8 +169,18 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="label_hor_alt_value">
+         <item row="4" column="0">
+          <widget class="QLabel" name="lb_eq_lat">
+           <property name="text">
+            <string>Latitude (equatorial)</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="lb_eq_latitude">
            <property name="text">
             <string>???°</string>
            </property>
@@ -157,37 +190,27 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="label_eq_lat">
+          <widget class="QLabel" name="lb_hor_az">
            <property name="text">
-            <string>Latitude (equatorial)</string>
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth (observer)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="label_eq_lat_value">
+         <item row="6" column="0">
+          <widget class="QLabel" name="lb_ecl_lon">
            <property name="text">
-            <string>???°</string>
+            <string>Longitude (ecliptical)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_eq_lon">
-           <property name="text">
-            <string>Longitude (equatorial)</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLabel" name="label_eq_lon_value">
+         <item row="6" column="1">
+          <widget class="QLabel" name="lb_ecl_longitude">
            <property name="text">
             <string>???°</string>
            </property>
@@ -201,18 +224,17 @@
       </item>
       <item row="2" column="1">
        <widget class="QGroupBox" name="group_position">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="title">
          <string>Station information</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_id">
-           <property name="text">
-            <string>Station ID</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="4">
+         <item row="4" column="4">
           <widget class="QSpinBox" name="spinbox_port">
            <property name="minimumSize">
             <size>
@@ -237,26 +259,35 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="2">
-          <widget class="QLineEdit" name="lineedit_IP">
-           <property name="inputMask">
-            <string/>
-           </property>
-           <property name="text">
-            <string>none</string>
-           </property>
-           <property name="maxLength">
-            <number>32767</number>
-           </property>
+         <item row="1" column="2" colspan="3">
+          <widget class="QDoubleSpinBox" name="dsb_latitude">
            <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="minimum">
+            <double>-90.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>90.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.000001000000000</double>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_IP">
+          <widget class="QLabel" name="label_lat">
            <property name="text">
-            <string>Server IP address</string>
+            <string>Latitude</string>
+           </property>
+           <property name="buddy">
+            <cstring>dsb_latitude</cstring>
            </property>
           </widget>
          </item>
@@ -273,17 +304,120 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="0" colspan="5">
+         <item row="2" column="0">
+          <widget class="QLabel" name="lb_lon">
+           <property name="text">
+            <string>Longitude</string>
+           </property>
+           <property name="buddy">
+            <cstring>dsb_longitude</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="3">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>port</string>
+           </property>
+           <property name="buddy">
+            <cstring>spinbox_port</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0" colspan="5">
           <widget class="QPushButton" name="button_station_accept">
            <property name="text">
             <string>Change</string>
            </property>
           </widget>
          </item>
-         <item row="1" column="3">
-          <widget class="QLabel" name="label">
+         <item row="2" column="2" colspan="3">
+          <widget class="QDoubleSpinBox" name="dsb_longitude">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="decimals">
+            <number>6</number>
+           </property>
+           <property name="minimum">
+            <double>-180.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>180.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.000001000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QLineEdit" name="lineedit_IP">
+           <property name="inputMask">
+            <string/>
+           </property>
            <property name="text">
-            <string>port</string>
+            <string>none</string>
+           </property>
+           <property name="maxLength">
+            <number>32767</number>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_id">
+           <property name="text">
+            <string>Station ID</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineedit_station_id</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_IP">
+           <property name="text">
+            <string>Server IP address</string>
+           </property>
+           <property name="buddy">
+            <cstring>lineedit_IP</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="lb_alt">
+           <property name="text">
+            <string>Altitude</string>
+           </property>
+           <property name="buddy">
+            <cstring>dsb_altitude</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2" colspan="3">
+          <widget class="QDoubleSpinBox" name="dsb_altitude">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="decimals">
+            <number>1</number>
+           </property>
+           <property name="minimum">
+            <double>0.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>65535.000000000000000</double>
+           </property>
+           <property name="singleStep">
+            <double>0.000001000000000</double>
            </property>
           </widget>
          </item>
@@ -295,25 +429,11 @@
         <property name="title">
          <string>Environment</string>
         </property>
-        <layout class="QFormLayout" name="formLayout_2">
+        <layout class="QFormLayout" name="formLayout">
          <item row="0" column="0">
           <widget class="QLabel" name="label_t">
            <property name="text">
             <string>Temperature:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_p">
-           <property name="text">
-            <string>Pressure:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_h">
-           <property name="text">
-            <string>Humidity:</string>
            </property>
           </widget>
          </item>
@@ -327,6 +447,13 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_p">
+           <property name="text">
+            <string>Pressure:</string>
+           </property>
+          </widget>
+         </item>
          <item row="1" column="1">
           <widget class="QLabel" name="label_press">
            <property name="text">
@@ -334,6 +461,13 @@
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_h">
+           <property name="text">
+            <string>Humidity:</string>
            </property>
           </widget>
          </item>
@@ -477,7 +611,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1292</width>
+     <width>896</width>
      <height>21</height>
     </rect>
    </property>
@@ -513,6 +647,19 @@
    </property>
   </action>
  </widget>
+ <tabstops>
+  <tabstop>checkbox_manual</tabstop>
+  <tabstop>button_cover</tabstop>
+  <tabstop>lineedit_station_id</tabstop>
+  <tabstop>dsb_latitude</tabstop>
+  <tabstop>dsb_longitude</tabstop>
+  <tabstop>dsb_altitude</tabstop>
+  <tabstop>lineedit_IP</tabstop>
+  <tabstop>spinbox_port</tabstop>
+  <tabstop>button_station_accept</tabstop>
+  <tabstop>button_send_heartbeat</tabstop>
+  <tabstop>log</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

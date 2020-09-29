@@ -34,10 +34,10 @@ enum Command {
     FAN_OFF,                   // turn off the fan
     II_ON,                     // turn on image intensifier
     II_OFF,                    // turn off image intensifier
-    SW_RESET                   // perform software reset
+    SW_RESET,                  // perform software reset
 };
 
-static QMap<Command, QChar> Commands = {
+const static QMap<Command, QChar> Commands = {
     {NOP, '\x00'},
     {COVER_OPEN, '\x01'},
     {COVER_CLOSE, '\x02'},
@@ -48,7 +48,7 @@ static QMap<Command, QChar> Commands = {
     {SW_RESET, '\x0b'}
 };
 
-static QMap<CoverState, QString> cover_code = {
+const static QMap<CoverState, QString> cover_code = {
     {CoverState::OPEN, "O"},
     {CoverState::OPENING, ">"},
     {CoverState::CLOSED, "C"},
@@ -56,13 +56,13 @@ static QMap<CoverState, QString> cover_code = {
     {CoverState::SAFETY, "S"},
 };
 
-static QMap<HeatingState, QString> heating_code = {
+const static QMap<HeatingState, QString> heating_code = {
     {HeatingState::OFF, "0"},
     {HeatingState::ON, "1"},
     {HeatingState::UNKNOWN, "?"},
 };
 
-static QMap<IntensifierState, QString> intensifier_code = {
+const static QMap<IntensifierState, QString> intensifier_code = {
     {IntensifierState::OFF, "0"},
     {IntensifierState::ON, "1"},
     {IntensifierState::UNKNOWN, "?"},
