@@ -354,7 +354,7 @@
           </widget>
          </item>
          <item row="4" column="2">
-          <widget class="QLineEdit" name="lineedit_IP">
+          <widget class="QLineEdit" name="le_ip">
            <property name="inputMask">
             <string/>
            </property>
@@ -385,7 +385,7 @@
             <string>Server IP address</string>
            </property>
            <property name="buddy">
-            <cstring>lineedit_IP</cstring>
+            <cstring>le_ip</cstring>
            </property>
           </widget>
          </item>
@@ -654,7 +654,7 @@
   <tabstop>dsb_latitude</tabstop>
   <tabstop>dsb_longitude</tabstop>
   <tabstop>dsb_altitude</tabstop>
-  <tabstop>lineedit_IP</tabstop>
+  <tabstop>le_ip</tabstop>
   <tabstop>spinbox_port</tabstop>
   <tabstop>button_station_accept</tabstop>
   <tabstop>button_send_heartbeat</tabstop>

@@ -10,6 +10,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QSettings>
+#include <QMessageLogger>
 
 #include "station.h"
 #include "universe.h"
@@ -55,6 +56,7 @@ private slots:
     void log_error(const QString& message);
 
     void on_checkbox_manual_stateChanged(int arg1);
+    void station_position_edited(void);
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
@@ -70,8 +72,10 @@ private:
     QString station_id = "AGO";
 
     void display_cover_status(void);
+
     Station *station;
     Universe *universe;
+    Server *server;
 
     QString format_message(const QString& message) const;
 };

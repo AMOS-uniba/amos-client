@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->station = new Station();
     this->universe = new Universe();
 
-    this->create_timers();
 
     this->network_manager = new QNetworkAccessManager(this);
     connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
@@ -29,15 +28,22 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
+    this->server = new Server(QHostAddress(this->ip), this->port);
+
+    this->create_timers();
     this->display_cover_status();
 
-    this->ui->lineedit_IP->setText(this->ip);
+    this->ui->le_ip->setText(this->ip);
     this->ui->spinbox_port->setValue(this->port);
     this->ui->lineedit_station_id->setText(this->station_id);
 
     this->ui->dsb_latitude->setValue(this->station->latitude);
     this->ui->dsb_longitude->setValue(this->station->longitude);
     this->ui->dsb_altitude->setValue(this->station->altitude);
+
+    connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
+    connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
+    connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
 }
 
 void MainWindow::load_settings(void) {
@@ -108,21 +114,8 @@ void MainWindow::display_env_data(void) {
 }
 
 void MainWindow::send_heartbeat(void) {
-    QString address = QString("http://%1:%2/station/%3/heartbeat/").arg(this->ip).arg(this->port).arg(this->station_id);
-    this->log_debug("About to send a heartbeat to " + address);
+    this->server->send_heartbeat();
 
-    QUrl url(address);
-
-    QNetworkRequest request(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-    QJsonDocument document = QJsonDocument(this->station->prepare_heartbeat());
-    QByteArray message = document.toJson(QJsonDocument::Compact);
-
-    this->log_debug(message);
-    QNetworkReply *reply = this->network_manager->post(request, message);
-
-    connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::heartbeat_error);
 }
 
 void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
@@ -143,6 +136,7 @@ QString MainWindow::format_message(const QString& message) const {
 }
 
 void MainWindow::log_debug(const QString& message) {
+    qDebug("%s", qUtf8Printable(message));
     ui->log->addItem(this->format_message(message));
 }
 
@@ -234,7 +228,7 @@ void MainWindow::on_button_cover_clicked() {
 
 void MainWindow::on_button_station_accept_clicked() {
     this->station_id = ui->lineedit_station_id->text();
-    this->ip = ui->lineedit_IP->text();
+    this->ip = ui->le_ip->text();
     this->port = ui->spinbox_port->value();
 
     this->station->latitude = ui->dsb_latitude->value();
@@ -247,6 +241,8 @@ void MainWindow::on_button_station_accept_clicked() {
     this->settings->setValue("station/latitude", this->station->latitude);
     this->settings->setValue("station/longitude", this->station->longitude);
     this->settings->setValue("station/altitude", this->station->altitude);
+
+    this->ui->button_station_accept->setText("No changes");
 }
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
@@ -260,4 +256,18 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
     this->station->automatic = (bool) enable;
     ui->group_control->setEnabled(this->station->automatic);
     ui->button_send_heartbeat->setEnabled(this->station->automatic);
+}
+
+void MainWindow::station_position_edited(void) {
+    this->log_debug(QString("%1 %2 %3").arg(this->station->latitude, 8, 'f', 8).arg(this->station->longitude, 8, 'f', 8).arg(this->station->altitude, 8, 'f', 8));
+    if (
+        (ui->dsb_latitude->value() != this->station->latitude) ||
+        (ui->dsb_longitude->value() != this->station->longitude) ||
+        (ui->dsb_altitude->value() != this->station->altitude) ||
+        (ui->le_ip->text() != this->server->ip)
+    ) {
+        ui->button_station_accept->setText("Apply changes");
+    } else {
+        ui->button_station_accept->setText("No changes");
+    }
 }
