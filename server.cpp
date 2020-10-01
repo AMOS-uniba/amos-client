@@ -1,5 +1,4 @@
-#include "server.h"
-#include "mainwindow.h"
+#include "include.h"
 
 Server::Server(MainWindow* _main_window, const QHostAddress& _address, const unsigned short _port, const QString& _station_id):
     main_window(_main_window) {

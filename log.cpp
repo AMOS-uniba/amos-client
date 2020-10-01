@@ -1,7 +1,7 @@
-#include "log.h"
+#include "include.h"
 
-Log::Log(QObject *parent, const QString& filename, QListWidget *_display):
-    QObject(parent), display(_display) {
+Log::Log(QObject *parent, const QString& filename):
+    QObject(parent) {
 
     if (!filename.isEmpty()) {
         this->file = new QFile();
@@ -24,8 +24,12 @@ QMap<Level, QString> Log::Levels = {
     { Level::Critical, "CRI" },
 };
 
+void Log::set_display_widget(QListWidget* widget) {
+    this->display = widget;
+}
+
 QString Log::format(Level level, const QString& message) const {
-    return QString("[%1 %2] %3").arg(QDateTime::currentDateTimeUtc().toString()).arg(Log::Levels.find(level).value()).arg(message);
+    return QString("[%1 %2] %3").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(Log::Levels.find(level).value()).arg(message);
 }
 
 void Log::write_to_file(Level level, const QString& message) const {
@@ -35,6 +39,11 @@ void Log::write_to_file(Level level, const QString& message) const {
 
     if (this->file != nullptr) {
         out << full;
+        out.flush();
+    }
+
+    if (this->display != nullptr) {
+        this->display->addItem(message);
     }
 }
 

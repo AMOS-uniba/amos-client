@@ -37,42 +37,16 @@ enum Command {
     SW_RESET,                  // perform software reset
 };
 
-const static QMap<Command, QChar> Commands = {
-    {NOP, '\x00'},
-    {COVER_OPEN, '\x01'},
-    {COVER_CLOSE, '\x02'},
-    {FAN_ON, '\x05'},
-    {FAN_OFF, '\x06'},
-    {II_ON, '\x07'},
-    {II_OFF, '\x08'},
-    {SW_RESET, '\x0b'}
-};
-
-const static QMap<CoverState, QString> cover_code = {
-    {CoverState::OPEN, "O"},
-    {CoverState::OPENING, ">"},
-    {CoverState::CLOSED, "C"},
-    {CoverState::CLOSING, "<"},
-    {CoverState::SAFETY, "S"},
-};
-
-const static QMap<HeatingState, QString> heating_code = {
-    {HeatingState::OFF, "0"},
-    {HeatingState::ON, "1"},
-    {HeatingState::UNKNOWN, "?"},
-};
-
-const static QMap<IntensifierState, QString> intensifier_code = {
-    {IntensifierState::OFF, "0"},
-    {IntensifierState::ON, "1"},
-    {IntensifierState::UNKNOWN, "?"},
-};
-
 
 class DomeManager {
 private:
     QDateTime last_received;
     std::default_random_engine generator;
+
+    const static QMap<Command, QChar> Commands;
+    const static QMap<CoverState, QString> CoverCode;
+    const static QMap<HeatingState, QString> HeatingCode;
+    const static QMap<IntensifierState, QString> IntensifierCode;
 
     const QString& get_cover_code(void) const;
     const QString& get_heating_code(void) const;

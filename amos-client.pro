@@ -49,6 +49,7 @@ HEADERS += \
     APC/APC_VecMat3D.h \
     domemanager.h \
     forward.h \
+    include.h \
     log.h \
     mainwindow.h \
     server.h \

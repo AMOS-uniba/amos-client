@@ -21,16 +21,18 @@ enum class Level {
 class Log: public QObject {
     Q_OBJECT
 private:
-    QFile *file;
-    QListWidget *display;
+    QFile *file = nullptr;
+    QListWidget *display = nullptr;
 
     static QMap<Level, QString> Levels;
 
     QString format(Level level, const QString& message) const;
 
 public:
-    explicit Log(QObject *parent, const QString& filename, QListWidget *display = nullptr);
+    explicit Log(QObject *parent, const QString& filename);
     ~Log(void);
+
+    void set_display_widget(QListWidget* widget);
 
     void debug(const QString& message) const;
     void info(const QString& message) const;

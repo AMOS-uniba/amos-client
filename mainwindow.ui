@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>896</width>
-    <height>852</height>
+    <width>1169</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="font">
@@ -113,7 +113,125 @@
     </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout_5">
-      <item row="1" column="1">
+      <item row="1" column="0">
+       <widget class="QGroupBox" name="group_control">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="title">
+         <string>Control</string>
+        </property>
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="2" column="0">
+          <widget class="QGroupBox" name="group_cover">
+           <property name="title">
+            <string>Cover</string>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QPushButton" name="button_cover">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>50</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>undefined</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_cover_state">
+              <property name="minimumSize">
+               <size>
+                <width>60</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>60</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>undefined</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QProgressBar" name="progress_cover">
+              <property name="maximum">
+               <number>400</number>
+              </property>
+              <property name="value">
+               <number>0</number>
+              </property>
+              <property name="format">
+               <string>%v/%m</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QGroupBox" name="group_devices">
+           <property name="title">
+            <string>Devices</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout_7">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_fan_text">
+              <property name="text">
+               <string>Fan:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="label_fan_2">
+              <property name="text">
+               <string>? %</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_ii_text">
+              <property name="text">
+               <string>Image intensifier:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="label_ii">
+              <property name="text">
+               <string>? %</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item row="1" column="2">
        <widget class="QGroupBox" name="group_sun">
         <property name="title">
          <string>Sun</string>
@@ -222,7 +340,7 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="2" column="2">
        <widget class="QGroupBox" name="group_position">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -263,7 +381,7 @@
           </widget>
          </item>
          <item row="0" column="2" colspan="3">
-          <widget class="QLineEdit" name="lineedit_station_id">
+          <widget class="QLineEdit" name="le_station_id">
            <property name="text">
             <string>none</string>
            </property>
@@ -362,7 +480,7 @@
             <string>Station ID</string>
            </property>
            <property name="buddy">
-            <cstring>lineedit_station_id</cstring>
+            <cstring>le_station_id</cstring>
            </property>
           </widget>
          </item>
@@ -505,120 +623,14 @@
         </layout>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QGroupBox" name="group_control">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
+      <item row="2" column="1">
+       <widget class="QGroupBox" name="group_scheduled">
         <property name="title">
-         <string>Control</string>
+         <string>Scheduled events</string>
         </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="2" column="0">
-          <widget class="QGroupBox" name="group_cover">
-           <property name="title">
-            <string>Cover</string>
-           </property>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <widget class="QPushButton" name="button_cover">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_cover_state">
-              <property name="minimumSize">
-               <size>
-                <width>60</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>60</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QProgressBar" name="progress_cover">
-              <property name="maximum">
-               <number>400</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-              <property name="format">
-               <string>%v/%m</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QGroupBox" name="group_devices">
-           <property name="title">
-            <string>Devices</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_7">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_fan_text">
-              <property name="text">
-               <string>Fan:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_fan_2">
-              <property name="text">
-               <string>? %</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_ii_text">
-              <property name="text">
-               <string>Image intensifier:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="label_ii">
-              <property name="text">
-               <string>? %</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QTableWidget" name="tableWidget"/>
          </item>
         </layout>
        </widget>
@@ -632,7 +644,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>896</width>
+     <width>1169</width>
      <height>21</height>
     </rect>
    </property>
@@ -671,7 +683,7 @@
  <tabstops>
   <tabstop>checkbox_manual</tabstop>
   <tabstop>button_cover</tabstop>
-  <tabstop>lineedit_station_id</tabstop>
+  <tabstop>le_station_id</tabstop>
   <tabstop>le_ip</tabstop>
   <tabstop>sb_port</tabstop>
   <tabstop>button_station_accept</tabstop>

@@ -1,5 +1,4 @@
-#include "station.h"
-#include "universe.h"
+#include "include.h"
 
 Station::Station(const QString& _id) {
     this->id = _id;
@@ -22,7 +21,7 @@ double Station::get_sun_altitude(void) {
 }
 
 double Station::get_sun_azimuth(void) {
-    this->sun_azimuth = fmod(this->sun_position().phi * Deg, 360.0);
+    this->sun_azimuth = fmod(this->sun_position().phi * Deg + 360.0, 360.0);
     return this->sun_azimuth;
 }
 

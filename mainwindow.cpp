@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "include.h"
 #include "ui_mainwindow.h"
 
 #include <random>
@@ -14,8 +14,10 @@
 #include <QMessageLogger>
 
 
+extern Log logger;
+
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
 
     this->universe = new Universe();
 
@@ -30,11 +32,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->ui->le_ip->setText(this->server->get_address().toString());
     this->ui->sb_port->setValue(this->server->get_port());
-    this->ui->lineedit_station_id->setText(this->station->id);
+    this->ui->le_station_id->setText(this->station->id);
 
     this->ui->dsb_latitude->setValue(this->station->latitude);
     this->ui->dsb_longitude->setValue(this->station->longitude);
     this->ui->dsb_altitude->setValue(this->station->altitude);
+
+    logger.set_display_widget(this->ui->log);
+
+    logger.info("Initialization complete");
 
     connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
@@ -79,8 +85,13 @@ void MainWindow::create_timers(void) {
     connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);}
 
 MainWindow::~MainWindow() {
-    delete ui;
-    delete timer_operation;
+    delete this->ui;
+    delete this->timer_operation;
+    delete this->timer_cover;
+    delete this->timer_heartbeat;
+    delete this->timer_telegram;
+    delete this->universe;
+    delete this->station;
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -93,8 +104,7 @@ void MainWindow::process_timer(void) {
     this->display_env_data();
     this->display_sun_properties();
 
-    this->setWindowTitle(this->settings->fileName());
-    this->settings->sync();
+    this->settings->sync();     // THIS IS INEFFICIENT!
 }
 
 void MainWindow::display_sun_properties(void) {
@@ -210,11 +220,10 @@ void MainWindow::on_button_cover_clicked() {
     this->display_cover_status();
     this->timer_cover->start();
     ui->button_cover->setEnabled(false);
-
 }
 
 void MainWindow::on_button_station_accept_clicked() {
-    this->station->id = ui->lineedit_station_id->text();
+    this->station->id = ui->le_station_id->text();
     QString address = ui->le_ip->text();
     unsigned short port = ui->sb_port->value();
 
@@ -248,9 +257,10 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
 }
 
 void MainWindow::station_position_edited(void) {
-    this->log_debug(QString("%1 %2 %3").arg(this->station->latitude, 8, 'f', 8).arg(this->station->longitude, 8, 'f', 8).arg(this->station->altitude, 8, 'f', 8));
+//    this->log_debug(QString("%1 %2 %3").arg(this->station->latitude, 8, 'f', 8).arg(this->station->longitude, 8, 'f', 8).arg(this->station->altitude, 8, 'f', 8));
 
     this->button_station_toggle(
+        (ui->le_station_id->text() != this->station->id) ||
         (ui->dsb_latitude->value() != this->station->latitude) ||
         (ui->dsb_longitude->value() != this->station->longitude) ||
         (ui->dsb_altitude->value() != this->station->altitude) ||
