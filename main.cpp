@@ -2,12 +2,11 @@
 
 #include <QApplication>
 
-MainWindow* main;
+MainWindow* main_window;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     MainWindow w;
-    main = &w;
     w.show();
     return a.exec();
 }

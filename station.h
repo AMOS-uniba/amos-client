@@ -21,8 +21,9 @@ public:
     double latitude;
     double longitude;
     double altitude;
+    QString id;
 
-    Station();
+    Station(const QString& _id);
 
     bool automatic = false;
 

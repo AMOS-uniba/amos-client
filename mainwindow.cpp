@@ -17,25 +17,20 @@
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
-    this->station = new Station();
     this->universe = new Universe();
 
-
-    this->network_manager = new QNetworkAccessManager(this);
-    connect(this->network_manager, &QNetworkAccessManager::finished, this, &MainWindow::heartbeat_ok);
 
     this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
-    this->server = new Server(QHostAddress(this->ip), this->port);
 
     this->create_timers();
     this->display_cover_status();
 
-    this->ui->le_ip->setText(this->ip);
-    this->ui->spinbox_port->setValue(this->port);
-    this->ui->lineedit_station_id->setText(this->station_id);
+    this->ui->le_ip->setText(this->server->get_address().toString());
+    this->ui->sb_port->setValue(this->server->get_port());
+    this->ui->lineedit_station_id->setText(this->station->id);
 
     this->ui->dsb_latitude->setValue(this->station->latitude);
     this->ui->dsb_longitude->setValue(this->station->longitude);
@@ -44,12 +39,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_position_edited);
+    connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_position_edited);
+    connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_position_edited);
 }
 
 void MainWindow::load_settings(void) {
-    this->ip = this->settings->value("server/ip").toString();
-    this->port = this->settings->value("server/port").toInt();
-    this->station_id = this->settings->value("station/id").toString();
+    QString ip = this->settings->value("server/ip").toString();
+    unsigned short port = this->settings->value("server/port").toInt();
+    QString station_id = this->settings->value("station/id").toString();
+
+    this->server = new Server(this, QHostAddress(ip), port, station_id);
+
+    this->station = new Station(station_id);
 
     this->station->latitude = this->settings->value("station/latitude").toDouble();
     this->station->longitude = this->settings->value("station/longitude").toDouble();
@@ -99,11 +100,11 @@ void MainWindow::process_timer(void) {
 void MainWindow::display_sun_properties(void) {
     ui->lb_hor_altitude->setText(QString("%1°").arg(this->station->get_sun_altitude(), 3, 'f', 3));
     ui->lb_hor_azimuth->setText(QString("%1°").arg(this->station->get_sun_azimuth(), 3, 'f', 3));
-
-    ui->lb_eq_latitude->setText(QString("%1°").arg(Universe::compute_sun_equ()[theta] * Deg, 3, 'f', 3));
-    ui->lb_eq_longitude->setText(QString("%1°").arg(Universe::compute_sun_equ()[phi] * Deg, 3, 'f', 3));
-
-    ui->lb_ecl_longitude->setText(QString("%1°").arg(Universe::compute_sun_ecl()[phi] * Deg, 3, 'f', 3));
+    auto equ = Universe::compute_sun_equ();
+    ui->lb_eq_latitude->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
+    ui->lb_eq_longitude->setText(QString("%1°").arg(equ[phi] * Deg, 3, 'f', 3));
+    auto ecl = Universe::compute_sun_ecl();
+    ui->lb_ecl_longitude->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
 }
 
 void MainWindow::display_env_data(void) {
@@ -114,25 +115,11 @@ void MainWindow::display_env_data(void) {
 }
 
 void MainWindow::send_heartbeat(void) {
-    this->server->send_heartbeat();
-
-}
-
-void MainWindow::heartbeat_error(QNetworkReply::NetworkError error) {
-    this->log_error(QString("Heartbeat could not be sent: error %1").arg(error));
-}
-
-void MainWindow::heartbeat_ok(QNetworkReply* reply) {
-    log_debug("Heartbeat received (HTTP code " + reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString() + "), response: \"" + reply->readAll() + "\"");
-    reply->deleteLater();
-}
-
-void MainWindow::heartbeat_response(void) {
-    this->log_debug("Heartbeat response");
+    this->server->send_heartbeat(this->station->prepare_heartbeat());
 }
 
 QString MainWindow::format_message(const QString& message) const {
-    return "[" + QDateTime::currentDateTimeUtc().toString(Qt::ISODate) + "] " + message;
+    return QString("[%1] %2)").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(message);
 }
 
 void MainWindow::log_debug(const QString& message) {
@@ -227,22 +214,24 @@ void MainWindow::on_button_cover_clicked() {
 }
 
 void MainWindow::on_button_station_accept_clicked() {
-    this->station_id = ui->lineedit_station_id->text();
-    this->ip = ui->le_ip->text();
-    this->port = ui->spinbox_port->value();
+    this->station->id = ui->lineedit_station_id->text();
+    QString address = ui->le_ip->text();
+    unsigned short port = ui->sb_port->value();
+
+    this->server->set_url(QHostAddress(address), port, this->station->id);
 
     this->station->latitude = ui->dsb_latitude->value();
     this->station->longitude = ui->dsb_longitude->value();
     this->station->altitude = ui->dsb_altitude->value();
 
-    this->settings->setValue("server/ip", this->ip);
-    this->settings->setValue("server/port", this->port);
-    this->settings->setValue("station/id", this->station_id);
+    this->settings->setValue("server/ip", this->server->get_address().toString());
+    this->settings->setValue("server/port", this->server->get_port());
+    this->settings->setValue("station/id", this->station->id);
     this->settings->setValue("station/latitude", this->station->latitude);
     this->settings->setValue("station/longitude", this->station->longitude);
     this->settings->setValue("station/altitude", this->station->altitude);
 
-    this->ui->button_station_accept->setText("No changes");
+    this->button_station_toggle(false);
 }
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
@@ -260,14 +249,22 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
 
 void MainWindow::station_position_edited(void) {
     this->log_debug(QString("%1 %2 %3").arg(this->station->latitude, 8, 'f', 8).arg(this->station->longitude, 8, 'f', 8).arg(this->station->altitude, 8, 'f', 8));
-    if (
+
+    this->button_station_toggle(
         (ui->dsb_latitude->value() != this->station->latitude) ||
         (ui->dsb_longitude->value() != this->station->longitude) ||
         (ui->dsb_altitude->value() != this->station->altitude) ||
-        (ui->le_ip->text() != this->server->ip)
-    ) {
-        ui->button_station_accept->setText("Apply changes");
+        (ui->le_ip->text() != this->server->get_address().toString()) ||
+        (ui->sb_port->value() != this->server->get_port())
+    );
+}
+
+void MainWindow::button_station_toggle(bool enable) {
+    if (enable) {
+        this->ui->button_station_accept->setText("Apply changes");
+        this->ui->button_station_accept->setEnabled(true);
     } else {
-        ui->button_station_accept->setText("No changes");
+        this->ui->button_station_accept->setText("No changes");
+        this->ui->button_station_accept->setEnabled(false);
     }
 }

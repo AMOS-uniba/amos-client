@@ -1,8 +1,8 @@
 #include "station.h"
 #include "universe.h"
 
-Station::Station() {
-
+Station::Station(const QString& _id) {
+    this->id = _id;
 }
 
 Polar Station::sun_position(const QDateTime& time) {

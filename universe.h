@@ -1,8 +1,9 @@
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
 
-#include "station.h"
+#include <QDateTime>
 
+#include "forward.h"
 #include "APC\APC_include.h"
 
 class Universe {
