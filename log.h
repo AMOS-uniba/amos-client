@@ -14,9 +14,8 @@ enum class Level {
     Info,
     Warning,
     Error,
-    Critical,
+    Fatal,
 };
-
 
 class Log: public QObject {
     Q_OBJECT
@@ -25,6 +24,7 @@ private:
     QListWidget *display = nullptr;
 
     static QMap<Level, QString> Levels;
+    static QMap<Level, Qt::GlobalColor> Colours;
 
     QString format(Level level, const QString& message) const;
 
@@ -36,8 +36,11 @@ public:
 
     void debug(const QString& message) const;
     void info(const QString& message) const;
+    void warning(const QString& message) const;
+    void error(const QString& message) const;
+    void fatal(const QString& message) const;
 
-    void write_to_file(Level level, const QString& message) const;
+    void write(Level level, const QString& message) const;
 };
 
 #endif // LOG_H

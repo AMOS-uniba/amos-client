@@ -40,6 +40,9 @@ private slots:
 
     void display_sun_properties(void);
     void display_env_data(void);
+
+    void display_cover_status(void);
+    void display_gizmo_status(void);
     void send_heartbeat(void);
 
     void on_button_send_heartbeat_pressed();
@@ -54,6 +57,10 @@ private slots:
 
     void button_station_toggle(bool enable);
 
+    void on_bt_fan_clicked();
+    void on_bt_intensifier_clicked();
+
+
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     Ui::MainWindow *ui;
@@ -61,8 +68,6 @@ private:
 
     double sun_azimuth = 0;
     double sun_altitude = 0;
-
-    void display_cover_status(void);
 
     Station *station;
     Universe *universe;

@@ -1,51 +1,87 @@
-#include "domemanager.h"
+#include "include.h"
+
+extern Log logger;
 
 DomeManager::DomeManager() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
 }
 
-const QMap<Command, QChar> DomeManager::Commands = {
-    {NOP, '\x00'},
-    {COVER_OPEN, '\x01'},
-    {COVER_CLOSE, '\x02'},
-    {FAN_ON, '\x05'},
-    {FAN_OFF, '\x06'},
-    {II_ON, '\x07'},
-    {II_OFF, '\x08'},
-    {SW_RESET, '\x0b'}
+const QMap<Command, char> DomeManager::CommandCode = {
+    {Command::NOP, '\x00'},
+    {Command::COVER_OPEN, '\x01'},
+    {Command::COVER_CLOSE, '\x02'},
+    {Command::FAN_ON, '\x05'},
+    {Command::FAN_OFF, '\x06'},
+    {Command::II_ON, '\x07'},
+    {Command::II_OFF, '\x08'},
+    {Command::SW_RESET, '\x0b'}
 };
 
-const QMap<CoverState, QString> DomeManager::CoverCode = {
-    {CoverState::OPEN, "O"},
-    {CoverState::OPENING, ">"},
-    {CoverState::CLOSED, "C"},
-    {CoverState::CLOSING, "<"},
-    {CoverState::SAFETY, "S"},
+const QMap<Command, QString> DomeManager::CommandName = {
+    {Command::NOP, "no operation"},
+    {Command::COVER_OPEN, "open cover"},
+    {Command::COVER_CLOSE, "close cover"},
+    {Command::FAN_ON, "turn on fan"},
+    {Command::FAN_OFF, "turn off fan"},
+    {Command::II_ON, "turn on image intensifier"},
+    {Command::II_OFF, "turn off image intensifier"},
+    {Command::SW_RESET, "software reset"}
 };
 
-const QMap<HeatingState, QString> DomeManager::HeatingCode = {
-    {HeatingState::OFF, "0"},
-    {HeatingState::ON, "1"},
-    {HeatingState::UNKNOWN, "?"},
+const QMap<CoverState, char> DomeManager::CoverCode = {
+    {CoverState::OPEN, 'O'},
+    {CoverState::OPENING, '>'},
+    {CoverState::CLOSED, 'C'},
+    {CoverState::CLOSING, '<'},
+    {CoverState::SAFETY, 'S'},
 };
 
-const QMap<IntensifierState, QString> DomeManager::IntensifierCode = {
-    {IntensifierState::OFF, "0"},
-    {IntensifierState::ON, "1"},
-    {IntensifierState::UNKNOWN, "?"},
+const QMap<TernaryState, char> DomeManager::TernaryCode = {
+    {TernaryState::OFF, '0'},
+    {TernaryState::ON, '1'},
+    {TernaryState::UNKNOWN, '?'},
 };
 
+const QMap<TernaryState, QString> DomeManager::TernaryName = {
+    {TernaryState::OFF, "off"},
+    {TernaryState::ON, "on"},
+    {TernaryState::UNKNOWN, "unknown"},
+};
 
-const QString& DomeManager::get_cover_code(void) const {
-    return CoverCode.find(this->cover_state).value();
+char DomeManager::cover_code(void) const {
+    return DomeManager::CoverCode.find(this->cover_state).value();
 }
 
-const QString& DomeManager::get_heating_code(void) const {
-    return HeatingCode.find(this->heating_state).value();
+char DomeManager::ternary_code(TernaryState state) const {
+    return DomeManager::TernaryCode.find(state).value();
 }
 
-const QString& DomeManager::get_intensifier_code(void) const {
-    return IntensifierCode.find(this->intensifier_state).value();
+char DomeManager::heating_code(void) const {
+    return DomeManager::ternary_code(this->heating_state);
+}
+
+char DomeManager::fan_code(void) const {
+    return DomeManager::ternary_code(this->fan_state);
+}
+
+char DomeManager::intensifier_code(void) const {
+    return DomeManager::ternary_code(this->intensifier_state);
+}
+
+char DomeManager::command_code(Command command) const {
+    return DomeManager::CommandCode.find(command).value();
+}
+
+const QString& DomeManager::command_name(Command command) const {
+    return DomeManager::CommandName.find(command).value();
+}
+
+const QString& DomeManager::ternary_name(TernaryState state) const {
+    return DomeManager::TernaryName.find(state).value();
+}
+
+const QString& DomeManager::fan_state_name(void) const {
+    return this->ternary_name(this->fan_state);
 }
 
 const QDateTime& DomeManager::get_last_received(void) const {
@@ -65,8 +101,8 @@ void DomeManager::fake_env_data(void) {
 }
 
 void DomeManager::fake_gizmo_data(void) {
-    this->heating_state = HeatingState::UNKNOWN;
-    this->intensifier_state = IntensifierState::UNKNOWN;
+    this->heating_state = TernaryState::UNKNOWN;
+    this->intensifier_state = TernaryState::UNKNOWN;
 }
 
 QJsonObject DomeManager::json(void) const {
@@ -77,12 +113,15 @@ QJsonObject DomeManager::json(void) const {
     message["humidity"] = this->humidity;
     message["cover_position"] = (double) this->cover_position;
 
-    message["heating"] = this->get_heating_code();
-    message["intensifier"] = this->get_intensifier_code();
+    message["heating"] = this->heating_code();
+    message["intensifier"] = this->intensifier_code();
+    message["fan"] = this->fan_code();
 
     return message;
 }
 
 void DomeManager::send_command(const Command& command) const {
+    QString message = QString("C%1").arg(DomeManager::command_code(command));
+    logger.info(QString("{MOCKUP} Sending a manual command %1").arg(DomeManager::command_name(command)));
     return;
 }

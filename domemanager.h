@@ -14,19 +14,13 @@ enum class CoverState {
     SAFETY,
 };
 
-enum class HeatingState {
+enum class TernaryState {
     ON,
     OFF,
     UNKNOWN,
 };
 
-enum class IntensifierState {
-    ON,
-    OFF,
-    UNKNOWN,
-};
-
-enum Command {
+enum class Command {
     NOP,                       // do nothing, just for testing
     COVER_OPEN,                // open the cover
     COVER_CLOSE,               // close the cover
@@ -43,14 +37,22 @@ private:
     QDateTime last_received;
     std::default_random_engine generator;
 
-    const static QMap<Command, QChar> Commands;
-    const static QMap<CoverState, QString> CoverCode;
-    const static QMap<HeatingState, QString> HeatingCode;
-    const static QMap<IntensifierState, QString> IntensifierCode;
+    const static QMap<Command, char> CommandCode;
+    const static QMap<Command, QString> CommandName;
+    const static QMap<CoverState, char> CoverCode;
+    const static QMap<TernaryState, char> TernaryCode;
+    const static QMap<TernaryState, QString> TernaryName;
 
-    const QString& get_cover_code(void) const;
-    const QString& get_heating_code(void) const;
-    const QString& get_intensifier_code(void) const;
+    char cover_code(void) const;
+    char ternary_code(TernaryState state) const;
+    char fan_code(void) const;
+    char heating_code(void) const;
+    char intensifier_code(void) const;
+
+    char command_code(Command command) const;
+    const QString& command_name(Command command) const;
+    const QString& ternary_name(TernaryState state) const;
+
 public:
     double temperature;
     double pressure;
@@ -59,8 +61,9 @@ public:
     unsigned int cover_position = 0;
 
     CoverState cover_state = CoverState::CLOSED;
-    HeatingState heating_state = HeatingState::OFF;
-    IntensifierState intensifier_state = IntensifierState::OFF;
+    TernaryState heating_state = TernaryState::UNKNOWN;
+    TernaryState intensifier_state = TernaryState::UNKNOWN;
+    TernaryState fan_state = TernaryState::UNKNOWN;
 
     DomeManager();
 
@@ -68,8 +71,10 @@ public:
     void fake_gizmo_data(void);
 
     const QDateTime& get_last_received(void) const;
+    const QString& fan_state_name(void) const;
 
     void send_command(const Command& command) const;
+
     QJsonObject json(void) const;
 };
 

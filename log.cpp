@@ -21,7 +21,15 @@ QMap<Level, QString> Log::Levels = {
     { Level::Info, "INF" },
     { Level::Warning, "WAR" },
     { Level::Error, "ERR" },
-    { Level::Critical, "CRI" },
+    { Level::Fatal, "FTL" },
+};
+
+QMap<Level, Qt::GlobalColor> Log::Colours = {
+    { Level::Debug, Qt::gray },
+    { Level::Info, Qt::black },
+    { Level::Warning, Qt::yellow },
+    { Level::Error, Qt::red },
+    { Level::Fatal, Qt::darkRed },
 };
 
 void Log::set_display_widget(QListWidget* widget) {
@@ -29,24 +37,41 @@ void Log::set_display_widget(QListWidget* widget) {
 }
 
 QString Log::format(Level level, const QString& message) const {
-    return QString("[%1 %2] %3").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(Log::Levels.find(level).value()).arg(message);
+    return QString("%1 [%2] %3").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(Log::Levels.find(level).value()).arg(message);
 }
 
-void Log::write_to_file(Level level, const QString& message) const {
+void Log::write(Level level, const QString& message) const {
     QString full = this->format(level, message);
     QTextStream out(this->file);
     out.setCodec("UTF-8");
 
     if (this->file != nullptr) {
-        out << full;
-        out.flush();
+        out << full << Qt::endl;
     }
 
     if (this->display != nullptr) {
-        this->display->addItem(message);
+        QListWidgetItem *item = new QListWidgetItem(full);
+        item->setForeground(Log::Colours.find(level).value());
+        this->display->addItem(item);
     }
 }
 
+void Log::debug(const QString& message) const {
+    this->write(Level::Debug, message);
+}
+
 void Log::info(const QString& message) const {
-    this->write_to_file(Level::Info, message);
+    this->write(Level::Info, message);
+}
+
+void Log::warning(const QString& message) const {
+    this->write(Level::Warning, message);
+}
+
+void Log::error(const QString& message) const {
+    this->write(Level::Error, message);
+}
+
+void Log::fatal(const QString& message) const {
+    this->write(Level::Fatal, message);
 }

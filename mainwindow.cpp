@@ -1,5 +1,6 @@
-#include "include.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "include.h"
 
 #include <random>
 #include <chrono>
@@ -129,12 +130,12 @@ void MainWindow::send_heartbeat(void) {
 }
 
 QString MainWindow::format_message(const QString& message) const {
-    return QString("[%1] %2)").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(message);
+    return QString("[%1] %2").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(message);
 }
 
 void MainWindow::log_debug(const QString& message) {
     qDebug("%s", qUtf8Printable(message));
-    ui->log->addItem(this->format_message(message));
+    logger.debug(message);
 }
 
 void MainWindow::log_error(const QString& message) {
@@ -177,33 +178,37 @@ void MainWindow::request_telegram(void) {
 }
 
 void MainWindow::display_cover_status(void) {
-    QString station;
+    QString caption;
     switch (this->station->dome_manager.cover_state) {
         case CoverState::OPEN: {
-            station = "Open";
+            caption = "Open";
             ui->button_cover->setText("Close");
             break;
         }
         case CoverState::OPENING: {
-            station = "Opening...";
+            caption = "Opening...";
             break;
         }
         case CoverState::CLOSED: {
-            station = "Closed";
+            caption = "Closed";
             ui->button_cover->setText("Open");
             break;
         }
         case CoverState::CLOSING: {
-            station = "Closing...";
+            caption = "Closing...";
             break;
         }
         default: {
-            station = "undefined";
+            caption = "undefined";
             break;
         }
     }
     ui->progress_cover->setValue(this->station->dome_manager.cover_position);
-    ui->label_cover_state->setText(station);
+    ui->label_cover_state->setText(caption);
+}
+
+void MainWindow::display_gizmo_status(void) {
+    this->ui->lb_fan->setText(this->station->dome_manager.fan_state_name());
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -246,10 +251,10 @@ void MainWindow::on_button_station_accept_clicked() {
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
     if (enable) {
         this->setWindowTitle("AMOS [manual mode]");
-        this->log_debug("Switched to manual mode");
+        logger.warning("Switched to manual mode");
     } else {
         this->setWindowTitle("AMOS [automatic mode]");
-        this->log_debug("Switched to automatic mode");
+        logger.warning("Switched to automatic mode");
     }
     this->station->automatic = (bool) enable;
     ui->group_control->setEnabled(this->station->automatic);
@@ -276,5 +281,37 @@ void MainWindow::button_station_toggle(bool enable) {
     } else {
         this->ui->button_station_accept->setText("No changes");
         this->ui->button_station_accept->setEnabled(false);
+    }
+}
+
+void MainWindow::on_bt_fan_clicked() {
+    switch (this->station->dome_manager.fan_state) {
+        case TernaryState::OFF:
+        case TernaryState::UNKNOWN: {
+            this->station->dome_manager.send_command(Command::FAN_ON);
+            this->station->dome_manager.fan_state = TernaryState::ON;   // MOCKUP
+            break;
+        }
+        case TernaryState::ON: {
+            this->station->dome_manager.send_command(Command::FAN_OFF);
+            this->station->dome_manager.fan_state = TernaryState::OFF;  // MOCKUP
+            break;
+        }
+    }
+}
+
+void MainWindow::on_bt_intensifier_clicked() {
+    switch (this->station->dome_manager.intensifier_state) {
+        case TernaryState::OFF:
+        case TernaryState::UNKNOWN: {
+            this->station->dome_manager.send_command(Command::II_ON);
+            this->station->dome_manager.intensifier_state = TernaryState::ON;   // MOCKUP
+            break;
+        }
+        case TernaryState::ON: {
+            this->station->dome_manager.send_command(Command::II_OFF);
+            this->station->dome_manager.intensifier_state = TernaryState::OFF;   // MOCKUP
+            break;
+        }
     }
 }
