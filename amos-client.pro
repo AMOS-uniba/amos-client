@@ -30,6 +30,7 @@ SOURCES += \
     mainwindow.cpp \
     server.cpp \
     station.cpp \
+    storage.cpp \
     universe.cpp
 
 HEADERS += \
@@ -54,6 +55,7 @@ HEADERS += \
     mainwindow.h \
     server.h \
     station.h \
+    storage.h \
     universe.h
 
 FORMS += \

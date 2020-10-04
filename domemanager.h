@@ -12,6 +12,7 @@ enum class CoverState {
     CLOSING,
     CLOSED,
     SAFETY,
+    UNKNOWN,
 };
 
 enum class TernaryState {
@@ -32,16 +33,25 @@ enum class Command {
 };
 
 
+struct State {
+    char code;
+    QString display_name;
+};
+
+struct CommandInfo {
+    char code;
+    QString display_name;
+};
+
+
 class DomeManager {
 private:
     QDateTime last_received;
     std::default_random_engine generator;
 
-    const static QMap<Command, char> CommandCode;
-    const static QMap<Command, QString> CommandName;
-    const static QMap<CoverState, char> CoverCode;
-    const static QMap<TernaryState, char> TernaryCode;
-    const static QMap<TernaryState, QString> TernaryName;
+    const static QMap<CoverState, State> Cover;
+    const static QMap<TernaryState, State> Ternary;
+    const static QMap<Command, CommandInfo> Commands;
 
     char cover_code(void) const;
     char ternary_code(TernaryState state) const;
@@ -50,8 +60,8 @@ private:
     char intensifier_code(void) const;
 
     char command_code(Command command) const;
-    const QString& command_name(Command command) const;
-    const QString& ternary_name(TernaryState state) const;
+    QString command_name(Command command) const;
+    QString ternary_name(TernaryState state) const;
 
 public:
     double temperature;
@@ -71,7 +81,8 @@ public:
     void fake_gizmo_data(void);
 
     const QDateTime& get_last_received(void) const;
-    const QString& fan_state_name(void) const;
+    QString fan_state_name(void) const;
+    QString intensifier_state_name(void) const;
 
     void send_command(const Command& command) const;
 

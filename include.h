@@ -3,6 +3,7 @@
 
 #include "mainwindow.h"
 #include "server.h"
+#include "storage.h"
 #include "universe.h"
 #include "log.h"
 #include "domemanager.h"

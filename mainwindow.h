@@ -9,6 +9,8 @@
 #include <QSerialPort>
 #include <QSettings>
 #include <QMessageLogger>
+#include <QFileDialog>
+#include <QLineEdit>
 
 #include "universe.h"
 #include "server.h"
@@ -50,7 +52,7 @@ private slots:
     void on_button_cover_clicked();
     void move_cover(void);
 
-    void on_button_station_accept_clicked();
+    void on_bt_station_apply_clicked();
 
     void on_checkbox_manual_stateChanged(int arg1);
     void station_position_edited(void);
@@ -60,6 +62,13 @@ private slots:
     void on_bt_fan_clicked();
     void on_bt_intensifier_clicked();
 
+
+    void on_bt_station_reset_clicked();
+
+    void set_storage(Storage& storage, QLineEdit& edit, const QString title);
+
+    void on_bt_primary_clicked();
+    void on_bt_permanent_clicked();
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
