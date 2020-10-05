@@ -35,16 +35,14 @@ Storage& Station::get_permanent_storage(void) {
 }
 
 QJsonObject Station::prepare_heartbeat(void) const {
-    QJsonObject json {
-        {"automatic", this->automatic},
-        {"timestamp", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
+     return QJsonObject {
+        {"auto", this->automatic},
+        {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->dome_manager.json()},
 
         {"disk", QJsonObject {
-            {"primary", this->primary_storage->json()},
-            {"permanent", this->permanent_storage->json()},
+            {"prim", this->primary_storage->json()},
+            {"perm", this->permanent_storage->json()},
         }}
     };
-
-    return QJsonObject(json);
 }

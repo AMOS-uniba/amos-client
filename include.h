@@ -5,6 +5,7 @@
 #include "server.h"
 #include "storage.h"
 #include "universe.h"
+#include "station.h"
 #include "log.h"
 #include "domemanager.h"
 

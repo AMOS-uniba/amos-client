@@ -11,10 +11,9 @@
 #include <QMessageLogger>
 #include <QFileDialog>
 #include <QLineEdit>
+#include <QProgressBar>
 
-#include "universe.h"
-#include "server.h"
-#include "station.h"
+#include "forward.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -24,12 +23,8 @@ QT_END_NAMESPACE
 class MainWindow: public QMainWindow {
     Q_OBJECT
 public:
-    bool manual = false;
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-    void log_debug(const QString& message);
-    void log_error(const QString& message);
 
 private slots:
     void load_settings(void);
@@ -45,6 +40,10 @@ private slots:
 
     void display_cover_status(void);
     void display_gizmo_status(void);
+    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
+    void display_storage_status(void);
+    void display_station_config(void);
+
     void send_heartbeat(void);
 
     void on_button_send_heartbeat_pressed();
@@ -65,10 +64,11 @@ private slots:
 
     void on_bt_station_reset_clicked();
 
-    void set_storage(Storage& storage, QLineEdit& edit, const QString title);
+    void set_storage(Storage& storage, QLineEdit& edit);
 
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
+
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
@@ -81,7 +81,5 @@ private:
     Station *station;
     Universe *universe;
     Server *server;
-
-    QString format_message(const QString& message) const;
 };
 #endif // MAINWINDOW_H

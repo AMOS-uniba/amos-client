@@ -13,7 +13,8 @@ enum class CoverState {
     CLOSED,
     SAFETY,
     UNKNOWN,
-};
+};                              // we might split OPENING and CLOSING to include
+                                // the information if it is before or after SAFETY
 
 enum class TernaryState {
     ON,
@@ -22,16 +23,15 @@ enum class TernaryState {
 };
 
 enum class Command {
-    NOP,                       // do nothing, just for testing
-    COVER_OPEN,                // open the cover
-    COVER_CLOSE,               // close the cover
-    FAN_ON,                    // turn on the fan
-    FAN_OFF,                   // turn off the fan
-    II_ON,                     // turn on image intensifier
-    II_OFF,                    // turn off image intensifier
-    SW_RESET,                  // perform software reset
+    NOP,                        // do nothing, just for testing
+    COVER_OPEN,                 // open the cover
+    COVER_CLOSE,                // close the cover
+    FAN_ON,                     // turn on the fan
+    FAN_OFF,                    // turn off the fan
+    II_ON,                      // turn on image intensifier
+    II_OFF,                     // turn off image intensifier
+    SW_RESET,                   // perform software reset
 };
-
 
 struct State {
     char code;
@@ -48,22 +48,14 @@ class DomeManager {
 private:
     QDateTime last_received;
     std::default_random_engine generator;
+public:
 
+    /* maps for storing states and their associated information
+        (code, verbose name, further properties may be added as needed) */
     const static QMap<CoverState, State> Cover;
     const static QMap<TernaryState, State> Ternary;
     const static QMap<Command, CommandInfo> Commands;
 
-    char cover_code(void) const;
-    char ternary_code(TernaryState state) const;
-    char fan_code(void) const;
-    char heating_code(void) const;
-    char intensifier_code(void) const;
-
-    char command_code(Command command) const;
-    QString command_name(Command command) const;
-    QString ternary_name(TernaryState state) const;
-
-public:
     double temperature;
     double pressure;
     double humidity;
@@ -79,10 +71,7 @@ public:
 
     void fake_env_data(void);
     void fake_gizmo_data(void);
-
     const QDateTime& get_last_received(void) const;
-    QString fan_state_name(void) const;
-    QString intensifier_state_name(void) const;
 
     void send_command(const Command& command) const;
 

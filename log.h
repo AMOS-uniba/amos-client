@@ -1,5 +1,6 @@
 #include <QObject>
 #include <QListWidget>
+#include <QTableWidget>
 #include <QFile>
 #include <QTextStream>
 #include <QDateTime>
@@ -17,22 +18,27 @@ enum class Level {
     Fatal,
 };
 
+struct LevelInfo {
+    QString code;
+    QString name;
+    Qt::GlobalColor colour;
+};
+
 class Log: public QObject {
     Q_OBJECT
 private:
     QFile *file = nullptr;
-    QListWidget *display = nullptr;
+    QTableWidget *display = nullptr;
 
-    static QMap<Level, QString> Levels;
-    static QMap<Level, Qt::GlobalColor> Colours;
+    const static QMap<Level, LevelInfo> Levels;
 
-    QString format(Level level, const QString& message) const;
+    QString format(const QDateTime& timestamp, Level level, const QString& message) const;
 
 public:
     explicit Log(QObject *parent, const QString& filename);
     ~Log(void);
 
-    void set_display_widget(QListWidget* widget);
+    void set_display_widget(QTableWidget* widget);
 
     void debug(const QString& message) const;
     void info(const QString& message) const;

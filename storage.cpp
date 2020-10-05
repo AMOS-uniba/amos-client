@@ -8,11 +8,12 @@ QStorageInfo Storage::info(void) const {
     return QStorageInfo(this->directory);
 }
 
+// return JSON info for heartbeat composition
 QJsonObject Storage::json(void) const {
     QStorageInfo storage_info = this->info();
     return QJsonObject {
-        {"available", (double) storage_info.bytesAvailable() / (1024 * 1024 * 1024)},
-        {"total", (double) storage_info.bytesTotal() / (1024 * 1024 * 1024)},
+        {"a", (double) storage_info.bytesAvailable() / (1024 * 1024 * 1024)},
+        {"t", (double) storage_info.bytesTotal() / (1024 * 1024 * 1024)},
     };
 }
 
@@ -23,4 +24,8 @@ const QDir& Storage::get_directory(void) const {
 void Storage::set_directory(const QDir& dir) {
     logger.info(QString("Storage '%1' set to %2").arg(this->name).arg(dir.path()));
     this->directory = dir;
+}
+
+const QString& Storage::get_name(void) const {
+    return this->name;
 }

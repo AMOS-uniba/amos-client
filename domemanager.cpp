@@ -32,30 +32,6 @@ const QMap<TernaryState, State> DomeManager::Ternary = {
     {TernaryState::UNKNOWN, {'?', "unknown"}},
 };
 
-char DomeManager::ternary_code(TernaryState state) const {
-    return DomeManager::Ternary[state].code;
-}
-
-char DomeManager::heating_code(void) const {
-    return DomeManager::ternary_code(this->heating_state);
-}
-
-char DomeManager::fan_code(void) const {
-    return DomeManager::Ternary[this->fan_state].code;
-}
-
-char DomeManager::intensifier_code(void) const {
-    return DomeManager::ternary_code(this->intensifier_state);
-}
-
-QString DomeManager::fan_state_name(void) const {
-    return DomeManager::Ternary[this->fan_state].display_name;
-}
-
-QString DomeManager::intensifier_state_name(void) const {
-    return DomeManager::Ternary[this->intensifier_state].display_name;
-}
-
 const QDateTime& DomeManager::get_last_received(void) const {
     return this->last_received;
 }
@@ -78,22 +54,22 @@ void DomeManager::fake_gizmo_data(void) {
 }
 
 QJsonObject DomeManager::json(void) const {
-    QJsonObject message;
-
-    message["temperature"] = this->temperature;
-    message["pressure"] = this->pressure;
-    message["humidity"] = this->humidity;
-    message["cover_position"] = (double) this->cover_position;
-
-    message["heating"] = QString(QChar(this->heating_code()));
-    message["intensifier"] = QString(QChar(this->intensifier_code()));
-    message["fan"] = QString(QChar(this->fan_code()));
-
-    return message;
+    return QJsonObject {
+        {"env", QJsonObject {
+            {"t", this->temperature},
+            {"p", this->pressure},
+            {"h", this->humidity},
+        }},
+        {"cs", DomeManager::Cover[this->cover_state].code},
+        {"cp", (int) this->cover_position},
+        {"heat", QString(QChar(Ternary[this->heating_state].code))},
+        {"ii", QString(QChar(Ternary[this->intensifier_state].code))},
+        {"fan", QString(QChar(Ternary[this->fan_state].code))},
+    };
 }
 
 void DomeManager::send_command(const Command& command) const {
     QString message = QString("C%1").arg(DomeManager::Commands[command].code);
-    logger.info(QString("{MOCKUP} Sending a manual command %1").arg(DomeManager::Commands[command].display_name));
+    logger.info(QString("{MOCKUP} Sending a manual command '%1'").arg(DomeManager::Commands[command].display_name));
     return;
 }

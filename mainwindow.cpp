@@ -22,6 +22,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->universe = new Universe();
 
+    this->ui->tb_log->setColumnWidth(0, 140);
+    this->ui->tb_log->setColumnWidth(1, 80);
 
     this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
@@ -31,16 +33,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->create_timers();
     this->display_cover_status();
     this->display_gizmo_status();
+    this->display_station_config();
+    this->display_storage_status();
 
-    this->ui->le_ip->setText(this->server->get_address().toString());
-    this->ui->sb_port->setValue(this->server->get_port());
-    this->ui->le_station_id->setText(this->station->id);
-
-    this->ui->dsb_latitude->setValue(this->station->latitude);
-    this->ui->dsb_longitude->setValue(this->station->longitude);
-    this->ui->dsb_altitude->setValue(this->station->altitude);
-
-    logger.set_display_widget(this->ui->log);
+    logger.set_display_widget(this->ui->tb_log);
     logger.info("Client initialized");
 
     // connect signals for handling of edits of station position
@@ -60,7 +56,11 @@ void MainWindow::load_settings(void) {
 
     this->server = new Server(this, QHostAddress(ip), port, station_id);
 
-    this->station = new Station(station_id, QDir("C:/"), QDir("D:/"));
+    this->station = new Station(
+        station_id,
+        QDir(this->settings->value("storage/primary").toString()),
+        QDir(this->settings->value("storage/permanent").toString())
+    );
 
     this->station->latitude = this->settings->value("station/latitude").toDouble();
     this->station->longitude = this->settings->value("station/longitude").toDouble();
@@ -96,6 +96,7 @@ MainWindow::~MainWindow() {
     delete this->timer_telegram;
     delete this->universe;
     delete this->station;
+    delete this->server;
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -131,31 +132,30 @@ void MainWindow::display_env_data(void) {
     ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager.humidity, 3, 'f', 1));
 }
 
+void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
+    QStorageInfo info = storage.info();
+    pb->setMaximum((int) ((double) info.bytesTotal() / (1024 * 1024 * 1024)));
+    pb->setValue((int) ((double) info.bytesAvailable() / (1024 * 1024 * 1024)));
+    le->setText(storage.get_directory().path());
+}
+
+void MainWindow::display_storage_status(void) {
+    this->display_storage_status(this->station->get_primary_storage(), this->ui->pb_primary, this->ui->le_primary);
+    this->display_storage_status(this->station->get_permanent_storage(), this->ui->pb_permanent, this->ui->le_permanent);
+}
+
+void MainWindow::display_station_config(void) {
+    this->ui->le_ip->setText(this->server->get_address().toString());
+    this->ui->sb_port->setValue(this->server->get_port());
+    this->ui->le_station_id->setText(this->station->id);
+
+    this->ui->dsb_latitude->setValue(this->station->latitude);
+    this->ui->dsb_longitude->setValue(this->station->longitude);
+    this->ui->dsb_altitude->setValue(this->station->altitude);
+}
+
 void MainWindow::send_heartbeat(void) {
-    QStorageInfo primary = this->station->get_primary_storage().info();
-    this->ui->pb_primary->setValue((int) ((double) primary.bytesAvailable() / (1024 * 1024 * 1024)));
-    this->ui->pb_primary->setMaximum((int) ((double) primary.bytesTotal() / (1024 * 1024 * 1024)));
-
-    QStorageInfo permanent = this->station->get_permanent_storage().info();
-    this->ui->pb_permanent->setValue((int) ((double) permanent.bytesAvailable() / (1024 * 1024 * 1024)));
-    this->ui->pb_permanent->setMaximum((int) ((double) permanent.bytesTotal() / (1024 * 1024 * 1024)));
-
     this->server->send_heartbeat(this->station->prepare_heartbeat());
-}
-
-QString MainWindow::format_message(const QString& message) const {
-    return QString("[%1] %2").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(message);
-}
-
-void MainWindow::log_debug(const QString& message) {
-    qDebug("%s", qUtf8Printable(message));
-    logger.debug(message);
-}
-
-void MainWindow::log_error(const QString& message) {
-    QListWidgetItem *item = new QListWidgetItem(this->format_message(message));
-    item->setForeground(Qt::red);
-    ui->log->addItem(item);
 }
 
 void MainWindow::move_cover(void) {
@@ -222,10 +222,10 @@ void MainWindow::display_cover_status(void) {
 }
 
 void MainWindow::display_gizmo_status(void) {
-    this->ui->lb_fan->setText(this->station->dome_manager.fan_state_name());
+    this->ui->lb_fan->setText(DomeManager::Ternary[this->station->dome_manager.fan_state].display_name);
     this->ui->bt_fan->setText(this->station->dome_manager.fan_state == TernaryState::ON ? "disable" : "enable");
 
-    this->ui->lb_intensifier->setText(this->station->dome_manager.intensifier_state_name());
+    this->ui->lb_intensifier->setText(DomeManager::Ternary[this->station->dome_manager.intensifier_state].display_name);
     this->ui->bt_intensifier->setText(this->station->dome_manager.intensifier_state == TernaryState::ON ? "disable" : "enable");
 }
 
@@ -235,9 +235,11 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 
 void MainWindow::on_button_cover_clicked() {
     if (this->station->dome_manager.cover_state == CoverState::CLOSED) {
+        this->station->dome_manager.send_command(Command::COVER_OPEN);
         this->station->dome_manager.cover_state = CoverState::OPENING;
     }
     if (this->station->dome_manager.cover_state == CoverState::OPEN) {
+        this->station->dome_manager.send_command(Command::COVER_CLOSE);
         this->station->dome_manager.cover_state = CoverState::CLOSING;
     }
     this->display_cover_status();
@@ -275,7 +277,6 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_longitude->setValue(this->station->longitude);
     this->ui->dsb_altitude->setValue(this->station->altitude);
 }
-
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
     if (enable) {
@@ -347,17 +348,29 @@ void MainWindow::on_bt_intensifier_clicked() {
     this->display_gizmo_status();
 }
 
-void MainWindow::set_storage(Storage& storage, QLineEdit& edit, const QString title) {
-    QDir old = storage.get_directory();
-    QString new_dir = QFileDialog::getExistingDirectory(this, title, old.path(), QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    storage.set_directory(new_dir);
-    edit.setText(new_dir);
+void MainWindow::set_storage(Storage& storage, QLineEdit& edit) {
+    QString new_dir = QFileDialog::getExistingDirectory(
+        this,
+        QString("Select %1 storage directory").arg(storage.get_name()),
+        storage.get_directory().path(),
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+
+    if (new_dir == "") {
+        logger.debug("Directory selection aborted");
+        return;
+    } else {
+        storage.set_directory(new_dir);
+        edit.setText(new_dir);
+        this->display_storage_status();
+        this->settings->setValue(QString("storage/%1").arg(storage.get_name()), new_dir);
+    }
 }
 
 void MainWindow::on_bt_primary_clicked() {
-    this->set_storage(this->station->get_primary_storage(), *this->ui->le_primary, "Primary data storage");
+    this->set_storage(this->station->get_primary_storage(), *this->ui->le_primary);
 }
 
 void MainWindow::on_bt_permanent_clicked() {
-    this->set_storage(this->station->get_permanent_storage(), *this->ui->le_permanent, "Permanent data storage");
+    this->set_storage(this->station->get_permanent_storage(), *this->ui->le_permanent);
 }

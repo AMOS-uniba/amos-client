@@ -16,32 +16,25 @@ Log::~Log(void) {
     }
 }
 
-QMap<Level, QString> Log::Levels = {
-    { Level::Debug, "DBG" },
-    { Level::Info, "INF" },
-    { Level::Warning, "WAR" },
-    { Level::Error, "ERR" },
-    { Level::Fatal, "FTL" },
+const QMap<Level, LevelInfo> Log::Levels = {
+    { Level::Debug, {"DBG", "debug", Qt::gray}},
+    { Level::Info, {"INF", "info", Qt::black}},
+    { Level::Warning, {"WAR", "warning", Qt::darkYellow}},
+    { Level::Error, {"ERR", "error", Qt::red}},
+    { Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
 };
 
-QMap<Level, Qt::GlobalColor> Log::Colours = {
-    { Level::Debug, Qt::gray },
-    { Level::Info, Qt::black },
-    { Level::Warning, Qt::yellow },
-    { Level::Error, Qt::red },
-    { Level::Fatal, Qt::darkRed },
-};
-
-void Log::set_display_widget(QListWidget* widget) {
+void Log::set_display_widget(QTableWidget* widget) {
     this->display = widget;
 }
 
-QString Log::format(Level level, const QString& message) const {
-    return QString("%1 [%2] %3").arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)).arg(Log::Levels.find(level).value()).arg(message);
+QString Log::format(const QDateTime& timestamp, Level level, const QString& message) const {
+    return QString("%1 [%2] %3").arg(timestamp.toString(Qt::ISODate)).arg(Log::Levels[level].code).arg(message);
 }
 
 void Log::write(Level level, const QString& message) const {
-    QString full = this->format(level, message);
+    QDateTime now = QDateTime::currentDateTimeUtc();
+    QString full = this->format(now, level, message);
     QTextStream out(this->file);
     out.setCodec("UTF-8");
 
@@ -50,9 +43,20 @@ void Log::write(Level level, const QString& message) const {
     }
 
     if (this->display != nullptr) {
-        QListWidgetItem *item = new QListWidgetItem(full);
-        item->setForeground(Log::Colours.find(level).value());
-        this->display->addItem(item);
+        this->display->insertRow(this->display->rowCount());
+
+        QTableWidgetItem *timestamp = new QTableWidgetItem(now.toString("yyyy-MM-dd hh:mm:ss.zzz"));
+        timestamp->setTextAlignment(Qt::AlignCenter);
+        this->display->setItem(this->display->rowCount() - 1, 0, timestamp);
+
+        QTableWidgetItem *level_ = new QTableWidgetItem(Log::Levels[level].name);
+        level_->setForeground(Log::Levels[level].colour);
+        level_->setTextAlignment(Qt::AlignCenter);
+        this->display->setItem(this->display->rowCount() - 1, 1, level_);
+
+        QTableWidgetItem *text = new QTableWidgetItem(message);
+        text->setForeground(Log::Levels[level].colour);
+        this->display->setItem(this->display->rowCount() - 1, 2, text);
     }
 }
 
