@@ -25,6 +25,7 @@ SOURCES += \
     APC/APC_Time.cpp \
     APC/APC_VecMat3D.cpp \
     domemanager.cpp \
+    exception.cpp \
     log.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -50,6 +51,7 @@ HEADERS += \
     APC/APC_Time.h \
     APC/APC_VecMat3D.h \
     domemanager.h \
+    exception.h \
     forward.h \
     include.h \
     log.h \

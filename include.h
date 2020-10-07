@@ -9,6 +9,8 @@
 #include "log.h"
 #include "domemanager.h"
 #include "telegram.h"
+#include "exception.h"
+
 
 #include <stdexcept>
 

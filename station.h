@@ -5,8 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QStorageInfo>
 
-#include "domemanager.h"
-#include "server.h"
+#include "forward.h"
 #include "APC/APC_include.h"
 
 #ifndef STATION_H
@@ -32,6 +31,7 @@ public:
     QString id;
 
     Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
+    ~Station(void);
 
     bool automatic = false;
 
@@ -39,7 +39,7 @@ public:
     double get_sun_altitude(void);
     double get_sun_azimuth(void);
 
-    DomeManager dome_manager;
+    DomeManager* dome_manager;
     QVector<Server> servers;
 
     QJsonObject prepare_heartbeat(void) const;

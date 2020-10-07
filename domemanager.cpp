@@ -4,6 +4,7 @@ extern Log logger;
 
 DomeManager::DomeManager() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+    this->address = 0x55;
 }
 
 const QMap<Command, CommandInfo> DomeManager::Commands = {
@@ -69,7 +70,10 @@ QJsonObject DomeManager::json(void) const {
 }
 
 void DomeManager::send_command(const Command& command) const {
-    QString message = QString("C%1").arg(DomeManager::Commands[command].code);
+    QByteArray message = QByteArray("C_");
+    message[1] = Commands[command].code;
     logger.info(QString("{MOCKUP} Sending a manual command '%1'").arg(DomeManager::Commands[command].display_name));
+
+    Telegram telegram(this->address, message);
     return;
 }

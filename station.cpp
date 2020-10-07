@@ -5,6 +5,12 @@ Station::Station(const QString& _id, const QDir& primary_storage_dir, const QDir
 
     this->primary_storage = new Storage("primary", primary_storage_dir);
     this->permanent_storage = new Storage("permanent", permanent_storage_dir);
+
+    this->dome_manager = new DomeManager();
+}
+
+Station::~Station(void) {
+    delete this->dome_manager;
 }
 
 Polar Station::sun_position(const QDateTime& time) {
@@ -38,7 +44,7 @@ QJsonObject Station::prepare_heartbeat(void) const {
      return QJsonObject {
         {"auto", this->automatic},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
-        {"dome", this->dome_manager.json()},
+        {"dome", this->dome_manager->json()},
 
         {"disk", QJsonObject {
             {"prim", this->primary_storage->json()},

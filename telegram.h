@@ -1,4 +1,4 @@
-#include "include.h"
+#include "forward.h"
 
 #ifndef TELEGRAM_H
 #define TELEGRAM_H
@@ -6,9 +6,9 @@
 
 class Telegram {
 private:
-    constexpr static unsigned char START_BYTE_SLAVE = 0x5a;
+    constexpr static unsigned char START_BYTE_SLAVE = 0x5A;
     constexpr static unsigned char START_BYTE_MASTER = 0x55;
-    constexpr static unsigned char END_BYTE = 0x78;
+    constexpr static unsigned char END_BYTE = 0x0D;
     constexpr static unsigned char MAX_LENGTH = 100;
 
     unsigned char address;

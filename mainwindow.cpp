@@ -126,10 +126,10 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString("Environment (%1 s)").arg((double) this->station->dome_manager.get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1));
-    ui->label_temp->setText(QString("%1 °C").arg(this->station->dome_manager.temperature, 3, 'f', 1));
-    ui->label_press->setText(QString("%1 kPa").arg(this->station->dome_manager.pressure / 1000, 5, 'f', 3));
-    ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager.humidity, 3, 'f', 1));
+    ui->group_environment->setTitle(QString("Environment (%1 s)").arg((double) this->station->dome_manager->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1));
+    ui->label_temp->setText(QString("%1 °C").arg(this->station->dome_manager->temperature, 3, 'f', 1));
+    ui->label_press->setText(QString("%1 kPa").arg(this->station->dome_manager->pressure / 1000, 5, 'f', 3));
+    ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager->humidity, 3, 'f', 1));
 }
 
 void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
@@ -159,22 +159,22 @@ void MainWindow::send_heartbeat(void) {
 }
 
 void MainWindow::move_cover(void) {
-    switch (this->station->dome_manager.cover_state) {
+    switch (this->station->dome_manager->cover_state) {
         case CoverState::OPENING: {
-            if (this->station->dome_manager.cover_position < 400) {
-                this->station->dome_manager.cover_position += 1;
+            if (this->station->dome_manager->cover_position < 400) {
+                this->station->dome_manager->cover_position += 1;
             } else {
-                this->station->dome_manager.cover_state = CoverState::OPEN;
+                this->station->dome_manager->cover_state = CoverState::OPEN;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
             break;
         }
         case CoverState::CLOSING: {
-            if (this->station->dome_manager.cover_position > 0) {
-                this->station->dome_manager.cover_position -= 1;
+            if (this->station->dome_manager->cover_position > 0) {
+                this->station->dome_manager->cover_position -= 1;
             } else {
-                this->station->dome_manager.cover_state = CoverState::CLOSED;
+                this->station->dome_manager->cover_state = CoverState::CLOSED;
                 ui->button_cover->setEnabled(true);
                 this->timer_cover->stop();
             }
@@ -188,12 +188,12 @@ void MainWindow::move_cover(void) {
 
 void MainWindow::request_telegram(void) {
     /* Currently a mockup */
-    this->station->dome_manager.fake_env_data();
+    this->station->dome_manager->fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {
     QString caption;
-    switch (this->station->dome_manager.cover_state) {
+    switch (this->station->dome_manager->cover_state) {
         case CoverState::OPEN: {
             caption = "Open";
             ui->button_cover->setText("Close");
@@ -217,16 +217,16 @@ void MainWindow::display_cover_status(void) {
             break;
         }
     }
-    ui->progress_cover->setValue(this->station->dome_manager.cover_position);
+    ui->progress_cover->setValue(this->station->dome_manager->cover_position);
     ui->label_cover_state->setText(caption);
 }
 
 void MainWindow::display_gizmo_status(void) {
-    this->ui->lb_fan->setText(DomeManager::Ternary[this->station->dome_manager.fan_state].display_name);
-    this->ui->bt_fan->setText(this->station->dome_manager.fan_state == TernaryState::ON ? "disable" : "enable");
+    this->ui->lb_fan->setText(DomeManager::Ternary[this->station->dome_manager->fan_state].display_name);
+    this->ui->bt_fan->setText(this->station->dome_manager->fan_state == TernaryState::ON ? "disable" : "enable");
 
-    this->ui->lb_intensifier->setText(DomeManager::Ternary[this->station->dome_manager.intensifier_state].display_name);
-    this->ui->bt_intensifier->setText(this->station->dome_manager.intensifier_state == TernaryState::ON ? "disable" : "enable");
+    this->ui->lb_intensifier->setText(DomeManager::Ternary[this->station->dome_manager->intensifier_state].display_name);
+    this->ui->bt_intensifier->setText(this->station->dome_manager->intensifier_state == TernaryState::ON ? "disable" : "enable");
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -234,13 +234,13 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->station->dome_manager.cover_state == CoverState::CLOSED) {
-        this->station->dome_manager.send_command(Command::COVER_OPEN);
-        this->station->dome_manager.cover_state = CoverState::OPENING;
+    if (this->station->dome_manager->cover_state == CoverState::CLOSED) {
+        this->station->dome_manager->send_command(Command::COVER_OPEN);
+        this->station->dome_manager->cover_state = CoverState::OPENING;
     }
-    if (this->station->dome_manager.cover_state == CoverState::OPEN) {
-        this->station->dome_manager.send_command(Command::COVER_CLOSE);
-        this->station->dome_manager.cover_state = CoverState::CLOSING;
+    if (this->station->dome_manager->cover_state == CoverState::OPEN) {
+        this->station->dome_manager->send_command(Command::COVER_CLOSE);
+        this->station->dome_manager->cover_state = CoverState::CLOSING;
     }
     this->display_cover_status();
     this->timer_cover->start();
@@ -315,16 +315,16 @@ void MainWindow::button_station_toggle(bool enable) {
 }
 
 void MainWindow::on_bt_fan_clicked() {
-    switch (this->station->dome_manager.fan_state) {
+    switch (this->station->dome_manager->fan_state) {
         case TernaryState::OFF:
         case TernaryState::UNKNOWN: {
-            this->station->dome_manager.send_command(Command::FAN_ON);
-            this->station->dome_manager.fan_state = TernaryState::ON;   // MOCKUP
+            this->station->dome_manager->send_command(Command::FAN_ON);
+            this->station->dome_manager->fan_state = TernaryState::ON;   // MOCKUP
             break;
         }
         case TernaryState::ON: {
-            this->station->dome_manager.send_command(Command::FAN_OFF);
-            this->station->dome_manager.fan_state = TernaryState::OFF;  // MOCKUP
+            this->station->dome_manager->send_command(Command::FAN_OFF);
+            this->station->dome_manager->fan_state = TernaryState::OFF;  // MOCKUP
             break;
         }
     }
@@ -332,16 +332,16 @@ void MainWindow::on_bt_fan_clicked() {
 }
 
 void MainWindow::on_bt_intensifier_clicked() {
-    switch (this->station->dome_manager.intensifier_state) {
+    switch (this->station->dome_manager->intensifier_state) {
         case TernaryState::OFF:
         case TernaryState::UNKNOWN: {
-            this->station->dome_manager.send_command(Command::II_ON);
-            this->station->dome_manager.intensifier_state = TernaryState::ON;   // MOCKUP
+            this->station->dome_manager->send_command(Command::II_ON);
+            this->station->dome_manager->intensifier_state = TernaryState::ON;   // MOCKUP
             break;
         }
         case TernaryState::ON: {
-            this->station->dome_manager.send_command(Command::II_OFF);
-            this->station->dome_manager.intensifier_state = TernaryState::OFF;   // MOCKUP
+            this->station->dome_manager->send_command(Command::II_OFF);
+            this->station->dome_manager->intensifier_state = TernaryState::OFF;   // MOCKUP
             break;
         }
     }

@@ -46,6 +46,7 @@ struct CommandInfo {
 
 class DomeManager {
 private:
+    unsigned char address;
     QDateTime last_received;
     std::default_random_engine generator;
 public:

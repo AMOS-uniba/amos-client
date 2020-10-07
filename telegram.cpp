@@ -1,4 +1,4 @@
-#include "telegram.h"
+#include "include.h"
 
 extern Log logger;
 
@@ -10,7 +10,7 @@ Telegram::Telegram(const unsigned char address, const QByteArray& message) {
 Telegram::Telegram(const QByteArray& received) {
     unsigned char length = received.length();
     if (length < 8) {
-        throw std::runtime_error("Telegram is too short");
+        throw std::runtime_error("Telegram \"\" is too short");
     }
     if (length > Telegram::MAX_LENGTH) {
         throw std::runtime_error("Telegram is too long");
@@ -20,8 +20,8 @@ Telegram::Telegram(const QByteArray& received) {
 
     unsigned char payload_length = Telegram::extract_length(received);
     if (length != payload_length * 2 + 8) {
-        throw std::runtime_error(QString("Real length %1 bytes does not match announced payload \
-            length %2 characters (total %3 bytes)").arg(length).arg(payload_length).arg(payload_length * 2 + 8).toStdString());
+        throw RuntimeException(QString("Real length %1 bytes does not match announced payload \
+            length %2 characters (total %3 bytes)").arg(length).arg(payload_length).arg(payload_length * 2 + 8));
     }
     logger.debug(QString("Lengths match (%1)").arg(length));
 
@@ -32,7 +32,7 @@ Telegram::Telegram(const QByteArray& received) {
 
     unsigned char received_crc = Telegram::decode_byte(received[length - 3], received[length - 2]);
     if (crc != received_crc) {
-        throw std::runtime_error(QString("CRCs do not match (computed %1, received %2)").arg(crc).arg(received_crc).toStdString());
+        throw RuntimeException(QString("CRCs do not match (computed %1, received %2)").arg(crc).arg(received_crc));
     }
     logger.debug(QString("CRC is OK (%1)").arg(crc));
 
