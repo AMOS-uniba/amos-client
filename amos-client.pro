@@ -31,6 +31,7 @@ SOURCES += \
     server.cpp \
     station.cpp \
     storage.cpp \
+    telegram.cpp \
     universe.cpp
 
 HEADERS += \
@@ -56,6 +57,7 @@ HEADERS += \
     server.h \
     station.h \
     storage.h \
+    telegram.h \
     universe.h
 
 FORMS += \

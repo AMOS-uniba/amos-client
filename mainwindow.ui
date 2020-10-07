@@ -18,6 +18,10 @@
   <property name="windowTitle">
    <string>AMOS [automatic mode]</string>
   </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../../../Desktop/icon.png</normaloff>../../../Desktop/icon.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="0" column="0">
@@ -32,14 +36,30 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_send_heartbeat">
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="le_telegram"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton">
         <property name="text">
-         <string>Send heartbeat</string>
+         <string>Parse telegram</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="4">
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="7">
        <widget class="QLabel" name="label_heartbeat">
         <property name="minimumSize">
          <size>
@@ -61,20 +81,7 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="3">
+      <item row="0" column="6">
        <widget class="QLabel" name="label_hb">
         <property name="minimumSize">
          <size>
@@ -87,7 +94,14 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1" colspan="4">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="button_send_heartbeat">
+        <property name="text">
+         <string>Send heartbeat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="7">
        <widget class="QTableWidget" name="tb_log">
         <property name="lineWidth">
          <number>1</number>
@@ -158,6 +172,13 @@
           <string>Message</string>
          </property>
         </column>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>Create telegram</string>
+        </property>
        </widget>
       </item>
      </layout>

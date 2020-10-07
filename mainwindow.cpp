@@ -374,3 +374,21 @@ void MainWindow::on_bt_primary_clicked() {
 void MainWindow::on_bt_permanent_clicked() {
     this->set_storage(this->station->get_permanent_storage(), *this->ui->le_permanent);
 }
+
+void MainWindow::on_pushButton_clicked() {
+    try {
+        Telegram telegram(QByteArray(ui->le_telegram->text().toUtf8()));
+    } catch (std::runtime_error& e) {
+        logger.error(e.what());
+    }
+}
+
+void MainWindow::on_pushButton_2_clicked() {
+    try {
+        Telegram telegram = Telegram(5, ui->le_telegram->text().toUtf8());
+        logger.info("Encoding...");
+        logger.info(QString("Encoded to %1").arg(QString(telegram.raw())));
+    } catch (std::runtime_error& e) {
+        logger.error(e.what());
+    }
+}

@@ -70,6 +70,10 @@ private slots:
     void on_bt_permanent_clicked();
 
 
+    void on_pushButton_clicked();
+
+    void on_pushButton_2_clicked();
+
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     Ui::MainWindow *ui;

@@ -4,7 +4,7 @@ Universe::Universe() {
 
 }
 
-// Get modified Julian date for specified UTC time
+// Compute modified Julian date for specified UTC time
 double Universe::mjd(const QDateTime& time) {
     return 40587.0 + ((double) time.toSecsSinceEpoch()) / 86400.0;
 }

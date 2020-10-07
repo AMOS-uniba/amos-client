@@ -8,6 +8,11 @@
 #include "station.h"
 #include "log.h"
 #include "domemanager.h"
+#include "telegram.h"
 
+#include <stdexcept>
+
+#include <QString>
+#include <QByteArray>
 
 #endif // INCLUDE_H
