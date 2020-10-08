@@ -10,10 +10,14 @@ public:
     RuntimeException(const QString& message);
 };
 
-
-class OutOfRange: public RuntimeException {
+class MalformedTelegram: public RuntimeException {
 public:
-    OutOfRange(const QString& message);
+    MalformedTelegram(const QString& message);
+};
+
+class EncodingError: public RuntimeException {
+public:
+    EncodingError(const QString& message);
 };
 
 #endif // EXCEPTION_H

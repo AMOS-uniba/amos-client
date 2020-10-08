@@ -75,9 +75,10 @@ void DomeManager::send_command(const Command& command) const {
     logger.info(QString("{MOCKUP} Sending a manual command '%1'").arg(DomeManager::Commands[command].display_name));
 
     Telegram telegram(this->address, message);
+    telegram.compose();
     return;
 }
 
-void DomeManager::process_response(const QByteArray& received) const {
-
+void DomeManager::process_response(const QByteArray& received) {
+    return;
 }

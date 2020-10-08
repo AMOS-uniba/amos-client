@@ -75,6 +75,7 @@ public:
     const QDateTime& get_last_received(void) const;
 
     void send_command(const Command& command) const;
+    void process_response(const QByteArray& received);
 
     QJsonObject json(void) const;
 };

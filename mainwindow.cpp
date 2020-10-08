@@ -385,10 +385,13 @@ void MainWindow::on_pushButton_clicked() {
 
 void MainWindow::on_pushButton_2_clicked() {
     try {
-        Telegram telegram = Telegram(5, ui->le_telegram->text().toUtf8());
+        Telegram telegram = Telegram(0x55, ui->le_telegram->text().toUtf8());
         logger.info("Encoding...");
-        logger.info(QString("Encoded to %1").arg(QString(telegram.raw())));
-    } catch (std::runtime_error& e) {
-        logger.error(e.what());
+        QByteArray ba = telegram.compose();
+        logger.info(QString("Encoded to %1").arg(QString(ba)));
+        Telegram orig = Telegram(ba);
+        logger.info(QByteArray(orig.compose()));
+    } catch (MalformedTelegram& e) {
+        logger.error(QString("Telegram is malformed: %1").arg(e.what()));
     }
 }
