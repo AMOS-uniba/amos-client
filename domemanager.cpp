@@ -77,3 +77,7 @@ void DomeManager::send_command(const Command& command) const {
     Telegram telegram(this->address, message);
     return;
 }
+
+void DomeManager::process_response(const QByteArray& received) const {
+
+}

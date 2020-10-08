@@ -10,4 +10,10 @@ public:
     RuntimeException(const QString& message);
 };
 
+
+class OutOfRange: public RuntimeException {
+public:
+    OutOfRange(const QString& message);
+};
+
 #endif // EXCEPTION_H

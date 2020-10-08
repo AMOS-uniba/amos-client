@@ -11,9 +11,6 @@ private:
     constexpr static unsigned char END_BYTE = 0x0D;
     constexpr static unsigned char MAX_LENGTH = 100;
 
-    unsigned char address;
-    QByteArray message;
-
     static unsigned char extract_address(const QByteArray& telegram);
     static unsigned char extract_length(const QByteArray& telegram);
 
@@ -29,6 +26,11 @@ private:
 public:
     Telegram(const unsigned char address, const QByteArray& message);
     Telegram(const QByteArray& message);
+
+    static bool validate_length(const QByteArray& received) const;
+    static bool validate_address(const QByteArray& received) const;
+    static bool validate_payload_length(const QByteArray& received) const;
+    static bool validate_crc(const QByteArray& received) const;
 
     QByteArray raw(void) const;
 

@@ -8,38 +8,62 @@ Telegram::Telegram(const unsigned char address, const QByteArray& message) {
 }
 
 Telegram::Telegram(const QByteArray& received) {
-    unsigned char length = received.length();
-    if (length < 8) {
-        throw std::runtime_error("Telegram \"\" is too short");
-    }
-    if (length > Telegram::MAX_LENGTH) {
-        throw std::runtime_error("Telegram is too long");
-    }
-
-    logger.debug(QString("Telegram length OK (%1)").arg(length));
-
-    unsigned char payload_length = Telegram::extract_length(received);
-    if (length != payload_length * 2 + 8) {
-        throw RuntimeException(QString("Real length %1 bytes does not match announced payload \
-            length %2 characters (total %3 bytes)").arg(length).arg(payload_length).arg(payload_length * 2 + 8));
-    }
-    logger.debug(QString("Lengths match (%1)").arg(length));
-
-    unsigned char crc = 0;
-    for (unsigned char i = 0; i < length - 3; i++) {
-        crc += received[i];
-    }
-
-    unsigned char received_crc = Telegram::decode_byte(received[length - 3], received[length - 2]);
-    if (crc != received_crc) {
-        throw RuntimeException(QString("CRCs do not match (computed %1, received %2)").arg(crc).arg(received_crc));
-    }
-    logger.debug(QString("CRC is OK (%1)").arg(crc));
+    this->validate_length(received);
+    this->validate_address(received);
+    this->validate_payload_length(received);
+    this->validate_crc(received);
 
     for (unsigned char i = 0; i < payload_length; i++) {
         this->message[i] = Telegram::decode_byte(received[5 + 2 * i], received[6 + 2 * i]);
     }
     logger.debug(QString("Decoded message is \"%1\"").arg(QString(this->message)));
+}
+
+void Telegram::validate_length(const QByteArray& received) const {
+    unsigned char length = received.length();
+    if (length < 8) {
+        throw RuntimeException(QString("Telegram \"%1\" is too short").arg(QString(received)));
+    }
+    if (length > Telegram::MAX_LENGTH) {
+        throw RuntimeException("Telegram is too long");
+    }
+    logger.debug(QString("Telegram length OK (%1)").arg(length));
+
+}
+
+void Telegram::validate_address(const QByteArray& received) const {
+    unsigned char received_address = Telegram::extract_address(received);
+    if (this->address != received_address) {
+        throw RuntimeException(QString("Addresses do not match (should be %1, received %2)").arg(this->address, received_address));
+    } else {
+        logger.debug(QString("Addresses match (%1)").arg(this->address));
+    }
+}
+
+void Telegram::validate_payload_length(const QByteArray& received) const {
+    unsigned char total_length = received.length();
+    unsigned char payload_length = Telegram::extract_length(received);
+    if (total_length != payload_length * 2 + 8) {
+        throw RuntimeException(QString("Real length %1 bytes does not match announced payload \
+            length %2 characters (total %3 bytes)").arg(total_length).arg(payload_length).arg(payload_length * 2 + 8));
+    } else {
+        logger.debug(QString("Lengths match (total %1 bytes, payload %2 characters)").arg(total_length).arg(payload_length));
+    }
+}
+
+void Telegram::validate_crc(const QByteArray& received) const {
+    unsigned char computed_crc = 0;
+    unsigned char length = received.length();
+    for (unsigned char i = 0; i < length - 3; i++) {
+        computed_crc += received[i];
+    }
+
+    unsigned char received_crc = Telegram::decode_byte(received[length - 3], received[length - 2]);
+    if (computed_crc != received_crc) {
+        throw RuntimeException(QString("CRCs do not match (computed %1, received %2)").arg(computed_crc).arg(received_crc));
+    } else {
+        logger.debug(QString("CRC is OK (%1)").arg(computed_crc));
+    }
 }
 
 unsigned char Telegram::extract_address(const QByteArray& received) {
@@ -62,7 +86,7 @@ unsigned char Telegram::char_to_hex(unsigned char value) {
     }
 
     // Fall-through: unknown byte, throw exception
-    throw std::range_error(QString("Invalid character to decode: %1").arg(value).toStdString());
+    throw OutOfRange(QString("Invalid character to decode: %1").arg(value));
 }
 
 // Convert a hexadecimal value (0-15) to a character [0-9A-F]
@@ -76,7 +100,7 @@ unsigned char Telegram::hex_to_char(unsigned char value) {
     }
 
     // Fall-through: unknown value, throw exception
-    throw std::range_error(QString("Invalid value to encode: %1").arg(value).toStdString());
+    throw OutOfRange(QString("Invalid value to encode: %1").arg(value));
 }
 
 // Encode least sigificant quad to char
