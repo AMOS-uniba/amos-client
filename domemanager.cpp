@@ -5,6 +5,12 @@ extern Log logger;
 DomeManager::DomeManager() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
     this->address = 0x55;
+
+    this->serial_port = new QSerialPort();
+    this->serial_port->setPortName("COM1");
+    this->serial_port->setBaudRate(9600);
+
+    this->connect(this->serial_port, &QSerialPort::readyRead, this, &DomeManager::process_response);
 }
 
 const QMap<Command, CommandInfo> DomeManager::Commands = {
@@ -54,6 +60,24 @@ void DomeManager::fake_gizmo_data(void) {
     this->intensifier_state = TernaryState::UNKNOWN;
 }
 
+void DomeManager::open_cover(void) {
+    if (this->cover_state == CoverState::CLOSED) {
+        this->send_command(Command::COVER_OPEN);
+        this->cover_state = CoverState::OPENING;
+    } else {
+        logger.warning("Cover is not closed, ignoring");
+    }
+}
+
+void DomeManager::close_cover(void) {
+    if (this->cover_state == CoverState::OPEN) {
+        this->send_command(Command::COVER_CLOSE);
+        this->cover_state = CoverState::CLOSING;
+    } else {
+        logger.warning("Cover is not open, ignoring");
+    }
+}
+
 QJsonObject DomeManager::json(void) const {
     return QJsonObject {
         {"env", QJsonObject {
@@ -75,10 +99,11 @@ void DomeManager::send_command(const Command& command) const {
     logger.info(QString("{MOCKUP} Sending a manual command '%1'").arg(DomeManager::Commands[command].display_name));
 
     Telegram telegram(this->address, message);
-    telegram.compose();
+    this->serial_port->write(telegram.compose());
     return;
 }
 
-void DomeManager::process_response(const QByteArray& received) {
-    return;
+void DomeManager::process_response(void) {
+    const QByteArray response = this->serial_port->readAll();
+    logger.info(QString("Received response: \"%1\"").arg(QString(response)));
 }

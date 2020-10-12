@@ -3,7 +3,6 @@
 #include <QTableWidget>
 #include <QFile>
 #include <QTextStream>
-#include <QDateTime>
 
 #include "forward.h"
 
@@ -33,7 +32,7 @@ private:
     const static QMap<Level, LevelInfo> Levels;
 
     QString format(const QDateTime& timestamp, Level level, const QString& message) const;
-
+    void write(Level level, const QString& message) const;
 public:
     explicit Log(QObject *parent, const QString& filename);
     ~Log(void);
@@ -45,8 +44,6 @@ public:
     void warning(const QString& message) const;
     void error(const QString& message) const;
     void fatal(const QString& message) const;
-
-    void write(Level level, const QString& message) const;
 };
 
 #endif // LOG_H

@@ -44,11 +44,14 @@ struct CommandInfo {
 };
 
 
-class DomeManager {
+class DomeManager: public QObject {
+    Q_OBJECT
 private:
     unsigned char address;
     QDateTime last_received;
     std::default_random_engine generator;
+
+    QSerialPort *serial_port;
 public:
 
     /* maps for storing states and their associated information
@@ -74,8 +77,11 @@ public:
     void fake_gizmo_data(void);
     const QDateTime& get_last_received(void) const;
 
+    void open_cover(void);
+    void close_cover(void);
+
     void send_command(const Command& command) const;
-    void process_response(const QByteArray& received);
+    void process_response(void);
 
     QJsonObject json(void) const;
 };

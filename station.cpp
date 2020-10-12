@@ -1,5 +1,7 @@
 #include "include.h"
 
+extern Log logger;
+
 Station::Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
     this->id = _id;
 
@@ -11,9 +13,11 @@ Station::Station(const QString& _id, const QDir& primary_storage_dir, const QDir
 
 Station::~Station(void) {
     delete this->dome_manager;
+    delete this->primary_storage;
+    delete this->permanent_storage;
 }
 
-Polar Station::sun_position(const QDateTime& time) {
+Polar Station::sun_position(const QDateTime& time) const {
     double alt, az;
     double mjd = Universe::mjd(time);
     double lmst = GMST(mjd) + this->longitude * Rad;
@@ -38,6 +42,19 @@ Storage& Station::get_primary_storage(void) {
 
 Storage& Station::get_permanent_storage(void) {
     return *this->permanent_storage;
+}
+
+void Station::check_sun(void) {
+    logger.debug("Checking the Sun's altitude");
+    if (this->automatic) {
+        if ((this->get_sun_altitude() >= this->altitude_dark)) {
+            this->dome_manager->close_cover();
+        }
+
+        if ((this->get_sun_altitude() < this->altitude_dark)) {
+            this->dome_manager->open_cover();
+        }
+    }
 }
 
 QJsonObject Station::prepare_heartbeat(void) const {

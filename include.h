@@ -13,8 +13,11 @@
 
 
 #include <stdexcept>
+#include <random>
 
 #include <QString>
 #include <QByteArray>
+#include <QNetworkAccessManager>
+#include <QDateTime>
 
 #endif // INCLUDE_H

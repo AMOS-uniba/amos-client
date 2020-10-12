@@ -17,11 +17,11 @@ Log::~Log(void) {
 }
 
 const QMap<Level, LevelInfo> Log::Levels = {
-    { Level::Debug, {"DBG", "debug", Qt::gray}},
-    { Level::Info, {"INF", "info", Qt::black}},
-    { Level::Warning, {"WAR", "warning", Qt::darkYellow}},
-    { Level::Error, {"ERR", "error", Qt::red}},
-    { Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
+    {Level::Debug, {"DBG", "debug", Qt::gray}},
+    {Level::Info, {"INF", "info", Qt::black}},
+    {Level::Warning, {"WAR", "warning", Qt::darkYellow}},
+    {Level::Error, {"ERR", "error", Qt::red}},
+    {Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
 };
 
 void Log::set_display_widget(QTableWidget* widget) {

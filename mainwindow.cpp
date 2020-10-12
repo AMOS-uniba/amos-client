@@ -62,9 +62,11 @@ void MainWindow::load_settings(void) {
         QDir(this->settings->value("storage/permanent").toString())
     );
 
-    this->station->latitude = this->settings->value("station/latitude").toDouble();
-    this->station->longitude = this->settings->value("station/longitude").toDouble();
-    this->station->altitude = this->settings->value("station/altitude").toDouble();
+    this->station->latitude = this->settings->value("station/latitude", 0).toDouble();
+    this->station->longitude = this->settings->value("station/longitude", 0).toDouble();
+    this->station->altitude = this->settings->value("station/altitude", 0).toDouble();
+
+    this->station->altitude_dark = this->settings->value("station/dark").toDouble();
 }
 
 void MainWindow::create_timers(void) {
@@ -80,7 +82,7 @@ void MainWindow::create_timers(void) {
     this->timer_heartbeat->start();
 
     this->timer_operation = new QTimer(this);
-    this->timer_operation->setInterval(100);
+    this->timer_operation->setInterval(1000);
     connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
     this->timer_operation->start();
 
@@ -89,11 +91,14 @@ void MainWindow::create_timers(void) {
     connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);}
 
 MainWindow::~MainWindow() {
+    logger.info("Terminating");
+
     delete this->ui;
     delete this->timer_operation;
     delete this->timer_cover;
     delete this->timer_heartbeat;
     delete this->timer_telegram;
+
     delete this->universe;
     delete this->station;
     delete this->server;
@@ -104,12 +109,15 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::process_timer(void) {
-    statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    ui->label_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
+    this->station->check_sun();
+    this->display_time();
     this->display_env_data();
     this->display_sun_properties();
+}
 
-    this->settings->sync();     // THIS IS INEFFICIENT!
+void MainWindow::display_time(void) {
+    statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    ui->label_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
 }
 
 void MainWindow::display_sun_properties(void) {
@@ -237,12 +245,10 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 
 void MainWindow::on_button_cover_clicked() {
     if (this->station->dome_manager->cover_state == CoverState::CLOSED) {
-        this->station->dome_manager->send_command(Command::COVER_OPEN);
-        this->station->dome_manager->cover_state = CoverState::OPENING;
+        this->station->dome_manager->open_cover();
     }
     if (this->station->dome_manager->cover_state == CoverState::OPEN) {
-        this->station->dome_manager->send_command(Command::COVER_CLOSE);
-        this->station->dome_manager->cover_state = CoverState::CLOSING;
+        this->station->dome_manager->open_cover();
     }
     this->display_cover_status();
     this->timer_cover->start();
@@ -266,6 +272,8 @@ void MainWindow::on_bt_station_apply_clicked() {
     this->settings->setValue("station/latitude", this->station->latitude);
     this->settings->setValue("station/longitude", this->station->longitude);
     this->settings->setValue("station/altitude", this->station->altitude);
+
+    this->settings->sync();
 
     this->button_station_toggle(false);
 }
@@ -311,6 +319,22 @@ void MainWindow::button_station_toggle(bool enable) {
         this->ui->bt_station_apply->setText("No changes");
         this->ui->bt_station_apply->setEnabled(false);
     }
+}
+
+void MainWindow::on_bt_heating_clicked() {
+    /*switch (this->station->dome_manager->heating_state) {
+        case TernaryState::OFF:
+        case TernaryState::UNKNOWN: {
+            this->station->dome_manager->send_command(Command::HEATING_ON);
+            this->station->dome_manager->heating_state = TernaryState::ON;
+            break;
+        }
+        case TernaryState::ON: {
+            this->station->dome_manager->send_command(Command::HEATING_OFF);
+            this->station->dome_manager->heating_state = TernaryState::OFF;
+        }
+    }*/
+    this->display_gizmo_status();
 }
 
 void MainWindow::on_bt_fan_clicked() {

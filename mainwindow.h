@@ -1,8 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <random>
-
 #include <QMainWindow>
 #include <QMap>
 #include <QTimer>
@@ -35,6 +33,7 @@ private slots:
     void process_timer(void);
     void request_telegram(void);
 
+    void display_time(void);
     void display_sun_properties(void);
     void display_env_data(void);
 
@@ -73,6 +72,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void on_bt_heating_clicked();
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;

@@ -89,7 +89,7 @@ QByteArray Telegram::compose(void) const {
     QByteArray buffer(length * 2 + 8, '\0');
     unsigned int i = 0;
     unsigned char crc = 0;
-    logger.debug(QString("Address %1, message \"%2\"").arg(this->address, 0, 16).arg(QString(this->message)));
+    logger.debug(QString("Address 0x%1, message \"%2\"").arg(this->address, 2, 16, QChar('0')).arg(QString(this->message)));
 
     crc += buffer[0] = Telegram::START_BYTE_MASTER;
     crc += buffer[1] = Telegram::encode_msq(address);

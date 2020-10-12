@@ -28,6 +28,7 @@ public:
     double latitude;
     double longitude;
     double altitude;
+    double altitude_dark;
     QString id;
 
     Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
@@ -35,13 +36,14 @@ public:
 
     bool automatic = false;
 
-    Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc());
+    Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double get_sun_altitude(void);
     double get_sun_azimuth(void);
 
     DomeManager* dome_manager;
     QVector<Server> servers;
 
+    void check_sun(void);
     QJsonObject prepare_heartbeat(void) const;
 
     Storage& get_primary_storage(void);
