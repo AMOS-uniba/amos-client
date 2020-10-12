@@ -134,8 +134,10 @@ void MainWindow::display_env_data(void) {
 
 void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
     QStorageInfo info = storage.info();
-    pb->setMaximum((int) ((double) info.bytesTotal() / (1024 * 1024 * 1024)));
-    pb->setValue((int) ((double) info.bytesAvailable() / (1024 * 1024 * 1024)));
+    unsigned int total = (int) ((double) info.bytesTotal() / (1 << 30));
+    unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
+    pb->setMaximum(total);
+    pb->setValue(total - used);
     le->setText(storage.get_directory().path());
 }
 
@@ -280,20 +282,17 @@ void MainWindow::on_bt_station_reset_clicked() {
 
 void MainWindow::on_checkbox_manual_stateChanged(int enable) {
     if (enable) {
-        this->setWindowTitle("AMOS [manual mode]");
+        this->setWindowTitle("AMOS client [manual mode]");
         logger.warning("Switched to manual mode");
     } else {
-        this->setWindowTitle("AMOS [automatic mode]");
+        this->setWindowTitle("AMOS client [automatic mode]");
         logger.warning("Switched to automatic mode");
     }
     this->station->automatic = (bool) enable;
     ui->group_control->setEnabled(this->station->automatic);
-    ui->button_send_heartbeat->setEnabled(this->station->automatic);
 }
 
 void MainWindow::station_position_edited(void) {
-//    this->log_debug(QString("%1 %2 %3").arg(this->station->latitude, 8, 'f', 8).arg(this->station->longitude, 8, 'f', 8).arg(this->station->altitude, 8, 'f', 8));
-
     this->button_station_toggle(
         (ui->le_station_id->text() != this->station->id) ||
         (ui->dsb_latitude->value() != this->station->latitude) ||
@@ -378,7 +377,7 @@ void MainWindow::on_bt_permanent_clicked() {
 void MainWindow::on_pushButton_clicked() {
     try {
         Telegram telegram(QByteArray(ui->le_telegram->text().toUtf8()));
-    } catch (std::runtime_error& e) {
+    } catch (RuntimeException& e) {
         logger.error(e.what());
     }
 }
@@ -391,7 +390,7 @@ void MainWindow::on_pushButton_2_clicked() {
         logger.info(QString("Encoded to %1").arg(QString(ba)));
         Telegram orig = Telegram(ba);
         logger.info(QByteArray(orig.compose()));
-    } catch (MalformedTelegram& e) {
+    } catch (RuntimeException& e) {
         logger.error(QString("Telegram is malformed: %1").arg(e.what()));
     }
 }

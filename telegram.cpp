@@ -30,11 +30,11 @@ Telegram::Telegram(const QByteArray& received) {
 
     // Check first and last bytes of the message
     if ((received[0] != Telegram::START_BYTE_SLAVE) && (received[0] != Telegram::START_BYTE_MASTER)) {
-        throw MalformedTelegram(QString("Incorrect start byte %1").arg(received[0]));
+        throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg(received[0], 2, 16, QChar('0')));
     }
 
     if (received[length - 1] != Telegram::END_BYTE) {
-        throw MalformedTelegram(QString("Incorrect end byte %1").arg(received[length - 1]));
+        throw MalformedTelegram(QString("Incorrect end byte 0x%1").arg((int) received[length - 1], 2, 16, QChar('0')));
     }
 
     // Finally extract address and payload

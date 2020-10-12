@@ -185,6 +185,9 @@
     </item>
     <item row="1" column="0">
      <layout class="QGridLayout" name="gridLayout_5">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetFixedSize</enum>
+      </property>
       <item row="1" column="3">
        <widget class="QGroupBox" name="group_storage">
         <property name="title">
@@ -287,7 +290,7 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>GroupBox</string>
+         <string>Measurements</string>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
