@@ -20,4 +20,9 @@ public:
     EncodingError(const QString& message);
 };
 
+class ConfigurationError: public std::runtime_error {
+public:
+    ConfigurationError(const QString& message);
+};
+
 #endif // EXCEPTION_H

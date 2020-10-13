@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1145</width>
-    <height>937</height>
+    <width>1131</width>
+    <height>595</height>
    </rect>
   </property>
   <property name="font">
@@ -19,8 +19,8 @@
    <string>AMOS [automatic mode]</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>../../Desktop/icon.png</normaloff>../../Desktop/icon.png</iconset>
+   <iconset resource="images.qrc">
+    <normaloff>:/images/images/icon.png</normaloff>:/images/images/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
@@ -817,6 +817,9 @@
               <property name="text">
                <string>undefined</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
             <item row="1" column="2">
@@ -826,19 +829,6 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3">
-             <widget class="QPushButton" name="bt_intensifier">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>undefined</string>
               </property>
              </widget>
             </item>
@@ -887,6 +877,25 @@
               <property name="text">
                <string>undefined</string>
               </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="3">
+             <widget class="QPushButton" name="bt_intensifier">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>undefined</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
              </widget>
             </item>
            </layout>
@@ -922,7 +931,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1145</width>
+     <width>1131</width>
      <height>21</height>
     </rect>
    </property>
@@ -966,6 +975,8 @@
   <tabstop>sb_port</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

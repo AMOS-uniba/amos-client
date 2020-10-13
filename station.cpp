@@ -17,6 +17,46 @@ Station::~Station(void) {
     delete this->permanent_storage;
 }
 
+void Station::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
+    if (fabs(new_latitude) > 90) {
+        throw ConfigurationError(QString("Latitude out of range: %1").arg(new_latitude));
+    }
+    if (fabs(new_longitude) > 180) {
+        throw ConfigurationError(QString("Longitude out of range: %1").arg(new_longitude));
+    }
+
+    this->latitude = new_latitude;
+    this->longitude = new_longitude;
+    this->altitude = new_altitude;
+    logger.info(QString("Station position set to %1°, %2°, %3 m").arg(this->latitude).arg(this->longitude).arg(this->altitude));
+}
+
+void Station::set_id(const QString& new_id) {
+    if (new_id.length() > 4) {
+        throw ConfigurationError(QString("Cannot set station id to '%1'").arg(new_id));
+    }
+
+    this->id = new_id;
+    logger.info(QString("Station id changed to '%1'").arg(this->id));
+}
+
+const QString& Station::get_id(void) const {
+    return this->id;
+}
+
+bool Station::is_dark(const QDateTime& time) const {
+    return (this->get_sun_altitude(time) < this->altitude_dark);
+}
+
+void Station::set_altitude_dark(const double new_altitude_dark) {
+    if ((new_altitude_dark < -18) || (new_altitude_dark > 1)) {
+        throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(new_altitude_dark));
+    }
+
+    this->altitude_dark = new_altitude_dark;
+    logger.info(QString("Darkness limit set to %1°").arg(new_altitude_dark));
+}
+
 Polar Station::sun_position(const QDateTime& time) const {
     double alt, az;
     double mjd = Universe::mjd(time);
@@ -28,12 +68,12 @@ Polar Station::sun_position(const QDateTime& time) const {
     return Polar(az + pi, alt);
 }
 
-double Station::get_sun_altitude(void) {
-    return this->sun_position().theta * Deg;
+double Station::get_sun_altitude(const QDateTime& time) const {
+    return this->sun_position(time).theta * Deg;
 }
 
-double Station::get_sun_azimuth(void) {
-    return fmod(this->sun_position().phi * Deg + 360.0, 360.0);
+double Station::get_sun_azimuth(const QDateTime& time) const {
+    return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
 Storage& Station::get_primary_storage(void) {
@@ -47,12 +87,10 @@ Storage& Station::get_permanent_storage(void) {
 void Station::check_sun(void) {
     logger.debug("Checking the Sun's altitude");
     if (this->automatic) {
-        if ((this->get_sun_altitude() >= this->altitude_dark)) {
-            this->dome_manager->close_cover();
-        }
-
-        if ((this->get_sun_altitude() < this->altitude_dark)) {
+        if (this->is_dark()) {
             this->dome_manager->open_cover();
+        } else {
+            this->dome_manager->close_cover();
         }
     }
 }

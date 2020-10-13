@@ -17,28 +17,39 @@ struct Position {
     double altitude;
 };
 
+/*!
+ * \brief The Station class represents the entire AMOS station (computer, dome, camera)
+ */
 class Station: public QObject {
     Q_OBJECT
 private:
+    QString id;
+    double altitude_dark;
+
     Storage *primary_storage;
     Storage *permanent_storage;
 
     QNetworkAccessManager *network_manager;
 public:
+    Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
+    ~Station(void);
+
     double latitude;
     double longitude;
     double altitude;
-    double altitude_dark;
-    QString id;
 
-    Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
-    ~Station(void);
+    void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
+    const QString& get_id(void) const;
+    void set_id(const QString& new_id);
+
+    bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
+    void set_altitude_dark(const double new_altitude_dark);
 
     bool automatic = false;
 
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    double get_sun_altitude(void);
-    double get_sun_azimuth(void);
+    double get_sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
+    double get_sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
 
     DomeManager* dome_manager;
     QVector<Server> servers;

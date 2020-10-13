@@ -30,6 +30,8 @@ enum class Command {
     FAN_OFF,                    // turn off the fan
     II_ON,                      // turn on image intensifier
     II_OFF,                     // turn off image intensifier
+    HOTWIRE_ON,                 // turn on hotwire
+    HOTWIRE_OFF,                // turn off hotwire
     SW_RESET,                   // perform software reset
 };
 
@@ -52,6 +54,8 @@ private:
     std::default_random_engine generator;
 
     QSerialPort *serial_port;
+
+    void process_response(void);
 public:
 
     /* maps for storing states and their associated information
@@ -77,13 +81,22 @@ public:
     void fake_gizmo_data(void);
     const QDateTime& get_last_received(void) const;
 
+    void update_status(void);
+
+
     void open_cover(void);
     void close_cover(void);
-
     void send_command(const Command& command) const;
-    void process_response(void);
 
     QJsonObject json(void) const;
+
+public slots:
+    void toggle_fan(void);
+    void toggle_heating(void);
+    void toggle_intensifier(void);
+
+signals:
+    void response_received(const QByteArray& response);
 };
 
 #endif // DOMEMANAGER_H

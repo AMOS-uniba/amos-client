@@ -5,3 +5,5 @@ RuntimeException::RuntimeException(const QString& message): std::runtime_error(m
 MalformedTelegram::MalformedTelegram(const QString& message): RuntimeException(message) {}
 
 EncodingError::EncodingError(const QString& message): RuntimeException(message) {}
+
+ConfigurationError::ConfigurationError(const QString& message): std::runtime_error(message.toStdString()) {}

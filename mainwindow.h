@@ -57,10 +57,6 @@ private slots:
 
     void button_station_toggle(bool enable);
 
-    void on_bt_fan_clicked();
-    void on_bt_intensifier_clicked();
-
-
     void on_bt_station_reset_clicked();
 
     void set_storage(Storage& storage, QLineEdit& edit);
@@ -72,8 +68,6 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
-
-    void on_bt_heating_clicked();
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;

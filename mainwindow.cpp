@@ -47,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     // connect signals for handling of edits of server address
     connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_position_edited);
+
+    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_fan);
+    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_heating);
+    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_intensifier);
 }
 
 void MainWindow::load_settings(void) {
@@ -62,11 +66,12 @@ void MainWindow::load_settings(void) {
         QDir(this->settings->value("storage/permanent").toString())
     );
 
-    this->station->latitude = this->settings->value("station/latitude", 0).toDouble();
-    this->station->longitude = this->settings->value("station/longitude", 0).toDouble();
-    this->station->altitude = this->settings->value("station/altitude", 0).toDouble();
-
-    this->station->altitude_dark = this->settings->value("station/dark").toDouble();
+    this->station->set_position(
+        this->settings->value("station/latitude", 0).toDouble(),
+        this->settings->value("station/longitude", 0).toDouble(),
+        this->settings->value("station/altitude", 0).toDouble()
+    );
+    this->station->set_altitude_dark(this->settings->value("station/dark", -7.0).toDouble());
 }
 
 void MainWindow::create_timers(void) {
@@ -123,7 +128,7 @@ void MainWindow::display_time(void) {
 void MainWindow::display_sun_properties(void) {
     auto hor = this->station->sun_position();
     ui->lb_hor_altitude->setText(QString("%1°").arg(hor.theta * Deg, 3, 'f', 3));
-    ui->lb_hor_azimuth->setText(QString("%1°").arg(hor.phi * Deg, 3, 'f', 3));
+    ui->lb_hor_azimuth->setText(QString("%1°").arg(fmod(hor.phi * Deg + 360.0, 360.0), 3, 'f', 3));
 
     auto equ = Universe::compute_sun_equ();
     ui->lb_eq_latitude->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
@@ -157,7 +162,7 @@ void MainWindow::display_storage_status(void) {
 void MainWindow::display_station_config(void) {
     this->ui->le_ip->setText(this->server->get_address().toString());
     this->ui->sb_port->setValue(this->server->get_port());
-    this->ui->le_station_id->setText(this->station->id);
+    this->ui->le_station_id->setText(this->station->get_id());
 
     this->ui->dsb_latitude->setValue(this->station->latitude);
     this->ui->dsb_longitude->setValue(this->station->longitude);
@@ -256,19 +261,16 @@ void MainWindow::on_button_cover_clicked() {
 }
 
 void MainWindow::on_bt_station_apply_clicked() {
-    this->station->id = ui->le_station_id->text();
     QString address = ui->le_ip->text();
     unsigned short port = ui->sb_port->value();
 
-    this->server->set_url(QHostAddress(address), port, this->station->id);
-
-    this->station->latitude = ui->dsb_latitude->value();
-    this->station->longitude = ui->dsb_longitude->value();
-    this->station->altitude = ui->dsb_altitude->value();
+    this->station->set_id(this->ui->le_station_id->text());
+    this->server->set_url(QHostAddress(address), port, this->station->get_id());
+    this->station->set_position(ui->dsb_latitude->value(), ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
 
     this->settings->setValue("server/ip", this->server->get_address().toString());
     this->settings->setValue("server/port", this->server->get_port());
-    this->settings->setValue("station/id", this->station->id);
+    this->settings->setValue("station/id", this->station->get_id());
     this->settings->setValue("station/latitude", this->station->latitude);
     this->settings->setValue("station/longitude", this->station->longitude);
     this->settings->setValue("station/altitude", this->station->altitude);
@@ -279,7 +281,7 @@ void MainWindow::on_bt_station_apply_clicked() {
 }
 
 void MainWindow::on_bt_station_reset_clicked() {
-    this->ui->le_station_id->setText(this->station->id);
+    this->ui->le_station_id->setText(this->station->get_id());
     this->ui->le_ip->setText(this->server->get_address().toString());
     this->ui->sb_port->setValue(this->server->get_port());
 
@@ -302,7 +304,7 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
 
 void MainWindow::station_position_edited(void) {
     this->button_station_toggle(
-        (ui->le_station_id->text() != this->station->id) ||
+        (ui->le_station_id->text() != this->station->get_id()) ||
         (ui->dsb_latitude->value() != this->station->latitude) ||
         (ui->dsb_longitude->value() != this->station->longitude) ||
         (ui->dsb_altitude->value() != this->station->altitude) ||
@@ -319,56 +321,6 @@ void MainWindow::button_station_toggle(bool enable) {
         this->ui->bt_station_apply->setText("No changes");
         this->ui->bt_station_apply->setEnabled(false);
     }
-}
-
-void MainWindow::on_bt_heating_clicked() {
-    /*switch (this->station->dome_manager->heating_state) {
-        case TernaryState::OFF:
-        case TernaryState::UNKNOWN: {
-            this->station->dome_manager->send_command(Command::HEATING_ON);
-            this->station->dome_manager->heating_state = TernaryState::ON;
-            break;
-        }
-        case TernaryState::ON: {
-            this->station->dome_manager->send_command(Command::HEATING_OFF);
-            this->station->dome_manager->heating_state = TernaryState::OFF;
-        }
-    }*/
-    this->display_gizmo_status();
-}
-
-void MainWindow::on_bt_fan_clicked() {
-    switch (this->station->dome_manager->fan_state) {
-        case TernaryState::OFF:
-        case TernaryState::UNKNOWN: {
-            this->station->dome_manager->send_command(Command::FAN_ON);
-            this->station->dome_manager->fan_state = TernaryState::ON;   // MOCKUP
-            break;
-        }
-        case TernaryState::ON: {
-            this->station->dome_manager->send_command(Command::FAN_OFF);
-            this->station->dome_manager->fan_state = TernaryState::OFF;  // MOCKUP
-            break;
-        }
-    }
-    this->display_gizmo_status();
-}
-
-void MainWindow::on_bt_intensifier_clicked() {
-    switch (this->station->dome_manager->intensifier_state) {
-        case TernaryState::OFF:
-        case TernaryState::UNKNOWN: {
-            this->station->dome_manager->send_command(Command::II_ON);
-            this->station->dome_manager->intensifier_state = TernaryState::ON;   // MOCKUP
-            break;
-        }
-        case TernaryState::ON: {
-            this->station->dome_manager->send_command(Command::II_OFF);
-            this->station->dome_manager->intensifier_state = TernaryState::OFF;   // MOCKUP
-            break;
-        }
-    }
-    this->display_gizmo_status();
 }
 
 void MainWindow::set_storage(Storage& storage, QLineEdit& edit) {
