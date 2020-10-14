@@ -7,8 +7,9 @@
 #include "universe.h"
 #include "station.h"
 #include "log.h"
-#include "domemanager.h"
+#include "dome.h"
 #include "telegram.h"
+#include "request.h"
 #include "exception.h"
 
 

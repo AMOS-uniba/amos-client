@@ -48,9 +48,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_position_edited);
 
-    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_fan);
-    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_heating);
-    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome_manager, &DomeManager::toggle_intensifier);
+    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_fan);
+    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_heating);
+    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_intensifier);
 }
 
 void MainWindow::load_settings(void) {
@@ -237,10 +237,10 @@ void MainWindow::display_cover_status(void) {
 }
 
 void MainWindow::display_gizmo_status(void) {
-    this->ui->lb_fan->setText(DomeManager::Ternary[this->station->dome_manager->fan_state].display_name);
+    this->ui->lb_fan->setText(Dome::Ternary[this->station->dome_manager->fan_state].display_name);
     this->ui->bt_fan->setText(this->station->dome_manager->fan_state == TernaryState::ON ? "disable" : "enable");
 
-    this->ui->lb_intensifier->setText(DomeManager::Ternary[this->station->dome_manager->intensifier_state].display_name);
+    this->ui->lb_intensifier->setText(Dome::Ternary[this->station->dome_manager->intensifier_state].display_name);
     this->ui->bt_intensifier->setText(this->station->dome_manager->intensifier_state == TernaryState::ON ? "disable" : "enable");
 }
 

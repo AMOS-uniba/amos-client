@@ -1,10 +1,13 @@
 #include <random>
 
 #include <QSerialPort>
+#include <QTimer>
 #include <QJsonObject>
 
 #ifndef DOMEMANAGER_H
 #define DOMEMANAGER_H
+
+#include "forward.h"
 
 enum class CoverState {
     OPEN,
@@ -22,19 +25,6 @@ enum class TernaryState {
     UNKNOWN,
 };
 
-enum class Command {
-    NOP,                        // do nothing, just for testing
-    COVER_OPEN,                 // open the cover
-    COVER_CLOSE,                // close the cover
-    FAN_ON,                     // turn on the fan
-    FAN_OFF,                    // turn off the fan
-    II_ON,                      // turn on image intensifier
-    II_OFF,                     // turn off image intensifier
-    HOTWIRE_ON,                 // turn on hotwire
-    HOTWIRE_OFF,                // turn off hotwire
-    SW_RESET,                   // perform software reset
-};
-
 struct State {
     char code;
     QString display_name;
@@ -46,16 +36,30 @@ struct CommandInfo {
 };
 
 
-class DomeManager: public QObject {
+class Dome: public QObject {
     Q_OBJECT
 private:
+    constexpr static unsigned int REFRESH = 500;
+    const static Request RequestBasic, RequestEnvironment, RequestShaft;
+    const static Command CommandNoOp;
+    const static Command CommandOpenCover, CommandCloseCover;
+    const static Command CommandFanOn, CommandFanOff;
+    const static Command CommandIIOn, CommandIIOff;
+    const static Command CommandHotwireOn, CommandHotwireOff;
+    const static Command CommandResetSlave;
+
     unsigned char address;
     QDateTime last_received;
     std::default_random_engine generator;
 
     QSerialPort *serial_port;
+    QTimer *refresh_timer;
 
     void process_response(void);
+
+    void update_status_basic(void);
+    void update_status_environment(void);
+    void update_status_shaft(void);
 public:
 
     /* maps for storing states and their associated information
@@ -63,6 +67,7 @@ public:
     const static QMap<CoverState, State> Cover;
     const static QMap<TernaryState, State> Ternary;
     const static QMap<Command, CommandInfo> Commands;
+    const static QMap<Request, CommandInfo> Requests;
 
     double temperature;
     double pressure;
@@ -75,18 +80,19 @@ public:
     TernaryState intensifier_state = TernaryState::UNKNOWN;
     TernaryState fan_state = TernaryState::UNKNOWN;
 
-    DomeManager();
+    Dome();
+    ~Dome();
 
     void fake_env_data(void);
     void fake_gizmo_data(void);
     const QDateTime& get_last_received(void) const;
 
-    void update_status(void);
-
 
     void open_cover(void);
     void close_cover(void);
     void send_command(const Command& command) const;
+    void send_request(const Request& request) const;
+    void send(const QByteArray& message) const;
 
     QJsonObject json(void) const;
 
@@ -94,6 +100,8 @@ public slots:
     void toggle_fan(void);
     void toggle_heating(void);
     void toggle_intensifier(void);
+
+    void request_status(void);
 
 signals:
     void response_received(const QByteArray& response);

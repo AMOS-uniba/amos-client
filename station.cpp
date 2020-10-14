@@ -8,7 +8,7 @@ Station::Station(const QString& _id, const QDir& primary_storage_dir, const QDir
     this->primary_storage = new Storage("primary", primary_storage_dir);
     this->permanent_storage = new Storage("permanent", permanent_storage_dir);
 
-    this->dome_manager = new DomeManager();
+    this->dome_manager = new Dome();
 }
 
 Station::~Station(void) {

@@ -51,7 +51,7 @@ public:
     double get_sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double get_sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
 
-    DomeManager* dome_manager;
+    Dome* dome_manager;
     QVector<Server> servers;
 
     void check_sun(void);
