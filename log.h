@@ -10,12 +10,12 @@
 #define LOG_H
 
 enum class Level {
-    DebugDetail,
-    Debug,
-    Info,
-    Warning,
-    Error,
-    Fatal,
+    DebugDetail = 10,
+    Debug = 8,
+    Info = 6,
+    Warning = 4,
+    Error = 2,
+    Fatal = 0,
 };
 
 struct LevelInfo {
@@ -29,6 +29,7 @@ class Log: public QObject {
 private:
     QFile *file = nullptr;
     QTableWidget *display = nullptr;
+    Level logging_level;
 
     const static QMap<Level, LevelInfo> Levels;
 
@@ -39,6 +40,7 @@ public:
     ~Log(void);
 
     void set_display_widget(QTableWidget* widget);
+    void set_level(Level new_level);
 
     void detail(const QString& message) const;
     void debug(const QString& message) const;

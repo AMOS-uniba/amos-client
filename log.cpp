@@ -1,7 +1,7 @@
 #include "include.h"
 
 Log::Log(QObject *parent, const QString& filename):
-    QObject(parent) {
+    QObject(parent), logging_level(Level::Info) {
 
     if (!filename.isEmpty()) {
         this->file = new QFile();
@@ -34,6 +34,10 @@ QString Log::format(const QDateTime& timestamp, Level level, const QString& mess
 }
 
 void Log::write(Level level, const QString& message) const {
+    if (level > this->logging_level) {
+        return;
+    }
+
     QDateTime now = QDateTime::currentDateTimeUtc();
     QString full = this->format(now, level, message);
     QTextStream out(this->file);
@@ -59,6 +63,10 @@ void Log::write(Level level, const QString& message) const {
         text->setForeground(Log::Levels[level].colour);
         this->display->setItem(this->display->rowCount() - 1, 2, text);
     }
+}
+
+void Log::set_level(Level new_level) {
+    this->logging_level = new_level;
 }
 
 void Log::detail(const QString& message) const {

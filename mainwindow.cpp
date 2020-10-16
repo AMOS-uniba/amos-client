@@ -72,6 +72,10 @@ void MainWindow::load_settings(void) {
         this->settings->value("station/altitude", 0).toDouble()
     );
     this->station->set_altitude_dark(this->settings->value("station/dark", -7.0).toDouble());
+
+    bool debug = this->settings->value("debug", false).toBool();
+    logger.set_level(debug ? Level::Debug : Level::Info);
+    this->ui->cb_debug->setChecked(debug);
 }
 
 void MainWindow::create_timers(void) {
@@ -300,7 +304,8 @@ void MainWindow::on_checkbox_manual_stateChanged(int enable) {
         logger.warning("Switched to automatic mode");
     }
     this->station->automatic = (bool) enable;
-    ui->group_control->setEnabled(this->station->automatic);
+    ui->group_cover->setEnabled(this->station->automatic);
+    ui->group_devices->setEnabled(this->station->automatic);
 }
 
 void MainWindow::station_position_edited(void) {
@@ -370,4 +375,11 @@ void MainWindow::on_pushButton_2_clicked() {
     } catch (RuntimeException& e) {
         logger.error(QString("Telegram is malformed: %1").arg(e.what()));
     }
+}
+
+void MainWindow::on_cb_debug_stateChanged(int debug) {
+    this->settings->setValue("debug", debug);
+
+    logger.set_level(debug ? Level::Debug : Level::Info);
+    logger.warning(QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
 }

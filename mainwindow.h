@@ -19,7 +19,7 @@ QT_END_NAMESPACE
 
 
 class MainWindow: public QMainWindow {
-    Q_OBJECT
+    Q_OBJECT    
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -68,6 +68,8 @@ private slots:
     void on_pushButton_clicked();
 
     void on_pushButton_2_clicked();
+
+    void on_cb_debug_stateChanged(int debug);
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;

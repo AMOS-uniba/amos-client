@@ -40,7 +40,7 @@ class Dome: public QObject {
     Q_OBJECT
 private:
     constexpr static unsigned int REFRESH = 500;
-    const static Request RequestBasic, RequestEnvironment, RequestShaft;
+    const static Request RequestBasic, RequestEnv, RequestShaft;
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
     const static Command CommandFanOn, CommandFanOff;
@@ -102,6 +102,8 @@ public slots:
     void request_status(void);
 
 signals:
+    void read_timeout(void) const;
+    void write_timeout(void) const;
     void response_received(const QByteArray& response);
 };
 

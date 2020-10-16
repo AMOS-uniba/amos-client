@@ -21,7 +21,7 @@ Dome::Dome() {
 }
 
 const Request Dome::RequestBasic        = Request('S', "basic data request");
-const Request Dome::RequestEnvironment  = Request('T', "environment data request");
+const Request Dome::RequestEnv  = Request('T', "environment data request");
 const Request Dome::RequestShaft        = Request('Z', "shaft position request");
 
 const Command Dome::CommandNoOp         = Command('\x00', "no operation");
@@ -124,9 +124,28 @@ void Dome::send(const QByteArray& message) const {
     Telegram telegram(this->address, message);
 
     if (this->serial_port->isOpen()) {
+        logger.debug("Serial port open");
         this->serial_port->write(telegram.compose());
     } else {
-        logger.error("Could not send command: serial port is not open");
+        if (this->serial_port->open(QSerialPort::ReadWrite)) {
+            logger.info("Opened");
+        } else {
+            logger.error(QString("Could not open serial port %1: %2").arg(this->serial_port->portName()).arg(this->serial_port->errorString()));
+        }
+    }
+
+    if (this->serial_port->waitForBytesWritten(10)) {
+        logger.info("Wait...");
+    } else {
+        logger.info("Timeout");
+        emit this->write_timeout();
+    }
+
+    if (this->serial_port->waitForReadyRead(10)) {
+        QByteArray response = this->serial_port->readAll();
+        logger.info(QString(response));
+    } else {
+        logger.info("No response");
     }
 }
 
@@ -169,4 +188,6 @@ void Dome::toggle_intensifier(void) {
 
 void Dome::request_status(void) {
     this->send_request(Dome::RequestBasic);
+    this->send_request(Dome::RequestEnv);
+    this->send_request(Dome::RequestShaft);
 }
