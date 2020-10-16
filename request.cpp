@@ -9,11 +9,14 @@ QByteArray Request::for_telegram(void) const {
     return QByteArray(1, this->code);
 }
 
-
 Command::Command(unsigned char _subcode, const QString& _display_name):
     Request('C', _display_name),
     subcode(_subcode) {}
 
 QByteArray Command::for_telegram(void) const {
     return QByteArray(1, this->code) + QByteArray(1, this->subcode);
+}
+
+const QString& Request::get_display_name(void) const {
+    return this->display_name;
 }

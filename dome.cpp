@@ -111,14 +111,13 @@ QJsonObject Dome::json(void) const {
 }
 
 void Dome::send_command(const Command& command) const {
-    logger.info(QString("Sending a command '%1'").arg(Dome::Commands[command].display_name));
+    logger.debug(QString("Sending a command '%1'").arg(command.get_display_name()));
     this->send(command.for_telegram());
 }
 
 void Dome::send_request(const Request& request) const {
-    QByteArray message(1, Requests[request].code);
-    logger.info(QString("Sending a request '%1'").arg(Dome::Requests[request].display_name));
-    this->send(message);
+    logger.debug(QString("Sending a request '%1'").arg(request.get_display_name()));
+    this->send(request.for_telegram());
 }
 
 void Dome::send(const QByteArray& message) const {
@@ -133,7 +132,7 @@ void Dome::send(const QByteArray& message) const {
 
 void Dome::process_response(void) {
     const QByteArray response = this->serial_port->readAll();
-    logger.info(QString("Received response: \"%1\"").arg(QString(response)));
+    logger.debug(QString("Received response: \"%1\"").arg(QString(response)));
     emit this->response_received(response);
 }
 

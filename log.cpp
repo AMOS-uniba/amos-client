@@ -17,7 +17,8 @@ Log::~Log(void) {
 }
 
 const QMap<Level, LevelInfo> Log::Levels = {
-    {Level::Debug, {"DBG", "debug", Qt::gray}},
+    {Level::DebugDetail, {"DTL", "debug detail", Qt::gray}},
+    {Level::Debug, {"DBG", "debug", Qt::darkGray}},
     {Level::Info, {"INF", "info", Qt::black}},
     {Level::Warning, {"WAR", "warning", Qt::darkYellow}},
     {Level::Error, {"ERR", "error", Qt::red}},
@@ -58,6 +59,10 @@ void Log::write(Level level, const QString& message) const {
         text->setForeground(Log::Levels[level].colour);
         this->display->setItem(this->display->rowCount() - 1, 2, text);
     }
+}
+
+void Log::detail(const QString& message) const {
+    this->write(Level::DebugDetail, message);
 }
 
 void Log::debug(const QString& message) const {

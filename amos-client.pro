@@ -5,6 +5,7 @@ QT      += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
+CONFIG += static
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -25,6 +26,7 @@ SOURCES += \
     APC/APC_Time.cpp \
     APC/APC_VecMat3D.cpp \
     dome.cpp \
+    domestate.cpp \
     exception.cpp \
     log.cpp \
     main.cpp \
@@ -52,6 +54,7 @@ HEADERS += \
     APC/APC_Time.h \
     APC/APC_VecMat3D.h \
     dome.h \
+    domestate.h \
     exception.h \
     forward.h \
     include.h \

@@ -13,6 +13,7 @@ protected:
 public:
     Request(unsigned char _code, const QString& _display_name);
     QByteArray for_telegram(void) const;
+    const QString& get_display_name(void) const;
 };
 
 class Command: public Request {

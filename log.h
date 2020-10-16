@@ -10,6 +10,7 @@
 #define LOG_H
 
 enum class Level {
+    DebugDetail,
     Debug,
     Info,
     Warning,
@@ -39,6 +40,7 @@ public:
 
     void set_display_widget(QTableWidget* widget);
 
+    void detail(const QString& message) const;
     void debug(const QString& message) const;
     void info(const QString& message) const;
     void warning(const QString& message) const;

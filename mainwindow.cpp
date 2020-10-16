@@ -93,7 +93,8 @@ void MainWindow::create_timers(void) {
 
     this->timer_cover = new QTimer(this);
     this->timer_cover->setInterval(10);
-    connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);}
+    connect(this->timer_cover, &QTimer::timeout, this, &MainWindow::move_cover);
+}
 
 MainWindow::~MainWindow() {
     logger.info("Terminating");

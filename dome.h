@@ -66,8 +66,6 @@ public:
         (code, verbose name, further properties may be added as needed) */
     const static QMap<CoverState, State> Cover;
     const static QMap<TernaryState, State> Ternary;
-    const static QMap<Command, CommandInfo> Commands;
-    const static QMap<Request, CommandInfo> Requests;
 
     double temperature;
     double pressure;
