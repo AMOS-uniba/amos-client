@@ -36,6 +36,29 @@ struct CommandInfo {
 };
 
 
+class CommThread: public QThread {
+    Q_OBJECT
+public:
+    explicit CommThread(QObject *parent = nullptr);
+    ~CommThread(void);
+
+    void transaction(const QString &port_name, int wait_timeout, const QByteArray &request);
+signals:
+    void response(const QByteArray &message);
+    void error(const QString &message);
+    void timeout(const QString &message);
+private:
+    void run(void) override;
+
+    QString port_name;
+    QByteArray request;
+    int wait_timeout = 0;
+    QMutex mutex;
+    QWaitCondition condition;
+    bool quit = false;
+};
+
+
 class Dome: public QObject {
     Q_OBJECT
 private:
@@ -54,8 +77,6 @@ private:
 
     QSerialPort *serial_port;
     QTimer *refresh_timer;
-
-    void process_response(void);
 
     void update_status_basic(void);
     void update_status_environment(void);

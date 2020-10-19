@@ -778,21 +778,7 @@
     </item>
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_send_heartbeat">
-        <property name="text">
-         <string>Send heartbeat</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="pushButton">
-        <property name="text">
-         <string>Parse telegram</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="5">
+      <item row="0" column="6">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -813,6 +799,19 @@
        </widget>
       </item>
       <item row="0" column="7">
+       <widget class="QLabel" name="label_hb">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Next heartbeat in</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="8">
        <widget class="QLabel" name="label_heartbeat">
         <property name="minimumSize">
          <size>
@@ -834,19 +833,6 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="6">
-       <widget class="QLabel" name="label_hb">
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Next heartbeat in</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="3">
        <widget class="QLineEdit" name="le_telegram"/>
       </item>
@@ -860,7 +846,14 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="8">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="button_send_heartbeat">
+        <property name="text">
+         <string>Send heartbeat</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="9">
        <widget class="QTableWidget" name="tb_log">
         <property name="lineWidth">
          <number>1</number>
@@ -931,6 +924,20 @@
           <string>Message</string>
          </property>
         </column>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>Parse telegram</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>PushButton</string>
+        </property>
        </widget>
       </item>
      </layout>

@@ -65,6 +65,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
+
+    connect(&this->comm_thread, &CommThread::response, this, [=](const QByteArray &m){ logger.info(m); });
+    connect(&this->comm_thread, &CommThread::error, this, [=](const QString &m){ logger.error(m); });
+    connect(&this->comm_thread, &CommThread::timeout, this, [=](const QString &m){ logger.warning(m); });
 }
 
 void MainWindow::load_settings(void) {
@@ -133,7 +137,7 @@ MainWindow::~MainWindow() {
 void MainWindow::closeEvent(QCloseEvent *event) {
     if (this->tray_icon->isVisible()) {
         this->hide();
-        event->ignore();
+       // event->ignore();
     }
 }
 void MainWindow::create_tray_icon() {
@@ -469,4 +473,8 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
 void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
     logger.warning(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
     this->station->dome_manager->init_serial_port(this->serial_ports[index].portName());
+}
+
+void MainWindow::on_pushButton_3_clicked() {
+    this->comm_thread.transaction("COM1", 100, "U99015390\x0D");
 }

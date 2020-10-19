@@ -16,6 +16,8 @@
 
 #include "forward.h"
 
+#include "dome.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -81,6 +83,8 @@ private slots:
     void show_message();
     void message_clicked();
 
+    void on_pushButton_3_clicked();
+
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     Ui::MainWindow *ui;
@@ -102,6 +106,8 @@ private:
 
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
+
+    CommThread comm_thread;
 
     QList<QSerialPortInfo> serial_ports;
 };
