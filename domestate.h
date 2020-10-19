@@ -13,7 +13,6 @@ public:
     virtual QByteArray full_text(void) const = 0;
 };
 
-
 class DomeStateBasic: public DomeState {
 public:
     bool servo_moving(void) const;

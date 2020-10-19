@@ -113,6 +113,10 @@ QByteArray Telegram::compose(void) const {
     return buffer;
 }
 
+QByteArray Telegram::get_message(void) const {
+    return this->message;
+}
+
 // Decode address in hexadecimal format "AB" to the corresponding byte
 unsigned char Telegram::decode_byte(unsigned char first, unsigned char second) {
     return (Telegram::char_to_hex(first) << 4) + (Telegram::char_to_hex(second));

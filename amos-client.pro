@@ -33,6 +33,7 @@ SOURCES += \
     mainwindow.cpp \
     request.cpp \
     server.cpp \
+    state.cpp \
     station.cpp \
     storage.cpp \
     telegram.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     mainwindow.h \
     request.h \
     server.h \
+    state.h \
     station.h \
     storage.h \
     telegram.h \

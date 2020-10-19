@@ -2,26 +2,8 @@
 
 extern Log logger;
 
-Dome::Dome() {
-    this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-    this->address = 0x55;
-
-    this->serial_port = new QSerialPort(this);
-    this->serial_port->open(QSerialPort::ReadWrite);
-    this->serial_port->setPortName("COM1");
-    this->serial_port->setBaudRate(QSerialPort::Baud9600);
-    this->serial_port->setDataBits(QSerialPort::Data8);
-
-    this->refresh_timer = new QTimer(this);
-    this->refresh_timer->setInterval(Dome::REFRESH);
-    this->connect(this->refresh_timer, &QTimer::timeout, this, &Dome::request_status);
-    this->refresh_timer->start();
-
-    this->connect(this->serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
-}
-
 const Request Dome::RequestBasic        = Request('S', "basic data request");
-const Request Dome::RequestEnv  = Request('T', "environment data request");
+const Request Dome::RequestEnv          = Request('T', "environment data request");
 const Request Dome::RequestShaft        = Request('Z', "shaft position request");
 
 const Command Dome::CommandNoOp         = Command('\x00', "no operation");
@@ -35,6 +17,17 @@ const Command Dome::CommandHotwireOn    = Command('\x09', "turn on hotwire");
 const Command Dome::CommandHotwireOff   = Command('\x0A', "turn off hotwire");
 const Command Dome::CommandResetSlave   = Command('\x0B', "reset slave");
 
+Dome::Dome() {
+    this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
+    this->address = 0x99;
+
+    this->refresh_timer = new QTimer(this);
+    this->refresh_timer->setInterval(Dome::REFRESH);
+    this->connect(this->refresh_timer, &QTimer::timeout, this, &Dome::request_status);
+    this->refresh_timer->start();
+
+    this->serial_port = nullptr;
+}
 
 Dome::~Dome() {
     delete this->serial_port;
@@ -58,6 +51,20 @@ const QMap<TernaryState, State> Dome::Ternary = {
 
 const QDateTime& Dome::get_last_received(void) const {
     return this->last_received;
+}
+
+void Dome::init_serial_port(const QString& port) {
+    if (this->serial_port != nullptr) {
+        delete this->serial_port;
+    }
+
+    this->serial_port = new QSerialPort(this);
+    this->serial_port->setPortName(port);
+    this->serial_port->setBaudRate(QSerialPort::Baud9600);
+    this->serial_port->setDataBits(QSerialPort::Data8);
+    this->serial_port->open(QSerialPort::ReadWrite);
+
+    //this->connect(this->serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
 }
 
 void Dome::fake_env_data(void) {
@@ -122,10 +129,32 @@ void Dome::send_request(const Request& request) const {
 
 void Dome::send(const QByteArray& message) const {
     Telegram telegram(this->address, message);
+    QByteArray full = telegram.compose();
 
+
+    this->serial_port->write(full);
+    if (this->serial_port->waitForBytesWritten(100)) {
+        logger.info("Waited for written");
+        if (this->serial_port->waitForReadyRead(100)) {
+            logger.info("Waited for read");
+            QByteArray response = this->serial_port->readAll();
+            while (this->serial_port->waitForReadyRead(100))
+                response += this->serial_port->readAll();
+            logger.info(QString(response));
+        } else {
+            logger.error(QString("Wait read response timeout"));
+        }
+    } else {
+        logger.error(QString("Wait write request timeout"));
+    }
+
+
+
+   /*
     if (this->serial_port->isOpen()) {
         logger.debug("Serial port open");
-        this->serial_port->write(telegram.compose());
+        logger.debug(QString(full));
+        this->serial_port->write(full);
     } else {
         if (this->serial_port->open(QSerialPort::ReadWrite)) {
             logger.info("Opened");
@@ -134,19 +163,25 @@ void Dome::send(const QByteArray& message) const {
         }
     }
 
-    if (this->serial_port->waitForBytesWritten(10)) {
-        logger.info("Wait...");
+    if (this->serial_port->waitForBytesWritten(100)) {
+        logger.info(QString("Bytes written: '%1'").arg(QString(full)));
     } else {
         logger.info("Timeout");
         emit this->write_timeout();
     }
 
-    if (this->serial_port->waitForReadyRead(10)) {
+    if (this->serial_port->waitForReadyRead(100)) {
         QByteArray response = this->serial_port->readAll();
+        while (this->serial_port->waitForReadyRead(100)) {
+            response += this->serial_port->readAll();
+        }
+
         logger.info(QString(response));
+        emit this->response_received(response);
     } else {
         logger.info("No response");
     }
+        */
 }
 
 void Dome::process_response(void) {
@@ -182,12 +217,8 @@ void Dome::toggle_intensifier(void) {
     }
 }
 
-//void DomeManager::response_received(const QByteArray& response) {
-//    logger.debug(QString("Response received: '%1'").arg(QString(response)));
-//}
-
 void Dome::request_status(void) {
     this->send_request(Dome::RequestBasic);
-    this->send_request(Dome::RequestEnv);
-    this->send_request(Dome::RequestShaft);
+    //this->send_request(Dome::RequestEnv);
+    //this->send_request(Dome::RequestShaft);
 }

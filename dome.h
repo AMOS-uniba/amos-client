@@ -39,7 +39,7 @@ struct CommandInfo {
 class Dome: public QObject {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 500;
+    constexpr static unsigned int REFRESH = 3000;
     const static Request RequestBasic, RequestEnv, RequestShaft;
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -81,6 +81,8 @@ public:
     Dome();
     ~Dome();
 
+    void init_serial_port(const QString& port);
+
     void fake_env_data(void);
     void fake_gizmo_data(void);
     const QDateTime& get_last_received(void) const;
@@ -104,7 +106,7 @@ public slots:
 signals:
     void read_timeout(void) const;
     void write_timeout(void) const;
-    void response_received(const QByteArray& response);
+    void response_received(const QByteArray& response) const;
 };
 
 #endif // DOMEMANAGER_H

@@ -12,6 +12,7 @@
 #include <QNetworkReply>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QSerialPortInfo>
 #include <QMessageLogger>
 
 
@@ -28,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
-
 
     this->create_timers();
     this->display_cover_status();
@@ -51,21 +51,34 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_fan);
     connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_heating);
     connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_intensifier);
+
+    this->serial_ports = QSerialPortInfo::availablePorts();
+    for (QSerialPortInfo sp: this->serial_ports) {
+        this->ui->co_serial_ports->addItem(sp.portName());
+    }
+
+    this->create_actions();
+    this->create_tray_icon();
+    this->set_icon(0);
+
+    this->tray_icon->show();
+
+    connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
+    connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 }
 
 void MainWindow::load_settings(void) {
-    QString ip = this->settings->value("server/ip").toString();
-    unsigned short port = this->settings->value("server/port").toInt();
-    QString station_id = this->settings->value("station/id").toString();
+    QString ip = this->settings->value("server/ip", "127.0.0.1").toString();
+    unsigned short port = this->settings->value("server/port", 4805).toInt();
+    QString station_id = this->settings->value("station/id", "none").toString();
 
     this->server = new Server(this, QHostAddress(ip), port, station_id);
 
-    this->station = new Station(
-        station_id,
-        QDir(this->settings->value("storage/primary").toString()),
-        QDir(this->settings->value("storage/permanent").toString())
+    this->station = new Station(station_id);
+    this->station->set_storages(
+        QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
+        QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
     );
-
     this->station->set_position(
         this->settings->value("station/latitude", 0).toDouble(),
         this->settings->value("station/longitude", 0).toDouble(),
@@ -76,6 +89,9 @@ void MainWindow::load_settings(void) {
     bool debug = this->settings->value("debug", false).toBool();
     logger.set_level(debug ? Level::Debug : Level::Info);
     this->ui->cb_debug->setChecked(debug);
+
+    this->station->manual = this->settings->value("manual", false).toBool();
+    this->ui->cb_manual->setChecked(this->station->manual);
 }
 
 void MainWindow::create_timers(void) {
@@ -114,6 +130,69 @@ MainWindow::~MainWindow() {
     delete this->server;
 }
 
+void MainWindow::closeEvent(QCloseEvent *event) {
+    if (this->tray_icon->isVisible()) {
+        this->hide();
+        event->ignore();
+    }
+}
+void MainWindow::create_tray_icon() {
+    this->trayIconMenu = new QMenu(this);
+    this->trayIconMenu->addAction(minimizeAction);
+    this->trayIconMenu->addAction(maximizeAction);
+    this->trayIconMenu->addAction(restoreAction);
+    this->trayIconMenu->addSeparator();
+    this->trayIconMenu->addAction(quitAction);
+
+    this->tray_icon = new QSystemTrayIcon(this);
+    this->tray_icon->setContextMenu(trayIconMenu);
+}
+
+void MainWindow::create_actions() {
+    minimizeAction = new QAction("Mi&nimize", this);
+    connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
+
+    maximizeAction = new QAction("Ma&ximize", this);
+    connect(maximizeAction, &QAction::triggered, this, &QWidget::showMaximized);
+
+    restoreAction = new QAction("&Restore", this);
+    connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
+
+    quitAction = new QAction("&Quit", this);
+    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+}
+
+void MainWindow::set_icon(int index) {
+    QIcon icon = QIcon(":/images/images/icon.png");
+    this->tray_icon->setIcon(icon);
+    this->setWindowIcon(icon);
+
+    this->tray_icon->setToolTip("AMOS controller");
+}
+
+void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
+    switch (reason) {
+        case QSystemTrayIcon::DoubleClick:
+            if (this->isVisible()) {
+                this->hide();
+            } else {
+                this->show();
+            }
+            break;
+        case QSystemTrayIcon::MiddleClick:
+            break;
+        default:
+            ;
+    }
+}
+
+void MainWindow::show_message(void) {
+    this->tray_icon->showMessage("AMOS", "AMOS is working", QIcon(":/images/images/icon.png"), 10000);
+}
+
+void MainWindow::message_clicked() {
+}
+
 void MainWindow::on_actionExit_triggered() {
     QApplication::quit();
 }
@@ -144,7 +223,9 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    ui->group_environment->setTitle(QString("Environment (%1 s)").arg((double) this->station->dome_manager->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1));
+    ui->group_environment->setTitle(QString("Environment (%1 s)").arg(
+        (double) this->station->dome_manager->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1)
+    );
     ui->label_temp->setText(QString("%1 °C").arg(this->station->dome_manager->temperature, 3, 'f', 1));
     ui->label_press->setText(QString("%1 kPa").arg(this->station->dome_manager->pressure / 1000, 5, 'f', 3));
     ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager->humidity, 3, 'f', 1));
@@ -295,19 +376,6 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_altitude->setValue(this->station->altitude);
 }
 
-void MainWindow::on_checkbox_manual_stateChanged(int enable) {
-    if (enable) {
-        this->setWindowTitle("AMOS client [manual mode]");
-        logger.warning("Switched to manual mode");
-    } else {
-        this->setWindowTitle("AMOS client [automatic mode]");
-        logger.warning("Switched to automatic mode");
-    }
-    this->station->automatic = (bool) enable;
-    ui->group_cover->setEnabled(this->station->automatic);
-    ui->group_devices->setEnabled(this->station->automatic);
-}
-
 void MainWindow::station_position_edited(void) {
     this->button_station_toggle(
         (ui->le_station_id->text() != this->station->get_id()) ||
@@ -359,6 +427,7 @@ void MainWindow::on_bt_permanent_clicked() {
 void MainWindow::on_pushButton_clicked() {
     try {
         Telegram telegram(QByteArray(ui->le_telegram->text().toUtf8()));
+        logger.info(telegram.get_message());
     } catch (RuntimeException& e) {
         logger.error(e.what());
     }
@@ -366,7 +435,7 @@ void MainWindow::on_pushButton_clicked() {
 
 void MainWindow::on_pushButton_2_clicked() {
     try {
-        Telegram telegram = Telegram(0x55, ui->le_telegram->text().toUtf8());
+        Telegram telegram = Telegram(0x99, ui->le_telegram->text().toUtf8());
         logger.info("Encoding...");
         QByteArray ba = telegram.compose();
         logger.info(QString("Encoded to %1").arg(QString(ba)));
@@ -382,4 +451,22 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
 
     logger.set_level(debug ? Level::Debug : Level::Info);
     logger.warning(QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
+}
+
+void MainWindow::on_cb_manual_stateChanged(int enable) {
+    if (enable) {
+        this->setWindowTitle("AMOS client [manual mode]");
+        logger.warning("Switched to manual mode");
+    } else {
+        this->setWindowTitle("AMOS client [automatic mode]");
+        logger.warning("Switched to automatic mode");
+    }
+    this->station->manual = (bool) enable;
+    ui->group_cover->setEnabled(this->station->manual);
+    ui->group_devices->setEnabled(this->station->manual);
+}
+
+void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
+    logger.warning(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
+    this->station->dome_manager->init_serial_port(this->serial_ports[index].portName());
 }

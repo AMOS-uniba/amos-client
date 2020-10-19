@@ -11,7 +11,7 @@
 #include "telegram.h"
 #include "request.h"
 #include "exception.h"
-
+#include "state.h"
 
 #include <stdexcept>
 #include <random>

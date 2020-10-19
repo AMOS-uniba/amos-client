@@ -10,11 +10,6 @@
     <height>943</height>
    </rect>
   </property>
-  <property name="font">
-   <font>
-    <family>Segoe UI</family>
-   </font>
-  </property>
   <property name="windowTitle">
    <string>AMOS [automatic mode]</string>
   </property>
@@ -572,6 +567,22 @@
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="2" column="0">
+          <widget class="QCheckBox" name="cb_manual">
+           <property name="cursor">
+            <cursorShape>IBeamCursor</cursorShape>
+           </property>
+           <property name="text">
+            <string>Enable manual control</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="co_serial_ports"/>
+         </item>
+         <item row="3" column="0" colspan="2">
           <widget class="QGroupBox" name="group_cover">
            <property name="title">
             <string>Cover</string>
@@ -634,7 +645,7 @@
            </layout>
           </widget>
          </item>
-         <item row="3" column="0">
+         <item row="4" column="0" colspan="2">
           <widget class="QGroupBox" name="group_devices">
            <property name="title">
             <string>Devices</string>
@@ -740,16 +751,6 @@
              </widget>
             </item>
            </layout>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="checkbox_manual">
-           <property name="text">
-            <string>Enable manual control</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
           </widget>
          </item>
         </layout>

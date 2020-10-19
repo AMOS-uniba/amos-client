@@ -25,6 +25,7 @@ public:
     Telegram(const QByteArray& message);
 
     QByteArray compose(void) const;
+    QByteArray get_message(void) const;
 };
 
 #endif // TELEGRAM_H

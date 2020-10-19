@@ -10,6 +10,9 @@
 #include <QFileDialog>
 #include <QLineEdit>
 #include <QProgressBar>
+#include <QMessageBox>
+#include <QSystemTrayIcon>
+#include <QCloseEvent>
 
 #include "forward.h"
 
@@ -20,6 +23,8 @@ QT_END_NAMESPACE
 
 class MainWindow: public QMainWindow {
     Q_OBJECT    
+protected:
+    void closeEvent(QCloseEvent *event) override;
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
@@ -52,7 +57,6 @@ private slots:
 
     void on_bt_station_apply_clicked();
 
-    void on_checkbox_manual_stateChanged(int arg1);
     void station_position_edited(void);
 
     void button_station_toggle(bool enable);
@@ -64,12 +68,18 @@ private slots:
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
 
-
     void on_pushButton_clicked();
-
     void on_pushButton_2_clicked();
 
+    void on_cb_manual_stateChanged(int enable);
     void on_cb_debug_stateChanged(int debug);
+
+    void on_co_serial_ports_currentIndexChanged(int index);
+
+    void set_icon(int index);
+    void icon_activated(QSystemTrayIcon::ActivationReason reason);
+    void show_message();
+    void message_clicked();
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
@@ -82,5 +92,17 @@ private:
     Station *station;
     Universe *universe;
     Server *server;
+
+    QAction *minimizeAction;
+    QAction *maximizeAction;
+    QAction *restoreAction;
+    QAction *quitAction;
+    void create_actions(void);
+    void create_tray_icon(void);
+
+    QSystemTrayIcon *tray_icon;
+    QMenu *trayIconMenu;
+
+    QList<QSerialPortInfo> serial_ports;
 };
 #endif // MAINWINDOW_H

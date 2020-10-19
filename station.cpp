@@ -2,11 +2,8 @@
 
 extern Log logger;
 
-Station::Station(const QString& _id, const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
+Station::Station(const QString& _id) {
     this->id = _id;
-
-    this->primary_storage = new Storage("primary", primary_storage_dir);
-    this->permanent_storage = new Storage("permanent", permanent_storage_dir);
 
     this->dome_manager = new Dome();
 }
@@ -15,6 +12,11 @@ Station::~Station(void) {
     delete this->dome_manager;
     delete this->primary_storage;
     delete this->permanent_storage;
+}
+
+void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
+    this->primary_storage = new Storage("primary", primary_storage_dir);
+    this->permanent_storage = new Storage("permanent", permanent_storage_dir);
 }
 
 void Station::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
@@ -86,7 +88,7 @@ Storage& Station::get_permanent_storage(void) {
 
 void Station::check_sun(void) {
     logger.debug("Checking the Sun's altitude");
-    if (this->automatic) {
+    if (this->manual) {
         if (this->is_dark()) {
             this->dome_manager->open_cover();
         } else {
@@ -97,7 +99,7 @@ void Station::check_sun(void) {
 
 QJsonObject Station::prepare_heartbeat(void) const {
      return QJsonObject {
-        {"auto", this->automatic},
+        {"auto", this->manual},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->dome_manager->json()},
 
