@@ -66,9 +66,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
-    connect(&this->comm_thread, &CommThread::response, this, [=](const QByteArray &m){ logger.info(m); });
+    /*connect(&this->comm_thread, &CommThread::response, this, [=](const QByteArray &m){ logger.info(m); });
     connect(&this->comm_thread, &CommThread::error, this, [=](const QString &m){ logger.error(m); });
-    connect(&this->comm_thread, &CommThread::timeout, this, [=](const QString &m){ logger.warning(m); });
+    connect(&this->comm_thread, &CommThread::timeout, this, [=](const QString &m){ logger.warning(m); });*/
 }
 
 void MainWindow::load_settings(void) {
@@ -111,7 +111,7 @@ void MainWindow::create_timers(void) {
     this->timer_heartbeat->start();
 
     this->timer_operation = new QTimer(this);
-    this->timer_operation->setInterval(1000);
+    this->timer_operation->setInterval(200);
     connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
     this->timer_operation->start();
 
@@ -476,5 +476,7 @@ void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
 }
 
 void MainWindow::on_pushButton_3_clicked() {
-    this->comm_thread.transaction("COM1", 100, "U99015390\x0D");
+    //this->comm_thread.transaction("COM1", 100, "U99015390\x0D");
+    this->station->dome_manager->send("S");
+    this->station->dome_manager->send("T");
 }

@@ -17,7 +17,7 @@ const Command Dome::CommandHotwireOn    = Command('\x09', "turn on hotwire");
 const Command Dome::CommandHotwireOff   = Command('\x0A', "turn off hotwire");
 const Command Dome::CommandResetSlave   = Command('\x0B', "reset slave");
 
-
+/*
 CommThread::CommThread(QObject *parent): QThread(parent) {}
 
 CommThread::~CommThread() {
@@ -57,6 +57,11 @@ void CommThread::run(void) {
 
     QSerialPort serial;
 
+    serial.setBaudRate(QSerialPort::Baud9600);
+    serial.setDataBits(QSerialPort::Data8);
+    serial.setParity(QSerialPort::NoParity);
+    serial.setStopBits(QSerialPort::OneStop);
+    serial.setFlowControl(QSerialPort::SoftwareControl);
     if (current_port_name.isEmpty()) {
         emit error("No port name specified");
         return;
@@ -74,11 +79,15 @@ void CommThread::run(void) {
                 logger.info(QString("Port %1 opened").arg(current_port_name));
             }
         }
+        qDebug() << "Serial error: " << serial.error();
+    qDebug() << "Serial errorString: " << serial.errorString();
 
         const QByteArray request_data = current_request;
-        logger.info(QString("Sending '%1'").arg(QString(request_data)));
+        logger.info(QString("Sending '%1' (%2 bytes)").arg(QString(request_data)).arg(request_data.length()));
         serial.write(request_data);
+        logger.info("Waiting for write");
         if (serial.waitForBytesWritten(this->wait_timeout)) {
+            logger.info("Written, waiting for read");
             if (serial.waitForReadyRead(current_wait_timeout)) {
                 QByteArray response_data = serial.readAll();
                 while (serial.waitForReadyRead(10)) {
@@ -107,7 +116,7 @@ void CommThread::run(void) {
         this->mutex.unlock();
     }
 }
-
+*/
 
 Dome::Dome() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
@@ -150,13 +159,14 @@ void Dome::init_serial_port(const QString& port) {
         delete this->serial_port;
     }
 
- /*   this->serial_port = new QSerialPort(this);
+    this->serial_port = new QSerialPort(this);
     this->serial_port->setPortName(port);
     this->serial_port->setBaudRate(QSerialPort::Baud9600);
     this->serial_port->setDataBits(QSerialPort::Data8);
     this->serial_port->open(QSerialPort::ReadWrite);
-*/
-    //this->connect(this->serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
+
+    this->connect(this->serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
+    this->connect(this->serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
 }
 
 void Dome::fake_env_data(void) {
@@ -220,12 +230,13 @@ void Dome::send_request(const Request& request) const {
 }
 
 void Dome::send(const QByteArray& message) const {
+    logger.info(QString("Sending message '%1'").arg(QString(message)));
     Telegram telegram(this->address, message);
     QByteArray full = telegram.compose();
 
-/*
     this->serial_port->write(full);
-    if (this->serial_port->waitForBytesWritten(100)) {
+
+  /*  if (this->serial_port->waitForBytesWritten(100)) {
         logger.info("Waited for written");
         if (this->serial_port->waitForReadyRead(100)) {
             logger.info("Waited for read");
@@ -239,41 +250,32 @@ void Dome::send(const QByteArray& message) const {
     } else {
         logger.error(QString("Wait write request timeout"));
     }*/
+}
 
-
-
-   /*
-    if (this->serial_port->isOpen()) {
-        logger.debug("Serial port open");
-        logger.debug(QString(full));
-        this->serial_port->write(full);
-    } else {
-        if (this->serial_port->open(QSerialPort::ReadWrite)) {
-            logger.info("Opened");
-        } else {
-            logger.error(QString("Could not open serial port %1: %2").arg(this->serial_port->portName()).arg(this->serial_port->errorString()));
-        }
+void Dome::process_response(void) {
+    QByteArray response;
+    QThread::msleep(50);
+    while (this->serial_port->bytesAvailable()) {
+        response += this->serial_port->readAll();
     }
 
-    if (this->serial_port->waitForBytesWritten(100)) {
-        logger.info(QString("Bytes written: '%1'").arg(QString(full)));
-    } else {
-        logger.info("Timeout");
-        emit this->write_timeout();
+    logger.info(QString("Processing response: %1 %2").arg(this->serial_port->bytesAvailable()).arg(QString(response)));
+    this->buffer += response;
+
+    logger.info(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->buffer)).arg(this->buffer.length()));
+
+    try {
+        Telegram telegram(this->buffer);
+        logger.info(QString("Got message %1").arg(QString(telegram.get_message())));
+        this->buffer.clear();
+    } catch (MalformedTelegram& e) {
+        logger.error(QString("Malformed message %1").arg(QString(this->buffer)));
     }
 
-    if (this->serial_port->waitForReadyRead(100)) {
-        QByteArray response = this->serial_port->readAll();
-        while (this->serial_port->waitForReadyRead(100)) {
-            response += this->serial_port->readAll();
-        }
+}
 
-        logger.info(QString(response));
-        emit this->response_received(response);
-    } else {
-        logger.info("No response");
-    }
-        */
+void Dome::handle_error(QSerialPort::SerialPortError error) {
+    logger.error(QString("Fucking serial port error %1: %2").arg(error).arg(this->serial_port->errorString()));
 }
 
 void Dome::toggle_fan(void) {

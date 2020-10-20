@@ -107,7 +107,7 @@ private:
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
 
-    CommThread comm_thread;
+    //CommThread comm_thread;
 
     QList<QSerialPortInfo> serial_ports;
 };

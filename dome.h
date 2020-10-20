@@ -35,7 +35,7 @@ struct CommandInfo {
     QString display_name;
 };
 
-
+/*
 class CommThread: public QThread {
     Q_OBJECT
 public:
@@ -58,7 +58,7 @@ private:
     bool quit = false;
 };
 
-
+*/
 class Dome: public QObject {
     Q_OBJECT
 private:
@@ -77,6 +77,8 @@ private:
 
     QSerialPort *serial_port;
     QTimer *refresh_timer;
+
+    QByteArray buffer;
 
     void update_status_basic(void);
     void update_status_environment(void);
@@ -123,6 +125,8 @@ public slots:
     void toggle_intensifier(void);
 
     void request_status(void);
+    void process_response(void);
+    void handle_error(QSerialPort::SerialPortError error);
 
 signals:
     void read_timeout(void) const;
