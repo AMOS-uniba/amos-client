@@ -25,4 +25,9 @@ public:
     ConfigurationError(const QString& message);
 };
 
+class InvalidState: public RuntimeException {
+public:
+    InvalidState(const QString& message);
+};
+
 #endif // EXCEPTION_H

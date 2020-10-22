@@ -5,16 +5,16 @@
 
 #include "forward.h"
 
-class DomeState {
-protected:
-    unsigned char state;
+class DomeStateS {
+private:
+    unsigned char basic;
+    unsigned char env;
+    unsigned char errors;
+    unsigned int t_alive;
 public:
-    DomeState(unsigned char byte);
-    virtual QByteArray full_text(void) const = 0;
-};
+    DomeStateS(void);
+    DomeStateS(const QByteArray &response);
 
-class DomeStateBasic: public DomeState {
-public:
     bool servo_moving(void) const;
     bool servo_direction(void) const;
     bool dome_open_sensor_active(void) const;
@@ -24,23 +24,12 @@ public:
     bool intensifier_active(void) const;
     bool fan_active(void) const;
 
-    QByteArray full_text(void) const override;
-};
-
-class DomeStateEnv: public DomeState {
-public:
-    DomeStateEnv(unsigned char byte);
     bool rain_sensor_active(void) const;
     bool light_sensor_active(void) const;
     bool computer_power_sensor_active(void) const;
     bool cover_safety_position(void) const;
     bool servo_blocked(void) const;
 
-    QByteArray full_text(void) const override;
-};
-
-class DomeStateError: public DomeState {
-public:
     bool error_t_lens(void) const;
     bool error_SHT31(void) const;
     bool emergency_closing_light(void) const;
@@ -50,7 +39,37 @@ public:
     bool error_t_CPU(void) const;
     bool emergency_closing_rain(void) const;
 
-    QByteArray full_text(void) const override;
+    unsigned int time_alive(void) const;
+
+    QByteArray full_text(void) const;
+};
+
+
+
+class DomeStateT {
+private:
+    float t_lens, t_cpu, t_sht, h_sht;
+    static float deciint(const QByteArray &chunk);
+public:
+    DomeStateT(void);
+    DomeStateT(const QByteArray &response);
+
+    float temperature_lens(void) const;
+    float temperature_cpu(void) const;
+    float temperature_sht(void) const;
+    float humidity_sht(void) const;
+};
+
+
+
+class DomeStateZ {
+private:
+    unsigned short int s_pos;
+public:
+    DomeStateZ(void);
+    DomeStateZ(const QByteArray &response);
+
+    unsigned short int shaft_position(void) const;
 };
 
 #endif // DOMESTATE_H

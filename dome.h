@@ -8,6 +8,7 @@
 #define DOMEMANAGER_H
 
 #include "forward.h"
+#include "domestate.h"
 
 enum class CoverState {
     OPEN,
@@ -59,10 +60,11 @@ private:
 };
 
 */
+
 class Dome: public QObject {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 3000;
+    constexpr static unsigned int REFRESH = 500;
     const static Request RequestBasic, RequestEnv, RequestShaft;
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -83,18 +85,20 @@ private:
     void update_status_basic(void);
     void update_status_environment(void);
     void update_status_shaft(void);
+
+    void process_response_S(const QByteArray &response);
+    void process_response_T(const QByteArray &response);
+    void process_response_Z(const QByteArray &response);
+
+    DomeStateS state_S;
+    DomeStateT state_T;
+    DomeStateZ state_Z;
 public:
 
     /* maps for storing states and their associated information
         (code, verbose name, further properties may be added as needed) */
     const static QMap<CoverState, State> Cover;
     const static QMap<TernaryState, State> Ternary;
-
-    double temperature;
-    double pressure;
-    double humidity;
-
-    unsigned int cover_position = 0;
 
     CoverState cover_state = CoverState::CLOSED;
     TernaryState heating_state = TernaryState::UNKNOWN;
@@ -106,13 +110,12 @@ public:
 
     void init_serial_port(const QString& port);
 
-    void fake_env_data(void);
-    void fake_gizmo_data(void);
     const QDateTime& get_last_received(void) const;
 
+    const DomeStateS& get_state_S(void) const;
+    const DomeStateT& get_state_T(void) const;
+    const DomeStateZ& get_state_Z(void) const;
 
-    void open_cover(void);
-    void close_cover(void);
     void send_command(const Command& command) const;
     void send_request(const Request& request) const;
     void send(const QByteArray& message) const;
@@ -120,6 +123,9 @@ public:
     QJsonObject json(void) const;
 
 public slots:
+    void open_cover(void);
+    void close_cover(void);
+
     void toggle_fan(void);
     void toggle_heating(void);
     void toggle_intensifier(void);

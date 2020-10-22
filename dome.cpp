@@ -169,50 +169,16 @@ void Dome::init_serial_port(const QString& port) {
     this->connect(this->serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
 }
 
-void Dome::fake_env_data(void) {
-    std::uniform_real_distribution<double> td(-20, 30);
-    std::normal_distribution<double> pd(100000, 1000);
-    std::uniform_real_distribution<double> hd(0, 100);
-
-    this->temperature = td(this->generator);
-    this->pressure = pd(this->generator);
-    this->humidity = hd(this->generator);
-
-    this->last_received = QDateTime::currentDateTimeUtc();
-}
-
-void Dome::fake_gizmo_data(void) {
-    this->heating_state = TernaryState::UNKNOWN;
-    this->intensifier_state = TernaryState::UNKNOWN;
-}
-
-void Dome::open_cover(void) {
-    if (this->cover_state == CoverState::CLOSED) {
-        this->send_command(Dome::CommandOpenCover);
-        this->cover_state = CoverState::OPENING;
-    } else {
-        logger.warning("Cover is not closed, ignoring");
-    }
-}
-
-void Dome::close_cover(void) {
-    if (this->cover_state == CoverState::OPEN) {
-        this->send_command(Dome::CommandCloseCover);
-        this->cover_state = CoverState::CLOSING;
-    } else {
-        logger.warning("Cover is not open, ignoring");
-    }
-}
-
 QJsonObject Dome::json(void) const {
     return QJsonObject {
         {"env", QJsonObject {
-            {"t", this->temperature},
-            {"p", this->pressure},
-            {"h", this->humidity},
+            {"t_lens", this->state_T.temperature_lens()},
+            {"t_cpu", this->state_T.temperature_cpu()},
+            {"t_sht", this->state_T.temperature_sht()},
+            {"h_sht", this->state_T.humidity_sht()},
         }},
         {"cs", Dome::Cover[this->cover_state].code},
-        {"cp", (int) this->cover_position},
+        {"cp", (int) this->state_Z.shaft_position()},
         {"heat", QString(QChar(Ternary[this->heating_state].code))},
         {"ii", QString(QChar(Ternary[this->intensifier_state].code))},
         {"fan", QString(QChar(Ternary[this->fan_state].code))},
@@ -254,28 +220,75 @@ void Dome::send(const QByteArray& message) const {
 
 void Dome::process_response(void) {
     QByteArray response;
-    QThread::msleep(50);
+
     while (this->serial_port->bytesAvailable()) {
         response += this->serial_port->readAll();
     }
 
-    logger.info(QString("Processing response: %1 %2").arg(this->serial_port->bytesAvailable()).arg(QString(response)));
+    //logger.debug(QString("Processing response: %1 %2").arg(this->serial_port->bytesAvailable()).arg(QString(response)));
     this->buffer += response;
 
-    logger.info(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->buffer)).arg(this->buffer.length()));
+    logger.debug(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->buffer)).arg(this->buffer.length()));
 
     try {
         Telegram telegram(this->buffer);
-        logger.info(QString("Got message %1").arg(QString(telegram.get_message())));
+        QByteArray message = telegram.get_message();
+        logger.info(QString("Received message %1").arg(QString(message.toHex())));
+
+        switch (message[0]) {
+            case 'S':
+                this->state_S = DomeStateS(message);
+                break;
+            case 'T':
+                this->state_T = DomeStateT(message);
+                break;
+            case 'Z':
+                this->state_Z = DomeStateZ(message);
+                break;
+            default:
+                throw MalformedTelegram(QString("Unknown message type '%1'").arg(message[0]));
+        }
+
         this->buffer.clear();
     } catch (MalformedTelegram& e) {
-        logger.error(QString("Malformed message %1").arg(QString(this->buffer)));
+       // logger.error(QString("Malformed message %1").arg(QString(this->buffer)));
+    } catch (InvalidState& e) {
+        logger.error(QString("Invalid state encountered: %1").arg(e.what()));
+        this->buffer.clear();
     }
 
 }
 
 void Dome::handle_error(QSerialPort::SerialPortError error) {
-    logger.error(QString("Fucking serial port error %1: %2").arg(error).arg(this->serial_port->errorString()));
+    logger.error(QString("Serial port error %1: %2").arg(error).arg(this->serial_port->errorString()));
+}
+
+const DomeStateS& Dome::get_state_S(void) const {
+    return this->state_S;
+}
+
+const DomeStateT& Dome::get_state_T(void) const {
+    return this->state_T;
+}
+
+const DomeStateZ& Dome::get_state_Z(void) const {
+    return this->state_Z;
+}
+
+void Dome::open_cover(void) {
+    if (this->cover_state == CoverState::CLOSED) {
+        this->send_command(Dome::CommandOpenCover);
+    } else {
+        logger.warning("Cover is not closed, ignoring");
+    }
+}
+
+void Dome::close_cover(void) {
+    if (this->cover_state == CoverState::OPEN) {
+        this->send_command(Dome::CommandCloseCover);
+    } else {
+        logger.warning("Cover is not open, ignoring");
+    }
 }
 
 void Dome::toggle_fan(void) {
@@ -306,7 +319,7 @@ void Dome::toggle_intensifier(void) {
 }
 
 void Dome::request_status(void) {
-    //this->send_request(Dome::RequestBasic);
-    //this->send_request(Dome::RequestEnv);
-    //this->send_request(Dome::RequestShaft);
+  //  this->send_request(Dome::RequestBasic);
+    this->send_request(Dome::RequestEnv);
+   // this->send_request(Dome::RequestShaft);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>996</width>
-    <height>943</height>
+    <width>1260</width>
+    <height>860</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,27 +21,24 @@
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="2" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="6">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="4">
-       <widget class="QPushButton" name="pushButton_2">
+      <item row="0" column="1">
+       <widget class="QPushButton" name="button_send_heartbeat">
         <property name="text">
-         <string>Create telegram</string>
+         <string>Send heartbeat</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="8">
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="cb_debug">
+        <property name="text">
+         <string>Debug output</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="9">
        <widget class="QLabel" name="label_heartbeat">
         <property name="minimumSize">
          <size>
@@ -63,20 +60,27 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="3">
-       <widget class="QLineEdit" name="le_telegram"/>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cb_debug">
+      <item row="0" column="2">
+       <widget class="QPushButton" name="pushButton">
         <property name="text">
-         <string>Debug output</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
+         <string>Parse telegram</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0" colspan="9">
+      <item row="0" column="8">
+       <widget class="QLabel" name="label_hb">
+        <property name="minimumSize">
+         <size>
+          <width>50</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Next heartbeat in</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="10">
        <widget class="QTableWidget" name="tb_log">
         <property name="lineWidth">
          <number>1</number>
@@ -149,12 +153,28 @@
         </column>
        </widget>
       </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="pushButton">
+      <item row="0" column="7">
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="0" column="4">
+       <widget class="QPushButton" name="pushButton_2">
         <property name="text">
-         <string>Parse telegram</string>
+         <string>Create telegram</string>
         </property>
        </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QLineEdit" name="le_telegram"/>
       </item>
       <item row="0" column="5">
        <widget class="QPushButton" name="pushButton_3">
@@ -163,23 +183,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_send_heartbeat">
+      <item row="0" column="6">
+       <widget class="QPushButton" name="pushButton_4">
         <property name="text">
-         <string>Send heartbeat</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="7">
-       <widget class="QLabel" name="label_hb">
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Next heartbeat in</string>
+         <string>Send T</string>
         </property>
        </widget>
       </item>
@@ -420,65 +427,29 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGroupBox" name="group_pc">
-           <property name="title">
-            <string>Computer</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout_2">
-            <item row="0" column="0">
-             <widget class="QLabel" name="lb_t_cpu">
-              <property name="text">
-               <string>Temperature:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_t_cpu">
-              <property name="text">
-               <string>? °C</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
           <widget class="QGroupBox" name="group_environment">
            <property name="title">
             <string>Environment</string>
            </property>
            <layout class="QFormLayout" name="formLayout">
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_t">
-              <property name="text">
-               <string>Temperature:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="label_temp">
-              <property name="text">
-               <string>? °C</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
             <item row="1" column="0">
-             <widget class="QLabel" name="label_p">
+             <widget class="QLabel" name="lx_t_lens">
               <property name="text">
-               <string>Pressure:</string>
+               <string>Lens temperature</string>
               </property>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="label_press">
+            <item row="4" column="0">
+             <widget class="QLabel" name="lx_h_sht">
               <property name="text">
-               <string>? kPa</string>
+               <string>SHT humidity</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLabel" name="lb_h_sht">
+              <property name="text">
+               <string>? %</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -486,16 +457,43 @@
              </widget>
             </item>
             <item row="2" column="0">
-             <widget class="QLabel" name="label_h">
+             <widget class="QLabel" name="lx_t_cpu">
               <property name="text">
-               <string>Humidity:</string>
+               <string>Processor temperature</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0">
+             <widget class="QLabel" name="lx_t_sht">
+              <property name="text">
+               <string>SHT temperature</string>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="1">
+             <widget class="QLabel" name="lb_t_sht">
+              <property name="text">
+               <string>? °C</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
              </widget>
             </item>
             <item row="2" column="1">
-             <widget class="QLabel" name="label_hum">
+             <widget class="QLabel" name="lb_t_cpu">
               <property name="text">
-               <string>? %</string>
+               <string>? °C</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="lb_t_lens">
+              <property name="text">
+               <string>? °C</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -949,7 +947,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>996</width>
+     <width>1260</width>
      <height>21</height>
     </rect>
    </property>

@@ -5,11 +5,11 @@ extern Log logger;
 Station::Station(const QString& _id) {
     this->id = _id;
 
-    this->dome_manager = new Dome();
+    this->dome = new Dome();
 }
 
 Station::~Station(void) {
-    delete this->dome_manager;
+    delete this->dome;
     delete this->primary_storage;
     delete this->permanent_storage;
 }
@@ -90,9 +90,9 @@ void Station::check_sun(void) {
     logger.debug("Checking the Sun's altitude");
     if (this->manual) {
         if (this->is_dark()) {
-            this->dome_manager->open_cover();
+            this->dome->open_cover();
         } else {
-            this->dome_manager->close_cover();
+            this->dome->close_cover();
         }
     }
 }
@@ -101,7 +101,7 @@ QJsonObject Station::prepare_heartbeat(void) const {
      return QJsonObject {
         {"auto", this->manual},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
-        {"dome", this->dome_manager->json()},
+        {"dome", this->dome->json()},
 
         {"disk", QJsonObject {
             {"prim", this->primary_storage->json()},

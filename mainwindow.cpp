@@ -48,9 +48,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_position_edited);
 
-    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_fan);
-    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_heating);
-    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome_manager, &Dome::toggle_intensifier);
+    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome, &Dome::toggle_fan);
+    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome, &Dome::toggle_heating);
+    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome, &Dome::toggle_intensifier);
 
     this->serial_ports = QSerialPortInfo::availablePorts();
     for (QSerialPortInfo sp: this->serial_ports) {
@@ -99,11 +99,11 @@ void MainWindow::load_settings(void) {
 }
 
 void MainWindow::create_timers(void) {
-    this->request_telegram();
+/*    this->request_telegram();
     this->timer_telegram = new QTimer(this);
     this->timer_telegram->setInterval(3000);
     connect(timer_telegram, &QTimer::timeout, this, &MainWindow::request_telegram);
-    this->timer_telegram->start();
+    this->timer_telegram->start();*/
 
     this->timer_heartbeat = new QTimer(this);
     this->timer_heartbeat->setInterval(15 * 1000);
@@ -127,7 +127,6 @@ MainWindow::~MainWindow() {
     delete this->timer_operation;
     delete this->timer_cover;
     delete this->timer_heartbeat;
-    delete this->timer_telegram;
 
     delete this->universe;
     delete this->station;
@@ -205,6 +204,7 @@ void MainWindow::process_timer(void) {
     this->station->check_sun();
     this->display_time();
     this->display_env_data();
+    this->display_cover_status();
     this->display_sun_properties();
 }
 
@@ -228,11 +228,14 @@ void MainWindow::display_sun_properties(void) {
 
 void MainWindow::display_env_data(void) {
     ui->group_environment->setTitle(QString("Environment (%1 s)").arg(
-        (double) this->station->dome_manager->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1)
+        (double) this->station->dome->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1)
     );
-    ui->label_temp->setText(QString("%1 °C").arg(this->station->dome_manager->temperature, 3, 'f', 1));
-    ui->label_press->setText(QString("%1 kPa").arg(this->station->dome_manager->pressure / 1000, 5, 'f', 3));
-    ui->label_hum->setText(QString("%1 %").arg(this->station->dome_manager->humidity, 3, 'f', 1));
+    DomeStateT state_T = this->station->dome->get_state_T();
+
+    ui->lb_t_lens->setText(QString("%1 °C").arg(state_T.temperature_lens(), 4, 'f', 1));
+    ui->lb_t_cpu->setText(QString("%1 °C").arg(state_T.temperature_cpu(), 4, 'f', 1));
+    ui->lb_t_sht->setText(QString("%1 °C").arg(state_T.temperature_sht(), 4, 'f', 1));
+    ui->lb_h_sht->setText(QString("%1 %").arg(state_T.humidity_sht(), 4, 'f', 1));
 }
 
 void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
@@ -264,41 +267,12 @@ void MainWindow::send_heartbeat(void) {
 }
 
 void MainWindow::move_cover(void) {
-    switch (this->station->dome_manager->cover_state) {
-        case CoverState::OPENING: {
-            if (this->station->dome_manager->cover_position < 400) {
-                this->station->dome_manager->cover_position += 1;
-            } else {
-                this->station->dome_manager->cover_state = CoverState::OPEN;
-                ui->button_cover->setEnabled(true);
-                this->timer_cover->stop();
-            }
-            break;
-        }
-        case CoverState::CLOSING: {
-            if (this->station->dome_manager->cover_position > 0) {
-                this->station->dome_manager->cover_position -= 1;
-            } else {
-                this->station->dome_manager->cover_state = CoverState::CLOSED;
-                ui->button_cover->setEnabled(true);
-                this->timer_cover->stop();
-            }
-            break;
-        }
-        default:
-            break;
-    }
     this->display_cover_status();
-}
-
-void MainWindow::request_telegram(void) {
-    /* Currently a mockup */
-    this->station->dome_manager->fake_env_data();
 }
 
 void MainWindow::display_cover_status(void) {
     QString caption;
-    switch (this->station->dome_manager->cover_state) {
+    switch (this->station->dome->cover_state) {
         case CoverState::OPEN: {
             caption = "Open";
             ui->button_cover->setText("Close");
@@ -322,16 +296,16 @@ void MainWindow::display_cover_status(void) {
             break;
         }
     }
-    ui->progress_cover->setValue(this->station->dome_manager->cover_position);
+    ui->progress_cover->setValue(this->station->dome->get_state_Z().shaft_position());
     ui->label_cover_state->setText(caption);
 }
 
 void MainWindow::display_gizmo_status(void) {
-    this->ui->lb_fan->setText(Dome::Ternary[this->station->dome_manager->fan_state].display_name);
-    this->ui->bt_fan->setText(this->station->dome_manager->fan_state == TernaryState::ON ? "disable" : "enable");
+    this->ui->lb_fan->setText(Dome::Ternary[this->station->dome->fan_state].display_name);
+    this->ui->bt_fan->setText(this->station->dome->fan_state == TernaryState::ON ? "disable" : "enable");
 
-    this->ui->lb_intensifier->setText(Dome::Ternary[this->station->dome_manager->intensifier_state].display_name);
-    this->ui->bt_intensifier->setText(this->station->dome_manager->intensifier_state == TernaryState::ON ? "disable" : "enable");
+    this->ui->lb_intensifier->setText(Dome::Ternary[this->station->dome->intensifier_state].display_name);
+    this->ui->bt_intensifier->setText(this->station->dome->intensifier_state == TernaryState::ON ? "disable" : "enable");
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -339,11 +313,11 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 }
 
 void MainWindow::on_button_cover_clicked() {
-    if (this->station->dome_manager->cover_state == CoverState::CLOSED) {
-        this->station->dome_manager->open_cover();
+    if (this->station->dome->cover_state == CoverState::CLOSED) {
+        this->station->dome->open_cover();
     }
-    if (this->station->dome_manager->cover_state == CoverState::OPEN) {
-        this->station->dome_manager->open_cover();
+    if (this->station->dome->cover_state == CoverState::OPEN) {
+        this->station->dome->open_cover();
     }
     this->display_cover_status();
     this->timer_cover->start();
@@ -472,11 +446,14 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
 
 void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
     logger.warning(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
-    this->station->dome_manager->init_serial_port(this->serial_ports[index].portName());
+    this->station->dome->init_serial_port(this->serial_ports[index].portName());
 }
 
 void MainWindow::on_pushButton_3_clicked() {
     //this->comm_thread.transaction("COM1", 100, "U99015390\x0D");
-    this->station->dome_manager->send("S");
-    this->station->dome_manager->send("T");
+    this->station->dome->send("S");
+}
+
+void MainWindow::on_pushButton_4_clicked() {
+    this->station->dome->send("Z");
 }

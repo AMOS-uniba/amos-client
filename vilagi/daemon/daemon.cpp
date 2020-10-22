@@ -7,8 +7,8 @@
 #include <winuser.h>
 #include <process.h>
 
-#include "util\logger.h"
-#include "util\amosko.h"
+#include "..\util\logger.h"
+#include "..\util\amosko.h"
 
 using namespace std;
 
@@ -95,7 +95,7 @@ bool alreadyRunning() {
 	return(GetLastError() == ERROR_ALREADY_EXISTS);
 }
 
-void remapND() {//because of windows 7 bug - network disks don't get connected at startup sometimes! 
+void remapND() {//because of windows 7 bug - network disks don't get connected at startup sometimes!
 	system(cok.command);
 }
 

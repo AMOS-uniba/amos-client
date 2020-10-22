@@ -38,7 +38,6 @@ private slots:
     void on_actionExit_triggered();
 
     void process_timer(void);
-    void request_telegram(void);
 
     void display_time(void);
     void display_sun_properties(void);
@@ -84,6 +83,8 @@ private slots:
     void message_clicked();
 
     void on_pushButton_3_clicked();
+
+    void on_pushButton_4_clicked();
 
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;

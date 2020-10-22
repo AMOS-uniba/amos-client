@@ -12,9 +12,11 @@
 #include "request.h"
 #include "exception.h"
 #include "state.h"
+#include "domestate.h"
 
 #include <stdexcept>
 #include <random>
+#include <cstring>
 
 #include <QString>
 #include <QByteArray>
