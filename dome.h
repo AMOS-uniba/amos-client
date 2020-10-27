@@ -9,6 +9,7 @@
 
 #include "forward.h"
 #include "domestate.h"
+#include "serialbuffer.h"
 
 enum class CoverState {
     OPEN,
@@ -80,7 +81,7 @@ private:
     QSerialPort *serial_port;
     QTimer *refresh_timer;
 
-    QByteArray buffer;
+    SerialBuffer buffer;
 
     void update_status_basic(void);
     void update_status_environment(void);

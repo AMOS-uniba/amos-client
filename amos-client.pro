@@ -32,6 +32,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     request.cpp \
+    serialbuffer.cpp \
     server.cpp \
     state.cpp \
     station.cpp \
@@ -62,6 +63,7 @@ HEADERS += \
     log.h \
     mainwindow.h \
     request.h \
+    serialbuffer.h \
     server.h \
     state.h \
     station.h \

@@ -2,9 +2,7 @@
 
 extern Log logger;
 
-Server::Server(MainWindow* _main_window, const QHostAddress& _address, const unsigned short _port, const QString& _station_id):
-    main_window(_main_window) {
-
+Server::Server(const QHostAddress& _address, const unsigned short _port, const QString& _station_id) {
     this->set_url(_address, _port, _station_id);
     this->network_manager = new QNetworkAccessManager(this);
     connect(this->network_manager, &QNetworkAccessManager::finished, this, &Server::heartbeat_ok);
@@ -40,7 +38,7 @@ void Server::send_heartbeat(const QJsonObject& heartbeat) const {
     logger.debug(message);
     QNetworkReply *reply = this->network_manager->post(request, message);
 
-    this->main_window->connect(reply, &QNetworkReply::errorOccurred, this, &Server::heartbeat_error);
+    this->connect(reply, &QNetworkReply::errorOccurred, this, &Server::heartbeat_error);
 }
 
 void Server::heartbeat_error(QNetworkReply::NetworkError error) {

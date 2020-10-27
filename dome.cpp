@@ -118,7 +118,7 @@ void CommThread::run(void) {
 }
 */
 
-Dome::Dome() {
+Dome::Dome(): buffer() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
     this->address = 0x99;
 
@@ -226,7 +226,7 @@ void Dome::process_response(void) {
     }
 
     //logger.debug(QString("Processing response: %1 %2").arg(this->serial_port->bytesAvailable()).arg(QString(response)));
-    this->buffer += response;
+    this->buffer.insert(response);
 
     logger.debug(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->buffer)).arg(this->buffer.length()));
 
