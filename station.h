@@ -23,7 +23,7 @@ struct Position {
 class Station: public QObject {
     Q_OBJECT
 private:
-    QString id;
+    QString m_id;
     double altitude_dark;
 
     Storage *primary_storage;
@@ -31,7 +31,7 @@ private:
 
     QNetworkAccessManager *network_manager;
 public:
-    Station(const QString& _id);
+    Station(const QString& id);
     ~Station(void);
 
     double latitude;

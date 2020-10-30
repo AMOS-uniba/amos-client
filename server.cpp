@@ -32,12 +32,10 @@ void Server::send_heartbeat(const QJsonObject& heartbeat) const {
     QNetworkRequest request(this->url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
-    QJsonDocument document = QJsonDocument(heartbeat);
-    QByteArray message = document.toJson(QJsonDocument::Compact);
+    QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
+    logger.debug(QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
-    logger.debug(message);
     QNetworkReply *reply = this->network_manager->post(request, message);
-
     this->connect(reply, &QNetworkReply::errorOccurred, this, &Server::heartbeat_error);
 }
 

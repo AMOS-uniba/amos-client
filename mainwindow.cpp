@@ -32,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->create_timers();
     this->display_cover_status();
-    this->display_gizmo_status();
     this->display_station_config();
     this->display_storage_status();
 
@@ -48,9 +47,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_position_edited);
     connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_position_edited);
 
-    connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome, &Dome::toggle_fan);
-    connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome, &Dome::toggle_heating);
-    connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome, &Dome::toggle_intensifier);
+    //connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome, &Dome::toggle_fan);
+    //connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome, &Dome::toggle_heating);
+    //connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome, &Dome::toggle_intensifier);
 
     this->serial_ports = QSerialPortInfo::availablePorts();
     for (QSerialPortInfo sp: this->serial_ports) {
@@ -69,6 +68,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     /*connect(&this->comm_thread, &CommThread::response, this, [=](const QByteArray &m){ logger.info(m); });
     connect(&this->comm_thread, &CommThread::error, this, [=](const QString &m){ logger.error(m); });
     connect(&this->comm_thread, &CommThread::timeout, this, [=](const QString &m){ logger.warning(m); });*/
+
+    this->connect(this->station->dome, &Dome::state_updated_S, this, &MainWindow::display_basic_data);
+    this->connect(this->station->dome, &Dome::state_updated_T, this, &MainWindow::display_env_data);
+    this->connect(this->station->dome, &Dome::state_updated_Z, this, &MainWindow::display_shaft_position);
 }
 
 void MainWindow::load_settings(void) {
@@ -76,7 +79,7 @@ void MainWindow::load_settings(void) {
     unsigned short port = this->settings->value("server/port", 4805).toInt();
     QString station_id = this->settings->value("station/id", "none").toString();
 
-    this->server = new Server(this, QHostAddress(ip), port, station_id);
+    this->server = new Server(QHostAddress(ip), port, station_id);
 
     this->station = new Station(station_id);
     this->station->set_storages(
@@ -99,12 +102,6 @@ void MainWindow::load_settings(void) {
 }
 
 void MainWindow::create_timers(void) {
-/*    this->request_telegram();
-    this->timer_telegram = new QTimer(this);
-    this->timer_telegram->setInterval(3000);
-    connect(timer_telegram, &QTimer::timeout, this, &MainWindow::request_telegram);
-    this->timer_telegram->start();*/
-
     this->timer_heartbeat = new QTimer(this);
     this->timer_heartbeat->setInterval(15 * 1000);
     connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
@@ -121,7 +118,7 @@ void MainWindow::create_timers(void) {
 }
 
 MainWindow::~MainWindow() {
-    logger.info("Terminating");
+    logger.info("Terminating normally");
 
     delete this->ui;
     delete this->timer_operation;
@@ -226,16 +223,81 @@ void MainWindow::display_sun_properties(void) {
     ui->lb_ecl_longitude->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
 }
 
+void MainWindow::display_basic_data(void) {
+    const DomeStateS &state = this->station->dome->get_state_S();
+
+    unsigned int time_alive = state.time_alive();
+    unsigned int days = time_alive / 86400;
+    unsigned int hours = (time_alive % 86400) / 3600;
+    unsigned int minutes = (time_alive % 3600) / 60;
+    unsigned int seconds = time_alive % 60;
+    this->ui->lb_time_alive->setText(QString("%1d %2:%3:%4")
+                                     .arg(days)
+                                     .arg(hours, 2, 10, QChar('0'))
+                                     .arg(minutes, 2, 10, QChar('0'))
+                                     .arg(seconds, 2, 10, QChar('0')));
+
+    this->ui->lb_dome_moving->setText(state.servo_moving() ? "moving" : "not moving");
+    this->ui->lb_dome_cover_direction->setText(state.servo_direction() ? "opening" : "closing");
+    this->ui->lb_dome_open_sensor->setText(state.dome_open_sensor_active() ? "active" : "not active");
+    this->ui->lb_dome_closed_sensor->setText(state.dome_closed_sensor_active() ? "active" : "not active");
+
+    this->ui->lb_dome_safety_position->setText(state.cover_safety_position() ? "yes" : "no");
+    this->ui->lb_dome_blocked->setText(state.servo_blocked() ? "yes" : "no");
+
+    this->ui->lb_lens_heating->setText(state.lens_heating_active() ? "on" : "off");
+    this->ui->bt_lens_heating->setText(state.lens_heating_active() ? "turn off" : "turn on");
+
+    this->ui->lb_camera_heating->setText(state.camera_heating_active() ? "on" : "off");
+    this->ui->bt_camera_heating->setText(state.camera_heating_active() ? "turn off" : "turn on");
+
+    this->ui->lb_fan->setText(state.fan_active() ? "on" : "off");
+    this->ui->bt_fan->setText(state.fan_active() ? "turn off" : "turn on");
+
+    if (state.intensifier_active()) {
+        this->ui->lb_intensifier->setText("on");
+        this->ui->lb_intensifier->setStyleSheet("QLabel { color: white; }");
+        this->ui->bt_intensifier->setText("turn off");
+    } else {
+        this->ui->lb_intensifier->setText("off");
+        this->ui->lb_intensifier->setStyleSheet("QLabel { color: black; }");
+        this->ui->bt_intensifier->setText("turn on");
+    }
+
+    if (state.rain_sensor_active()) {
+        this->ui->lb_rain_sensor->setText("raining");
+        this->ui->lb_rain_sensor->setStyleSheet("QLabel { color: blue; }");
+    } else {
+        this->ui->lb_rain_sensor->setText("not raining");
+        this->ui->lb_rain_sensor->setStyleSheet("QLabel { color: black; }");
+    }
+
+    if (state.light_sensor_active()) {
+        this->ui->lb_light_sensor->setText("light");
+        this->ui->lb_light_sensor->setStyleSheet("QLabel { color: white; }");
+    } else {
+        this->ui->lb_light_sensor->setText("dark");
+        this->ui->lb_light_sensor->setStyleSheet("QLabel { color: black; }");
+    }
+
+    this->ui->lb_master_power->setText(state.computer_power_sensor_active() ? "powered" : "not powered");
+}
+
 void MainWindow::display_env_data(void) {
     ui->group_environment->setTitle(QString("Environment (%1 s)").arg(
         (double) this->station->dome->get_last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000, 3, 'f', 1)
     );
-    DomeStateT state_T = this->station->dome->get_state_T();
+    const DomeStateT &state = this->station->dome->get_state_T();
 
-    ui->lb_t_lens->setText(QString("%1 °C").arg(state_T.temperature_lens(), 4, 'f', 1));
-    ui->lb_t_cpu->setText(QString("%1 °C").arg(state_T.temperature_cpu(), 4, 'f', 1));
-    ui->lb_t_sht->setText(QString("%1 °C").arg(state_T.temperature_sht(), 4, 'f', 1));
-    ui->lb_h_sht->setText(QString("%1 %").arg(state_T.humidity_sht(), 4, 'f', 1));
+    ui->lb_t_lens->setText(QString("%1 °C").arg(state.temperature_lens(), 4, 'f', 1));
+    ui->lb_t_cpu->setText(QString("%1 °C").arg(state.temperature_cpu(), 4, 'f', 1));
+    ui->lb_t_sht->setText(QString("%1 °C").arg(state.temperature_sht(), 4, 'f', 1));
+    ui->lb_h_sht->setText(QString("%1 %").arg(state.humidity_sht(), 4, 'f', 1));
+}
+
+void MainWindow::display_shaft_position(void) {
+    const DomeStateZ &state_Z = this->station->dome->get_state_Z();
+    this->ui->progress_cover->setValue(state_Z.shaft_position());
 }
 
 void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
@@ -298,14 +360,6 @@ void MainWindow::display_cover_status(void) {
     }
     ui->progress_cover->setValue(this->station->dome->get_state_Z().shaft_position());
     ui->label_cover_state->setText(caption);
-}
-
-void MainWindow::display_gizmo_status(void) {
-    this->ui->lb_fan->setText(Dome::Ternary[this->station->dome->fan_state].display_name);
-    this->ui->bt_fan->setText(this->station->dome->fan_state == TernaryState::ON ? "disable" : "enable");
-
-    this->ui->lb_intensifier->setText(Dome::Ternary[this->station->dome->intensifier_state].display_name);
-    this->ui->bt_intensifier->setText(this->station->dome->intensifier_state == TernaryState::ON ? "disable" : "enable");
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -440,7 +494,7 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
         logger.warning("Switched to automatic mode");
     }
     this->station->manual = (bool) enable;
-    ui->group_cover->setEnabled(this->station->manual);
+    this->ui->button_cover->setEnabled(this->station->manual);
     ui->group_devices->setEnabled(this->station->manual);
 }
 
@@ -456,4 +510,12 @@ void MainWindow::on_pushButton_3_clicked() {
 
 void MainWindow::on_pushButton_4_clicked() {
     this->station->dome->send("Z");
+}
+
+void MainWindow::on_bt_lens_heating_clicked(void) {
+    this->station->dome->toggle_lens_heating();
+}
+
+void MainWindow::on_bt_intensifier_clicked(void) {
+    this->station->dome->toggle_intensifier();
 }

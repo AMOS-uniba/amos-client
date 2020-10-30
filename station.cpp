@@ -2,9 +2,7 @@
 
 extern Log logger;
 
-Station::Station(const QString& _id) {
-    this->id = _id;
-
+Station::Station(const QString& id): m_id(id) {
     this->dome = new Dome();
 }
 
@@ -38,12 +36,12 @@ void Station::set_id(const QString& new_id) {
         throw ConfigurationError(QString("Cannot set station id to '%1'").arg(new_id));
     }
 
-    this->id = new_id;
-    logger.info(QString("Station id changed to '%1'").arg(this->id));
+    this->m_id = new_id;
+    logger.info(QString("Station id changed to '%1'").arg(this->m_id));
 }
 
 const QString& Station::get_id(void) const {
-    return this->id;
+    return this->m_id;
 }
 
 bool Station::is_dark(const QDateTime& time) const {
@@ -51,7 +49,7 @@ bool Station::is_dark(const QDateTime& time) const {
 }
 
 void Station::set_altitude_dark(const double new_altitude_dark) {
-    if ((new_altitude_dark < -18) || (new_altitude_dark > 1)) {
+    if ((new_altitude_dark < -18) || (new_altitude_dark > 0)) {
         throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(new_altitude_dark));
     }
 
@@ -87,14 +85,13 @@ Storage& Station::get_permanent_storage(void) {
 }
 
 void Station::check_sun(void) {
-    logger.debug("Checking the Sun's altitude");
-    if (this->manual) {
+/*    if (!this->manual) {
         if (this->is_dark()) {
             this->dome->open_cover();
         } else {
             this->dome->close_cover();
         }
-    }
+    } */
 }
 
 QJsonObject Station::prepare_heartbeat(void) const {

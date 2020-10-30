@@ -14,8 +14,7 @@ public:
     void insert(const QByteArray &bytes);
     QByteArray pop(void);
 signals:
-    void message_complete(void) const;
-    void full(void) const;
+    void message_complete(const QByteArray &message);
 };
 
 #endif // SERIALBUFFER_H

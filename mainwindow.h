@@ -41,11 +41,12 @@ private slots:
 
     void display_time(void);
     void display_sun_properties(void);
+
+    void display_basic_data(void);
     void display_env_data(void);
+    void display_shaft_position(void);
 
     void display_cover_status(void);
-    void display_gizmo_status(void);
-    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
     void display_storage_status(void);
     void display_station_config(void);
 
@@ -86,6 +87,10 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_bt_lens_heating_clicked();
+
+    void on_bt_intensifier_clicked();
+
 private:
     QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
     Ui::MainWindow *ui;
@@ -107,6 +112,8 @@ private:
 
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
+
+    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
 
     //CommThread comm_thread;
 

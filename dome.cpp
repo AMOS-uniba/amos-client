@@ -118,7 +118,7 @@ void CommThread::run(void) {
 }
 */
 
-Dome::Dome(): buffer() {
+Dome::Dome() {
     this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
     this->address = 0x99;
 
@@ -127,12 +127,16 @@ Dome::Dome(): buffer() {
     this->connect(this->refresh_timer, &QTimer::timeout, this, &Dome::request_status);
     this->refresh_timer->start();
 
-    this->serial_port = nullptr;
+    this->m_serial_port = nullptr;
+
+    this->m_buffer = new SerialBuffer();
+    this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &Dome::process_message);
 }
 
 Dome::~Dome() {
-    delete this->serial_port;
+    delete this->m_serial_port;
     delete this->refresh_timer;
+    delete this->m_buffer;
 }
 
 const QMap<CoverState, State> Dome::Cover = {
@@ -155,18 +159,18 @@ const QDateTime& Dome::get_last_received(void) const {
 }
 
 void Dome::init_serial_port(const QString& port) {
-    if (this->serial_port != nullptr) {
-        delete this->serial_port;
+    if (this->m_serial_port != nullptr) {
+        delete this->m_serial_port;
     }
 
-    this->serial_port = new QSerialPort(this);
-    this->serial_port->setPortName(port);
-    this->serial_port->setBaudRate(QSerialPort::Baud9600);
-    this->serial_port->setDataBits(QSerialPort::Data8);
-    this->serial_port->open(QSerialPort::ReadWrite);
+    this->m_serial_port = new QSerialPort(this);
+    this->m_serial_port->setPortName(port);
+    this->m_serial_port->setBaudRate(QSerialPort::Baud9600);
+    this->m_serial_port->setDataBits(QSerialPort::Data8);
+    this->m_serial_port->open(QSerialPort::ReadWrite);
 
-    this->connect(this->serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
-    this->connect(this->serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
+    this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
+    this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
 }
 
 QJsonObject Dome::json(void) const {
@@ -196,71 +200,69 @@ void Dome::send_request(const Request& request) const {
 }
 
 void Dome::send(const QByteArray& message) const {
-    logger.info(QString("Sending message '%1'").arg(QString(message)));
+ //   logger.debug(QString("Sending message '%1'").arg(QString(message)));
     Telegram telegram(this->address, message);
-    QByteArray full = telegram.compose();
 
-    this->serial_port->write(full);
+    this->m_serial_port->write(telegram.compose());
 
-  /*  if (this->serial_port->waitForBytesWritten(100)) {
-        logger.info("Waited for written");
-        if (this->serial_port->waitForReadyRead(100)) {
-            logger.info("Waited for read");
-            QByteArray response = this->serial_port->readAll();
-            while (this->serial_port->waitForReadyRead(100))
-                response += this->serial_port->readAll();
-            logger.info(QString(response));
+    if (this->m_serial_port->waitForBytesWritten(100)) {
+        logger.debug("Waited for written");
+        if (this->m_serial_port->waitForReadyRead(100)) {
+            logger.debug("Waited for read");
+            QByteArray response = this->m_serial_port->readAll();
+            while (this->m_serial_port->waitForReadyRead(100))
+                response += this->m_serial_port->readAll();
+            logger.debug(QString(response));
         } else {
-            logger.error(QString("Wait read response timeout"));
+            logger.debug(QString("Wait read response timeout"));
         }
     } else {
-        logger.error(QString("Wait write request timeout"));
-    }*/
+        logger.debug(QString("Wait write request timeout"));
+    }
 }
 
 void Dome::process_response(void) {
     QByteArray response;
 
-    while (this->serial_port->bytesAvailable()) {
-        response += this->serial_port->readAll();
+    while (this->m_serial_port->bytesAvailable()) {
+        response += this->m_serial_port->readAll();
     }
 
-    //logger.debug(QString("Processing response: %1 %2").arg(this->serial_port->bytesAvailable()).arg(QString(response)));
-    this->buffer.insert(response);
+    this->m_buffer->insert(response);
+}
 
-    logger.debug(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->buffer)).arg(this->buffer.length()));
 
+void Dome::process_message(const QByteArray &message) {
     try {
-        Telegram telegram(this->buffer);
-        QByteArray message = telegram.get_message();
-        logger.info(QString("Received message %1").arg(QString(message.toHex())));
+        Telegram telegram(message);
+        QByteArray decoded = telegram.get_message();
+        logger.info(QString("Decoded message %1").arg(QString(decoded.toHex())));
 
-        switch (message[0]) {
+        switch (decoded[0]) {
             case 'S':
-                this->state_S = DomeStateS(message);
+                this->state_S = DomeStateS(decoded);
+                emit this->state_updated_S();
                 break;
             case 'T':
-                this->state_T = DomeStateT(message);
+                this->state_T = DomeStateT(decoded);
+                emit this->state_updated_T();
                 break;
             case 'Z':
-                this->state_Z = DomeStateZ(message);
+                this->state_Z = DomeStateZ(decoded);
+                emit this->state_updated_Z();
                 break;
             default:
-                throw MalformedTelegram(QString("Unknown message type '%1'").arg(message[0]));
+                throw MalformedTelegram(QString("Unknown response type '%1'").arg(decoded[0]));
         }
-
-        this->buffer.clear();
-    } catch (MalformedTelegram& e) {
-       // logger.error(QString("Malformed message %1").arg(QString(this->buffer)));
-    } catch (InvalidState& e) {
-        logger.error(QString("Invalid state encountered: %1").arg(e.what()));
-        this->buffer.clear();
+    } catch (MalformedTelegram &e) {
+        logger.error(QString("Malformed message '%1'").arg(QString(message)));
+    } catch (InvalidState &e) {
+        logger.error(QString("Invalid state: '%1'").arg(e.what()));
     }
-
 }
 
 void Dome::handle_error(QSerialPort::SerialPortError error) {
-    logger.error(QString("Serial port error %1: %2").arg(error).arg(this->serial_port->errorString()));
+    //logger.error(QString("Serial port error %1: %2").arg(error).arg(this->m_serial_port->errorString()));
 }
 
 const DomeStateS& Dome::get_state_S(void) const {
@@ -291,35 +293,35 @@ void Dome::close_cover(void) {
     }
 }
 
-void Dome::toggle_fan(void) {
-    logger.info("Toggling the fan");
-    if (this->fan_state == TernaryState::OFF) {
-        this->send_command(Dome::CommandFanOn);
-    } else {
-        this->send_command(Dome::CommandFanOff);
-    }
-}
-
-void Dome::toggle_heating(void) {
-    logger.info("Toggling the heating");
-    if (this->heating_state == TernaryState::OFF) {
+void Dome::toggle_lens_heating(void) {
+    logger.info("Toggling the lens heating");
+    if (this->get_state_S().lens_heating_active()) {
         this->send_command(Dome::CommandHotwireOn);
     } else {
         this->send_command(Dome::CommandHotwireOff);
     }
 }
 
-void Dome::toggle_intensifier(void) {
-    logger.info("Toggling the image intensifier");
-    if (this->intensifier_state == TernaryState::OFF) {
-        this->send_command(Dome::CommandIIOn);
+void Dome::toggle_fan(void) {
+    logger.info("Toggling the fan");
+    if (this->get_state_S().fan_active()) {
+        this->send_command(Dome::CommandFanOn);
     } else {
+        this->send_command(Dome::CommandFanOff);
+    }
+}
+
+void Dome::toggle_intensifier(void) {
+    logger.info("Toggling the intensifier");
+    if (this->get_state_S().intensifier_active()) {
         this->send_command(Dome::CommandIIOff);
+    } else {
+        this->send_command(Dome::CommandIIOn);
     }
 }
 
 void Dome::request_status(void) {
-  //  this->send_request(Dome::RequestBasic);
+    this->send_request(Dome::RequestBasic);
     this->send_request(Dome::RequestEnv);
-   // this->send_request(Dome::RequestShaft);
+    this->send_request(Dome::RequestShaft);
 }

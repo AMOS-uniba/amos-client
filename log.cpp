@@ -48,20 +48,20 @@ void Log::write(Level level, const QString& message) const {
     }
 
     if (this->display != nullptr) {
-        this->display->insertRow(0);
+        this->display->insertRow(this->display->rowCount());
 
         QTableWidgetItem *timestamp = new QTableWidgetItem(now.toString("yyyy-MM-dd hh:mm:ss.zzz"));
         timestamp->setTextAlignment(Qt::AlignCenter);
-        this->display->setItem(0, 0, timestamp);
+        this->display->setItem(this->display->rowCount() - 1, 0, timestamp);
 
         QTableWidgetItem *level_ = new QTableWidgetItem(Log::Levels[level].name);
         level_->setForeground(Log::Levels[level].colour);
         level_->setTextAlignment(Qt::AlignCenter);
-        this->display->setItem(0, 1, level_);
+        this->display->setItem(this->display->rowCount() - 1, 1, level_);
 
         QTableWidgetItem *text = new QTableWidgetItem(message);
         text->setForeground(Log::Levels[level].colour);
-        this->display->setItem(0, 2, text);
+        this->display->setItem(this->display->rowCount() - 1, 2, text);
     }
 }
 

@@ -65,7 +65,7 @@ private:
 class Dome: public QObject {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 500;
+    constexpr static unsigned int REFRESH = 2000;
     const static Request RequestBasic, RequestEnv, RequestShaft;
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -78,10 +78,10 @@ private:
     QDateTime last_received;
     std::default_random_engine generator;
 
-    QSerialPort *serial_port;
+    QSerialPort *m_serial_port;
     QTimer *refresh_timer;
 
-    SerialBuffer buffer;
+    SerialBuffer *m_buffer;
 
     void update_status_basic(void);
     void update_status_environment(void);
@@ -127,18 +127,24 @@ public slots:
     void open_cover(void);
     void close_cover(void);
 
+
+    void toggle_lens_heating(void);
     void toggle_fan(void);
-    void toggle_heating(void);
     void toggle_intensifier(void);
 
     void request_status(void);
     void process_response(void);
+    void process_message(const QByteArray &message);
     void handle_error(QSerialPort::SerialPortError error);
 
 signals:
     void read_timeout(void) const;
     void write_timeout(void) const;
     void response_received(const QByteArray& response) const;
+
+    void state_updated_S(void) const;
+    void state_updated_T(void) const;
+    void state_updated_Z(void) const;
 };
 
 #endif // DOMEMANAGER_H
