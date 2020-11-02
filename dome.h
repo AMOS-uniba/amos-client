@@ -10,6 +10,7 @@
 #include "forward.h"
 #include "domestate.h"
 #include "serialbuffer.h"
+#include "serialthread.h"
 
 enum class CoverState {
     OPEN,
@@ -38,41 +39,12 @@ struct CommandInfo {
 };
 
 /*
-class CommThread: public QThread {
-    Q_OBJECT
-public:
-    explicit CommThread(QObject *parent = nullptr);
-    ~CommThread(void);
-
-    void transaction(const QString &port_name, int wait_timeout, const QByteArray &request);
-signals:
-    void response(const QByteArray &message);
-    void error(const QString &message);
-    void timeout(const QString &message);
-private:
-    void run(void) override;
-
-    QString port_name;
-    QByteArray request;
-    int wait_timeout = 0;
-    QMutex mutex;
-    QWaitCondition condition;
-    bool quit = false;
-};
-
 */
 
 class Dome: public QObject {
     Q_OBJECT
 private:
     constexpr static unsigned int REFRESH = 2000;
-    const static Request RequestBasic, RequestEnv, RequestShaft;
-    const static Command CommandNoOp;
-    const static Command CommandOpenCover, CommandCloseCover;
-    const static Command CommandFanOn, CommandFanOff;
-    const static Command CommandIIOn, CommandIIOff;
-    const static Command CommandHotwireOn, CommandHotwireOff;
-    const static Command CommandResetSlave;
 
     unsigned char address;
     QDateTime last_received;
@@ -94,6 +66,8 @@ private:
     DomeStateS state_S;
     DomeStateT state_T;
     DomeStateZ state_Z;
+
+    SerialThread *m_serial_thread;
 public:
 
     /* maps for storing states and their associated information
@@ -117,9 +91,9 @@ public:
     const DomeStateT& get_state_T(void) const;
     const DomeStateZ& get_state_Z(void) const;
 
-    void send_command(const Command& command) const;
-    void send_request(const Request& request) const;
-    void send(const QByteArray& message) const;
+    void send_command(const Command& command);
+    void send_request(const Request& request);
+    void send(const QByteArray& message);
 
     QJsonObject json(void) const;
 
@@ -133,9 +107,9 @@ public slots:
     void toggle_intensifier(void);
 
     void request_status(void);
-    void process_response(void);
     void process_message(const QByteArray &message);
-    void handle_error(QSerialPort::SerialPortError error);
+    void process_timeout(const QString &timeout);
+    void process_error(const QString &error);
 
 signals:
     void read_timeout(void) const;

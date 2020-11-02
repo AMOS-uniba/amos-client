@@ -2,7 +2,20 @@
 
 extern Log logger;
 
-DomeStateS::DomeStateS(void) {
+DomeState::DomeState(void) {
+    this->m_timestamp = QDateTime::currentDateTimeUtc();
+    logger.debug(QString("State at %1").arg(this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")));
+}
+
+float DomeState::deciint(const QByteArray &chunk) {
+   short int x;
+   memcpy(&x, chunk.data(), 2);
+   return (float) (x / 10.0);
+}
+
+
+
+DomeStateS::DomeStateS(void): DomeState() {
     this->basic = 0;
     this->env = 0;
     this->errors = 0;
@@ -75,17 +88,13 @@ QByteArray DomeStateS::full_text(void) const {
     return result;
 }
 
-DomeStateT::DomeStateT(void) {
+
+
+DomeStateT::DomeStateT(void): DomeState() {
     this->t_lens = 0;
     this->t_cpu = 0;
     this->t_sht = 0;
     this->h_sht = 0;
-}
-
-float DomeStateT::deciint(const QByteArray &chunk) {
-   short int x;
-   memcpy(&x, chunk.data(), 2);
-   return (float) (x / 10.0);
 }
 
 DomeStateT::DomeStateT(const QByteArray &response) {
@@ -107,7 +116,7 @@ float DomeStateT::humidity_sht(void) const                  { return this->h_sht
 
 
 
-DomeStateZ::DomeStateZ(void) {
+DomeStateZ::DomeStateZ(void): DomeState() {
     this->s_pos = 0;
 }
 

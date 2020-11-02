@@ -13,6 +13,7 @@
 #include "exception.h"
 #include "state.h"
 #include "domestate.h"
+#include "serialthread.h"
 
 #include <stdexcept>
 #include <random>

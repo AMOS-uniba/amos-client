@@ -5,7 +5,20 @@
 
 #include "forward.h"
 
-class DomeStateS {
+
+class DomeState {
+private:
+    QDateTime m_timestamp;
+protected:
+    static float deciint(const QByteArray &chunk);
+public:
+    DomeState(void);
+    const QDateTime& timestamp(void) const;
+};
+
+
+
+class DomeStateS: public DomeState {
 private:
     unsigned char basic;
     unsigned char env;
@@ -46,10 +59,9 @@ public:
 
 
 
-class DomeStateT {
+class DomeStateT: public DomeState {
 private:
     float t_lens, t_cpu, t_sht, h_sht;
-    static float deciint(const QByteArray &chunk);
 public:
     DomeStateT(void);
     DomeStateT(const QByteArray &response);
@@ -62,7 +74,7 @@ public:
 
 
 
-class DomeStateZ {
+class DomeStateZ: public DomeState {
 private:
     unsigned short int s_pos;
 public:
