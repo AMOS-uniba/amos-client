@@ -83,17 +83,9 @@ const QString Dome::serial_port_info(void) const {
 
 QJsonObject Dome::json(void) const {
     return QJsonObject {
-        {"env", QJsonObject {
-            {"t_lens", this->state_T.temperature_lens()},
-            {"t_cpu", this->state_T.temperature_cpu()},
-            {"t_sht", this->state_T.temperature_sht()},
-            {"h_sht", this->state_T.humidity_sht()},
-        }},
-        {"cs", Dome::Cover[this->cover_state].code},
-        {"cp", (int) this->state_Z.shaft_position()},
-        {"heat", QString(QChar(Ternary[this->heating_state].code))},
-        {"ii", QString(QChar(Ternary[this->intensifier_state].code))},
-        {"fan", QString(QChar(Ternary[this->fan_state].code))},
+        {"s", this->state_S().json()},
+        {"t", this->state_T().json()},
+        {"z", this->state_Z().json()},
     };
 }
 
@@ -130,15 +122,15 @@ void Dome::process_message(const QByteArray &message) {
 
         switch (decoded[0]) {
             case 'S':
-                this->state_S = DomeStateS(decoded);
+                this->m_state_S = DomeStateS(decoded);
                 emit this->state_updated_S();
                 break;
             case 'T':
-                this->state_T = DomeStateT(decoded);
+                this->m_state_T = DomeStateT(decoded);
                 emit this->state_updated_T();
                 break;
             case 'Z':
-                this->state_Z = DomeStateZ(decoded);
+                this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z();
                 break;
             case 'C':
@@ -158,16 +150,16 @@ void Dome::handle_error(QSerialPort::SerialPortError error) {
     logger.error(QString("Serial port error %1: %2").arg(error).arg(this->m_serial_port->errorString()));
 }
 
-const DomeStateS& Dome::get_state_S(void) const {
-    return this->state_S;
+const DomeStateS& Dome::state_S(void) const {
+    return this->m_state_S;
 }
 
-const DomeStateT& Dome::get_state_T(void) const {
-    return this->state_T;
+const DomeStateT& Dome::state_T(void) const {
+    return this->m_state_T;
 }
 
-const DomeStateZ& Dome::get_state_Z(void) const {
-    return this->state_Z;
+const DomeStateZ& Dome::state_Z(void) const {
+    return this->m_state_Z;
 }
 
 
@@ -182,7 +174,7 @@ void Dome::close_cover(bool manual) {
 }
 
 void Dome::toggle_lens_heating(void) {
-    if (this->get_state_S().lens_heating_active()) {
+    if (this->state_S().lens_heating_active()) {
         this->send_command(Dome::CommandHotwireOff);
         logger.info("Turned off lens heating");
     } else {
@@ -192,7 +184,7 @@ void Dome::toggle_lens_heating(void) {
 }
 
 void Dome::toggle_fan(void) {
-    if (this->get_state_S().fan_active()) {
+    if (this->state_S().fan_active()) {
         this->send_command(Dome::CommandFanOff);
         logger.info("Turned off the fan");
     } else {
@@ -202,7 +194,7 @@ void Dome::toggle_fan(void) {
 }
 
 void Dome::toggle_intensifier(void) {
-    if (this->get_state_S().intensifier_active()) {
+    if (this->state_S().intensifier_active()) {
         this->send_command(Dome::CommandIIOff);
         logger.info("Turned off the image intensifier");
     } else {

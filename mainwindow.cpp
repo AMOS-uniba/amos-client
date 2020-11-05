@@ -56,11 +56,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     //connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome, &Dome::toggle_heating);
     //connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome, &Dome::toggle_intensifier);
 
-    this->serial_ports = QSerialPortInfo::availablePorts();
-    for (QSerialPortInfo sp: this->serial_ports) {
-        this->ui->co_serial_ports->addItem(sp.portName());
-    }
-
+    this->init_serial_ports();
     this->create_actions();
     this->create_tray_icon();
     this->set_icon(0);
@@ -77,6 +73,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->dome, &Dome::state_updated_S, this, &MainWindow::display_basic_data);
     this->connect(this->station->dome, &Dome::state_updated_T, this, &MainWindow::display_env_data);
     this->connect(this->station->dome, &Dome::state_updated_Z, this, &MainWindow::display_shaft_position);
+}
+
+void MainWindow::init_serial_ports(void) {
+    this->ui->co_serial_ports->clear();
+    this->serial_ports = QSerialPortInfo::availablePorts();
+    for (QSerialPortInfo sp: this->serial_ports) {
+        this->ui->co_serial_ports->addItem(sp.portName());
+    }
 }
 
 void MainWindow::load_settings(void) {
@@ -118,18 +122,18 @@ void MainWindow::create_timers(void) {
     this->connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
     this->timer_heartbeat->start();
 
-    this->timer_operation = new QTimer(this);
-    this->timer_operation->setInterval(100);
-    this->connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::process_timer);
-    this->connect(this->timer_operation, &QTimer::timeout, this, &MainWindow::display_basic_data);
-    this->timer_operation->start();
+    this->timer_display = new QTimer(this);
+    this->timer_display->setInterval(100);
+    this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::process_display_timer);
+    this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::display_basic_data);
+    this->timer_display->start();
 }
 
 MainWindow::~MainWindow() {
     logger.info("Terminating normally");
 
     delete this->ui;
-    delete this->timer_operation;
+    delete this->timer_display;
     delete this->timer_heartbeat;
 
     delete this->universe;
@@ -204,7 +208,7 @@ void MainWindow::on_actionExit_triggered() {
     QApplication::quit();
 }
 
-void MainWindow::process_timer(void) {
+void MainWindow::process_display_timer(void) {
     this->station->check_sun();
     this->display_time();
     this->display_env_data();
@@ -220,6 +224,7 @@ void MainWindow::display_time(void) {
 
 void MainWindow::display_serial_port_info(void) {
     this->ui->lb_serial_port->setText(this->station->dome->serial_port_info());
+    this->ui->lb_serial_data->setText(this->station->dome->state_S().is_valid() ? "valid data" : "no data");
 }
 
 void MainWindow::display_sun_properties(void) {
@@ -235,11 +240,11 @@ void MainWindow::display_sun_properties(void) {
     } else {
         if (hor.theta * Deg > this->station->darkness_limit()) {
             this->ui->lb_sun_status->setText("too much light");
-            this->ui->lb_sun_status->setToolTip("Sun below horizon, but above limit");
+            this->ui->lb_sun_status->setToolTip("Sun is below the horizon, but above the darkness limit");
             this->ui->lb_sun_status->setStyleSheet("QLabel { color: blue; }");
         } else {
             this->ui->lb_sun_status->setText("dark enough");
-            this->ui->lb_sun_status->setToolTip("Sun below horizon and below the limit");
+            this->ui->lb_sun_status->setToolTip("Sun is below the horizon and below the darkness limit");
             this->ui->lb_sun_status->setStyleSheet("QLabel { color: black; }");
         }
     }
@@ -253,9 +258,9 @@ void MainWindow::display_sun_properties(void) {
 }
 
 void MainWindow::display_basic_data(void) {
-    const DomeStateS &state = this->station->dome->get_state_S();
+    const DomeStateS &state = this->station->dome->state_S();
 
-    if (state.valid()) {
+    if (state.is_valid()) {
         unsigned int time_alive = state.time_alive();
         unsigned int days = time_alive / 86400;
         unsigned int hours = (time_alive % 86400) / 3600;
@@ -352,17 +357,16 @@ void MainWindow::display_basic_data(void) {
 }
 
 void MainWindow::display_env_data(void) {
-    const DomeStateT &state = this->station->dome->get_state_T();
-    ui->group_environment->setTitle(QString("Environment (%1 s)").arg(state.age(), 3, 'f', 1));
-
-    ui->lb_t_lens->setText(QString("%1 °C").arg(state.temperature_lens(), 4, 'f', 1));
-    ui->lb_t_cpu->setText(QString("%1 °C").arg(state.temperature_cpu(), 4, 'f', 1));
-    ui->lb_t_sht->setText(QString("%1 °C").arg(state.temperature_sht(), 4, 'f', 1));
-    ui->lb_h_sht->setText(QString("%1 %").arg(state.humidity_sht(), 4, 'f', 1));
+    const DomeStateT &state = this->station->dome->state_T();
+    this->ui->group_environment->setTitle(QString("Environment (%1 s)").arg(state.age(), 3, 'f', 1));
+    this->ui->lb_t_lens->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_lens(), 4, 'f', 1) : "? °C");
+    this->ui->lb_t_cpu->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_cpu(), 4, 'f', 1) : "? °C");
+    this->ui->lb_t_sht->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_sht(), 4, 'f', 1) : "? °C");
+    this->ui->lb_h_sht->setText(state.is_valid() ? QString("%1 %").arg(state.humidity_sht(), 4, 'f', 1) : "? %");
 }
 
 void MainWindow::display_shaft_position(void) {
-    const DomeStateZ &state = this->station->dome->get_state_Z();
+    const DomeStateZ &state = this->station->dome->state_Z();
     this->ui->progress_cover->setValue(state.shaft_position());
 }
 
@@ -395,11 +399,14 @@ void MainWindow::display_station_config(void) {
 
 void MainWindow::send_heartbeat(void) {
     this->server->send_heartbeat(this->station->prepare_heartbeat());
+    if (this->station->dome->serial_port_info() != "open") {
+        this->init_serial_ports();
+    }
 }
 
 void MainWindow::display_cover_status(void) {
-    ui->progress_cover->setValue(this->station->dome->get_state_Z().shaft_position());
-    const DomeStateS &state = this->station->dome->get_state_S();
+    ui->progress_cover->setValue(this->station->dome->state_Z().shaft_position());
+    const DomeStateS &state = this->station->dome->state_S();
 
     QString caption;
     if (state.servo_moving()) {

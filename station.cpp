@@ -4,6 +4,10 @@ extern Log logger;
 
 Station::Station(const QString& id): m_id(id) {
     this->dome = new Dome();
+
+    this->m_timer_automatic = new QTimer(this);
+    this->m_timer_automatic->setInterval(1000);
+    this->connect(this->m_timer_automatic, &QTimer::timeout, this, &Station::automatic_check);
 }
 
 Station::~Station(void) {
@@ -125,4 +129,21 @@ QJsonObject Station::prepare_heartbeat(void) const {
             {"perm", this->m_permanent_storage->json()},
         }}
     };
+}
+
+void Station::automatic_check(void) {
+    logger.debug("Automatic check");
+    const DomeStateS &state = this->dome->state_S();
+
+    if (state.is_valid() && state.dome_open_sensor_active() && !this->is_dark()) {
+        this->dome->close_cover(false);
+    }
+
+    if (state.is_valid() && state.intensifier_active() && !this->is_dark()) {
+        this->dome->toggle_intensifier();
+    }
+
+    if (this->is_dark()) {
+        if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {}
+    }
 }

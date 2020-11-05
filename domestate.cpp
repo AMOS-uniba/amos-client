@@ -14,7 +14,7 @@ float DomeState::deciint(const QByteArray &chunk) {
    return (float) (x / 10.0);
 }
 
-bool DomeState::valid(void) const {
+bool DomeState::is_valid(void) const {
     return (this->m_valid && (this->age() < 5));
 }
 
@@ -101,6 +101,16 @@ QByteArray DomeStateS::full_text(void) const {
     return result;
 }
 
+QJsonValue DomeStateS::json() const {
+    if (this->is_valid()) {
+        return QJsonValue(QString(this->full_text()));
+    } else {
+        return QJsonValue(QJsonValue::Null);
+    }
+}
+
+
+
 DomeStateT::DomeStateT(void): DomeState() {
     this->m_temp_lens = 0;
     this->m_temp_cpu = 0;
@@ -126,6 +136,19 @@ float DomeStateT::temperature_cpu(void) const               { return this->m_tem
 float DomeStateT::temperature_sht(void) const               { return this->m_temp_sht; }
 float DomeStateT::humidity_sht(void) const                  { return this->m_humi_sht; }
 
+QJsonValue DomeStateT::json(void) const {
+    if (this->is_valid()) {
+        return QJsonObject {
+            {"t_lens", this->temperature_lens()},
+            {"t_cpu", this->temperature_cpu()},
+            {"t_sht", this->temperature_sht()},
+            {"h_sht", this->humidity_sht()},
+        };
+    } else {
+        return QJsonValue(QJsonValue::Null);
+    }
+}
+
 
 
 DomeStateZ::DomeStateZ(void): DomeState() {
@@ -144,4 +167,12 @@ DomeStateZ::DomeStateZ(const QByteArray &response) {
 
 unsigned short int DomeStateZ::shaft_position(void) const {
     return this->m_shaft_position;
+}
+
+QJsonValue DomeStateZ::json(void) const {
+    if (this->is_valid()) {
+        return QJsonObject {{"sp", this->shaft_position()}};
+    } else {
+        return QJsonValue(QJsonValue::Null);
+    }
 }

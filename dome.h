@@ -91,9 +91,9 @@ private:
     void process_response_T(const QByteArray &response);
     void process_response_Z(const QByteArray &response);
 
-    DomeStateS state_S;
-    DomeStateT state_T;
-    DomeStateZ state_Z;
+    DomeStateS m_state_S;
+    DomeStateT m_state_T;
+    DomeStateZ m_state_Z;
 
     unsigned char m_robin = 0;
 public:
@@ -116,9 +116,9 @@ public:
     const QDateTime& get_last_received(void) const;
     const QString serial_port_info(void) const;
 
-    const DomeStateS& get_state_S(void) const;
-    const DomeStateT& get_state_T(void) const;
-    const DomeStateZ& get_state_Z(void) const;
+    const DomeStateS& state_S(void) const;
+    const DomeStateT& state_T(void) const;
+    const DomeStateZ& state_Z(void) const;
 
     void send_command(const Command& command) const;
     void send_request(const Request& request) const;

@@ -34,10 +34,11 @@ public:
 private slots:
     void load_settings(void);
     void create_timers(void);
+    void init_serial_ports(void);
 
     void on_actionExit_triggered();
 
-    void process_timer(void);
+    void process_display_timer(void);
 
     void display_time(void);
     void display_sun_properties(void);
@@ -88,7 +89,7 @@ private slots:
     void on_bt_cover_close_clicked();
 
 private:
-    QTimer *timer_operation, *timer_telegram, *timer_heartbeat;
+    QTimer *timer_display, *timer_heartbeat;
     Ui::MainWindow *ui;
     QSettings *settings;
 

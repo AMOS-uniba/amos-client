@@ -15,7 +15,8 @@ public:
     DomeState(void);
     const QDateTime& timestamp(void) const;
     float age(void) const;
-    bool valid(void) const;
+    bool is_valid(void) const;
+    virtual QJsonValue json(void) const = 0;
 };
 
 
@@ -57,6 +58,7 @@ public:
     unsigned int time_alive(void) const;
 
     QByteArray full_text(void) const;
+    QJsonValue json(void) const override;
 };
 
 
@@ -72,6 +74,8 @@ public:
     float temperature_cpu(void) const;
     float temperature_sht(void) const;
     float humidity_sht(void) const;
+
+    QJsonValue json(void) const override;
 };
 
 
@@ -84,6 +88,8 @@ public:
     DomeStateZ(const QByteArray &response);
 
     unsigned short int shaft_position(void) const;
+
+    QJsonValue json(void) const override;
 };
 
 #endif // DOMESTATE_H

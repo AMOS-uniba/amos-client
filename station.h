@@ -35,6 +35,7 @@ private:
     Storage *m_permanent_storage;
 
     QNetworkAccessManager *m_network_manager;
+    QTimer *m_timer_automatic;
 public:
     Station(const QString& id);
     ~Station(void);
@@ -71,6 +72,8 @@ public:
 
     void check_sun(void);
     QJsonObject prepare_heartbeat(void) const;
+public slots:
+    void automatic_check(void);
 };
 
 #endif // STATION_H
