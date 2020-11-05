@@ -65,7 +65,7 @@ private:
 class Dome: public QObject {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 2000;
+    constexpr static unsigned int REFRESH = 300;
     const static Request RequestBasic, RequestEnv, RequestShaft;
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -94,6 +94,8 @@ private:
     DomeStateS state_S;
     DomeStateT state_T;
     DomeStateZ state_Z;
+
+    unsigned char m_robin = 0;
 public:
 
     /* maps for storing states and their associated information
@@ -109,9 +111,10 @@ public:
     Dome();
     ~Dome();
 
-    void init_serial_port(const QString& port);
+    void reset_serial_port(const QString& port);
 
     const QDateTime& get_last_received(void) const;
+    const QString serial_port_info(void) const;
 
     const DomeStateS& get_state_S(void) const;
     const DomeStateT& get_state_T(void) const;
@@ -124,8 +127,9 @@ public:
     QJsonObject json(void) const;
 
 public slots:
-    void open_cover(void);
-    void close_cover(void);
+    void open_cover(bool manual);
+    void close_cover(bool manual);
+
 
 
     void toggle_lens_heating(void);

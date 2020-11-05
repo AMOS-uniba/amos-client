@@ -6,8 +6,8 @@
 
 class Telegram {
 private:
-    unsigned char address;
-    QByteArray message;
+    unsigned char m_address;
+    QByteArray m_message;
 
     constexpr static unsigned char START_BYTE_SLAVE = 0x5A;
     constexpr static unsigned char START_BYTE_MASTER = 0x55;

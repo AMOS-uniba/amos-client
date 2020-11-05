@@ -2,8 +2,10 @@
 
 extern Log logger;
 
-Telegram::Telegram(const unsigned char address, const QByteArray& message): address(address), message(message) {}
+// Construct a new telegram from
+Telegram::Telegram(const unsigned char address, const QByteArray& message): m_address(address), m_message(message) {}
 
+// RAII: construct a new telegram from the received message, includes validation
 Telegram::Telegram(const QByteArray& received) {
     // Check length of the message
     unsigned char length = received.length();
@@ -32,16 +34,15 @@ Telegram::Telegram(const QByteArray& received) {
     if ((received[0] != Telegram::START_BYTE_SLAVE) && (received[0] != Telegram::START_BYTE_MASTER)) {
         throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg(received[0], 2, 16, QChar('0')));
     }
-
     if (received[length - 1] != Telegram::END_BYTE) {
         throw MalformedTelegram(QString("Incorrect end byte 0x%1").arg((int) received[length - 1], 2, 16, QChar('0')));
     }
 
     // Finally extract address and payload
-    this->address = Telegram::decode_byte(received[1], received[2]);
-    this->message.resize(payload_length);
+    this->m_address = Telegram::decode_byte(received[1], received[2]);
+    this->m_message.resize(payload_length);
     for (unsigned char i = 0; i < payload_length; i++) {
-        this->message[i] = Telegram::decode_byte(received[5 + 2 * i], received[6 + 2 * i]);
+        this->m_message[i] = Telegram::decode_byte(received[5 + 2 * i], received[6 + 2 * i]);
     }
 }
 
@@ -85,22 +86,22 @@ unsigned char Telegram::encode_msq(unsigned char value) {
 
 // Compose a byte array to be sent over the serial port
 QByteArray Telegram::compose(void) const {
-    unsigned char length = this->message.length();
+    unsigned char length = this->m_message.length();
     QByteArray buffer(length * 2 + 8, '\0');
     unsigned int i = 0;
     unsigned char crc = 0;
 
     crc += buffer[0] = Telegram::START_BYTE_MASTER;
-    crc += buffer[1] = Telegram::encode_msq(address);
-    crc += buffer[2] = Telegram::encode_lsq(address);
+    crc += buffer[1] = Telegram::encode_msq(m_address);
+    crc += buffer[2] = Telegram::encode_lsq(m_address);
 
 
     crc += buffer[3] = Telegram::encode_msq(length);
     crc += buffer[4] = Telegram::encode_lsq(length);
 
     for (unsigned char i = 0; i < length; i++) {
-        crc += buffer[5 + 2*i] = Telegram::encode_msq(this->message[i]);
-        crc += buffer[6 + 2*i] = Telegram::encode_lsq(this->message[i]);
+        crc += buffer[5 + 2*i] = Telegram::encode_msq(this->m_message[i]);
+        crc += buffer[6 + 2*i] = Telegram::encode_lsq(this->m_message[i]);
     }
 
     i = 5 + 2 * length;
@@ -113,7 +114,7 @@ QByteArray Telegram::compose(void) const {
 }
 
 QByteArray Telegram::get_message(void) const {
-    return this->message;
+    return this->m_message;
 }
 
 // Decode address in hexadecimal format "AB" to the corresponding byte

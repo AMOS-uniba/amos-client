@@ -8,11 +8,9 @@ class SerialBuffer: public QObject {
     Q_OBJECT
 private:
     QByteArray m_data;
-    QQueue<QByteArray> m_messages;
 public:
     SerialBuffer(void);
     void insert(const QByteArray &bytes);
-    QByteArray pop(void);
 signals:
     void message_complete(const QByteArray &message);
 };

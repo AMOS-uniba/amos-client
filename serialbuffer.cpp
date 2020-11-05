@@ -11,20 +11,9 @@ void SerialBuffer::insert(const QByteArray &bytes) {
     for (char b: bytes) {
         this->m_data.append(b);
 
-        logger.debug(QString("Buffer now contains '%1' (%2 bytes)").arg(QString(this->m_data)).arg(this->m_data.length()));
         if (b == 0x0D) {
-            //this->m_messages.enqueue(this->m_data);
             emit this->message_complete(this->m_data);
             this->m_data.clear();
         }
-    }
-
-}
-
-QByteArray SerialBuffer::pop(void) {
-    if (this->m_messages.isEmpty()) {
-        return this->m_messages.dequeue();
-    } else {
-        throw "Buffer empty";
     }
 }

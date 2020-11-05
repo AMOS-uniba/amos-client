@@ -2,50 +2,76 @@
 
 extern Log logger;
 
-DomeStateS::DomeStateS(void) {
-    this->basic = 0;
-    this->env = 0;
-    this->errors = 0;
-    this->t_alive = 0;
+
+
+DomeState::DomeState(void):
+    m_timestamp(QDateTime::currentDateTimeUtc()),
+    m_valid(false) {}
+
+float DomeState::deciint(const QByteArray &chunk) {
+   short int x;
+   memcpy(&x, chunk.data(), 2);
+   return (float) (x / 10.0);
+}
+
+bool DomeState::valid(void) const {
+    return (this->m_valid && (this->age() < 5));
+}
+
+const QDateTime& DomeState::timestamp(void) const {
+    return this->m_timestamp;
+}
+
+float DomeState::age(void) const {
+    return this->m_timestamp.msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0;
+}
+
+
+DomeStateS::DomeStateS(void): DomeState() {
+    this->m_basic = 0;
+    this->m_env = 0;
+    this->m_errors = 0;
+    this->m_time_alive = 0;
 }
 
 DomeStateS::DomeStateS(const QByteArray &response) {
     if (response.length() != 8) {
         throw InvalidState(QString("Wrong S-state length %1").arg(response.length()));
     }
-    this->basic     = response[1];
-    this->env       = response[2];
-    this->errors    = response[3];
-    memcpy(&this->t_alive, response.mid(4, 4), 4);
+    this->m_basic     = response[1];
+    this->m_env       = response[2];
+    this->m_errors    = response[3];
+    this->m_valid     = true;
+    memcpy(&this->m_time_alive, response.mid(4, 4), 4);
 
     logger.debug(QString("S state received: %1").arg(QString(this->full_text())));
 }
 
-bool DomeStateS::servo_moving(void) const                   { return this->basic & 0x01; }
-bool DomeStateS::servo_direction(void) const                { return this->basic & 0x02; }
-bool DomeStateS::dome_open_sensor_active(void) const        { return this->basic & 0x04; }
-bool DomeStateS::dome_closed_sensor_active(void) const      { return this->basic & 0x08; }
-bool DomeStateS::lens_heating_active(void) const            { return this->basic & 0x10; }
-bool DomeStateS::camera_heating_active(void) const          { return this->basic & 0x20; }
-bool DomeStateS::intensifier_active(void) const             { return this->basic & 0x40; }
-bool DomeStateS::fan_active(void) const                     { return this->basic & 0x80; }
+bool DomeStateS::servo_moving(void) const                   { return this->m_basic & 0x01; }
+bool DomeStateS::servo_direction(void) const                { return this->m_basic & 0x02; }
+bool DomeStateS::dome_open_sensor_active(void) const        { return this->m_basic & 0x04; }
+bool DomeStateS::dome_closed_sensor_active(void) const      { return this->m_basic & 0x08; }
+bool DomeStateS::lens_heating_active(void) const            { return this->m_basic & 0x10; }
+bool DomeStateS::camera_heating_active(void) const          { return this->m_basic & 0x20; }
+bool DomeStateS::intensifier_active(void) const             { return this->m_basic & 0x40; }
+bool DomeStateS::fan_active(void) const                     { return this->m_basic & 0x80; }
 
-bool DomeStateS::rain_sensor_active(void) const             { return this->env & 0x01; }
-bool DomeStateS::light_sensor_active(void) const            { return this->env & 0x02; }
-bool DomeStateS::computer_power_sensor_active(void) const   { return this->env & 0x04; }
-bool DomeStateS::cover_safety_position(void) const          { return this->env & 0x20; }
-bool DomeStateS::servo_blocked(void) const                  { return this->env & 0x80; }
+bool DomeStateS::rain_sensor_active(void) const             { return this->m_env & 0x01; }
+bool DomeStateS::light_sensor_active(void) const            { return this->m_env & 0x02; }
+bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x04; }
+bool DomeStateS::cover_safety_position(void) const          { return this->m_env & 0x20; }
+bool DomeStateS::servo_blocked(void) const                  { return this->m_env & 0x80; }
 
-bool DomeStateS::error_t_lens(void) const                   { return this->errors & 0x01; }
-bool DomeStateS::error_SHT31(void) const                    { return this->errors & 0x02; }
-bool DomeStateS::emergency_closing_light(void) const        { return this->errors & 0x04; }
-bool DomeStateS::error_watchdog_reset(void) const           { return this->errors & 0x08; }
-bool DomeStateS::error_brownout_reset(void) const           { return this->errors & 0x10; }
-bool DomeStateS::error_computer_power(void) const           { return this->errors & 0x20; }
-bool DomeStateS::error_t_CPU(void) const                    { return this->errors & 0x40; }
-bool DomeStateS::emergency_closing_rain(void) const         { return this->errors & 0x80; }
+bool DomeStateS::error_t_lens(void) const                   { return this->m_errors & 0x01; }
+bool DomeStateS::error_SHT31(void) const                    { return this->m_errors & 0x02; }
+bool DomeStateS::emergency_closing_light(void) const        { return this->m_errors & 0x04; }
+bool DomeStateS::error_watchdog_reset(void) const           { return this->m_errors & 0x08; }
+bool DomeStateS::error_brownout_reset(void) const           { return this->m_errors & 0x10; }
+bool DomeStateS::error_computer_power(void) const           { return this->m_errors & 0x20; }
+bool DomeStateS::error_t_CPU(void) const                    { return this->m_errors & 0x40; }
+bool DomeStateS::emergency_closing_rain(void) const         { return this->m_errors & 0x80; }
 
-unsigned int DomeStateS::time_alive(void) const             { return this->t_alive / 75; }
+unsigned int DomeStateS::time_alive(void) const             { return this->m_time_alive / 75; }
 
 QByteArray DomeStateS::full_text(void) const {
     QByteArray result(26, '-');
@@ -75,17 +101,11 @@ QByteArray DomeStateS::full_text(void) const {
     return result;
 }
 
-DomeStateT::DomeStateT(void) {
-    this->t_lens = 0;
-    this->t_cpu = 0;
-    this->t_sht = 0;
-    this->h_sht = 0;
-}
-
-float DomeStateT::deciint(const QByteArray &chunk) {
-   short int x;
-   memcpy(&x, chunk.data(), 2);
-   return (float) (x / 10.0);
+DomeStateT::DomeStateT(void): DomeState() {
+    this->m_temp_lens = 0;
+    this->m_temp_cpu = 0;
+    this->m_temp_sht = 0;
+    this->m_humi_sht = 0;
 }
 
 DomeStateT::DomeStateT(const QByteArray &response) {
@@ -93,22 +113,23 @@ DomeStateT::DomeStateT(const QByteArray &response) {
         throw InvalidState(QString("Wrong T-state length %1").arg(response.length()));
     }
 
-    this->t_lens  = DomeStateT::deciint(response.mid(1, 2));
-    this->t_cpu   = DomeStateT::deciint(response.mid(3, 2));
-    this->t_sht   = DomeStateT::deciint(response.mid(5, 2));
-    this->h_sht   = DomeStateT::deciint(response.mid(7, 2));
-    logger.debug(QString("T state received: %1 %2 %3 %4").arg(this->t_lens).arg(this->t_cpu).arg(this->t_sht).arg(this->h_sht));
+    this->m_temp_lens  = DomeStateT::deciint(response.mid(1, 2));
+    this->m_temp_cpu   = DomeStateT::deciint(response.mid(3, 2));
+    this->m_temp_sht   = DomeStateT::deciint(response.mid(5, 2));
+    this->m_humi_sht   = DomeStateT::deciint(response.mid(7, 2));
+    this->m_valid      = true;
+    logger.debug(QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_cpu).arg(this->m_temp_sht).arg(this->m_humi_sht));
 }
 
-float DomeStateT::temperature_lens(void) const              { return this->t_lens; }
-float DomeStateT::temperature_cpu(void) const               { return this->t_cpu; }
-float DomeStateT::temperature_sht(void) const               { return this->t_sht; }
-float DomeStateT::humidity_sht(void) const                  { return this->h_sht; }
+float DomeStateT::temperature_lens(void) const              { return this->m_temp_lens; }
+float DomeStateT::temperature_cpu(void) const               { return this->m_temp_cpu; }
+float DomeStateT::temperature_sht(void) const               { return this->m_temp_sht; }
+float DomeStateT::humidity_sht(void) const                  { return this->m_humi_sht; }
 
 
 
-DomeStateZ::DomeStateZ(void) {
-    this->s_pos = 0;
+DomeStateZ::DomeStateZ(void): DomeState() {
+    this->m_shaft_position = 0;
 }
 
 DomeStateZ::DomeStateZ(const QByteArray &response) {
@@ -116,10 +137,11 @@ DomeStateZ::DomeStateZ(const QByteArray &response) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }
 
-    memcpy(&this->s_pos, response.mid(1, 2).data(), 2);
-    logger.debug(QString("Z state received: %1").arg(this->s_pos));
+    memcpy(&this->m_shaft_position, response.mid(1, 2).data(), 2);
+    this->m_valid = true;
+    logger.debug(QString("Z state received: %1").arg(this->m_shaft_position));
 }
 
 unsigned short int DomeStateZ::shaft_position(void) const {
-    return this->s_pos;
+    return this->m_shaft_position;
 }

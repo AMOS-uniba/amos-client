@@ -42,6 +42,8 @@ private slots:
     void display_time(void);
     void display_sun_properties(void);
 
+
+    void display_serial_port_info(void);
     void display_basic_data(void);
     void display_env_data(void);
     void display_shaft_position(void);
@@ -54,12 +56,9 @@ private slots:
 
     void on_button_send_heartbeat_pressed();
 
-    void on_button_cover_clicked();
-    void move_cover(void);
-
     void on_bt_station_apply_clicked();
 
-    void station_position_edited(void);
+    void station_edited(void);
 
     void button_station_toggle(bool enable);
 
@@ -70,29 +69,26 @@ private slots:
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
 
-    void on_pushButton_clicked();
-    void on_pushButton_2_clicked();
-
     void on_cb_manual_stateChanged(int enable);
     void on_cb_debug_stateChanged(int debug);
 
     void on_co_serial_ports_currentIndexChanged(int index);
 
+    // Tray and messaging
     void set_icon(int index);
     void icon_activated(QSystemTrayIcon::ActivationReason reason);
     void show_message();
     void message_clicked();
 
-    void on_pushButton_3_clicked();
-
-    void on_pushButton_4_clicked();
-
     void on_bt_lens_heating_clicked();
-
     void on_bt_intensifier_clicked();
+    void on_bt_fan_clicked();
+
+    void on_bt_cover_open_clicked();
+    void on_bt_cover_close_clicked();
 
 private:
-    QTimer *timer_operation, *timer_cover, *timer_telegram, *timer_heartbeat;
+    QTimer *timer_operation, *timer_telegram, *timer_heartbeat;
     Ui::MainWindow *ui;
     QSettings *settings;
 

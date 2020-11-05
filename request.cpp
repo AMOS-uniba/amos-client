@@ -1,22 +1,22 @@
 #include "include.h"
 
-Request::Request(unsigned char _code, const QString& _display_name):
-    code(_code),
-    display_name(_display_name) {}
+Request::Request(unsigned char code, const QString& display_name):
+    m_code(code),
+    m_display_name(display_name) {}
 
 
 QByteArray Request::for_telegram(void) const {
-    return QByteArray(1, this->code);
+    return QByteArray(1, this->m_code);
 }
 
-Command::Command(unsigned char _subcode, const QString& _display_name):
-    Request('C', _display_name),
-    subcode(_subcode) {}
+Command::Command(unsigned char subcode, const QString& display_name):
+    Request('C', display_name),
+    m_subcode(subcode) {}
 
 QByteArray Command::for_telegram(void) const {
-    return QByteArray(1, this->code) + QByteArray(1, this->subcode);
+    return QByteArray(1, this->m_code) + QByteArray(1, this->m_subcode);
 }
 
-const QString& Request::get_display_name(void) const {
-    return this->display_name;
+const QString& Request::display_name(void) const {
+    return this->m_display_name;
 }

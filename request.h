@@ -8,19 +8,19 @@
 
 class Request {
 protected:
-    unsigned char code;
-    QString display_name;
+    unsigned char m_code;
+    QString m_display_name;
 public:
-    Request(unsigned char _code, const QString& _display_name);
+    Request(unsigned char code, const QString& display_name);
     QByteArray for_telegram(void) const;
-    const QString& get_display_name(void) const;
+    const QString& display_name(void) const;
 };
 
 class Command: public Request {
 private:
-    unsigned char subcode;
+    unsigned char m_subcode;
 public:
-    Command(unsigned char _subcode, const QString& _display_name);
+    Command(unsigned char subcode, const QString& display_name);
     QByteArray for_telegram(void) const;
 };
 
