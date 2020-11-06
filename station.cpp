@@ -109,19 +109,25 @@ double Station::sun_azimuth(const QDateTime& time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
-void Station::check_sun(void) {
-/*    if (!this->manual) {
-        if (this->is_dark()) {
-            this->dome->open_cover();
-        } else {
-            this->dome->close_cover();
-        }
-    } */
+void Station::set_manual_control(bool manual) {
+    this->m_manual_control = manual;
 }
+
+bool Station::is_manual(void) const { return this->m_manual_control; }
+
+void Station::set_safety_override(bool override) {
+    if (this->m_manual_control) {
+        this->m_safety_override = override;
+    } else {
+        logger.error("Cannot override safety when not in manual mode!");
+    }
+}
+
+bool Station::is_safety_overridden(void) const { return this->m_safety_override; }
 
 QJsonObject Station::prepare_heartbeat(void) const {
      return QJsonObject {
-        {"auto", !this->manual},
+        {"auto", !this->is_manual()},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->dome->json()},
         {"disk", QJsonObject {
@@ -136,14 +142,62 @@ void Station::automatic_check(void) {
     const DomeStateS &state = this->dome->state_S();
 
     if (state.is_valid() && state.dome_open_sensor_active() && !this->is_dark()) {
-        this->dome->close_cover(false);
+        this->close_cover();
     }
 
     if (state.is_valid() && state.intensifier_active() && !this->is_dark()) {
-        this->dome->toggle_intensifier();
+        this->turn_off_intensifier();
     }
 
     if (this->is_dark()) {
-        if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {}
+        if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
+            this->open_cover();
+        }
     }
+}
+
+// High level command to open the cover. Opens only if it is dark, or if in override mode.
+void Station::open_cover(void) {
+    if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
+        this->dome->send_command(Dome::CommandOpenCover);
+    }
+}
+
+// High level command to close the cover. Closes anytime.
+void Station::close_cover(void) {
+    this->dome->send_command(Dome::CommandCloseCover);
+}
+
+// High level command to turn on the hotwire. Works anytime
+void Station::turn_on_hotwire(void) {
+    this->dome->send_command(Dome::CommandHotwireOn);
+}
+
+// High level command to turn off the hotwire. Works anytime
+void Station::turn_off_hotwire(void) {
+    this->dome->send_command(Dome::CommandHotwireOff);
+}
+
+// High level command to turn on the fan. Works anytime
+void Station::turn_on_fan(void) {
+    this->dome->send_command(Dome::CommandFanOn);
+}
+
+// High level command to turn off the fan. Works anytime
+void Station::turn_off_fan(void) {
+    this->dome->send_command(Dome::CommandFanOff);
+}
+
+// High level command to turn on the intensifier. Turns on only if it is dark, or if in override mode.
+void Station::turn_on_intensifier(void) {
+    if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
+        this->dome->send_command(Dome::CommandIIOn);
+    } else {
+        logger.warning("Command ignored, sun is too high and override is not active");
+    }
+}
+
+// High level command to turn off the intensifier. Works anytime
+void Station::turn_off_intensifier(void) {
+    this->dome->send_command(Dome::CommandIIOff);
 }

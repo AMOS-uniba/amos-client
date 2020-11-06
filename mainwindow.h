@@ -88,6 +88,8 @@ private slots:
     void on_bt_cover_open_clicked();
     void on_bt_cover_close_clicked();
 
+    void on_cb_safety_override_stateChanged(int arg1);
+
 private:
     QTimer *timer_display, *timer_heartbeat;
     Ui::MainWindow *ui;

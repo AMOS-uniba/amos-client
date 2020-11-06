@@ -30,6 +30,8 @@ private:
 
     double m_darkness_limit;
     double m_humidity_limit;
+    bool m_manual_control;
+    bool m_safety_override;
 
     Storage *m_primary_storage;
     Storage *m_permanent_storage;
@@ -40,11 +42,12 @@ public:
     Station(const QString& id);
     ~Station(void);
 
-
+    // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
     Storage& primary_storage(void);
     Storage& permanent_storage(void);
 
+    // G&S for position
     void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
     double latitude(void) const;
     double longitude(void) const;
@@ -61,17 +64,33 @@ public:
     void set_humidity_limit(const double new_altitude_dark);
     double humidity_limit(void) const;
 
-    bool manual = false;
-
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
 
+    void set_manual_control(bool manual);
+    bool is_manual(void) const;
+
+    void set_safety_override(bool override);
+    bool is_safety_overridden(void) const;
+
     Dome* dome;
     QVector<Server> servers;
 
-    void check_sun(void);
     QJsonObject prepare_heartbeat(void) const;
+
+    void open_cover(void);
+    void close_cover(void);
+
+    void turn_on_intensifier(void);
+    void turn_off_intensifier(void);
+
+    void turn_on_hotwire(void);
+    void turn_off_hotwire(void);
+
+    void turn_on_fan(void);
+    void turn_off_fan(void);
+
 public slots:
     void automatic_check(void);
 };

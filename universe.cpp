@@ -31,9 +31,9 @@ QString Universe::altitude_colour(double altitude) {
         return QString("hsv(240, 50%, %1%)").arg(altitude * 50.0 / 90.0 + 50.0);
     } else {
         if (altitude < 30) {
-            return QString("hsv(%1, 100%, 70%)").arg(altitude + 30.0);
+            return QString("hsv(%1, 100%, 80%)").arg(altitude + 30.0);
         } else {
-            return QString("hsv(60, 100%, %1%)").arg(70.0 + (20.0 * altitude - 30.0) / 60);
+            return QString("hsv(60, %1%, %1%)").arg(70.0 + (20.0 * altitude - 30.0) / 60);
         }
     }
 }

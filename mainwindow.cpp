@@ -108,8 +108,8 @@ void MainWindow::load_settings(void) {
         logger.set_level(debug ? Level::Debug : Level::Info);
         this->ui->cb_debug->setChecked(debug);
 
-        this->station->manual = this->settings->value("manual", false).toBool();
-        this->ui->cb_manual->setChecked(this->station->manual);
+        this->station->set_manual_control(this->settings->value("manual", false).toBool());
+        this->ui->cb_manual->setChecked(this->station->is_manual());
     } catch (ConfigurationError &e) {
         logger.fatal(e.what());
         QApplication::exit(-4);
@@ -209,7 +209,6 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::process_display_timer(void) {
-    this->station->check_sun();
     this->display_time();
     this->display_env_data();
     this->display_cover_status();
@@ -235,17 +234,17 @@ void MainWindow::display_sun_properties(void) {
 
     if (hor.theta * Deg > 0) {
         this->ui->lb_sun_status->setText("day");
-        this->ui->lb_sun_status->setToolTip("Sun above horizon");
-        this->ui->lb_sun_status->setStyleSheet("QLabel { color: light-blue; }");
+        this->ui->lb_sun_status->setToolTip("Sun is above the horizon");
+        this->ui->lb_sun_status->setStyleSheet(QString("QLabel { color: %1; }").arg(Universe::altitude_colour(hor.theta * Deg)));
     } else {
-        if (hor.theta * Deg > this->station->darkness_limit()) {
-            this->ui->lb_sun_status->setText("too much light");
-            this->ui->lb_sun_status->setToolTip("Sun is below the horizon, but above the darkness limit");
-            this->ui->lb_sun_status->setStyleSheet("QLabel { color: blue; }");
-        } else {
+        if (this->station->is_dark()) {
             this->ui->lb_sun_status->setText("dark enough");
             this->ui->lb_sun_status->setToolTip("Sun is below the horizon and below the darkness limit");
             this->ui->lb_sun_status->setStyleSheet("QLabel { color: black; }");
+        } else {
+            this->ui->lb_sun_status->setText("too much light");
+            this->ui->lb_sun_status->setToolTip("Sun is below the horizon, but above the darkness limit");
+            this->ui->lb_sun_status->setStyleSheet("QLabel { color: blue; }");
         }
     }
 
@@ -277,8 +276,8 @@ void MainWindow::display_basic_data(void) {
         this->ui->lb_dome_open_sensor->setText(state.dome_open_sensor_active() ? "active" : "not active");
         this->ui->lb_dome_closed_sensor->setText(state.dome_closed_sensor_active() ? "active" : "not active");
 
-        this->ui->bt_cover_open->setEnabled(!state.dome_open_sensor_active() && this->station->manual);
-        this->ui->bt_cover_close->setEnabled(!state.dome_closed_sensor_active() && this->station->manual);
+        this->ui->bt_cover_open->setEnabled(!state.dome_open_sensor_active() && this->station->is_manual());
+        this->ui->bt_cover_close->setEnabled(!state.dome_closed_sensor_active() && this->station->is_manual());
 
         this->ui->lb_dome_safety_position->setText(state.cover_safety_position() ? "yes" : "no");
         this->ui->lb_dome_blocked->setText(state.servo_blocked() ? "yes" : "no");
@@ -538,37 +537,79 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
         this->setWindowTitle("AMOS client [automatic mode]");
         logger.warning("Switched to automatic mode");
     }
-    this->station->manual = (bool) enable;
+    this->station->set_manual_control((bool) enable);
 
-    this->ui->bt_camera_heating->setEnabled(this->station->manual);
-    this->ui->bt_lens_heating->setEnabled(this->station->manual);
-    this->ui->bt_intensifier->setEnabled(this->station->manual);
-    this->ui->bt_fan->setEnabled(this->station->manual);
+    this->ui->bt_camera_heating->setEnabled(this->station->is_manual());
+    this->ui->bt_lens_heating->setEnabled(this->station->is_manual());
+    this->ui->bt_intensifier->setEnabled(this->station->is_manual());
+    this->ui->bt_fan->setEnabled(this->station->is_manual());
+
+    this->ui->cb_safety_override->setEnabled(this->station->is_manual());
 
     this->display_cover_status();
 }
 
 void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
-    logger.info(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
-    this->station->dome->reset_serial_port(this->serial_ports[index].portName());
+    if (index == -1) {
+        logger.warning("No serial ports found");
+    } else {
+        logger.info(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
+        this->station->dome->reset_serial_port(this->serial_ports[index].portName());
+    }
 }
 
 void MainWindow::on_bt_lens_heating_clicked(void) {
-    this->station->dome->toggle_lens_heating();
+    if (this->station->dome->state_S().lens_heating_active()) {
+        this->station->turn_off_hotwire();
+    } else {
+        this->station->turn_on_hotwire();
+    }
 }
 
 void MainWindow::on_bt_intensifier_clicked(void) {
-    this->station->dome->toggle_intensifier();
+    if (this->station->dome->state_S().intensifier_active()) {
+        this->station->turn_off_intensifier();
+    } else {
+        this->station->turn_on_intensifier();
+    }
 }
 
 void MainWindow::on_bt_fan_clicked(void) {
-    this->station->dome->toggle_fan();
+    if (this->station->dome->state_S().fan_active()) {
+        this->station->turn_off_fan();
+    } else {
+        this->station->turn_on_fan();
+    }
 }
 
 void MainWindow::on_bt_cover_open_clicked(void) {
-    this->station->dome->open_cover(true);
+    logger.info("Manual command to open the cover");
+    this->station->open_cover();
 }
 
 void MainWindow::on_bt_cover_close_clicked(void) {
-    this->station->dome->close_cover(true);
+    logger.info("Manual command to close the cover");
+    this->station->close_cover();
+}
+
+void MainWindow::on_cb_safety_override_stateChanged(int state) {
+    logger.info(QString("%1").arg(state));
+    if (state == Qt::CheckState::Checked) {
+        QMessageBox box;
+        box.setText("You are about to override the safety mechanisms!");
+        box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
+        box.setIcon(QMessageBox::Icon::Warning);
+        box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        int choice = box.exec();
+
+        switch (choice) {
+            case QMessageBox::Ok:
+                break;
+            case QMessageBox::Cancel:
+            default:
+                this->ui->cb_safety_override->setChecked(false);
+                this->station->set_safety_override(true);
+                break;
+        }
+    }
 }

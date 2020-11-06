@@ -39,21 +39,6 @@ Dome::~Dome() {
     delete this->m_buffer;
 }
 
-const QMap<CoverState, State> Dome::Cover = {
-    {CoverState::CLOSED, {'C', "closed"}},
-    {CoverState::OPENING, {'>', "opening"}},
-    {CoverState::OPEN, {'O', "open"}},
-    {CoverState::CLOSING, {'<', "closing"}},
-    {CoverState::SAFETY, {'S', "safety"}},
-    {CoverState::UNKNOWN, {'?', "unknown"}},
-};
-
-const QMap<TernaryState, State> Dome::Ternary = {
-    {TernaryState::OFF, {'0', "off"}},
-    {TernaryState::ON, {'1', "on"}},
-    {TernaryState::UNKNOWN, {'?', "unknown"}},
-};
-
 const QDateTime& Dome::get_last_received(void) const {
     return this->last_received;
 }
@@ -77,7 +62,7 @@ const QString Dome::serial_port_info(void) const {
     if (this->m_serial_port->isOpen()) {
         return "open";
     } else {
-        return QString("Error %1: %2").arg(this->m_serial_port->error()).arg(this->m_serial_port->errorString());
+        return QString("error %1: %2").arg(this->m_serial_port->error()).arg(this->m_serial_port->errorString());
     }
 }
 
@@ -150,58 +135,9 @@ void Dome::handle_error(QSerialPort::SerialPortError error) {
     logger.error(QString("Serial port error %1: %2").arg(error).arg(this->m_serial_port->errorString()));
 }
 
-const DomeStateS& Dome::state_S(void) const {
-    return this->m_state_S;
-}
-
-const DomeStateT& Dome::state_T(void) const {
-    return this->m_state_T;
-}
-
-const DomeStateZ& Dome::state_Z(void) const {
-    return this->m_state_Z;
-}
-
-
-void Dome::open_cover(bool manual) {
-    logger.info(QString("Opening the cover (%1)").arg(manual ? "manual" : "automatic"));
-    this->send_command(Dome::CommandOpenCover);
-}
-
-void Dome::close_cover(bool manual) {
-    logger.info(QString("Closing the cover (%1)").arg(manual ? "manual" : "automatic"));
-    this->send_command(Dome::CommandCloseCover);
-}
-
-void Dome::toggle_lens_heating(void) {
-    if (this->state_S().lens_heating_active()) {
-        this->send_command(Dome::CommandHotwireOff);
-        logger.info("Turned off lens heating");
-    } else {
-        this->send_command(Dome::CommandHotwireOn);
-        logger.info("Turned on lens heating");
-    }
-}
-
-void Dome::toggle_fan(void) {
-    if (this->state_S().fan_active()) {
-        this->send_command(Dome::CommandFanOff);
-        logger.info("Turned off the fan");
-    } else {
-        this->send_command(Dome::CommandFanOn);
-        logger.info("Turned on the fan");
-    }
-}
-
-void Dome::toggle_intensifier(void) {
-    if (this->state_S().intensifier_active()) {
-        this->send_command(Dome::CommandIIOff);
-        logger.info("Turned off the image intensifier");
-    } else {
-        this->send_command(Dome::CommandIIOn);
-        logger.info("Turned on the image intensifier");
-    }
-}
+const DomeStateS& Dome::state_S(void) const { return this->m_state_S; }
+const DomeStateT& Dome::state_T(void) const { return this->m_state_T; }
+const DomeStateZ& Dome::state_Z(void) const { return this->m_state_Z; }
 
 void Dome::request_status(void) {
     switch (this->m_robin) {
