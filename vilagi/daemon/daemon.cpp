@@ -170,8 +170,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 							}
 						}
 
-					}
-					else {
+					} else {
 						closeUFO();
 
 						if (cok.open) {

@@ -106,6 +106,7 @@ void Dome::process_message(const QByteArray &message) {
         QByteArray decoded = telegram.get_message();
 
         switch (decoded[0]) {
+            case 'C':
             case 'S':
                 this->m_state_S = DomeStateS(decoded);
                 emit this->state_updated_S();
@@ -117,9 +118,6 @@ void Dome::process_message(const QByteArray &message) {
             case 'Z':
                 this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z();
-                break;
-            case 'C':
-                logger.warning("Ignoring C message");
                 break;
             default:
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));

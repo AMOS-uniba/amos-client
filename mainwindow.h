@@ -39,6 +39,7 @@ private slots:
     void on_actionExit_triggered();
 
     void process_display_timer(void);
+    void process_watchdog_timer(void);
 
     void display_time(void);
     void display_sun_properties(void);
@@ -91,7 +92,7 @@ private slots:
     void on_cb_safety_override_stateChanged(int arg1);
 
 private:
-    QTimer *timer_display, *timer_heartbeat;
+    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
     Ui::MainWindow *ui;
     QSettings *settings;
 

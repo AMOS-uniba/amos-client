@@ -142,16 +142,42 @@ void Station::automatic_check(void) {
     const DomeStateS &state = this->dome->state_S();
 
     if (state.is_valid() && state.dome_open_sensor_active() && !this->is_dark()) {
+        logger.info("Closing the cover (automatic)");
         this->close_cover();
     }
 
     if (state.is_valid() && state.intensifier_active() && !this->is_dark()) {
+        logger.info("Turning off the image intensifier (automatic))");
         this->turn_off_intensifier();
     }
 
+
+    // should only do this in automatic mode
     if (this->is_dark()) {
         if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
+            logger.info("Opening the cover (automatic)");
             this->open_cover();
+        }
+
+        if (state.dome_open_sensor_active()) {
+            if (!state.intensifier_active()) {
+                logger.info("Turning on the image intensifier (automatic)");
+                this->turn_on_intensifier();
+            }
+
+            if (!state.fan_active()) {
+                logger.info("Turning on the fan (automatic)");
+                this->turn_on_fan();
+            }
+        }
+    } else {
+        if (state.dome_open_sensor_active()) {
+            logger.info("Closing the cover (automatic)");
+            this->close_cover();
+        }
+        if (state.intensifier_active()) {
+            logger.info("Turning off the image intensifier (automatic))");
+            this->turn_off_intensifier();
         }
     }
 }

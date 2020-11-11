@@ -38,6 +38,9 @@ DomeStateS::DomeStateS(const QByteArray &response) {
     if (response.length() != 8) {
         throw InvalidState(QString("Wrong S-state length %1").arg(response.length()));
     }
+    if ((response[0] != 'S') && (response[0] != 'C')) {
+        throw InvalidState(QString("Invalid first char of S state message '%1'").arg(QString(QChar(response[0]))));
+    }
     this->m_basic     = response[1];
     this->m_env       = response[2];
     this->m_errors    = response[3];
@@ -75,8 +78,8 @@ unsigned int DomeStateS::time_alive(void) const             { return this->m_tim
 
 QByteArray DomeStateS::full_text(void) const {
     QByteArray result(26, '-');
-    result[     0] = this->servo_moving()                        ? '1' : '0';
-    result[     1] = this->servo_direction()                     ? 'O' : 'C';
+    result[     0] = this->servo_moving()                        ? 'M' : '-';
+    result[     1] = this->servo_direction()                     ? 'O' : '-';
     result[     2] = this->dome_open_sensor_active()             ? 'O' : '-';
     result[     3] = this->dome_closed_sensor_active()           ? 'C' : '-';
     result[     4] = this->lens_heating_active()                 ? 'H' : '-';

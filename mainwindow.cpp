@@ -52,10 +52,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->dsb_darkness_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
     this->connect(this->ui->dsb_humidity_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
 
-    //connect(this->ui->bt_fan, &QPushButton::clicked, this->station->dome, &Dome::toggle_fan);
-    //connect(this->ui->bt_heating, &QPushButton::clicked, this->station->dome, &Dome::toggle_heating);
-    //connect(this->ui->bt_intensifier, &QPushButton::clicked, this->station->dome, &Dome::toggle_intensifier);
-
     this->init_serial_ports();
     this->create_actions();
     this->create_tray_icon();
@@ -118,15 +114,19 @@ void MainWindow::load_settings(void) {
 
 void MainWindow::create_timers(void) {
     this->timer_heartbeat = new QTimer(this);
-    this->timer_heartbeat->setInterval(15 * 1000);
+    this->timer_heartbeat->setInterval(60 * 1000);
     this->connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
     this->timer_heartbeat->start();
 
     this->timer_display = new QTimer(this);
     this->timer_display->setInterval(100);
     this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::process_display_timer);
-    this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::display_basic_data);
     this->timer_display->start();
+
+    this->timer_watchdog = new QTimer(this);
+    this->timer_watchdog->setInterval(1000);
+    this->connect(this->timer_watchdog, &QTimer::timeout, this, &MainWindow::process_watchdog_timer);
+    this->timer_watchdog->start();
 }
 
 MainWindow::~MainWindow() {
@@ -135,6 +135,7 @@ MainWindow::~MainWindow() {
     delete this->ui;
     delete this->timer_display;
     delete this->timer_heartbeat;
+    delete this->timer_watchdog;
 
     delete this->universe;
     delete this->station;
@@ -210,10 +211,17 @@ void MainWindow::on_actionExit_triggered() {
 
 void MainWindow::process_display_timer(void) {
     this->display_time();
+    this->display_basic_data();
     this->display_env_data();
     this->display_cover_status();
     this->display_sun_properties();
     this->display_serial_port_info();
+}
+
+void MainWindow::process_watchdog_timer(void) {
+    if (this->station->dome->serial_port_info() != "open") {
+        this->init_serial_ports();
+    }
 }
 
 void MainWindow::display_time(void) {
@@ -398,9 +406,6 @@ void MainWindow::display_station_config(void) {
 
 void MainWindow::send_heartbeat(void) {
     this->server->send_heartbeat(this->station->prepare_heartbeat());
-    if (this->station->dome->serial_port_info() != "open") {
-        this->init_serial_ports();
-    }
 }
 
 void MainWindow::display_cover_status(void) {
@@ -593,7 +598,7 @@ void MainWindow::on_bt_cover_close_clicked(void) {
 }
 
 void MainWindow::on_cb_safety_override_stateChanged(int state) {
-    logger.info(QString("%1").arg(state));
+    logger.info(QString("State changed: %1").arg(state));
     if (state == Qt::CheckState::Checked) {
         QMessageBox box;
         box.setText("You are about to override the safety mechanisms!");
