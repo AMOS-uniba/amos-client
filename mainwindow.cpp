@@ -429,7 +429,7 @@ void MainWindow::display_cover_status(void) {
                 if (state.dome_closed_sensor_active()) {
                     caption = "closed";
                 } else {
-                    caption = "problem";
+                    caption = "inconsistent";
                 }
             }
         }
@@ -447,7 +447,9 @@ void MainWindow::on_bt_station_apply_clicked() {
 
     this->station->set_id(this->ui->le_station_id->text());
     this->server->set_url(QHostAddress(address), port, this->station->get_id());
-    this->station->set_position(ui->dsb_latitude->value(), ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
+    this->station->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
+    this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
+    this->station->set_humidity_limit(this->ui->dsb_humidity_limit->value());
 
     this->settings->setValue("server/ip", this->server->get_address().toString());
     this->settings->setValue("server/port", this->server->get_port());
@@ -609,11 +611,11 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
 
         switch (choice) {
             case QMessageBox::Ok:
+                this->station->set_safety_override(true);
                 break;
             case QMessageBox::Cancel:
             default:
                 this->ui->cb_safety_override->setChecked(false);
-                this->station->set_safety_override(true);
                 break;
         }
     }

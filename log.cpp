@@ -20,7 +20,7 @@ const QMap<Level, LevelInfo> Log::Levels = {
     {Level::DebugDetail, {"DTL", "debug detail", Qt::gray}},
     {Level::Debug, {"DBG", "debug", Qt::darkGray}},
     {Level::Info, {"INF", "info", Qt::black}},
-    {Level::Warning, {"WAR", "warning", Qt::darkYellow}},
+    {Level::Warning, {"WAR", "warning", Qt::magenta}},
     {Level::Error, {"ERR", "error", Qt::red}},
     {Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
 };

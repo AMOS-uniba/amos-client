@@ -8,12 +8,14 @@ Station::Station(const QString& id): m_id(id) {
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
     this->connect(this->m_timer_automatic, &QTimer::timeout, this, &Station::automatic_check);
+    this->m_timer_automatic->start();
 }
 
 Station::~Station(void) {
     delete this->dome;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
+    delete this->m_timer_automatic;
 }
 
 void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
@@ -21,13 +23,8 @@ void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanen
     this->m_permanent_storage = new Storage("permanent", permanent_storage_dir);
 }
 
-Storage& Station::primary_storage(void) {
-    return *this->m_primary_storage;
-}
-
-Storage& Station::permanent_storage(void) {
-    return *this->m_permanent_storage;
-}
+Storage& Station::primary_storage(void) { return *this->m_primary_storage; }
+Storage& Station::permanent_storage(void) { return *this->m_permanent_storage; }
 
 // Position getters and setters
 void Station::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
@@ -79,6 +76,10 @@ void Station::set_darkness_limit(const double new_darkness_limit) {
 }
 
 // Humidity limit settings
+bool Station::is_humid(void) const {
+    return (this->dome->state_T().humidity_sht() > this->m_humidity_limit);
+}
+
 double Station::humidity_limit(void) const { return this->m_humidity_limit; }
 
 void Station::set_humidity_limit(const double new_humidity_limit) {
@@ -137,47 +138,62 @@ QJsonObject Station::prepare_heartbeat(void) const {
     };
 }
 
+// Perform automatic state checks
 void Station::automatic_check(void) {
     logger.debug("Automatic check");
+
     const DomeStateS &state = this->dome->state_S();
 
-    if (state.is_valid() && state.dome_open_sensor_active() && !this->is_dark()) {
-        logger.info("Closing the cover (automatic)");
+    if (!state.is_valid()) {
+        logger.warning("S state is not valid!");
+    }
+
+    // Emergency: close the cover
+    if (state.dome_open_sensor_active() && !this->is_dark()) {
+        logger.warning("Closing the cover (automatic)");
         this->close_cover();
     }
 
-    if (state.is_valid() && state.intensifier_active() && !this->is_dark()) {
-        logger.info("Turning off the image intensifier (automatic))");
+    // Emergency: turn off the image intensifier
+    if (state.intensifier_active() && !this->is_dark()) {
+        logger.warning("Turning off the image intensifier (automatic)");
         this->turn_off_intensifier();
     }
 
 
-    // should only do this in automatic mode
-    if (this->is_dark()) {
-        if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
-            logger.info("Opening the cover (automatic)");
-            this->open_cover();
-        }
-
-        if (state.dome_open_sensor_active()) {
-            if (!state.intensifier_active()) {
-                logger.info("Turning on the image intensifier (automatic)");
-                this->turn_on_intensifier();
-            }
-
-            if (!state.fan_active()) {
-                logger.info("Turning on the fan (automatic)");
-                this->turn_on_fan();
-            }
-        }
+    if (this->m_manual_control) {
+        // If we are in manual mode, pass other automatic checks
+        logger.debug("Manual control, passing");
     } else {
-        if (state.dome_open_sensor_active()) {
-            logger.info("Closing the cover (automatic)");
-            this->close_cover();
-        }
-        if (state.intensifier_active()) {
-            logger.info("Turning off the image intensifier (automatic))");
-            this->turn_off_intensifier();
+        if (this->is_dark()) {
+            // If it is dark, not raning and the computer is running, start observing
+            if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
+                logger.info("Opening the cover (automatic)");
+                this->open_cover();
+            }
+
+            // If the dome is open, turn on the image intensifier and the fan
+            if (state.dome_open_sensor_active()) {
+                if (!state.intensifier_active()) {
+                    logger.info("Turning on the image intensifier (automatic)");
+                    this->turn_on_intensifier();
+                }
+
+                if (!state.fan_active()) {
+                    logger.info("Turning on the fan (automatic)");
+                    this->turn_on_fan();
+                }
+            }
+        } else {
+            // If it is not dark, close the cover and turn off the image intensifier
+            if (state.dome_open_sensor_active()) {
+                logger.info("Closing the cover (automatic)");
+                this->close_cover();
+            }
+            if (state.intensifier_active()) {
+                logger.info("Turning off the image intensifier (automatic)");
+                this->turn_off_intensifier();
+            }
         }
     }
 }
