@@ -1,9 +1,10 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
 Station::Station(const QString& id): m_id(id) {
-    this->dome = new Dome();
+    this->m_dome = new Dome();
+    this->m_state_logger = new StateLogger(this, "state.log");
 
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
@@ -12,10 +13,10 @@ Station::Station(const QString& id): m_id(id) {
 }
 
 Station::~Station(void) {
-    delete this->dome;
+    delete this->m_dome;
+    delete this->m_timer_automatic;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
-    delete this->m_timer_automatic;
 }
 
 void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
@@ -26,8 +27,13 @@ void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanen
 Storage& Station::primary_storage(void) { return *this->m_primary_storage; }
 Storage& Station::permanent_storage(void) { return *this->m_permanent_storage; }
 
+Dome* Station::dome(void) const { return this->m_dome; }
+
 // Position getters and setters
+
+// Set position of the station
 void Station::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
+    // Check that the new value is meaningful
     if (fabs(new_latitude) > 90) {
         throw ConfigurationError(QString("Latitude out of range: %1").arg(new_latitude));
     }
@@ -54,7 +60,7 @@ void Station::set_id(const QString& new_id) {
     }
 
     this->m_id = new_id;
-    logger.info(QString("Station id changed to '%1'").arg(this->m_id));
+    logger.info(QString("Station id set to '%1'").arg(this->m_id));
 }
 
 const QString& Station::get_id(void) const { return this->m_id; }
@@ -72,23 +78,23 @@ void Station::set_darkness_limit(const double new_darkness_limit) {
     }
 
     this->m_darkness_limit = new_darkness_limit;
-    logger.info(QString("Darkness limit set to %1°").arg(m_darkness_limit));
+    logger.info(QString("Station's darkness limit set to %1°").arg(m_darkness_limit));
 }
 
 // Humidity limit settings
 bool Station::is_humid(void) const {
-    return (this->dome->state_T().humidity_sht() > this->m_humidity_limit);
+    return (this->m_dome->state_T().humidity_sht() > this->m_humidity_limit);
 }
 
 double Station::humidity_limit(void) const { return this->m_humidity_limit; }
 
 void Station::set_humidity_limit(const double new_humidity_limit) {
     if ((new_humidity_limit < 0) || (new_humidity_limit > 100)) {
-        throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(m_humidity_limit));
+        throw ConfigurationError(QString("Humidity limit out of range: %1°").arg(m_humidity_limit));
     }
 
     this->m_humidity_limit = new_humidity_limit;
-    logger.info(QString("Humidity limit set to %1%").arg(m_humidity_limit));
+    logger.info(QString("Station's humidity limit set to %1%").arg(m_humidity_limit));
 }
 
 Polar Station::sun_position(const QDateTime& time) const {
@@ -110,6 +116,7 @@ double Station::sun_azimuth(const QDateTime& time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
+// Manual and safety getters and setters
 void Station::set_manual_control(bool manual) {
     this->m_manual_control = manual;
 }
@@ -130,7 +137,7 @@ QJsonObject Station::prepare_heartbeat(void) const {
      return QJsonObject {
         {"auto", !this->is_manual()},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
-        {"dome", this->dome->json()},
+        {"dome", this->m_dome->json()},
         {"disk", QJsonObject {
             {"prim", this->m_primary_storage->json()},
             {"perm", this->m_permanent_storage->json()},
@@ -138,14 +145,30 @@ QJsonObject Station::prepare_heartbeat(void) const {
     };
 }
 
+void Station::log_state(void) {
+    const DomeStateS& stateS = this->dome()->state_S();
+    const DomeStateT& stateT = this->dome()->state_T();
+    const DomeStateZ& stateZ = this->dome()->state_Z();
+    QString line = QString("%1 %2C %3C %4C %5% %6")
+                        .arg(QString(stateS.full_text()))
+                        .arg(stateT.temperature_sht(), 6, 'f', 1)
+                        .arg(stateT.temperature_lens(), 6, 'f', 1)
+                        .arg(stateT.temperature_cpu(), 6, 'f', 1)
+                        .arg(stateT.humidity_sht(), 6, 'f', 1)
+                        .arg(stateZ.shaft_position(), 4);
+
+    this->m_state_logger->log(line);
+}
+
 // Perform automatic state checks
 void Station::automatic_check(void) {
     logger.debug("Automatic check");
 
-    const DomeStateS &state = this->dome->state_S();
+    const DomeStateS &state = this->m_dome->state_S();
 
     if (!state.is_valid()) {
-        logger.warning("S state is not valid!");
+        logger.warning("Automatic loop: S state is not valid, automatic loop skipped");
+        return;
     }
 
     // Emergency: close the cover
@@ -163,35 +186,35 @@ void Station::automatic_check(void) {
 
     if (this->m_manual_control) {
         // If we are in manual mode, pass other automatic checks
-        logger.debug("Manual control, passing");
+        logger.debug("Manual control mode, passing");
     } else {
         if (this->is_dark()) {
             // If it is dark, not raning and the computer is running, start observing
             if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
-                logger.info("Opening the cover (automatic)");
+                logger.info("Opened the cover (automatic)");
                 this->open_cover();
             }
 
             // If the dome is open, turn on the image intensifier and the fan
             if (state.dome_open_sensor_active()) {
                 if (!state.intensifier_active()) {
-                    logger.info("Turning on the image intensifier (automatic)");
+                    logger.info("Turned on the image intensifier (automatic)");
                     this->turn_on_intensifier();
                 }
 
                 if (!state.fan_active()) {
-                    logger.info("Turning on the fan (automatic)");
+                    logger.info("Turned on the fan (automatic)");
                     this->turn_on_fan();
                 }
             }
         } else {
             // If it is not dark, close the cover and turn off the image intensifier
             if (state.dome_open_sensor_active()) {
-                logger.info("Closing the cover (automatic)");
+                logger.info("Closed the cover (automatic)");
                 this->close_cover();
             }
             if (state.intensifier_active()) {
-                logger.info("Turning off the image intensifier (automatic)");
+                logger.info("Turned off the image intensifier (automatic)");
                 this->turn_off_intensifier();
             }
         }
@@ -201,39 +224,39 @@ void Station::automatic_check(void) {
 // High level command to open the cover. Opens only if it is dark, or if in override mode.
 void Station::open_cover(void) {
     if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
-        this->dome->send_command(Dome::CommandOpenCover);
+        this->m_dome->send_command(Dome::CommandOpenCover);
     }
 }
 
 // High level command to close the cover. Closes anytime.
 void Station::close_cover(void) {
-    this->dome->send_command(Dome::CommandCloseCover);
+    this->m_dome->send_command(Dome::CommandCloseCover);
 }
 
 // High level command to turn on the hotwire. Works anytime
 void Station::turn_on_hotwire(void) {
-    this->dome->send_command(Dome::CommandHotwireOn);
+    this->m_dome->send_command(Dome::CommandHotwireOn);
 }
 
 // High level command to turn off the hotwire. Works anytime
 void Station::turn_off_hotwire(void) {
-    this->dome->send_command(Dome::CommandHotwireOff);
+    this->m_dome->send_command(Dome::CommandHotwireOff);
 }
 
 // High level command to turn on the fan. Works anytime
 void Station::turn_on_fan(void) {
-    this->dome->send_command(Dome::CommandFanOn);
+    this->m_dome->send_command(Dome::CommandFanOn);
 }
 
 // High level command to turn off the fan. Works anytime
 void Station::turn_off_fan(void) {
-    this->dome->send_command(Dome::CommandFanOff);
+    this->m_dome->send_command(Dome::CommandFanOff);
 }
 
 // High level command to turn on the intensifier. Turns on only if it is dark, or if in override mode.
 void Station::turn_on_intensifier(void) {
     if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
-        this->dome->send_command(Dome::CommandIIOn);
+        this->m_dome->send_command(Dome::CommandIIOn);
     } else {
         logger.warning("Command ignored, sun is too high and override is not active");
     }
@@ -241,5 +264,25 @@ void Station::turn_on_intensifier(void) {
 
 // High level command to turn off the intensifier. Works anytime
 void Station::turn_off_intensifier(void) {
-    this->dome->send_command(Dome::CommandIIOff);
+    this->m_dome->send_command(Dome::CommandIIOff);
+}
+
+StationState Station::status(void) const {
+    if (this->is_manual()) {
+        return StationState::MANUAL;
+    }
+
+    if (this->is_dark()) {
+        if (this->m_dome->state_S().is_valid()) {
+            if (this->m_dome->state_S().dome_open_sensor_active() && this->m_dome->state_S().intensifier_active()) {
+                return StationState::OBSERVING;
+            } else {
+                return StationState::NOT_OBSERVING;
+            }
+        } else {
+            return StationState::DOME_UNREACHABLE;
+        }
+    } else {
+        return StationState::DOME_UNREACHABLE;
+    }
 }

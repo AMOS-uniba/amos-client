@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1234</width>
-    <height>894</height>
+    <height>898</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,9 +21,6 @@
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <layout class="QGridLayout" name="grid_main">
-      <property name="sizeConstraint">
-       <enum>QLayout::SetFixedSize</enum>
-      </property>
       <item row="4" column="0">
        <widget class="QGroupBox" name="group_sun">
         <property name="sizePolicy">

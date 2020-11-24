@@ -1,41 +1,42 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
-Server::Server(const QHostAddress& _address, const unsigned short _port, const QString& _station_id) {
-    this->set_url(_address, _port, _station_id);
-    this->network_manager = new QNetworkAccessManager(this);
-    connect(this->network_manager, &QNetworkAccessManager::finished, this, &Server::heartbeat_ok);
+
+Server::Server(const QHostAddress& address, const unsigned short port, const QString& station_id) {
+    this->set_url(address, port, station_id);
+    this->m_network_manager = new QNetworkAccessManager(this);
+    connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &Server::heartbeat_ok);
 }
 
 Server::~Server() {
-    delete this->network_manager;
+    delete this->m_network_manager;
 }
 
-QHostAddress Server::get_address(void) const {
-    return this->address;
+QHostAddress Server::address(void) const {
+    return this->m_address;
 }
 
-unsigned short Server::get_port(void) const {
-    return this->port;
+unsigned short Server::port(void) const {
+    return this->m_port;
 }
 
 void Server::set_url(const QHostAddress& address, const unsigned short port, const QString& station_id) {
-    this->address = address;
-    this->port = port;
-    this->url = QUrl(QString("http://%1:%2/station/%3/heartbeat/").arg(this->address.toString()).arg(this->port).arg(station_id));
+    this->m_address = address;
+    this->m_port = port;
+    this->m_url = QUrl(QString("http://%1:%2/station/%3/heartbeat/").arg(this->m_address.toString()).arg(this->m_port).arg(station_id));
 }
 
 void Server::send_heartbeat(const QJsonObject& heartbeat) const {
-    logger.debug(QString("Sending a heartbeat to %1").arg(this->url.toString()));
+    logger.debug(QString("Sending a heartbeat to %1").arg(this->m_url.toString()));
 
-    QNetworkRequest request(this->url);
+    QNetworkRequest request(this->m_url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
     logger.debug(QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
-    QNetworkReply *reply = this->network_manager->post(request, message);
+    QNetworkReply *reply = this->m_network_manager->post(request, message);
     this->connect(reply, &QNetworkReply::errorOccurred, this, &Server::heartbeat_error);
 }
 

@@ -12,23 +12,23 @@
 class Server: public QObject {
     Q_OBJECT
 private:
-    QHostAddress address;
-    unsigned short port;
+    QHostAddress m_address;
+    unsigned short m_port;
 
-    QUrl url;
-    QNetworkAccessManager *network_manager;
+    QUrl m_url;
+    QNetworkAccessManager *m_network_manager;
 
 private slots:
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_ok(QNetworkReply *reply);
     void heartbeat_response(void);
 public:
-    Server(const QHostAddress &_address, const unsigned short _port, const QString &station_id);
+    Server(const QHostAddress &address, const unsigned short port, const QString &station_id);
     ~Server(void);
 
     void set_url(const QHostAddress &address, const unsigned short port, const QString &station_id);
-    QHostAddress get_address(void) const;
-    unsigned short get_port(void) const;
+    QHostAddress address(void) const;
+    unsigned short port(void) const;
 
 public slots:
     void send_heartbeat(const QJsonObject &heartbeat) const;

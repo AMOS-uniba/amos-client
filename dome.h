@@ -68,9 +68,8 @@ private:
     constexpr static unsigned int REFRESH = 300;
     const static Request RequestBasic, RequestEnv, RequestShaft;
 
-    unsigned char address;
-    QDateTime last_received;
-    std::default_random_engine generator;
+    unsigned char m_address;
+    QDateTime m_last_received;
 
     QSerialPort *m_serial_port;
     QTimer *refresh_timer;
@@ -103,7 +102,7 @@ public:
 
     void reset_serial_port(const QString& port);
 
-    const QDateTime& get_last_received(void) const;
+    const QDateTime& last_received(void) const;
     const QString serial_port_info(void) const;
 
     const DomeStateS& state_S(void) const;

@@ -6,8 +6,8 @@
 
 class Storage {
 private:
-    QString name;
-    QDir directory;
+    QString m_name;
+    QDir m_directory;
 public:
     Storage(const QString& _name, const QDir& _directory);
     QStorageInfo info(void) const;

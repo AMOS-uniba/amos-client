@@ -1,7 +1,7 @@
 #include "include.h"
 #include "serialbuffer.h"
 
-extern Log logger;
+extern EventLogger logger;
 
 SerialBuffer::SerialBuffer(void) {
     this->m_data = QByteArray();

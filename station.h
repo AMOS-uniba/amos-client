@@ -11,10 +11,13 @@
 #ifndef STATION_H
 #define STATION_H
 
-struct Position {
-    double latitude;
-    double longitude;
-    double altitude;
+
+enum class StationState {
+    OBSERVING,
+    NOT_OBSERVING,
+    DAY,
+    MANUAL,
+    DOME_UNREACHABLE,
 };
 
 /*!
@@ -36,11 +39,17 @@ private:
     Storage *m_primary_storage;
     Storage *m_permanent_storage;
 
+    StateLogger *m_state_logger;
+    Dome *m_dome;
+    QVector<Server> *m_servers;
+
     QNetworkAccessManager *m_network_manager;
     QTimer *m_timer_automatic;
 public:
     Station(const QString& id);
     ~Station(void);
+
+    StationState status(void) const;
 
     // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
@@ -56,14 +65,17 @@ public:
     const QString& get_id(void) const;
     void set_id(const QString& new_id);
 
+    // Darkness getters and setters
     bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     void set_darkness_limit(const double new_altitude_dark);
     double darkness_limit(void) const;
 
+    // Humidity getters and setters
     bool is_humid(void) const;
     void set_humidity_limit(const double new_altitude_dark);
     double humidity_limit(void) const;
 
+    // Sun position functions
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
@@ -74,11 +86,11 @@ public:
     void set_safety_override(bool override);
     bool is_safety_overridden(void) const;
 
-    Dome* dome;
-    QVector<Server> servers;
+    Dome* dome(void) const;
 
     QJsonObject prepare_heartbeat(void) const;
 
+    // Command wrappers
     void open_cover(void);
     void close_cover(void);
 
@@ -93,6 +105,7 @@ public:
 
 public slots:
     void automatic_check(void);
+    void log_state(void);
 };
 
 #endif // STATION_H

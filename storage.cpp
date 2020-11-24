@@ -1,11 +1,11 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
-Storage::Storage(const QString& _name, const QDir& _directory): name(_name), directory(_directory) {}
+Storage::Storage(const QString& _name, const QDir& _directory): m_name(_name), m_directory(_directory) {}
 
 QStorageInfo Storage::info(void) const {
-    return QStorageInfo(this->directory);
+    return QStorageInfo(this->m_directory);
 }
 
 // return JSON info for heartbeat composition
@@ -18,14 +18,14 @@ QJsonObject Storage::json(void) const {
 }
 
 const QDir& Storage::get_directory(void) const {
-    return this->directory;
+    return this->m_directory;
 }
 
 void Storage::set_directory(const QDir& dir) {
-    logger.info(QString("Storage '%1' set to %2").arg(this->name).arg(dir.path()));
-    this->directory = dir;
+    logger.info(QString("Storage '%1' set to %2").arg(this->m_name).arg(dir.path()));
+    this->m_directory = dir;
 }
 
 const QString& Storage::get_name(void) const {
-    return this->name;
+    return this->m_name;
 }

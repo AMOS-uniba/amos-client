@@ -1,6 +1,6 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
 // Construct a new telegram from
 Telegram::Telegram(const unsigned char address, const QByteArray& message): m_address(address), m_message(message) {}
@@ -32,7 +32,7 @@ Telegram::Telegram(const QByteArray& received) {
 
     // Check first and last bytes of the message
     if ((received[0] != Telegram::START_BYTE_SLAVE) && (received[0] != Telegram::START_BYTE_MASTER)) {
-        throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg(received[0], 2, 16, QChar('0')));
+        throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg((int) received[0], 2, 16, QChar('0')));
     }
     if (received[length - 1] != Telegram::END_BYTE) {
         throw MalformedTelegram(QString("Incorrect end byte 0x%1").arg((int) received[length - 1], 2, 16, QChar('0')));
@@ -74,7 +74,7 @@ unsigned char Telegram::hex_to_char(unsigned char value) {
     throw EncodingError(QString("Invalid value to encode: %1").arg(value));
 }
 
-// Encode least sigificant quad to char
+// Encode least significant quad to char
 unsigned char Telegram::encode_lsq(unsigned char value) {
     return Telegram::hex_to_char(value & 0x0F);
 }

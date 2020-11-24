@@ -91,6 +91,8 @@ private slots:
 
     void on_cb_safety_override_stateChanged(int arg1);
 
+    void on_actionManual_control_triggered();
+
 private:
     QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
     Ui::MainWindow *ui;

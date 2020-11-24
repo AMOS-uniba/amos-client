@@ -25,10 +25,12 @@ SOURCES += \
     APC/APC_Sun.cpp \
     APC/APC_Time.cpp \
     APC/APC_VecMat3D.cpp \
+    logging/baselogger.cpp \
+    logging/eventlogger.cpp \
+    logging/statelogger.cpp \
     dome.cpp \
     domestate.cpp \
     exception.cpp \
-    log.cpp \
     main.cpp \
     mainwindow.cpp \
     request.cpp \
@@ -55,12 +57,14 @@ HEADERS += \
     APC/APC_Sun.h \
     APC/APC_Time.h \
     APC/APC_VecMat3D.h \
+    logging/baselogger.h \
+    logging/eventlogger.h \
+    logging/statelogger.h \
     dome.h \
     domestate.h \
     exception.h \
     forward.h \
     include.h \
-    log.h \
     mainwindow.h \
     request.h \
     serialbuffer.h \

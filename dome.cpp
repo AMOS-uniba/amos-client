@@ -1,6 +1,6 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
 const Request Dome::RequestBasic        = Request('S', "basic data request");
 const Request Dome::RequestEnv          = Request('T', "environment data request");
@@ -19,8 +19,7 @@ const Command Dome::CommandResetSlave   = Command('\x0B', "reset slave");
 
 
 Dome::Dome() {
-    this->generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-    this->address = 0x99;
+    this->m_address = 0x99;
 
     this->refresh_timer = new QTimer(this);
     this->refresh_timer->setInterval(Dome::REFRESH);
@@ -39,8 +38,8 @@ Dome::~Dome() {
     delete this->m_buffer;
 }
 
-const QDateTime& Dome::get_last_received(void) const {
-    return this->last_received;
+const QDateTime& Dome::last_received(void) const {
+    return this->m_last_received;
 }
 
 void Dome::reset_serial_port(const QString& port) {
@@ -85,7 +84,7 @@ void Dome::send_request(const Request& request) const {
 }
 
 void Dome::send(const QByteArray& message) const {
-    Telegram telegram(this->address, message);
+    Telegram telegram(this->m_address, message);
     this->m_serial_port->write(telegram.compose());
 }
 

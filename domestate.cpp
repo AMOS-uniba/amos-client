@@ -1,6 +1,6 @@
 #include "include.h"
 
-extern Log logger;
+extern EventLogger logger;
 
 
 
@@ -134,10 +134,10 @@ DomeStateT::DomeStateT(const QByteArray &response) {
     logger.debug(QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_cpu).arg(this->m_temp_sht).arg(this->m_humi_sht));
 }
 
-float DomeStateT::temperature_lens(void) const              { return this->m_temp_lens; }
-float DomeStateT::temperature_cpu(void) const               { return this->m_temp_cpu; }
-float DomeStateT::temperature_sht(void) const               { return this->m_temp_sht; }
-float DomeStateT::humidity_sht(void) const                  { return this->m_humi_sht; }
+float DomeStateT::temperature_lens(void) const { return this->m_temp_lens; }
+float DomeStateT::temperature_cpu(void) const  { return this->m_temp_cpu; }
+float DomeStateT::temperature_sht(void) const  { return this->m_temp_sht; }
+float DomeStateT::humidity_sht(void) const     { return this->m_humi_sht; }
 
 QJsonValue DomeStateT::json(void) const {
     if (this->is_valid()) {
