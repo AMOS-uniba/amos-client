@@ -56,3 +56,8 @@ void Server::heartbeat_ok(QNetworkReply* reply) {
 void Server::heartbeat_response(void) {
     logger.debug("Heartbeat response");
 }
+
+void Server::send_sighting(const Sighting &sighting) const {
+    logger.info("Sending a sighting");
+    QNetworkRequest request(this->m_url);
+}

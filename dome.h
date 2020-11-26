@@ -8,8 +8,6 @@
 #define DOMEMANAGER_H
 
 #include "forward.h"
-#include "domestate.h"
-#include "serialbuffer.h"
 
 enum class CoverState {
     OPEN,

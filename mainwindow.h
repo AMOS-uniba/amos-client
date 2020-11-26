@@ -77,7 +77,7 @@ private slots:
     void on_co_serial_ports_currentIndexChanged(int index);
 
     // Tray and messaging
-    void set_icon(int index);
+    void set_icon(const StationState &state);
     void icon_activated(QSystemTrayIcon::ActivationReason reason);
     void show_message();
     void message_clicked();
@@ -103,7 +103,6 @@ private:
 
     Station *station;
     Universe *universe;
-    Server *server;
 
     QAction *minimizeAction;
     QAction *maximizeAction;

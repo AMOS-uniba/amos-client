@@ -2,14 +2,21 @@
 
 extern EventLogger logger;
 
-Station::Station(const QString& id): m_id(id) {
+Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING) {
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
+
+    this->m_server = nullptr;
 
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
     this->connect(this->m_timer_automatic, &QTimer::timeout, this, &Station::automatic_check);
     this->m_timer_automatic->start();
+
+    this->m_timer_file_watchdog = new QTimer(this);
+    this->m_timer_file_watchdog->setInterval(2000);
+    this->connect(this->m_timer_file_watchdog, &QTimer::timeout, this, &Station::file_check);
+    this->m_timer_file_watchdog->start();
 }
 
 Station::~Station(void) {
@@ -17,6 +24,10 @@ Station::~Station(void) {
     delete this->m_timer_automatic;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
+
+    if (this->m_server != nullptr) {
+        delete this->m_server;
+    }
 }
 
 void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
@@ -28,6 +39,13 @@ Storage& Station::primary_storage(void) { return *this->m_primary_storage; }
 Storage& Station::permanent_storage(void) { return *this->m_permanent_storage; }
 
 Dome* Station::dome(void) const { return this->m_dome; }
+
+// Server getters and setters
+void Station::set_server(Server *server) {
+    this->m_server = server;
+}
+
+Server* Station::server(void) { return this->m_server; }
 
 // Position getters and setters
 
@@ -164,21 +182,21 @@ void Station::log_state(void) {
 void Station::automatic_check(void) {
     logger.debug("Automatic check");
 
-    const DomeStateS &state = this->m_dome->state_S();
+    const DomeStateS &stateS = this->m_dome->state_S();
 
-    if (!state.is_valid()) {
+    if (!stateS.is_valid()) {
         logger.warning("Automatic loop: S state is not valid, automatic loop skipped");
         return;
     }
 
     // Emergency: close the cover
-    if (state.dome_open_sensor_active() && !this->is_dark()) {
+    if (stateS.dome_open_sensor_active() && !this->is_dark()) {
         logger.warning("Closing the cover (automatic)");
         this->close_cover();
     }
 
     // Emergency: turn off the image intensifier
-    if (state.intensifier_active() && !this->is_dark()) {
+    if (stateS.intensifier_active() && !this->is_dark()) {
         logger.warning("Turning off the image intensifier (automatic)");
         this->turn_off_intensifier();
     }
@@ -190,30 +208,30 @@ void Station::automatic_check(void) {
     } else {
         if (this->is_dark()) {
             // If it is dark, not raning and the computer is running, start observing
-            if (state.dome_closed_sensor_active() && !state.rain_sensor_active() && state.computer_power_sensor_active()) {
+            if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active()) {
                 logger.info("Opened the cover (automatic)");
                 this->open_cover();
             }
 
             // If the dome is open, turn on the image intensifier and the fan
-            if (state.dome_open_sensor_active()) {
-                if (!state.intensifier_active()) {
+            if (stateS.dome_open_sensor_active()) {
+                if (!stateS.intensifier_active()) {
                     logger.info("Turned on the image intensifier (automatic)");
                     this->turn_on_intensifier();
                 }
 
-                if (!state.fan_active()) {
+                if (!stateS.fan_active()) {
                     logger.info("Turned on the fan (automatic)");
                     this->turn_on_fan();
                 }
             }
         } else {
             // If it is not dark, close the cover and turn off the image intensifier
-            if (state.dome_open_sensor_active()) {
+            if (stateS.dome_open_sensor_active()) {
                 logger.info("Closed the cover (automatic)");
                 this->close_cover();
             }
-            if (state.intensifier_active()) {
+            if (stateS.intensifier_active()) {
                 logger.info("Turned off the image intensifier (automatic)");
                 this->turn_off_intensifier();
             }
@@ -267,22 +285,51 @@ void Station::turn_off_intensifier(void) {
     this->m_dome->send_command(Dome::CommandIIOff);
 }
 
-StationState Station::status(void) const {
+StationState Station::determine_state(void) const {
     if (this->is_manual()) {
         return StationState::MANUAL;
     }
 
-    if (this->is_dark()) {
-        if (this->m_dome->state_S().is_valid()) {
+    if (this->m_dome->state_S().is_valid()) {
+        if (this->is_dark()) {
             if (this->m_dome->state_S().dome_open_sensor_active() && this->m_dome->state_S().intensifier_active()) {
                 return StationState::OBSERVING;
             } else {
                 return StationState::NOT_OBSERVING;
             }
         } else {
-            return StationState::DOME_UNREACHABLE;
+            return StationState::DAY;
         }
     } else {
         return StationState::DOME_UNREACHABLE;
     }
+}
+
+void Station::send_heartbeat(void) {
+    this->m_server->send_heartbeat(this->prepare_heartbeat());
+}
+
+void Station::check_state(void) {
+    StationState new_state = this->determine_state();
+
+    if (this->m_state != new_state) {
+        this->m_state = new_state;
+        emit this->state_changed();
+    }
+}
+
+StationState Station::state(void) {
+    this->m_state = this->determine_state();
+    return this->m_state;
+}
+
+void Station::file_check(void) {
+    logger.info("Checking files...");
+    for (auto sighting: this->primary_storage().list_new_sightings()) {
+        this->send_sighting(sighting);
+    }
+}
+
+void Station::send_sighting(const Sighting &sighting) {
+    this->m_server->send_sighting(sighting);
 }

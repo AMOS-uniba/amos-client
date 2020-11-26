@@ -2,6 +2,7 @@
 #define FORWARD_H
 
 #include <QtCore>
+#include <QObject>
 
 QT_FORWARD_DECLARE_CLASS(MainWindow);
 QT_FORWARD_DECLARE_CLASS(Station);
@@ -20,5 +21,10 @@ QT_FORWARD_DECLARE_CLASS(DomeStateZ);
 QT_FORWARD_DECLARE_CLASS(BaseLogger);
 QT_FORWARD_DECLARE_CLASS(EventLogger);
 QT_FORWARD_DECLARE_CLASS(StateLogger);
+
+#include "utils/stationstate.h"
+#include "utils/domestate.h"
+#include "utils/serialbuffer.h"
+#include "utils/sighting.h"
 
 #endif // FORWARD_H

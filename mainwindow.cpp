@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->init_serial_ports();
     this->create_actions();
     this->create_tray_icon();
-    this->set_icon(0);
+    this->set_icon(StationState::NOT_OBSERVING);
 
     this->tray_icon->show();
 
@@ -69,6 +69,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->dome(), &Dome::state_updated_S, this, &MainWindow::display_basic_data);
     this->connect(this->station->dome(), &Dome::state_updated_T, this, &MainWindow::display_env_data);
     this->connect(this->station->dome(), &Dome::state_updated_Z, this, &MainWindow::display_shaft_position);
+
+    this->connect(this->station, &Station::state_changed, this, &MainWindow::show_message);
+    this->connect(this->ui->cb_manual, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
 }
 
 void MainWindow::init_serial_ports(void) {
@@ -85,12 +88,11 @@ void MainWindow::load_settings(void) {
         unsigned short port = this->settings->value("server/port", 4805).toInt();
         QString station_id = this->settings->value("station/id", "none").toString();
 
-        this->server = new Server(QHostAddress(ip), port, station_id);
-
         this->station = new Station(station_id);
+        this->station->set_server(new Server(QHostAddress(ip), port, station_id));
         this->station->set_storages(
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
-        QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
+            QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
         );
         this->station->set_position(
             this->settings->value("station/latitude", 0).toDouble(),
@@ -139,7 +141,6 @@ MainWindow::~MainWindow() {
 
     delete this->universe;
     delete this->station;
-    delete this->server;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -174,24 +175,34 @@ void MainWindow::create_actions() {
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 
-void MainWindow::set_icon(int index) {
+void MainWindow::set_icon(const StationState &state) {
     QIcon icon;
-    switch (index) {
-        case 0:
-            icon = QIcon(":/images/icon.png");
+    QString tooltip;
+    switch (state) {
+        case StationState::MANUAL:
+            icon = QIcon(":/images/green.ico");
+            tooltip = "Manual control enabled";
             break;
-        case 1:
-            icon = QIcon(":/images/grey.png");
+        case StationState::DAY:
+            icon = QIcon(":/images/yellow.ico");
+            tooltip = "Daylight, not observing";
             break;
-        default:
-            icon = QIcon(":/images/red.png");
+        case StationState::OBSERVING:
+            icon = QIcon(":/images/blue.ico");
+            tooltip = "Observation in progress";
+            break;
+        case StationState::NOT_OBSERVING:
+            icon = QIcon(":/images/grey.ico");
+            tooltip = "Not observing";
+            break;
+        case StationState::DOME_UNREACHABLE:
+            icon = QIcon(":/images/red.ico");
+            tooltip = "Dome is not responding";
             break;
     }
 
     this->tray_icon->setIcon(icon);
-    this->setWindowIcon(icon);
-
-    this->tray_icon->setToolTip("AMOS controller");
+    this->tray_icon->setToolTip(QString("AMOS controller\n%1").arg(tooltip));
 }
 
 void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
@@ -211,7 +222,13 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::show_message(void) {
-    this->tray_icon->showMessage("AMOS", "AMOS is working", QIcon(":/images/images/icon.png"), 10000);
+    switch (this->station->state()) {
+        case StationState::DAY:
+            this->tray_icon->showMessage("AMOS controller", "AMOS is working", QIcon(":/images/images/blue.ico"), 5000);
+            break;
+        default:
+            break;
+    }
 }
 
 void MainWindow::message_clicked() {
@@ -234,6 +251,9 @@ void MainWindow::process_watchdog_timer(void) {
     if (this->station->dome()->serial_port_info() != "open") {
         this->init_serial_ports();
     }
+
+    this->setWindowTitle("AMOS client [automatic mode]");
+    this->set_icon(this->station->determine_state());
 }
 
 void MainWindow::display_time(void) {
@@ -404,8 +424,8 @@ void MainWindow::display_storage_status(void) {
 }
 
 void MainWindow::display_station_config(void) {
-    this->ui->le_ip->setText(this->server->address().toString());
-    this->ui->sb_port->setValue(this->server->port());
+    this->ui->le_ip->setText(this->station->server()->address().toString());
+    this->ui->sb_port->setValue(this->station->server()->port());
     this->ui->le_station_id->setText(this->station->get_id());
 
     this->ui->dsb_latitude->setValue(this->station->latitude());
@@ -418,13 +438,15 @@ void MainWindow::display_station_config(void) {
 
 void MainWindow::send_heartbeat(void) {
     this->station->log_state();
-    this->server->send_heartbeat(this->station->prepare_heartbeat());
+    this->display_storage_status();
+    this->station->send_heartbeat();
 }
 
 void MainWindow::display_cover_status(void) {
     // Set cover state label
     const DomeStateS &stateS = this->station->dome()->state_S();
     QString text;
+
     if (stateS.is_valid()) {
         if (stateS.servo_moving()) {
             text = stateS.servo_direction() ? "opening..." : "closing";
@@ -455,13 +477,13 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 
 void MainWindow::on_bt_station_apply_clicked() {
     this->station->set_id(this->ui->le_station_id->text());
-    this->server->set_url(QHostAddress(this->ui->le_ip->text()), this->ui->sb_port->value(), this->station->get_id());
+    this->station->server()->set_url(QHostAddress(this->ui->le_ip->text()), this->ui->sb_port->value(), this->station->get_id());
     this->station->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
     this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
     this->station->set_humidity_limit(this->ui->dsb_humidity_limit->value());
 
-    this->settings->setValue("server/ip", this->server->address().toString());
-    this->settings->setValue("server/port", this->server->port());
+    this->settings->setValue("server/ip", this->station->server()->address().toString());
+    this->settings->setValue("server/port", this->station->server()->port());
     this->settings->setValue("station/id", this->station->get_id());
     this->settings->setValue("station/latitude", this->station->latitude());
     this->settings->setValue("station/longitude", this->station->longitude());
@@ -477,8 +499,8 @@ void MainWindow::on_bt_station_apply_clicked() {
 
 void MainWindow::on_bt_station_reset_clicked() {
     this->ui->le_station_id->setText(this->station->get_id());
-    this->ui->le_ip->setText(this->server->address().toString());
-    this->ui->sb_port->setValue(this->server->port());
+    this->ui->le_ip->setText(this->station->server()->address().toString());
+    this->ui->sb_port->setValue(this->station->server()->port());
 
     this->ui->dsb_latitude->setValue(this->station->latitude());
     this->ui->dsb_longitude->setValue(this->station->longitude());
@@ -494,8 +516,8 @@ void MainWindow::station_edited(void) {
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||
         (this->ui->dsb_longitude->value() != this->station->longitude()) ||
         (this->ui->dsb_altitude->value() != this->station->altitude()) ||
-        (this->ui->le_ip->text() != this->server->address().toString()) ||
-        (this->ui->sb_port->value() != this->server->port()) ||
+        (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
+        (this->ui->sb_port->value() != this->station->server()->port()) ||
         (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) ||
         (this->ui->dsb_humidity_limit->value() != this->station->humidity_limit())
     );
@@ -547,10 +569,8 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
 
 void MainWindow::on_cb_manual_stateChanged(int enable) {
     if (enable) {
-        this->setWindowTitle("AMOS client [manual mode]");
         logger.warning("Switched to manual mode");
     } else {
-        this->setWindowTitle("AMOS client [automatic mode]");
         logger.warning("Switched to automatic mode");
     }
     this->station->set_manual_control((bool) enable);
@@ -561,6 +581,7 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
     this->ui->bt_fan->setEnabled(this->station->is_manual());
 
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
+    this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
     this->display_cover_status();
 }
@@ -615,7 +636,7 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
         box.setText("You are about to override the safety mechanisms!");
         box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
         box.setIcon(QMessageBox::Icon::Warning);
-        box.setWindowIcon(QIcon(":/images/icon.png"));
+        box.setWindowIcon(QIcon(":/images/blue.ico"));
         box.setWindowTitle("Safety mechanism override");
         box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         int choice = box.exec();

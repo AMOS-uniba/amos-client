@@ -29,18 +29,18 @@ SOURCES += \
     logging/eventlogger.cpp \
     logging/statelogger.cpp \
     dome.cpp \
-    domestate.cpp \
-    exception.cpp \
     main.cpp \
     mainwindow.cpp \
-    request.cpp \
-    serialbuffer.cpp \
     server.cpp \
-    state.cpp \
     station.cpp \
     storage.cpp \
-    telegram.cpp \
-    universe.cpp
+    utils/domestate.cpp \
+    utils/exception.cpp \
+    utils/request.cpp \
+    utils/serialbuffer.cpp \
+    utils/sighting.cpp \
+    utils/telegram.cpp \
+    utils/universe.cpp
 
 HEADERS += \
     APC/APC_Cheb.h \
@@ -61,19 +61,21 @@ HEADERS += \
     logging/eventlogger.h \
     logging/statelogger.h \
     dome.h \
-    domestate.h \
-    exception.h \
     forward.h \
     include.h \
     mainwindow.h \
-    request.h \
     serialbuffer.h \
     server.h \
-    state.h \
     station.h \
     storage.h \
-    telegram.h \
-    universe.h
+    utils/domestate.h \
+    utils/exception.h \
+    utils/request.h \
+    utils/serialbuffer.h \
+    utils/sighting.h \
+    utils/stationstate.h \
+    utils/telegram.h \
+    utils/universe.h
 
 FORMS += \
     mainwindow.ui
@@ -85,3 +87,5 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     images.qrc
+
+RC_FILE = amos-client.rc

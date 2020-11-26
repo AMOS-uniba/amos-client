@@ -1,23 +1,25 @@
 #ifndef INCLUDE_H
 #define INCLUDE_H
 
+#include <stdexcept>
+#include <random>
+#include <cstring>
+
+#include "utils/request.h"
+#include "utils/universe.h"
+#include "utils/telegram.h"
+#include "utils/exception.h"
+#include "utils/stationstate.h"
+#include "utils/domestate.h"
+#include "utils/sighting.h"
+
 #include "mainwindow.h"
 #include "server.h"
 #include "storage.h"
-#include "universe.h"
 #include "station.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"
 #include "dome.h"
-#include "telegram.h"
-#include "request.h"
-#include "exception.h"
-#include "state.h"
-#include "domestate.h"
-
-#include <stdexcept>
-#include <random>
-#include <cstring>
 
 #include <QString>
 #include <QByteArray>

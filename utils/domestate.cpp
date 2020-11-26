@@ -44,9 +44,9 @@ DomeStateS::DomeStateS(const QByteArray &response) {
     this->m_basic     = response[1];
     this->m_env       = response[2];
     this->m_errors    = response[3];
-    this->m_valid     = true;
     memcpy(&this->m_time_alive, response.mid(4, 4), 4);
 
+    this->m_valid     = true;
     logger.debug(QString("S state received: %1").arg(QString(this->full_text())));
 }
 
@@ -76,6 +76,8 @@ bool DomeStateS::emergency_closing_rain(void) const         { return this->m_err
 
 unsigned int DomeStateS::time_alive(void) const             { return this->m_time_alive / 75; }
 
+
+// Return textual representation of the state (three bytes as received,
 QByteArray DomeStateS::full_text(void) const {
     QByteArray result(26, '-');
     result[     0] = this->servo_moving()                        ? 'M' : '-';
@@ -112,8 +114,6 @@ QJsonValue DomeStateS::json() const {
     }
 }
 
-
-
 DomeStateT::DomeStateT(void): DomeState() {
     this->m_temp_lens = 0;
     this->m_temp_cpu = 0;
@@ -130,6 +130,7 @@ DomeStateT::DomeStateT(const QByteArray &response) {
     this->m_temp_cpu   = DomeStateT::deciint(response.mid(3, 2));
     this->m_temp_sht   = DomeStateT::deciint(response.mid(5, 2));
     this->m_humi_sht   = DomeStateT::deciint(response.mid(7, 2));
+
     this->m_valid      = true;
     logger.debug(QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_cpu).arg(this->m_temp_sht).arg(this->m_humi_sht));
 }
@@ -164,6 +165,7 @@ DomeStateZ::DomeStateZ(const QByteArray &response) {
     }
 
     memcpy(&this->m_shaft_position, response.mid(1, 2).data(), 2);
+
     this->m_valid = true;
     logger.debug(QString("Z state received: %1").arg(this->m_shaft_position));
 }

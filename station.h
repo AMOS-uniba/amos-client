@@ -12,14 +12,6 @@
 #define STATION_H
 
 
-enum class StationState {
-    OBSERVING,
-    NOT_OBSERVING,
-    DAY,
-    MANUAL,
-    DOME_UNREACHABLE,
-};
-
 /*!
  * \brief The Station class represents the entire AMOS station (computer, dome, camera)
  */
@@ -36,25 +28,32 @@ private:
     bool m_manual_control;
     bool m_safety_override;
 
+    StationState m_state;
+
     Storage *m_primary_storage;
     Storage *m_permanent_storage;
 
     StateLogger *m_state_logger;
     Dome *m_dome;
-    QVector<Server> *m_servers;
+    Server *m_server;
 
     QNetworkAccessManager *m_network_manager;
-    QTimer *m_timer_automatic;
+    QTimer *m_timer_automatic, *m_timer_file_watchdog;
 public:
     Station(const QString& id);
     ~Station(void);
 
-    StationState status(void) const;
+    StationState determine_state(void) const;
+    void check_state(void);
+    StationState state(void);
 
     // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
     Storage& primary_storage(void);
     Storage& permanent_storage(void);
+
+    void set_server(Server *server);
+    Server* server(void);
 
     // G&S for position
     void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
@@ -90,6 +89,8 @@ public:
 
     QJsonObject prepare_heartbeat(void) const;
 
+    void send_sighting(const Sighting &sighting);
+
     // Command wrappers
     void open_cover(void);
     void close_cover(void);
@@ -105,7 +106,13 @@ public:
 
 public slots:
     void automatic_check(void);
+    void file_check(void);
     void log_state(void);
+
+    void send_heartbeat(void);
+
+signals:
+    void state_changed(void) const;
 };
 
 #endif // STATION_H

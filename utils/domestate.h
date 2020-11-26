@@ -15,6 +15,7 @@ public:
     DomeState(void);
     const QDateTime& timestamp(void) const;
     float age(void) const;
+    void set_valid(void);
     bool is_valid(void) const;
     virtual QJsonValue json(void) const = 0;
 };

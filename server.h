@@ -1,4 +1,3 @@
-#include <QObject>
 #include <QHostAddress>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
@@ -32,6 +31,7 @@ public:
 
 public slots:
     void send_heartbeat(const QJsonObject &heartbeat) const;
+    void send_sighting(const Sighting &sighting) const;
 };
 
 #endif // SERVER_H
