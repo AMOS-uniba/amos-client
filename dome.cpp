@@ -42,10 +42,14 @@ const QDateTime& Dome::last_received(void) const {
     return this->m_last_received;
 }
 
-void Dome::reset_serial_port(const QString& port) {
+void Dome::clear_serial_port(void) {
     if (this->m_serial_port != nullptr) {
         delete this->m_serial_port;
     }
+}
+
+void Dome::reset_serial_port(const QString& port) {
+    this->clear_serial_port();
 
     this->m_serial_port = new QSerialPort(this);
     this->m_serial_port->setPortName(port);
@@ -58,6 +62,10 @@ void Dome::reset_serial_port(const QString& port) {
 }
 
 const QString Dome::serial_port_info(void) const {
+    if (this->m_serial_port == nullptr) {
+        return QString("no serial ports available");
+    }
+
     if (this->m_serial_port->isOpen()) {
         return "open";
     } else {
@@ -84,8 +92,13 @@ void Dome::send_request(const Request& request) const {
 }
 
 void Dome::send(const QByteArray& message) const {
-    Telegram telegram(this->m_address, message);
-    this->m_serial_port->write(telegram.compose());
+    if (this->m_serial_port == nullptr) {
+        logger.error("Cannot send: no serial port set");
+        return;
+    } else {
+        Telegram telegram(this->m_address, message);
+        this->m_serial_port->write(telegram.compose());
+    }
 }
 
 void Dome::process_response(void) {

@@ -589,6 +589,7 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
 void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
     if (index == -1) {
         logger.warning("No serial ports found");
+        this->station->dome()->clear_serial_port();
     } else {
         logger.info(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
         this->station->dome()->reset_serial_port(this->serial_ports[index].portName());

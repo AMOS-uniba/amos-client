@@ -98,6 +98,7 @@ public:
     Dome();
     ~Dome();
 
+    void clear_serial_port(void);
     void reset_serial_port(const QString& port);
 
     const QDateTime& last_received(void) const;
