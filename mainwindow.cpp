@@ -50,7 +50,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // connect signals for handling of edits of safety limits
     this->connect(this->ui->dsb_darkness_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->dsb_humidity_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
+    this->connect(this->ui->dsb_humidity_limit_lower, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
+    this->connect(this->ui->dsb_humidity_limit_upper, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
 
     this->init_serial_ports();
     this->create_actions();
@@ -100,7 +101,10 @@ void MainWindow::load_settings(void) {
             this->settings->value("station/altitude", 0).toDouble()
         );
         this->station->set_darkness_limit(this->settings->value("limits/darkness", -12.0).toDouble());
-        this->station->set_humidity_limit(this->settings->value("limits/humidity", 75.0).toDouble());
+        this->station->set_humidity_limits(
+            this->settings->value("limits/humidity_lower", 75.0).toDouble(),
+            this->settings->value("limits/humidity_upper", 80.0).toDouble()
+        );
 
         bool debug = this->settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
@@ -212,6 +216,7 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
                 this->hide();
             } else {
                 this->show();
+                this->activateWindow();
             }
             break;
         case QSystemTrayIcon::MiddleClick:
@@ -373,7 +378,7 @@ void MainWindow::display_basic_data(void) {
         this->ui->lb_dome_blocked->setText("?");
 
         this->ui->lb_lens_heating->setText("?");
-        this->ui->bt_lens_heating->setText("?");
+        this->ui->bt_lens_heating->setText("no connection");
 
         this->ui->lb_camera_heating->setText("?");
         this->ui->bt_camera_heating->setText("no connection");
@@ -433,7 +438,8 @@ void MainWindow::display_station_config(void) {
     this->ui->dsb_altitude->setValue(this->station->altitude());
 
     this->ui->dsb_darkness_limit->setValue(this->station->darkness_limit());
-    this->ui->dsb_humidity_limit->setValue(this->station->humidity_limit());
+    this->ui->dsb_humidity_limit_lower->setValue(this->station->humidity_limit_lower());
+    this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
 void MainWindow::send_heartbeat(void) {
@@ -477,10 +483,21 @@ void MainWindow::on_button_send_heartbeat_pressed() {
 
 void MainWindow::on_bt_station_apply_clicked() {
     this->station->set_id(this->ui->le_station_id->text());
-    this->station->server()->set_url(QHostAddress(this->ui->le_ip->text()), this->ui->sb_port->value(), this->station->get_id());
-    this->station->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
+    this->station->server()->set_url(
+        QHostAddress(this->ui->le_ip->text()),
+        this->ui->sb_port->value(),
+        this->station->get_id()
+    );
+    this->station->set_position(
+        this->ui->dsb_latitude->value(),
+        this->ui->dsb_longitude->value(),
+        this->ui->dsb_altitude->value()
+    );
     this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
-    this->station->set_humidity_limit(this->ui->dsb_humidity_limit->value());
+    this->station->set_humidity_limits(
+        this->ui->dsb_humidity_limit_lower->value(),
+        this->ui->dsb_humidity_limit_upper->value()
+    );
 
     this->settings->setValue("server/ip", this->station->server()->address().toString());
     this->settings->setValue("server/port", this->station->server()->port());
@@ -490,7 +507,8 @@ void MainWindow::on_bt_station_apply_clicked() {
     this->settings->setValue("station/altitude", this->station->altitude());
 
     this->settings->setValue("limits/darkness", this->station->darkness_limit());
-    this->settings->setValue("limits/humidity", this->station->humidity_limit());
+    this->settings->setValue("limits/humidity_lower", this->station->humidity_limit_lower());
+    this->settings->setValue("limits/humidity_upper", this->station->humidity_limit_upper());
 
     this->settings->sync();
 
@@ -507,7 +525,8 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_altitude->setValue(this->station->altitude());
 
     this->ui->dsb_darkness_limit->setValue(this->station->darkness_limit());
-    this->ui->dsb_humidity_limit->setValue(this->station->humidity_limit());
+    this->ui->dsb_humidity_limit_lower->setValue(this->station->humidity_limit_lower());
+    this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
 void MainWindow::station_edited(void) {
@@ -519,7 +538,8 @@ void MainWindow::station_edited(void) {
         (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
         (this->ui->sb_port->value() != this->station->server()->port()) ||
         (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) ||
-        (this->ui->dsb_humidity_limit->value() != this->station->humidity_limit())
+        (this->ui->dsb_humidity_limit_lower->value() != this->station->humidity_limit_lower()) ||
+        (this->ui->dsb_humidity_limit_upper->value() != this->station->humidity_limit_upper())
     );
 }
 

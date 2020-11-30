@@ -1,6 +1,8 @@
 #include <QHostAddress>
 #include <QNetworkReply>
 #include <QNetworkAccessManager>
+#include <QHttpPart>
+#include <QHttpMultiPart>
 
 #include "forward.h"
 
@@ -14,7 +16,8 @@ private:
     QHostAddress m_address;
     unsigned short m_port;
 
-    QUrl m_url;
+    QUrl m_url_heartbeat;
+    QUrl m_url_sighting;
     QNetworkAccessManager *m_network_manager;
 
 private slots:

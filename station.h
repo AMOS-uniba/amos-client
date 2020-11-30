@@ -24,7 +24,7 @@ private:
     double m_altitude;
 
     double m_darkness_limit;
-    double m_humidity_limit;
+    double m_humidity_limit_lower, m_humidity_limit_upper;
     bool m_manual_control;
     bool m_safety_override;
 
@@ -71,8 +71,10 @@ public:
 
     // Humidity getters and setters
     bool is_humid(void) const;
-    void set_humidity_limit(const double new_altitude_dark);
-    double humidity_limit(void) const;
+    bool is_very_humid(void) const;
+    void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
+    double humidity_limit_lower(void) const;
+    double humidity_limit_upper(void) const;
 
     // Sun position functions
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
@@ -90,6 +92,7 @@ public:
     QJsonObject prepare_heartbeat(void) const;
 
     void send_sighting(const Sighting &sighting);
+    void move_sighting(Sighting &sighting);
 
     // Command wrappers
     void open_cover(void);

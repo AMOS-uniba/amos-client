@@ -7,6 +7,7 @@ EventLogger::~EventLogger(void) {}
 const QMap<Level, LevelInfo> EventLogger::Levels = {
     {Level::DebugDetail, {"DTL", "debug detail", Qt::gray}},
     {Level::Debug, {"DBG", "debug", Qt::darkGray}},
+    {Level::DebugError, {"DBE", "debug error", Qt::red}},
     {Level::Info, {"INF", "info", Qt::black}},
     {Level::Warning, {"WAR", "warning", Qt::magenta}},
     {Level::Error, {"ERR", "error", Qt::red}},
@@ -59,6 +60,10 @@ void EventLogger::set_level(Level new_level) {
 
 void EventLogger::detail(const QString &message) const {
     this->write(Level::DebugDetail, message);
+}
+
+void EventLogger::debug_error(const QString &message) const {
+    this->write(Level::DebugError, message);
 }
 
 void EventLogger::debug(const QString &message) const {

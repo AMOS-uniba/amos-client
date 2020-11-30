@@ -101,18 +101,27 @@ void Station::set_darkness_limit(const double new_darkness_limit) {
 
 // Humidity limit settings
 bool Station::is_humid(void) const {
-    return (this->m_dome->state_T().humidity_sht() > this->m_humidity_limit);
+    return (this->m_dome->state_T().humidity_sht() >= this->m_humidity_limit_lower);
 }
 
-double Station::humidity_limit(void) const { return this->m_humidity_limit; }
+bool Station::is_very_humid(void) const {
+    return (this->m_dome->state_T().humidity_sht() >= this->m_humidity_limit_upper);
+}
 
-void Station::set_humidity_limit(const double new_humidity_limit) {
-    if ((new_humidity_limit < 0) || (new_humidity_limit > 100)) {
-        throw ConfigurationError(QString("Humidity limit out of range: %1°").arg(m_humidity_limit));
+double Station::humidity_limit_lower(void) const { return this->m_humidity_limit_lower; }
+double Station::humidity_limit_upper(void) const { return this->m_humidity_limit_upper; }
+
+void Station::set_humidity_limits(const double new_lower, const double new_upper) {
+    if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper - 1)) {
+        throw ConfigurationError(QString("Invalid humidity limits: %1% - %2%").arg(new_lower).arg(new_upper));
     }
 
-    this->m_humidity_limit = new_humidity_limit;
-    logger.info(QString("Station's humidity limit set to %1%").arg(m_humidity_limit));
+    this->m_humidity_limit_lower = new_lower;
+    this->m_humidity_limit_upper = new_upper;
+    logger.info(QString("Station's humidity limits set to %1% - %2%")
+                .arg(this->m_humidity_limit_lower)
+                .arg(this->m_humidity_limit_upper)
+    );
 }
 
 Polar Station::sun_position(const QDateTime& time) const {
@@ -208,9 +217,15 @@ void Station::automatic_check(void) {
     } else {
         if (this->is_dark()) {
             // If it is dark, not raning and the computer is running, start observing
-            if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active()) {
+            if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active() && !this->is_humid()) {
                 logger.info("Opened the cover (automatic)");
                 this->open_cover();
+            }
+
+            // If humidity is very high, close the cover
+            if (this->is_very_humid()) {
+                logger.info("Closed the cover due to high humidity (automatic)");
+                this->close_cover();
             }
 
             // If the dome is open, turn on the image intensifier and the fan
@@ -327,9 +342,14 @@ void Station::file_check(void) {
     logger.info("Checking files...");
     for (auto sighting: this->primary_storage().list_new_sightings()) {
         this->send_sighting(sighting);
+        this->move_sighting(sighting);
     }
 }
 
 void Station::send_sighting(const Sighting &sighting) {
     this->m_server->send_sighting(sighting);
+}
+
+void Station::move_sighting(Sighting &sighting) {
+//    QFile::rename(sighting.jpg(), QF);
 }

@@ -46,23 +46,23 @@ void Storage::update_active_directory(void) {
 QVector<Sighting> Storage::list_new_sightings(void) {
     QVector<Sighting> sightings;
 
-    QString full_path = this->m_active_directory.path();
-    logger.info(QString("Listing files in %1").arg(full_path));
+    QString dir = this->m_root_directory.path();
+    logger.info(QString("Listing files in %1").arg(dir));
 
-    QStringList xmls = this->m_active_directory.entryList({"*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
+    QStringList xmls = this->m_root_directory.entryList({"*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
     for (QString xml: xmls) {
-        QString xml_path = full_path + "/" + xml;
+        QString xml_path = dir + "/" + xml;
         QFileInfo xml_info(xml_path);
-        QString jpg_path = full_path + "/" + xml_info.completeBaseName() + "P.jpg";
+        QString jpg_path = dir + "/" + xml_info.completeBaseName() + "P.jpg";
         QFileInfo jpg_info(jpg_path);
 
         logger.info(QString("Found file '%1'").arg(xml_path));
         if (QFile::exists(jpg_path) && jpg_info.isFile()) {
-            logger.info(QString("Also found jpg file '%1'").arg(jpg_path));
+            logger.info(QString("Also found JPG file '%1'").arg(jpg_path));
             sightings.append(Sighting(jpg_path, xml_path));
         } else {
-            logger.info(QString("Could not find corresponding XML '%1'").arg(xml_path));
+            logger.info(QString("Could not find corresponding JPG '%1'").arg(jpg_path));
         }
     }
 

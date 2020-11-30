@@ -13,6 +13,7 @@
 enum class Level {
     DebugDetail = 10,
     Debug = 8,
+    DebugError = 7,
     Info = 6,
     Warning = 4,
     Error = 2,
@@ -44,6 +45,7 @@ public:
 
     void detail(const QString &message) const;
     void debug(const QString &message) const;
+    void debug_error(const QString &message) const;
     void info(const QString &message) const;
     void warning(const QString &message) const;
     void error(const QString &message) const;

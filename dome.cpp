@@ -93,7 +93,7 @@ void Dome::send_request(const Request& request) const {
 
 void Dome::send(const QByteArray& message) const {
     if (this->m_serial_port == nullptr) {
-        logger.error("Cannot send: no serial port set");
+        logger.debug_error("Cannot send: no serial port set");
         return;
     } else {
         Telegram telegram(this->m_address, message);

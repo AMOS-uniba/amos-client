@@ -24,13 +24,24 @@ unsigned short Server::port(void) const {
 void Server::set_url(const QHostAddress& address, const unsigned short port, const QString& station_id) {
     this->m_address = address;
     this->m_port = port;
-    this->m_url = QUrl(QString("http://%1:%2/station/%3/heartbeat/").arg(this->m_address.toString()).arg(this->m_port).arg(station_id));
+    this->m_url_heartbeat = QUrl(
+        QString("http://%1:%2/station/%3/heartbeat/")
+            .arg(this->m_address.toString())
+            .arg(this->m_port)
+            .arg(station_id)
+    );
+    this->m_url_sighting = QUrl(
+        QString("http://%1:%2/station/%3/sighting/")
+            .arg(this->m_address.toString())
+            .arg(this->m_port)
+            .arg(station_id)
+    );
 }
 
 void Server::send_heartbeat(const QJsonObject& heartbeat) const {
-    logger.debug(QString("Sending a heartbeat to %1").arg(this->m_url.toString()));
+    logger.debug(QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
-    QNetworkRequest request(this->m_url);
+    QNetworkRequest request(this->m_url_heartbeat);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
@@ -58,6 +69,28 @@ void Server::heartbeat_response(void) {
 }
 
 void Server::send_sighting(const Sighting &sighting) const {
-    logger.info("Sending a sighting");
-    QNetworkRequest request(this->m_url);
+    logger.info(QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
+
+    QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+    QHttpPart jpg_part;
+    jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
+    jpg_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"jpg\"; filename=\"a.jpg\"");
+    QFile *jpg_file = new QFile(sighting.jpg());
+    jpg_file->open(QIODevice::ReadOnly);
+    jpg_part.setBodyDevice(jpg_file);
+
+    QHttpPart xml_part;
+    xml_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/xml; charset=utf-8");
+    xml_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"xml\"; filename=\"a.xml\"");
+    QFile *xml_file = new QFile(sighting.xml());
+    xml_file->open(QIODevice::ReadOnly);
+    xml_part.setBodyDevice(xml_file);
+
+    multipart->append(jpg_part);
+    multipart->append(xml_part);
+
+    QNetworkRequest request(this->m_url_sighting);
+    QNetworkReply *reply = this->m_network_manager->post(request, multipart);
+    multipart->setParent(reply); // delete the multiPart with the reply
 }
