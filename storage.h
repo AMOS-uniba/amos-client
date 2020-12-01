@@ -18,9 +18,8 @@ public:
     void set_directory(const QDir &dir);
 
     QVector<Sighting> list_new_sightings(void);
-
+    void move_sighting(Sighting& sighting);
 public slots:
-    void update_active_directory(void);
 };
 
 

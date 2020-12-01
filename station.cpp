@@ -351,5 +351,5 @@ void Station::send_sighting(const Sighting &sighting) {
 }
 
 void Station::move_sighting(Sighting &sighting) {
-//    QFile::rename(sighting.jpg(), QF);
+    this->m_primary_storage->move_sighting(sighting);
 }

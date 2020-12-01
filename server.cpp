@@ -6,7 +6,7 @@ extern EventLogger logger;
 Server::Server(const QHostAddress& address, const unsigned short port, const QString& station_id) {
     this->set_url(address, port, station_id);
     this->m_network_manager = new QNetworkAccessManager(this);
-    connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &Server::heartbeat_ok);
+    this->connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &Server::heartbeat_ok);
 }
 
 Server::~Server() {
@@ -21,7 +21,7 @@ unsigned short Server::port(void) const {
     return this->m_port;
 }
 
-void Server::set_url(const QHostAddress& address, const unsigned short port, const QString& station_id) {
+void Server::set_url(const QHostAddress &address, const unsigned short port, const QString &station_id) {
     this->m_address = address;
     this->m_port = port;
     this->m_url_heartbeat = QUrl(
@@ -38,7 +38,7 @@ void Server::set_url(const QHostAddress& address, const unsigned short port, con
     );
 }
 
-void Server::send_heartbeat(const QJsonObject& heartbeat) const {
+void Server::send_heartbeat(const QJsonObject &heartbeat) const {
     logger.debug(QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
@@ -73,24 +73,18 @@ void Server::send_sighting(const Sighting &sighting) const {
 
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-    QHttpPart jpg_part;
-    jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
-    jpg_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"jpg\"; filename=\"a.jpg\"");
-    QFile *jpg_file = new QFile(sighting.jpg());
-    jpg_file->open(QIODevice::ReadOnly);
-    jpg_part.setBodyDevice(jpg_file);
+    QHttpPart text_part;
+    text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"text\"");
+    QJsonDocument document(QJsonObject {{"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")}});
 
-    QHttpPart xml_part;
-    xml_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/xml; charset=utf-8");
-    xml_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"xml\"; filename=\"a.xml\"");
-    QFile *xml_file = new QFile(sighting.xml());
-    xml_file->open(QIODevice::ReadOnly);
-    xml_part.setBodyDevice(xml_file);
+    text_part.setBody(document.toJson(QJsonDocument::Compact));
 
-    multipart->append(jpg_part);
-    multipart->append(xml_part);
+    multipart->append(sighting.jpg_part());
+    multipart->append(sighting.xml_part());
+    multipart->append(text_part);
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply *reply = this->m_network_manager->post(request, multipart);
-    multipart->setParent(reply); // delete the multiPart with the reply
+    multipart->setParent(reply); // delete the multiPart with the reply */
 }

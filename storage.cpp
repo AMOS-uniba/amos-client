@@ -3,7 +3,6 @@
 extern EventLogger logger;
 
 Storage::Storage(const QString &name, const QDir &directory): m_name(name), m_root_directory(directory) {
-    this->update_active_directory();
 }
 
 QStorageInfo Storage::info(void) const {
@@ -32,40 +31,33 @@ const QString& Storage::get_name(void) const {
     return this->m_name;
 }
 
-void Storage::update_active_directory(void) {
-    QDateTime now = QDateTime::currentDateTimeUtc();
-
-    this->m_active_directory = QDir(QString("%1/%2/%3/%4")
-        .arg(this->m_root_directory.path())
-        .arg(now.toString("yyyy"))
-        .arg(now.toString("yyyyMM"))
-        .arg(now.toString("yyyyMMdd"))
-    );
-}
-
 QVector<Sighting> Storage::list_new_sightings(void) {
     QVector<Sighting> sightings;
 
     QString dir = this->m_root_directory.path();
     logger.info(QString("Listing files in %1").arg(dir));
 
-    QStringList xmls = this->m_root_directory.entryList({"*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
+    QStringList xmls = this->m_root_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
     for (QString xml: xmls) {
-        QString xml_path = dir + "/" + xml;
-        QFileInfo xml_info(xml_path);
-        QString jpg_path = dir + "/" + xml_info.completeBaseName() + "P.jpg";
-        QFileInfo jpg_info(jpg_path);
+        try {
+            QFileInfo xml_info(QString("%1/%2").arg(dir).arg(xml));
+            QString prefix = QString("%1/%2").arg(xml_info.absolutePath()).arg(xml_info.completeBaseName());
 
-        logger.info(QString("Found file '%1'").arg(xml_path));
-        if (QFile::exists(jpg_path) && jpg_info.isFile()) {
-            logger.info(QString("Also found JPG file '%1'").arg(jpg_path));
-            sightings.append(Sighting(jpg_path, xml_path));
-        } else {
-            logger.info(QString("Could not find corresponding JPG '%1'").arg(jpg_path));
+            logger.info(QString("Found %1").arg(prefix));
+            sightings.append(Sighting(prefix));
+        } catch (RuntimeException &e) {
+            logger.error(QString("Could not create a sighting: %1").arg(e.what()));
         }
-    }
 
-    this->update_active_directory();
+    }
     return sightings;
+}
+
+void Storage::move_sighting(Sighting &sighting) {
+    logger.info("Moving a sighting...");
+    sighting.move(QString("%1/%2/")
+        .arg(this->m_root_directory.path())
+        .arg(QDateTime::currentDateTimeUtc().toString("yyyy/MM/dd"))
+    );
 }
