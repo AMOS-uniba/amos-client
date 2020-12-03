@@ -39,6 +39,8 @@ private:
 
     QNetworkAccessManager *m_network_manager;
     QTimer *m_timer_automatic, *m_timer_file_watchdog;
+
+    QString m_ufo_path;
 public:
     Station(const QString& id);
     ~Station(void);

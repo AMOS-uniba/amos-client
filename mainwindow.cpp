@@ -34,6 +34,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->display_cover_status();
     this->display_station_config();
     this->display_storage_status();
+    this->display_ufo_state();
 
     logger.set_display_widget(this->ui->tb_log);
     logger.info("Client initialized");
@@ -89,6 +90,9 @@ void MainWindow::load_settings(void) {
         unsigned short port = this->settings->value("server/port", 4805).toInt();
         QString station_id = this->settings->value("station/id", "none").toString();
 
+        this->ufo = new UfoManager();
+        this->ufo->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
+
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
         this->station->set_storages(
@@ -113,8 +117,17 @@ void MainWindow::load_settings(void) {
         this->station->set_manual_control(this->settings->value("manual", false).toBool());
         this->ui->cb_manual->setChecked(this->station->is_manual());
     } catch (ConfigurationError &e) {
-        logger.fatal(e.what());
-        QApplication::exit(-4);
+        QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
+        QMessageBox box;
+        box.setText(postmortem);
+        box.setIcon(QMessageBox::Icon::Critical);
+        box.setWindowIcon(QIcon(":/images/blue.ico"));
+        box.setWindowTitle("Configuration error");
+        box.setStandardButtons(QMessageBox::Ok);
+        box.exec();
+
+        logger.fatal(postmortem);
+        exit(-4);
     }
 }
 
@@ -145,6 +158,7 @@ MainWindow::~MainWindow() {
 
     delete this->universe;
     delete this->station;
+    delete this->ufo;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -189,7 +203,7 @@ void MainWindow::set_icon(const StationState &state) {
             break;
         case StationState::DAY:
             icon = QIcon(":/images/yellow.ico");
-            tooltip = "Daylight, not observing";
+            tooltip = "Day, not observing";
             break;
         case StationState::OBSERVING:
             icon = QIcon(":/images/blue.ico");
@@ -257,8 +271,9 @@ void MainWindow::process_watchdog_timer(void) {
         this->init_serial_ports();
     }
 
-    this->setWindowTitle("AMOS client [automatic mode]");
+    this->setWindowTitle(QString("AMOS client [%1 mode]").arg(this->station->is_manual() ? "manual" : "automatic"));
     this->set_icon(this->station->determine_state());
+    this->display_ufo_state();
 }
 
 void MainWindow::display_time(void) {
@@ -338,7 +353,7 @@ void MainWindow::display_basic_data(void) {
 
         if (state.intensifier_active()) {
             this->ui->lb_intensifier->setText("on");
-            this->ui->lb_intensifier->setStyleSheet("QLabel { color: white; }");
+            this->ui->lb_intensifier->setStyleSheet("QLabel { color: red; }");
             this->ui->bt_intensifier->setText("turn off");
         } else {
             this->ui->lb_intensifier->setText("off");
@@ -356,7 +371,7 @@ void MainWindow::display_basic_data(void) {
 
         if (state.light_sensor_active()) {
             this->ui->lb_light_sensor->setText("light");
-            this->ui->lb_light_sensor->setStyleSheet("QLabel { color: white; }");
+            this->ui->lb_light_sensor->setStyleSheet("QLabel { color: red; }");
         } else {
             this->ui->lb_light_sensor->setText("dark");
             this->ui->lb_light_sensor->setStyleSheet("QLabel { color: black; }");
@@ -440,6 +455,11 @@ void MainWindow::display_station_config(void) {
     this->ui->dsb_darkness_limit->setValue(this->station->darkness_limit());
     this->ui->dsb_humidity_limit_lower->setValue(this->station->humidity_limit_lower());
     this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
+}
+
+void MainWindow::display_ufo_state(void) {
+    this->ui->le_ufo_path->setText(this->ufo->path());
+    this->ui->lb_ufo_state->setText(this->ufo->state_string());
 }
 
 void MainWindow::send_heartbeat(void) {
@@ -553,7 +573,7 @@ void MainWindow::button_station_toggle(bool enable) {
     }
 }
 
-void MainWindow::set_storage(Storage& storage, QLineEdit& edit) {
+void MainWindow::set_storage(Storage &storage, QLineEdit *edit) {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
         QString("Select %1 storage directory").arg(storage.get_name()),
@@ -566,18 +586,18 @@ void MainWindow::set_storage(Storage& storage, QLineEdit& edit) {
         return;
     } else {
         storage.set_directory(new_dir);
-        edit.setText(new_dir);
+        edit->setText(new_dir);
         this->display_storage_status();
         this->settings->setValue(QString("storage/%1").arg(storage.get_name()), new_dir);
     }
 }
 
 void MainWindow::on_bt_primary_clicked() {
-    this->set_storage(this->station->primary_storage(), *this->ui->le_primary);
+    this->set_storage(this->station->primary_storage(), this->ui->le_primary);
 }
 
 void MainWindow::on_bt_permanent_clicked() {
-    this->set_storage(this->station->permanent_storage(), *this->ui->le_permanent);
+    this->set_storage(this->station->permanent_storage(), this->ui->le_permanent);
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {
@@ -593,8 +613,10 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
     } else {
         logger.warning("Switched to automatic mode");
     }
+
     this->station->set_manual_control((bool) enable);
 
+    this->settings->setValue("manual", this->station->is_manual());
     this->ui->bt_camera_heating->setEnabled(this->station->is_manual());
     this->ui->bt_lens_heating->setEnabled(this->station->is_manual());
     this->ui->bt_intensifier->setEnabled(this->station->is_manual());
@@ -676,4 +698,25 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
 
 void MainWindow::on_actionManual_control_triggered() {
     this->ui->cb_manual->click();
+}
+
+void MainWindow::on_bt_change_ufo_clicked(void) {
+     QString filename = QFileDialog::getOpenFileName(
+        this,
+        "Select UFO executable",
+        QString(),
+        "Executable file (*.exe)"
+    );
+
+    if (filename == "") {
+        logger.debug("Directory selection aborted");
+        return;
+    } else {
+        this->settings->setValue("ufo/path", filename);
+        this->reset_ufo();
+    }
+}
+
+void MainWindow::reset_ufo(void) {
+    this->display_ufo_state();
 }

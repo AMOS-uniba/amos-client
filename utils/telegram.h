@@ -3,7 +3,6 @@
 #ifndef TELEGRAM_H
 #define TELEGRAM_H
 
-
 class Telegram {
 private:
     unsigned char m_address;

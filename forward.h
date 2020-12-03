@@ -3,6 +3,7 @@
 
 #include <QtCore>
 #include <QObject>
+#include <QString>
 
 QT_FORWARD_DECLARE_CLASS(MainWindow);
 QT_FORWARD_DECLARE_CLASS(Station);

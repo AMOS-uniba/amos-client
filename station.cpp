@@ -1,8 +1,12 @@
 #include "include.h"
+#include <windows.h>
+#include <winuser.h>
 
 extern EventLogger logger;
 
-Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING) {
+Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING), m_ufo_path("") {
+    qDebug() << "Station created";
+
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
 
@@ -51,7 +55,7 @@ Server* Station::server(void) { return this->m_server; }
 
 // Set position of the station
 void Station::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
-    // Check that the new value is meaningful
+    // Check that the new values are meaningful
     if (fabs(new_latitude) > 90) {
         throw ConfigurationError(QString("Latitude out of range: %1").arg(new_latitude));
     }
@@ -210,7 +214,6 @@ void Station::automatic_check(void) {
         this->turn_off_intensifier();
     }
 
-
     if (this->m_manual_control) {
         // If we are in manual mode, pass other automatic checks
         logger.debug("Manual control mode, passing");
@@ -339,7 +342,7 @@ StationState Station::state(void) {
 }
 
 void Station::file_check(void) {
-    logger.info("Checking files...");
+    logger.debug("Checking files...");
     for (auto sighting: this->primary_storage().list_new_sightings()) {
         this->send_sighting(sighting);
         this->move_sighting(sighting);

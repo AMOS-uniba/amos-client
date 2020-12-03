@@ -73,16 +73,9 @@ void Server::send_sighting(const Sighting &sighting) const {
 
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-    QHttpPart text_part;
-    text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
-    text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"text\"");
-    QJsonDocument document(QJsonObject {{"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")}});
-
-    text_part.setBody(document.toJson(QJsonDocument::Compact));
-
     multipart->append(sighting.jpg_part());
     multipart->append(sighting.xml_part());
-    multipart->append(text_part);
+    multipart->append(sighting.json_metadata());
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply *reply = this->m_network_manager->post(request, multipart);

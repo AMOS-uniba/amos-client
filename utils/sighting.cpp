@@ -35,12 +35,11 @@ void Sighting::try_open(const QString &path) {
 void Sighting::move(const QString &path) {
     logger.info(QString("Moving to %1").arg(path));
     QDir().mkpath(path);
+
     for (auto &file: this->m_files) {
-//        logger.info(QString("Moving %1 to %2").arg(file).arg(QString("%1/%2").arg(path).arg(QFileInfo(file).fileName())));
         QString new_path = QString("%1/%2").arg(path).arg(QFileInfo(file).fileName());
         QFile::rename(file, new_path);
         file = new_path;
-//        logger.info(file);
     }
 }
 
@@ -70,18 +69,15 @@ QHttpPart Sighting::xml_part(void) const {
     return xml_part;
 }
 
-const QString& Sighting::jpg(void) const {
-    return this->m_jpg;
-}
+QHttpPart Sighting::json_metadata(void) const {
+    QHttpPart text_part;
+    text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
 
-const QString& Sighting::xml(void) const {
-    return this->m_xml;
-}
+    QJsonObject content {
+        {"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")}
+    };
 
-const QString& Sighting::bmp(void) const {
-    return this->m_bmp;
-}
-
-const QString& Sighting::avi(void) const {
-    return this->m_avi;
+    text_part.setBody(QJsonDocument(content).toJson(QJsonDocument::Compact));
+    return text_part;
 }

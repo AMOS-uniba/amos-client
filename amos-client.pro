@@ -40,6 +40,7 @@ SOURCES += \
     utils/serialbuffer.cpp \
     utils/sighting.cpp \
     utils/telegram.cpp \
+    utils/ufomanager.cpp \
     utils/universe.cpp
 
 HEADERS += \
@@ -75,6 +76,7 @@ HEADERS += \
     utils/sighting.h \
     utils/stationstate.h \
     utils/telegram.h \
+    utils/ufomanager.h \
     utils/universe.h
 
 FORMS += \

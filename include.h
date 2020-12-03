@@ -12,6 +12,7 @@
 #include "utils/stationstate.h"
 #include "utils/domestate.h"
 #include "utils/sighting.h"
+#include "utils/ufomanager.h"
 
 #include "mainwindow.h"
 #include "server.h"

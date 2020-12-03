@@ -35,7 +35,7 @@ QVector<Sighting> Storage::list_new_sightings(void) {
     QVector<Sighting> sightings;
 
     QString dir = this->m_root_directory.path();
-    logger.info(QString("Listing files in %1").arg(dir));
+    logger.debug(QString("Listing files in %1").arg(dir));
 
     QStringList xmls = this->m_root_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
@@ -44,7 +44,6 @@ QVector<Sighting> Storage::list_new_sightings(void) {
             QFileInfo xml_info(QString("%1/%2").arg(dir).arg(xml));
             QString prefix = QString("%1/%2").arg(xml_info.absolutePath()).arg(xml_info.completeBaseName());
 
-            logger.info(QString("Found %1").arg(prefix));
             sightings.append(Sighting(prefix));
         } catch (RuntimeException &e) {
             logger.error(QString("Could not create a sighting: %1").arg(e.what()));
@@ -55,7 +54,7 @@ QVector<Sighting> Storage::list_new_sightings(void) {
 }
 
 void Storage::move_sighting(Sighting &sighting) {
-    logger.info("Moving a sighting...");
+    logger.debug("Moving a sighting...");
     sighting.move(QString("%1/%2/")
         .arg(this->m_root_directory.path())
         .arg(QDateTime::currentDateTimeUtc().toString("yyyy/MM/dd"))

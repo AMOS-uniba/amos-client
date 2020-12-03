@@ -23,13 +23,9 @@ public:
 
     QHttpPart jpg_part(void) const;
     QHttpPart xml_part(void) const;
+    QHttpPart json_metadata(void) const;
 
     void move(const QString &prefix);
-
-    const QString& jpg(void) const;
-    const QString& xml(void) const;
-    const QString& bmp(void) const;
-    const QString& avi(void) const;
 };
 
 #endif // SIGHTING_H

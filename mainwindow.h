@@ -17,6 +17,7 @@
 #include "forward.h"
 
 #include "dome.h"
+#include "utils/ufomanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -30,6 +31,35 @@ protected:
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
+private:
+    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
+    Ui::MainWindow *ui;
+    QSettings *settings;
+
+    double sun_azimuth = 0;
+    double sun_altitude = 0;
+
+    Station *station = nullptr;
+    Universe *universe = nullptr;
+    UfoManager *ufo = nullptr;
+
+    QAction *minimizeAction;
+    QAction *maximizeAction;
+    QAction *restoreAction;
+    QAction *quitAction;
+    void create_actions(void);
+    void create_tray_icon(void);
+
+    QSystemTrayIcon *tray_icon;
+    QMenu *trayIconMenu;
+
+    void set_storage(Storage& storage, QLineEdit *edit);
+    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
+
+    //CommThread comm_thread;
+
+    QList<QSerialPortInfo> serial_ports;
 
 private slots:
     void load_settings(void);
@@ -53,20 +83,15 @@ private slots:
     void display_cover_status(void);
     void display_storage_status(void);
     void display_station_config(void);
+    void display_ufo_state(void);
 
     void send_heartbeat(void);
-
     void on_button_send_heartbeat_pressed();
 
-    void on_bt_station_apply_clicked();
-
-    void station_edited(void);
-
     void button_station_toggle(bool enable);
-
     void on_bt_station_reset_clicked();
-
-    void set_storage(Storage& storage, QLineEdit& edit);
+    void on_bt_station_apply_clicked();
+    void station_edited(void);
 
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
@@ -93,31 +118,7 @@ private slots:
 
     void on_actionManual_control_triggered();
 
-private:
-    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
-    Ui::MainWindow *ui;
-    QSettings *settings;
-
-    double sun_azimuth = 0;
-    double sun_altitude = 0;
-
-    Station *station;
-    Universe *universe;
-
-    QAction *minimizeAction;
-    QAction *maximizeAction;
-    QAction *restoreAction;
-    QAction *quitAction;
-    void create_actions(void);
-    void create_tray_icon(void);
-
-    QSystemTrayIcon *tray_icon;
-    QMenu *trayIconMenu;
-
-    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
-
-    //CommThread comm_thread;
-
-    QList<QSerialPortInfo> serial_ports;
+    void on_bt_change_ufo_clicked();
+    void reset_ufo();
 };
 #endif // MAINWINDOW_H
