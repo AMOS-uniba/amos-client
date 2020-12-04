@@ -229,6 +229,7 @@ void Station::automatic_check(void) {
             if (this->is_very_humid()) {
                 logger.info("Closed the cover due to high humidity (automatic)");
                 this->close_cover();
+                this->turn_off_intensifier();
             }
 
             // If the dome is open, turn on the image intensifier and the fan
