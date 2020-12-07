@@ -1015,7 +1015,7 @@
             <item row="11" column="2" colspan="3">
              <widget class="QDoubleSpinBox" name="dsb_darkness_limit">
               <property name="toolTip">
-               <string>altitude above mean sea level</string>
+               <string>darkness limit for opening the cover</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1074,6 +1074,9 @@
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
                <widget class="QPushButton" name="bt_station_reset">
+                <property name="toolTip">
+                 <string>reset the changes</string>
+                </property>
                 <property name="text">
                  <string>Reset changes</string>
                 </property>
@@ -1083,6 +1086,9 @@
                <widget class="QPushButton" name="bt_station_apply">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="toolTip">
+                 <string>save the changes</string>
                 </property>
                 <property name="text">
                  <string>No changes</string>
@@ -1213,7 +1219,7 @@
             <item row="12" column="2">
              <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
               <property name="toolTip">
-               <string>altitude above mean sea level</string>
+               <string>open only if humidity is below this level</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1241,7 +1247,7 @@
             <item row="12" column="4">
              <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
               <property name="toolTip">
-               <string>altitude above mean sea level</string>
+               <string>close if humidity exceeds this level</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1295,6 +1301,9 @@
              <widget class="QLineEdit" name="le_ufo_path">
               <property name="cursor">
                <cursorShape>ForbiddenCursor</cursorShape>
+              </property>
+              <property name="toolTip">
+               <string>path to monitored executable</string>
               </property>
               <property name="readOnly">
                <bool>true</bool>
