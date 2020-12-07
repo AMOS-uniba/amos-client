@@ -180,8 +180,9 @@ void Station::log_state(void) {
     const DomeStateS& stateS = this->dome()->state_S();
     const DomeStateT& stateT = this->dome()->state_T();
     const DomeStateZ& stateZ = this->dome()->state_Z();
-    QString line = QString("%1 %2C %3C %4C %5% %6")
+    QString line = QString("%1 %2° %3C %4C %5C %6% %7")
                         .arg(QString(stateS.full_text()))
+                        .arg(this->sun_altitude(), 3, 'f', 1)
                         .arg(stateT.temperature_sht(), 6, 'f', 1)
                         .arg(stateT.temperature_lens(), 6, 'f', 1)
                         .arg(stateT.temperature_cpu(), 6, 'f', 1)

@@ -51,6 +51,10 @@ void EventLogger::write(Level level, const QString &message) const {
         QTableWidgetItem *text = new QTableWidgetItem(message);
         text->setForeground(EventLogger::Levels[level].colour);
         this->m_display->setItem(this->m_display->rowCount() - 1, 2, text);
+
+        if (this->m_display->rowCount() > 256) {
+            this->m_display->removeRow(0);
+        }
     }
 }
 
