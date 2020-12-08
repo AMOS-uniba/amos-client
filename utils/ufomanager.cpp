@@ -4,7 +4,7 @@
 #include "windows.h"
 #include "process.h"
 
-extern StateLogger logger;
+extern EventLogger logger;
 
 UfoManager::UfoManager(): m_state(UfoState::NOT_RUNNING) {
 
@@ -41,6 +41,7 @@ bool UfoManager::is_running() {
 }
 
 void UfoManager::start_ufo(void) {
+    logger.info("Started UFO");
     if (this->m_state == UfoState::NOT_RUNNING) {
         QProcess::startDetached(this->m_path, {}, QFileInfo(this->m_path).absoluteDir().path(), &this->m_pid);
     }

@@ -57,6 +57,10 @@ private:
     void set_storage(Storage& storage, QLineEdit *edit);
     void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
 
+    void display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off);
+    void display_device_button(bool on, QPushButton *button);
+    void display_sensor_value(float value, QLabel *label, const QString& unit);
+
     //CommThread comm_thread;
 
     QList<QSerialPortInfo> serial_ports;

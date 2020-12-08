@@ -5,8 +5,6 @@
 extern EventLogger logger;
 
 Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING), m_ufo_path("") {
-    qDebug() << "Station created";
-
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
 
@@ -182,12 +180,12 @@ void Station::log_state(void) {
     const DomeStateZ& stateZ = this->dome()->state_Z();
     QString line = QString("%1 %2° %3C %4C %5C %6% %7")
                         .arg(QString(stateS.full_text()))
-                        .arg(this->sun_altitude(), 3, 'f', 1)
-                        .arg(stateT.temperature_sht(), 6, 'f', 1)
-                        .arg(stateT.temperature_lens(), 6, 'f', 1)
-                        .arg(stateT.temperature_cpu(), 6, 'f', 1)
-                        .arg(stateT.humidity_sht(), 6, 'f', 1)
-                        .arg(stateZ.shaft_position(), 4);
+                        .arg(this->sun_altitude(), 5, 'f', 1)
+                        .arg(stateT.temperature_sht(), 5, 'f', 1)
+                        .arg(stateT.temperature_lens(), 5, 'f', 1)
+                        .arg(stateT.temperature_cpu(), 5, 'f', 1)
+                        .arg(stateT.humidity_sht(), 5, 'f', 1)
+                        .arg(stateZ.shaft_position(), 3);
 
     this->m_state_logger->log(line);
 }

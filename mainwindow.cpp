@@ -162,9 +162,14 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    if (this->tray_icon->isVisible()) {
+   /* if (this->tray_icon->isVisible()) {
         this->hide();
        // event->ignore();
+    }*/
+
+    event->ignore();
+    if (QMessageBox::question(this, "Confirm exit", "Are you sure you want to turn off the client?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+        event->accept();
     }
 }
 void MainWindow::create_tray_icon() {
@@ -236,7 +241,7 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
         case QSystemTrayIcon::MiddleClick:
             break;
         default:
-            ;
+            break;
     }
 }
 
@@ -316,6 +321,31 @@ void MainWindow::display_sun_properties(void) {
     this->ui->lb_ecl_longitude->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
 }
 
+void MainWindow::display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off) {
+    bool valid = this->station->dome()->state_S().is_valid();
+    label->setText(valid ? value ? on : off : "?");
+    label->setStyleSheet(QString("QLabel { color: %1; }").arg(valid ? value ? colour_on : colour_off : "gray"));
+}
+
+void MainWindow::display_device_button(bool on, QPushButton *button) {
+    bool valid = this->station->dome()->state_S().is_valid();
+    button->setText(valid ? on ? "turn off" : "turn on" : "no connection");
+}
+
+void MainWindow::display_sensor_value(float value, QLabel *label, const QString &unit) {
+    if (this->station->dome()->state_T().is_valid()) {
+        label->setText(QString("%1 %2").arg(value, 4, 'f', 1).arg(unit));
+        if (unit == "°C") {
+            label->setStyleSheet(QString("QLabel { color: hsv(%1, 255, 220); }").arg(180 - value * 5));
+        } else {
+            label->setStyleSheet(QString("QLabel { color: black; }"));
+        }
+    } else {
+        label->setText(QString("? %1").arg(unit));
+        label->setStyleSheet(QString("QLabel { color: gray; }"));
+    }
+}
+
 void MainWindow::display_basic_data(void) {
     const DomeStateS &state = this->station->dome()->state_S();
 
@@ -331,97 +361,58 @@ void MainWindow::display_basic_data(void) {
                                          .arg(minutes, 2, 10, QChar('0'))
                                          .arg(seconds, 2, 10, QChar('0')));
 
-        this->ui->lb_dome_moving->setText(state.servo_moving() ? "moving" : "not moving");
-        this->ui->lb_dome_cover_direction->setText(state.servo_direction() ? "opening" : "closing");
-        this->ui->lb_dome_open_sensor->setText(state.dome_open_sensor_active() ? "active" : "not active");
-        this->ui->lb_dome_closed_sensor->setText(state.dome_closed_sensor_active() ? "active" : "not active");
-
         this->ui->bt_cover_open->setEnabled(!state.dome_open_sensor_active() && this->station->is_manual());
         this->ui->bt_cover_close->setEnabled(!state.dome_closed_sensor_active() && this->station->is_manual());
-
-        this->ui->lb_dome_safety_position->setText(state.cover_safety_position() ? "yes" : "no");
-        this->ui->lb_dome_blocked->setText(state.servo_blocked() ? "yes" : "no");
-
-        this->ui->lb_lens_heating->setText(state.lens_heating_active() ? "on" : "off");
-        this->ui->bt_lens_heating->setText(state.lens_heating_active() ? "turn off" : "turn on");
-
-        this->ui->lb_camera_heating->setText(state.camera_heating_active() ? "on" : "off");
-        this->ui->bt_camera_heating->setText(state.camera_heating_active() ? "turn off" : "turn on");
-
-        this->ui->lb_fan->setText(state.fan_active() ? "on" : "off");
-        this->ui->bt_fan->setText(state.fan_active() ? "turn off" : "turn on");
-
-        if (state.intensifier_active()) {
-            this->ui->lb_intensifier->setText("on");
-            this->ui->lb_intensifier->setStyleSheet("QLabel { color: red; }");
-            this->ui->bt_intensifier->setText("turn off");
-        } else {
-            this->ui->lb_intensifier->setText("off");
-            this->ui->lb_intensifier->setStyleSheet("QLabel { color: black; }");
-            this->ui->bt_intensifier->setText("turn on");
-        }
-
-        if (state.rain_sensor_active()) {
-            this->ui->lb_rain_sensor->setText("raining");
-            this->ui->lb_rain_sensor->setStyleSheet("QLabel { color: blue; }");
-        } else {
-            this->ui->lb_rain_sensor->setText("not raining");
-            this->ui->lb_rain_sensor->setStyleSheet("QLabel { color: black; }");
-        }
-
-        if (state.light_sensor_active()) {
-            this->ui->lb_light_sensor->setText("light");
-            this->ui->lb_light_sensor->setStyleSheet("QLabel { color: red; }");
-        } else {
-            this->ui->lb_light_sensor->setText("dark");
-            this->ui->lb_light_sensor->setStyleSheet("QLabel { color: black; }");
-        }
-
-        this->ui->lb_master_power->setText(state.computer_power_sensor_active() ? "powered" : "not powered");
     } else {
         this->ui->lb_time_alive->setText("???");
-
-        this->ui->lb_dome_moving->setText("?");
-        this->ui->lb_dome_cover_direction->setText("?");
-        this->ui->lb_dome_open_sensor->setText("?");
-        this->ui->lb_dome_closed_sensor->setText("?");
-
         this->ui->bt_cover_open->setEnabled(false);
         this->ui->bt_cover_close->setEnabled(false);
-
-        this->ui->lb_dome_safety_position->setText("?");
-        this->ui->lb_dome_blocked->setText("?");
-
-        this->ui->lb_lens_heating->setText("?");
-        this->ui->bt_lens_heating->setText("no connection");
-
-        this->ui->lb_camera_heating->setText("?");
-        this->ui->bt_camera_heating->setText("no connection");
-
-        this->ui->lb_fan->setText("?");
-        this->ui->bt_fan->setText("no connection");
-
-        this->ui->lb_intensifier->setText("?");
-        this->ui->lb_intensifier->setStyleSheet("QLabel { color: red; }");
-        this->ui->bt_intensifier->setText("no connection");
-
-        this->ui->lb_rain_sensor->setText("?");
-        this->ui->lb_rain_sensor->setStyleSheet("QLabel { color: red; }");
-
-        this->ui->lb_light_sensor->setText("?");
-        this->ui->lb_light_sensor->setStyleSheet("QLabel { color: red; }");
-
-        this->ui->lb_master_power->setText("?");
     }
+
+    // Basic
+    this->display_S_state_bit(state.servo_moving(),                 this->ui->lb_dome_moving,           "moving",  "not moving", "green", "black");
+    this->display_S_state_bit(state.servo_direction(),              this->ui->lb_dome_cover_direction,  "opening", "closing", "black", "black");
+    this->display_S_state_bit(state.dome_open_sensor_active(),      this->ui->lb_dome_open_sensor,      "active",  "not active", "green", "black");
+    this->display_S_state_bit(state.dome_closed_sensor_active(),    this->ui->lb_dome_closed_sensor,    "active",  "not active", "green", "black");
+
+    this->display_S_state_bit(state.lens_heating_active(),          this->ui->lb_lens_heating,          "on", "off", "green", "black");
+    this->display_S_state_bit(state.camera_heating_active(),        this->ui->lb_camera_heating,        "on", "off", "green", "black");
+    this->display_S_state_bit(state.fan_active(),                   this->ui->lb_fan,                   "on", "off", "green", "black");
+    this->display_S_state_bit(state.intensifier_active(),           this->ui->lb_intensifier,           "on", "off", "green", "black");
+
+    this->display_device_button(state.lens_heating_active(),        this->ui->bt_lens_heating);
+    this->display_device_button(state.camera_heating_active(),      this->ui->bt_camera_heating);
+    this->display_device_button(state.fan_active(),                 this->ui->bt_fan);
+    this->display_device_button(state.intensifier_active(),         this->ui->bt_intensifier);
+
+    // Environment
+    this->display_S_state_bit(state.rain_sensor_active(),           this->ui->lb_rain_sensor,           "raining", "not raining", "blue", "black");
+    this->display_S_state_bit(state.light_sensor_active(),          this->ui->lb_light_sensor,          "light", "no light", "light-blue", "black");
+    this->display_S_state_bit(state.computer_power_sensor_active(), this->ui->lb_computer_power,        "powered", "not powered", "green", "red");
+    this->display_S_state_bit(state.cover_safety_position(),        this->ui->lb_cover_safety_position, "safety", "no", "blue", "black");
+    this->display_S_state_bit(state.servo_blocked(),                this->ui->lb_servo_blocked,         "blocked", "no", "blue", "black");
+
+    // Errors
+    this->display_S_state_bit(state.error_t_lens(),                 this->ui->lb_error_t_lens,          "error",    "ok", "red", "black");
+    this->display_S_state_bit(state.error_SHT31(),                  this->ui->lb_error_SHT31,           "error",    "ok", "red", "black");
+    this->display_S_state_bit(state.emergency_closing_light(),      this->ui->lb_error_light,           "closed",   "ok", "red", "black");
+    this->display_S_state_bit(state.error_watchdog_reset(),         this->ui->lb_error_watchdog_reset,  "reset",    "ok", "red", "black");
+    this->display_S_state_bit(state.error_brownout_reset(),         this->ui->lb_error_brownout_reset,  "reset",    "ok", "red", "black");
+    this->display_S_state_bit(state.error_computer_power(),         this->ui->lb_error_computer_power,  "error",    "ok", "red", "black");
+    this->display_S_state_bit(state.error_t_CPU(),                  this->ui->lb_error_t_CPU,           "error",    "ok", "red", "black");
+    this->display_S_state_bit(state.emergency_closing_rain(),       this->ui->lb_error_rain,            "closed",   "ok", "red", "black");
 }
 
 void MainWindow::display_env_data(void) {
     const DomeStateT &state = this->station->dome()->state_T();
-    this->ui->group_environment->setTitle(QString("Environment (%1 s)").arg(state.age(), 3, 'f', 1));
-    this->ui->lb_t_lens->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_lens(), 4, 'f', 1) : "? °C");
-    this->ui->lb_t_cpu->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_cpu(), 4, 'f', 1) : "? °C");
-    this->ui->lb_t_sht->setText(state.is_valid() ? QString("%1 °C").arg(state.temperature_sht(), 4, 'f', 1) : "? °C");
-    this->ui->lb_h_sht->setText(state.is_valid() ? QString("%1 %").arg(state.humidity_sht(), 4, 'f', 1) : "? %");
+    if (state.is_valid()) {
+        this->ui->group_environment->setTitle(QString("Environment (%1 s)").arg(state.age(), 3, 'f', 1));
+    }
+
+    this->display_sensor_value(state.temperature_lens(),    this->ui->lb_t_lens,    "°C");
+    this->display_sensor_value(state.temperature_cpu(),     this->ui->lb_t_cpu,     "°C");
+    this->display_sensor_value(state.temperature_sht(),     this->ui->lb_t_sht,     "°C");
+    this->display_sensor_value(state.humidity_sht(),        this->ui->lb_h_sht,     "%");
 }
 
 void MainWindow::display_shaft_position(void) {
@@ -460,11 +451,11 @@ void MainWindow::display_station_config(void) {
 void MainWindow::display_ufo_state(void) {
     this->ui->le_ufo_path->setText(this->ufo->path());
     this->ui->lb_ufo_state->setText(this->ufo->state_string());
+    this->display_storage_status();
 }
 
 void MainWindow::send_heartbeat(void) {
     this->station->log_state();
-    this->display_storage_status();
     this->station->send_heartbeat();
 }
 
@@ -633,7 +624,7 @@ void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
         logger.warning("No serial ports found");
         this->station->dome()->clear_serial_port();
     } else {
-        logger.info(QString("Serial port changed to %1").arg(this->serial_ports[index].portName()));
+        logger.info(QString("Serial port set to %1").arg(this->serial_ports[index].portName()));
         this->station->dome()->reset_serial_port(this->serial_ports[index].portName());
     }
 }
@@ -673,7 +664,6 @@ void MainWindow::on_bt_cover_close_clicked(void) {
 }
 
 void MainWindow::on_cb_safety_override_stateChanged(int state) {
-    logger.info(QString("State changed: %1").arg(state));
     if (state == Qt::CheckState::Checked) {
         QMessageBox box;
         box.setText("You are about to override the safety mechanisms!");
