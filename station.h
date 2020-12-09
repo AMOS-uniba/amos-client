@@ -109,6 +109,8 @@ public:
     void turn_on_fan(void);
     void turn_off_fan(void);
 
+    static QString temperature_colour(float temperature);
+
 public slots:
     void automatic_check(void);
     void file_check(void);

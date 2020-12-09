@@ -2,16 +2,8 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1046</width>
-    <height>923</height>
-   </rect>
-  </property>
   <property name="windowTitle">
-   <string>AMOS [automatic mode]</string>
+   <string>AMOS client [automatic mode]</string>
   </property>
   <property name="windowIcon">
    <iconset resource="images.qrc">
@@ -20,1693 +12,1836 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QGridLayout" name="grid_main">
-      <item row="0" column="0" rowspan="2">
-       <widget class="QGroupBox" name="group_dome">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="title">
-         <string>Dome</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QCheckBox" name="cb_manual">
-           <property name="text">
-            <string>Enable manual control</string>
-           </property>
-           <property name="checked">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0" colspan="2">
-          <widget class="QGroupBox" name="group_environment">
-           <property name="title">
-            <string>Environment</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_11">
-            <item row="2" column="1">
-             <widget class="QLabel" name="lb_t_sht">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="lx_t_lens">
-              <property name="text">
-               <string>Lens temperature</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="lx_h_sht">
-              <property name="text">
-               <string>SHT humidity</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLabel" name="lb_rain_sensor">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lx_t_sht">
-              <property name="text">
-               <string>SHT temperature</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="lb_t_lens">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="lb_t_cpu">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QLabel" name="lb_h_sht">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="lx_t_cpu">
-              <property name="text">
-               <string>Processor temperature</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="lx_rain_sensor">
-              <property name="text">
-               <string>Rain sensor</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="lx_light_sensor">
-              <property name="text">
-               <string>Light sensor</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QLabel" name="lx_computer_power">
-              <property name="text">
-               <string>Master power</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLabel" name="lb_light_sensor">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="1">
-             <widget class="QLabel" name="lb_computer_power">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QCheckBox" name="cb_safety_override">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="text">
-            <string>Safety override</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lx_serial_port">
-           <property name="text">
-            <string>Serial port</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="2">
-          <widget class="QLabel" name="lb_serial_port">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="co_serial_ports"/>
-         </item>
-         <item row="7" column="0" colspan="2">
-          <widget class="QGroupBox" name="group_cover">
-           <property name="title">
-            <string>Cover</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="4" column="3">
-             <widget class="QLabel" name="lb_dome_closed_sensor">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="4">
-             <widget class="QLabel" name="label_cover_state">
-              <property name="font">
-               <font>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="3">
-             <widget class="QLabel" name="lb_cover_safety_position">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="0">
-             <widget class="QPushButton" name="bt_cover_open">
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>open</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="lx_dome_open_sensor">
-              <property name="text">
-               <string>Open dome sensor</string>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="3">
-             <widget class="QLabel" name="lb_servo_blocked">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0" colspan="4">
-             <widget class="QProgressBar" name="progress_cover">
-              <property name="maximum">
-               <number>401</number>
-              </property>
-              <property name="value">
-               <number>0</number>
-              </property>
-              <property name="format">
-               <string>%v/%m</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="3">
-             <widget class="QLabel" name="lb_dome_cover_direction">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lx_dome_cover_direction">
-              <property name="text">
-               <string>Servo direction</string>
-              </property>
-             </widget>
-            </item>
-            <item row="7" column="3">
-             <widget class="QPushButton" name="bt_cover_close">
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>close</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="3">
-             <widget class="QLabel" name="lb_dome_open_sensor">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="lx_servo_blocked">
-              <property name="text">
-               <string>Blocked</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="lx_dome_moving">
-              <property name="text">
-               <string>Servo moving</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="3">
-             <widget class="QLabel" name="lb_dome_moving">
-              <property name="font">
-               <font>
-                <pointsize>8</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="lx_dome_closed_sensor">
-              <property name="text">
-               <string>Closed dome sensor</string>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="lx_cover_safety_position">
-              <property name="text">
-               <string>Safety position</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="lx_time_alive">
-           <property name="text">
-            <string>Time alive</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0" colspan="2">
-          <widget class="QLabel" name="lb_serial_data">
-           <property name="font">
-            <font>
-             <pointsize>12</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="lb_time_alive">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>?</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="0" column="1" rowspan="4">
-       <widget class="QFrame" name="right">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <layout class="QVBoxLayout" name="verticalLayout">
-         <item>
-          <widget class="QGroupBox" name="group_storage">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>Data storage monitor</string>
-           </property>
-           <property name="flat">
-            <bool>false</bool>
-           </property>
-           <property name="checkable">
-            <bool>false</bool>
-           </property>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <item>
-             <widget class="QListWidget" name="listWidget"/>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="gb_primary">
-              <property name="title">
-               <string>Primary</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_10">
-               <item row="0" column="0">
-                <widget class="QLineEdit" name="le_primary">
-                 <property name="cursor">
-                  <cursorShape>ForbiddenCursor</cursorShape>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QProgressBar" name="pb_primary">
-                 <property name="maximum">
-                  <number>400</number>
-                 </property>
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                 <property name="format">
-                  <string>%v/%m GB</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="bt_primary">
-                 <property name="text">
-                  <string>Change</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-            <item>
-             <widget class="QGroupBox" name="gb_permanent">
-              <property name="title">
-               <string>Permanent</string>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_9">
-               <item row="0" column="0">
-                <widget class="QLineEdit" name="le_permanent">
-                 <property name="cursor">
-                  <cursorShape>ForbiddenCursor</cursorShape>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QPushButton" name="bt_permanent">
-                 <property name="text">
-                  <string>Change</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="0" colspan="2">
-                <widget class="QProgressBar" name="pb_permanent">
-                 <property name="maximum">
-                  <number>400</number>
-                 </property>
-                 <property name="value">
-                  <number>0</number>
-                 </property>
-                 <property name="format">
-                  <string>%v/%m GB</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="group_position">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>Station information</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="5" column="2" colspan="3">
-             <widget class="QDoubleSpinBox" name="dsb_latitude">
-              <property name="toolTip">
-               <string>geographic latitude of the station</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string>°</string>
-              </property>
-              <property name="decimals">
-               <number>6</number>
-              </property>
-              <property name="minimum">
-               <double>-90.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>90.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.000001000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="10" column="2" colspan="3">
-             <widget class="QDoubleSpinBox" name="dsb_altitude">
-              <property name="toolTip">
-               <string>altitude above mean sea level</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string> m</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="minimum">
-               <double>0.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>65535.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="2" colspan="3">
-             <widget class="QLineEdit" name="le_station_id">
-              <property name="text">
-               <string>none</string>
-              </property>
-              <property name="maxLength">
-               <number>4</number>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="11" column="2" colspan="3">
-             <widget class="QDoubleSpinBox" name="dsb_darkness_limit">
-              <property name="toolTip">
-               <string>darkness limit for opening the cover</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string>°</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="minimum">
-               <double>-18.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>0.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.100000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="10" column="0">
-             <widget class="QLabel" name="lx_alt">
-              <property name="text">
-               <string>Altitude</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="lx_ip">
-              <property name="text">
-               <string>Server IP address</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="8" column="0">
-             <widget class="QLabel" name="lx_lon">
-              <property name="text">
-               <string>Longitude</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="15" column="0" colspan="5">
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QPushButton" name="bt_station_reset">
-                <property name="toolTip">
-                 <string>reset the changes</string>
-                </property>
-                <property name="text">
-                 <string>Reset changes</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="bt_station_apply">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="toolTip">
-                 <string>save the changes</string>
-                </property>
-                <property name="text">
-                 <string>No changes</string>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item row="8" column="2" colspan="3">
-             <widget class="QDoubleSpinBox" name="dsb_longitude">
-              <property name="toolTip">
-               <string>geographic longitude of the station</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string>°</string>
-              </property>
-              <property name="decimals">
-               <number>6</number>
-              </property>
-              <property name="minimum">
-               <double>-180.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>180.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>0.000001000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="4">
-             <widget class="QSpinBox" name="sb_port">
-              <property name="minimumSize">
-               <size>
-                <width>64</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="toolTip">
-               <string>port</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="minimum">
-               <number>80</number>
-              </property>
-              <property name="maximum">
-               <number>65535</number>
-              </property>
-              <property name="value">
-               <number>9999</number>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="lx_lat">
-              <property name="text">
-               <string>Latitude</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="12" column="0">
-             <widget class="QLabel" name="lx_humidity_lower">
-              <property name="text">
-               <string>Humidity limit lower</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="11" column="0">
-             <widget class="QLabel" name="lx_darkness_limit">
-              <property name="text">
-               <string>Sun altitude limit</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="3">
-             <widget class="QLabel" name="lx_port">
-              <property name="text">
-               <string>port</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="2">
-             <widget class="QLineEdit" name="le_ip">
-              <property name="inputMask">
-               <string/>
-              </property>
-              <property name="text">
-               <string>none</string>
-              </property>
-              <property name="maxLength">
-               <number>32767</number>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="lx_id">
-              <property name="text">
-               <string>Station ID</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="12" column="2">
-             <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
-              <property name="toolTip">
-               <string>open only if humidity is below this level</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string>%</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="minimum">
-               <double>0.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>100.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="12" column="4">
-             <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
-              <property name="toolTip">
-               <string>close if humidity exceeds this level</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-              <property name="showGroupSeparator" stdset="0">
-               <bool>true</bool>
-              </property>
-              <property name="suffix">
-               <string>%</string>
-              </property>
-              <property name="decimals">
-               <number>1</number>
-              </property>
-              <property name="minimum">
-               <double>0.000000000000000</double>
-              </property>
-              <property name="maximum">
-               <double>100.000000000000000</double>
-              </property>
-              <property name="singleStep">
-               <double>1.000000000000000</double>
-              </property>
-             </widget>
-            </item>
-            <item row="12" column="3">
-             <widget class="QLabel" name="lx_humidity_upper">
-              <property name="text">
-               <string>upper</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="group_ufo">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>UFO Capture</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <item row="1" column="0">
-             <widget class="QLineEdit" name="le_ufo_path">
-              <property name="cursor">
-               <cursorShape>ForbiddenCursor</cursorShape>
-              </property>
-              <property name="toolTip">
-               <string>path to monitored executable</string>
-              </property>
-              <property name="readOnly">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QCheckBox" name="checkBox">
-              <property name="text">
-               <string>Auto start/stop</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QPushButton" name="bt_ufo">
-              <property name="text">
-               <string>Run UFO</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QPushButton" name="bt_change_ufo">
-              <property name="text">
-               <string>Change</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QLabel" name="lb_ufo_state">
-              <property name="font">
-               <font>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <italic>false</italic>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>undefined</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="group_sun">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="title">
-            <string>Sun</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout_6">
-            <item row="1" column="1">
-             <widget class="QLabel" name="lb_hor_altitude">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???°</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="0">
-             <widget class="QLabel" name="lb_ecl_lon">
-              <property name="text">
-               <string>Ecliptical longitude λ</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="lb_eq_lon">
-              <property name="text">
-               <string>Right ascension α</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLabel" name="lb_eq_latitude">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???°</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="1">
-             <widget class="QLabel" name="lb_eq_longitude">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???°</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="lb_hor_azimuth">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???°</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="lb_hor_alt">
-              <property name="text">
-               <string>Altitude θ</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="lb_eq_lat">
-              <property name="text">
-               <string>Declination δ</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="6" column="1">
-             <widget class="QLabel" name="lb_ecl_longitude">
-              <property name="font">
-               <font>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???°</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="lb_hor_az">
-              <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0" colspan="2">
-             <widget class="QLabel" name="lb_sun_status">
-              <property name="font">
-               <font>
-                <pointsize>12</pointsize>
-                <weight>75</weight>
-                <bold>true</bold>
-               </font>
-              </property>
-              <property name="text">
-               <string>???</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QGroupBox" name="group_errors">
-        <property name="title">
-         <string>Error bits</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_5">
-         <item row="2" column="1">
-          <widget class="QLabel" name="lb_error_light">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="lb_error_SHT31">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lx_error_light">
-           <property name="text">
-            <string>Emergency closing (light)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="lx_error_watchdog_reset">
-           <property name="text">
-            <string>Watchdog reset</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QLabel" name="lb_error_computer_power">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="lx_error_computer_power">
-           <property name="text">
-            <string>Master power failure</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="lb_error_t_lens">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="lx_error_SHT31">
-           <property name="text">
-            <string>Environment temperature</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLabel" name="lb_error_watchdog_reset">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="lx_error_t_lens">
-           <property name="text">
-            <string>Lens temperature</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QLabel" name="lb_error_brownout_reset">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="lx_error_brownout_reset">
-           <property name="text">
-            <string>Brownout reset</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="lx_error_t_CPU">
-           <property name="text">
-            <string>CPU temperature</string>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="0">
-          <widget class="QLabel" name="lx_error_rain">
-           <property name="text">
-            <string>Emergency closing (rain)</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QLabel" name="lb_error_t_CPU">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QLabel" name="lb_error_rain">
-           <property name="font">
-            <font>
-             <pointsize>8</pointsize>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-      <item row="2" column="0">
-       <widget class="QGroupBox" name="group_devices">
-        <property name="title">
-         <string>Devices</string>
-        </property>
-        <layout class="QGridLayout" name="gridLayout_7">
-         <item row="0" column="0">
-          <widget class="QLabel" name="lx_lens_heating">
-           <property name="frameShape">
-            <enum>QFrame::NoFrame</enum>
-           </property>
-           <property name="text">
-            <string>Lens heating</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="2">
-          <widget class="QLabel" name="lb_camera_heating">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="3">
-          <widget class="QPushButton" name="bt_intensifier">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="2">
-          <widget class="QLabel" name="lb_intensifier">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="2">
-          <widget class="QLabel" name="lb_lens_heating">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QLabel" name="lb_fan">
-           <property name="font">
-            <font>
-             <weight>75</weight>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="lx_camera_heating">
-           <property name="text">
-            <string>Camera heating</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="lx_intensifier">
-           <property name="text">
-            <string>Image intensifier</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="3">
-          <widget class="QPushButton" name="bt_camera_heating">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="lx_fan">
-           <property name="text">
-            <string>Fan</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="3">
-          <widget class="QPushButton" name="bt_fan">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="3">
-          <widget class="QPushButton" name="bt_lens_heating">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>undefined</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QFrame" name="frame_dome">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="group_dome">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Dome</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="0" column="0">
+           <widget class="QCheckBox" name="cb_manual">
+            <property name="text">
+             <string>Enable manual control</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="lb_serial_port">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>undefined</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lx_serial_port">
+            <property name="text">
+             <string>Serial port</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QLabel" name="lb_serial_data">
+            <property name="text">
+             <string>undefined</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="co_serial_ports"/>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="cb_safety_override">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Safety override</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lx_time_alive">
+            <property name="text">
+             <string>Time alive</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_devices">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>16777215</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Devices</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_7">
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_lens_heating">
+               <property name="frameShape">
+                <enum>QFrame::NoFrame</enum>
+               </property>
+               <property name="text">
+                <string>Lens heating</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="2">
+              <widget class="QLabel" name="lb_camera_heating">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QPushButton" name="bt_intensifier">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QLabel" name="lb_intensifier">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QLabel" name="lb_lens_heating">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="2">
+              <widget class="QLabel" name="lb_fan">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_camera_heating">
+               <property name="text">
+                <string>Camera heating</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_intensifier">
+               <property name="text">
+                <string>Image intensifier</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QPushButton" name="bt_camera_heating">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_fan">
+               <property name="text">
+                <string>Fan</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QPushButton" name="bt_fan">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="3">
+              <widget class="QPushButton" name="bt_lens_heating">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="6" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_environment">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title">
+             <string>Environment</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="2" column="1">
+              <widget class="QLabel" name="lb_t_sht">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_t_lens">
+               <property name="text">
+                <string>Lens temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_h_sht">
+               <property name="text">
+                <string>SHT humidity</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="lb_rain_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_t_sht">
+               <property name="text">
+                <string>SHT temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lb_t_lens">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="lb_t_cpu">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="lb_h_sht">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_t_cpu">
+               <property name="text">
+                <string>Processor temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_rain_sensor">
+               <property name="text">
+                <string>Rain sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_light_sensor">
+               <property name="text">
+                <string>Light sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_computer_power">
+               <property name="text">
+                <string>Master power</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="lb_light_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QLabel" name="lb_computer_power">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="7" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_cover">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title">
+             <string>Cover</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_2">
+             <item row="4" column="3">
+              <widget class="QLabel" name="lb_dome_closed_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="4">
+              <widget class="QLabel" name="lb_cover_state">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <weight>75</weight>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QLabel" name="lb_cover_safety_position">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QPushButton" name="bt_cover_open">
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>open</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_dome_open_sensor">
+               <property name="text">
+                <string>Open dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="3">
+              <widget class="QLabel" name="lb_servo_blocked">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0" colspan="4">
+              <widget class="QProgressBar" name="progress_cover">
+               <property name="maximum">
+                <number>401</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="3">
+              <widget class="QLabel" name="lb_dome_cover_direction">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_dome_cover_direction">
+               <property name="text">
+                <string>Servo direction</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="3">
+              <widget class="QPushButton" name="bt_cover_close">
+               <property name="maximumSize">
+                <size>
+                 <width>50</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="text">
+                <string>close</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="3">
+              <widget class="QLabel" name="lb_dome_open_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="lx_servo_blocked">
+               <property name="text">
+                <string>Blocked</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_dome_moving">
+               <property name="text">
+                <string>Servo moving</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="3">
+              <widget class="QLabel" name="lb_dome_moving">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_dome_closed_sensor">
+               <property name="text">
+                <string>Closed dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_cover_safety_position">
+               <property name="text">
+                <string>Safety position</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lb_time_alive">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>?</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_errors">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="title">
+             <string>Error bits</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="2" column="1">
+              <widget class="QLabel" name="lb_error_light">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="lb_error_SHT31">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_error_light">
+               <property name="text">
+                <string>Emergency closing (light)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_error_watchdog_reset">
+               <property name="text">
+                <string>Watchdog reset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <widget class="QLabel" name="lb_error_computer_power">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_error_computer_power">
+               <property name="text">
+                <string>Master power failure</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lb_error_t_lens">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_error_SHT31">
+               <property name="text">
+                <string>Environment temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QLabel" name="lb_error_watchdog_reset">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_error_t_lens">
+               <property name="text">
+                <string>Lens temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLabel" name="lb_error_brownout_reset">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="lx_error_brownout_reset">
+               <property name="text">
+                <string>Brownout reset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="lx_error_t_CPU">
+               <property name="text">
+                <string>CPU temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="lx_error_rain">
+               <property name="text">
+                <string>Emergency closing (rain)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="1">
+              <widget class="QLabel" name="lb_error_t_CPU">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QLabel" name="lb_error_rain">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
-     <layout class="QGridLayout" name="grid_log">
-      <item row="0" column="3">
-       <widget class="QLabel" name="label_hb">
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Next heartbeat in</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cb_debug">
-        <property name="text">
-         <string>Debug output</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="0" column="1">
-       <widget class="QPushButton" name="button_send_heartbeat">
-        <property name="text">
-         <string>Send heartbeat</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="4">
-       <widget class="QLabel" name="label_heartbeat">
-        <property name="minimumSize">
-         <size>
-          <width>50</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>50</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>? s</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="5">
-       <widget class="QTableWidget" name="tb_log">
-        <property name="lineWidth">
-         <number>1</number>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOn</enum>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::NoSelection</enum>
-        </property>
-        <property name="horizontalScrollMode">
-         <enum>QAbstractItemView::ScrollPerPixel</enum>
-        </property>
-        <property name="gridStyle">
-         <enum>Qt::NoPen</enum>
-        </property>
-        <property name="wordWrap">
-         <bool>false</bool>
-        </property>
-        <property name="rowCount">
-         <number>0</number>
-        </property>
-        <property name="columnCount">
-         <number>3</number>
-        </property>
-        <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>45</number>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>88</number>
-        </attribute>
-        <attribute name="horizontalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderMinimumSectionSize">
-         <number>18</number>
-        </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>18</number>
-        </attribute>
-        <column>
+     <widget class="QFrame" name="frame_station">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>3</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QGroupBox" name="group_ufo">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>UFO Capture</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="0">
+           <widget class="QLineEdit" name="le_ufo_path">
+            <property name="cursor">
+             <cursorShape>ForbiddenCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>path to monitored executable</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="checkBox">
+            <property name="text">
+             <string>Auto start/stop</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="bt_ufo">
+            <property name="text">
+             <string>Run UFO</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="bt_change_ufo">
+            <property name="text">
+             <string>Change</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="lb_ufo_state">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <italic>false</italic>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>undefined</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="group_position">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Station information</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="5" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_latitude">
+            <property name="toolTip">
+             <string>geographic latitude of the station</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>6</number>
+            </property>
+            <property name="minimum">
+             <double>-90.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>90.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.000001000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_altitude">
+            <property name="toolTip">
+             <string>altitude above mean sea level</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string> m</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>65535.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="3">
+           <widget class="QLineEdit" name="le_station_id">
+            <property name="text">
+             <string>none</string>
+            </property>
+            <property name="maxLength">
+             <number>4</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_darkness_limit">
+            <property name="toolTip">
+             <string>darkness limit for opening the cover</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-18.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="10" column="0">
+           <widget class="QLabel" name="lx_alt">
+            <property name="text">
+             <string>Altitude</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lx_ip">
+            <property name="text">
+             <string>Server IP address</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="lx_lon">
+            <property name="text">
+             <string>Longitude</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="15" column="0" colspan="5">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QPushButton" name="bt_station_reset">
+              <property name="toolTip">
+               <string>reset the changes</string>
+              </property>
+              <property name="text">
+               <string>Reset changes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="bt_station_apply">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>save the changes</string>
+              </property>
+              <property name="text">
+               <string>No changes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="8" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_longitude">
+            <property name="toolTip">
+             <string>geographic longitude of the station</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>6</number>
+            </property>
+            <property name="minimum">
+             <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.000001000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="4">
+           <widget class="QSpinBox" name="sb_port">
+            <property name="minimumSize">
+             <size>
+              <width>64</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>port</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="minimum">
+             <number>80</number>
+            </property>
+            <property name="maximum">
+             <number>65535</number>
+            </property>
+            <property name="value">
+             <number>9999</number>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lx_lat">
+            <property name="text">
+             <string>Latitude</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0">
+           <widget class="QLabel" name="lx_humidity_lower">
+            <property name="text">
+             <string>Humidity limit lower</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="lx_darkness_limit">
+            <property name="text">
+             <string>Sun altitude limit</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QLabel" name="lx_port">
+            <property name="text">
+             <string>port</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="le_ip">
+            <property name="inputMask">
+             <string/>
+            </property>
+            <property name="text">
+             <string>none</string>
+            </property>
+            <property name="maxLength">
+             <number>32767</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lx_id">
+            <property name="text">
+             <string>Station ID</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="2">
+           <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
+            <property name="toolTip">
+             <string>open only if humidity is below this level</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>%</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="4">
+           <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
+            <property name="toolTip">
+             <string>close if humidity exceeds this level</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>%</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="3">
+           <widget class="QLabel" name="lx_humidity_upper">
+            <property name="text">
+             <string>upper</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="group_storage">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Data storage monitor</string>
+         </property>
+         <property name="flat">
+          <bool>false</bool>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QGroupBox" name="gb_primary">
+            <property name="title">
+             <string>Primary</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_10">
+             <item row="0" column="1">
+              <widget class="QPushButton" name="bt_primary">
+               <property name="text">
+                <string>Change</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="le_primary">
+               <property name="cursor">
+                <cursorShape>ForbiddenCursor</cursorShape>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QProgressBar" name="pb_primary">
+               <property name="maximum">
+                <number>400</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m GB</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="QListWidget" name="listWidget">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>50</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="gb_permanent">
+            <property name="title">
+             <string>Permanent</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_9">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="le_permanent">
+               <property name="cursor">
+                <cursorShape>ForbiddenCursor</cursorShape>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="bt_permanent">
+               <property name="text">
+                <string>Change</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QProgressBar" name="pb_permanent">
+               <property name="maximum">
+                <number>400</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m GB</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="group_sun">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Sun</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="1">
+           <widget class="QLabel" name="lb_hor_altitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="lb_ecl_lon">
+            <property name="text">
+             <string>Ecliptical longitude λ</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lb_eq_lon">
+            <property name="text">
+             <string>Right ascension α</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="lb_eq_latitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lb_eq_longitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lb_hor_azimuth">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lb_hor_alt">
+            <property name="text">
+             <string>Altitude θ</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lb_eq_lat">
+            <property name="text">
+             <string>Declination δ</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="lb_ecl_longitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lb_hor_az">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="lb_sun_status">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QFrame" name="frame">
+      <layout class="QGridLayout" name="grid_log">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="cb_debug">
          <property name="text">
-          <string>Timestamp</string>
+          <string>Debug output</string>
          </property>
-         <property name="textAlignment">
-          <set>AlignCenter</set>
+         <property name="checked">
+          <bool>true</bool>
          </property>
-        </column>
-        <column>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QLabel" name="label_heartbeat">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Level</string>
+          <string>? s</string>
          </property>
-         <property name="textAlignment">
-          <set>AlignCenter</set>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
-        </column>
-        <column>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="5">
+        <widget class="QTableWidget" name="tb_log">
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOn</enum>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="gridStyle">
+          <enum>Qt::NoPen</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>45</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>88</number>
+         </attribute>
+         <attribute name="horizontalHeaderHighlightSections">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>18</number>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>18</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Timestamp</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Level</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Message</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_hb">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Message</string>
+          <string>Next heartbeat in</string>
          </property>
-        </column>
-       </widget>
-      </item>
-     </layout>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="button_send_heartbeat">
+         <property name="text">
+          <string>Send heartbeat</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -1715,7 +1850,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1046</width>
+     <width>1520</width>
      <height>21</height>
     </rect>
    </property>

@@ -5,6 +5,14 @@
 
 #include "forward.h"
 
+enum class SerialPortState {
+    CLOSED,
+    OPEN,
+    ERROR,
+    NO_PORTS,
+};
+
+
 class DomeState {
 private:
     QDateTime m_timestamp;

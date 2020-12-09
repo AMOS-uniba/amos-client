@@ -4,6 +4,27 @@
 
 extern EventLogger logger;
 
+QString Station::temperature_colour(float temperature) {
+    float h = 0, s = 0, v = 0;
+    if (temperature < 0.0) {
+        h = 180 - 4.0 * temperature;
+        s = (1 + temperature / 50.0) * 255;
+        v = 255;
+    } else {
+        if (temperature < 15) {
+            h = 180 - 6.0 * temperature;
+        } else {
+            h = 90 - (4.5 * (temperature - 15));
+        }
+        if (h < 0) {
+            h += 360;
+        }
+        s = 255;
+        v = 160;
+    }
+    return QString("hsv(%1, %2, %3)").arg(h).arg(s).arg(v);
+}
+
 Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING), m_ufo_path("") {
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
@@ -114,7 +135,7 @@ double Station::humidity_limit_lower(void) const { return this->m_humidity_limit
 double Station::humidity_limit_upper(void) const { return this->m_humidity_limit_upper; }
 
 void Station::set_humidity_limits(const double new_lower, const double new_upper) {
-    if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper - 1)) {
+    if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper)) {
         throw ConfigurationError(QString("Invalid humidity limits: %1% - %2%").arg(new_lower).arg(new_upper));
     }
 
@@ -170,7 +191,10 @@ QJsonObject Station::prepare_heartbeat(void) const {
         {"disk", QJsonObject {
             {"prim", this->m_primary_storage->json()},
             {"perm", this->m_permanent_storage->json()},
-        }}
+        }},
+        {"cfg", QJsonObject {
+            {"dl", this->m_darkness_limit},
+        }},
     };
 }
 
@@ -197,20 +221,28 @@ void Station::automatic_check(void) {
     const DomeStateS &stateS = this->m_dome->state_S();
 
     if (!stateS.is_valid()) {
-        logger.warning("Automatic loop: S state is not valid, automatic loop skipped");
+        logger.warning("S state is not valid, automatic loop skipped");
         return;
     }
 
-    // Emergency: close the cover
+    // Emergency: close the cover, unless safety overridden
     if (stateS.dome_open_sensor_active() && !this->is_dark()) {
-        logger.warning("Closing the cover (automatic)");
-        this->close_cover();
+        if (this->m_safety_override) {
+            logger.warning("[AUTO] Emergency override active, not closing");
+        } else {
+            logger.warning("[AUTO] Closed the cover (not dark enough)");
+            this->close_cover();
+        }
     }
 
-    // Emergency: turn off the image intensifier
+    // Emergency: turn off the image intensifier, unless safety overridden
     if (stateS.intensifier_active() && !this->is_dark()) {
-        logger.warning("Turning off the image intensifier (automatic)");
-        this->turn_off_intensifier();
+        if (this->m_safety_override) {
+            logger.warning("[AUTO] Emergency override active, not turning off the intensifier");
+        } else {
+            logger.warning("[AUTO] Turned off the image intensifier (not dark enough)");
+            this->turn_off_intensifier();
+        }
     }
 
     if (this->m_manual_control) {
@@ -218,39 +250,34 @@ void Station::automatic_check(void) {
         logger.debug("Manual control mode, passing");
     } else {
         if (this->is_dark()) {
-            // If it is dark, not raning and the computer is running, start observing
+            // If it is dark, it is not raining, humidity is low and the computer is running, start observing
             if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active() && !this->is_humid()) {
-                logger.info("Opened the cover (automatic)");
+                logger.info("[AUTO] Opened the cover");
                 this->open_cover();
             }
 
-            // If humidity is very high, close the cover
-            if (this->is_very_humid()) {
-                logger.info("Closed the cover due to high humidity (automatic)");
-                this->close_cover();
-                this->turn_off_intensifier();
-            }
-
-            // If the dome is open, turn on the image intensifier and the fan
             if (stateS.dome_open_sensor_active()) {
+                // If the dome is open, turn on the image intensifier and the fan
                 if (!stateS.intensifier_active()) {
-                    logger.info("Turned on the image intensifier (automatic)");
+                    logger.info("[AUTO] Cover open, turned on the image intensifier");
                     this->turn_on_intensifier();
                 }
 
                 if (!stateS.fan_active()) {
-                    logger.info("Turned on the fan (automatic)");
+                    logger.info("[AUTO] Turned on the fan");
                     this->turn_on_fan();
                 }
+
+                // But if humidity is very high, close the cover
+                if (this->is_very_humid()) {
+                    logger.info("[AUTO] Closed the cover (high humidity)");
+                    this->close_cover();
+                }
             }
-        } else {
-            // If it is not dark, close the cover and turn off the image intensifier
-            if (stateS.dome_open_sensor_active()) {
-                logger.info("Closed the cover (automatic)");
-                this->close_cover();
-            }
-            if (stateS.intensifier_active()) {
-                logger.info("Turned off the image intensifier (automatic)");
+
+            // If the dome is closed, turn off the intensifier
+            if (stateS.dome_closed_sensor_active() && stateS.intensifier_active()) {
+                logger.info("[AUTO] Cover is closed, turned off the intensifier");
                 this->turn_off_intensifier();
             }
         }

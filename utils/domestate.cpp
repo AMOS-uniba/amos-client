@@ -2,8 +2,6 @@
 
 extern EventLogger logger;
 
-
-
 DomeState::DomeState(void):
     m_timestamp(QDateTime::currentDateTimeUtc()),
     m_valid(false) {}

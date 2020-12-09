@@ -13,6 +13,7 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
+#include <QSerialPortInfo>
 
 #include "forward.h"
 

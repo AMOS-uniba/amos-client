@@ -20,12 +20,16 @@ QString UfoManager::state_string() const {
     switch (this->m_state) {
         case UfoState::NOT_FOUND:
             return "file not found";
+            break;
         case UfoState::NOT_EXE:
             return "file not an executable";
+            break;
         case UfoState::NOT_RUNNING:
             return "not running";
+            break;
         case UfoState::RUNNING:
             return "running";
+            break;
     }
 }
 

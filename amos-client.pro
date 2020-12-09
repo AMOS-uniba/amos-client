@@ -30,6 +30,9 @@ SOURCES += \
     logging/statelogger.cpp \
     dome.cpp \
     main.cpp \
+    mainwindow/display.cpp \
+    mainwindow/settings.cpp \
+    mainwindow/tray.cpp \
     mainwindow.cpp \
     server.cpp \
     station.cpp \
