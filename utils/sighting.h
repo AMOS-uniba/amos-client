@@ -26,6 +26,7 @@ public:
     QHttpPart json_metadata(void) const;
 
     void move(const QString &prefix);
+    qint64 avi_size(void) const;
 };
 
 #endif // SIGHTING_H

@@ -32,6 +32,11 @@ void Sighting::try_open(const QString &path) {
     }
 }
 
+qint64 Sighting::avi_size(void) const {
+    auto info = QFileInfo(this->m_avi);
+    return info.exists() ? info.size() : -1;
+}
+
 void Sighting::move(const QString &path) {
     logger.info(QString("Moving to %1").arg(path));
     QDir().mkpath(path);
@@ -75,7 +80,8 @@ QHttpPart Sighting::json_metadata(void) const {
     text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
 
     QJsonObject content {
-        {"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")}
+        {"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")},
+        {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
     };
 
     text_part.setBody(QJsonDocument(content).toJson(QJsonDocument::Compact));

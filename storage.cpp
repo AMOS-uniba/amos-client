@@ -13,8 +13,8 @@ QStorageInfo Storage::info(void) const {
 QJsonObject Storage::json(void) const {
     QStorageInfo storage_info = this->info();
     return QJsonObject {
-        {"a", (double) storage_info.bytesAvailable() / (1024 * 1024 * 1024)},
-        {"t", (double) storage_info.bytesTotal() / (1024 * 1024 * 1024)},
+        {"a", storage_info.bytesAvailable()},
+        {"t", storage_info.bytesTotal()},
     };
 }
 
