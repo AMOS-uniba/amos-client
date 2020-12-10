@@ -86,6 +86,7 @@ QString Dome::serial_port_info(void) const {
 
 QJsonObject Dome::json(void) const {
     return QJsonObject {
+        {"st", QString(QChar(this->serial_port_state().code()))},
         {"s", this->state_S().json()},
         {"t", this->state_T().json()},
         {"z", this->state_Z().json()},

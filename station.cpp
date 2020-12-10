@@ -194,6 +194,8 @@ QJsonObject Station::prepare_heartbeat(void) const {
         }},
         {"cfg", QJsonObject {
             {"dl", this->m_darkness_limit},
+            {"hll", this->m_humidity_limit_lower},
+            {"hlu", this->m_humidity_limit_upper},
         }},
     };
 }
