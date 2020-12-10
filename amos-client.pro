@@ -32,6 +32,7 @@ SOURCES += \
     main.cpp \
     mainwindow/display.cpp \
     mainwindow/settings.cpp \
+    mainwindow/timers.cpp \
     mainwindow/tray.cpp \
     mainwindow.cpp \
     server.cpp \

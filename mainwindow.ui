@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1041</width>
+    <height>912</height>
+   </rect>
+  </property>
   <property name="windowTitle">
    <string>AMOS client [automatic mode]</string>
   </property>
@@ -546,19 +554,6 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="0">
-              <widget class="QPushButton" name="bt_cover_open">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>open</string>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0">
               <widget class="QLabel" name="lx_dome_open_sensor">
                <property name="text">
@@ -619,19 +614,6 @@
               <widget class="QLabel" name="lx_dome_cover_direction">
                <property name="text">
                 <string>Servo direction</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="3">
-              <widget class="QPushButton" name="bt_cover_close">
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="text">
-                <string>close</string>
                </property>
               </widget>
              </item>
@@ -698,6 +680,24 @@
                 <string>Safety position</string>
                </property>
               </widget>
+             </item>
+             <item row="7" column="0" colspan="4">
+              <layout class="QHBoxLayout" name="hl_openclose">
+               <item>
+                <widget class="QPushButton" name="bt_cover_open">
+                 <property name="text">
+                  <string>open</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bt_cover_close">
+                 <property name="text">
+                  <string>close</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
             </layout>
            </widget>
@@ -1850,7 +1850,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1520</width>
+     <width>1041</width>
      <height>21</height>
     </rect>
    </property>
@@ -1887,11 +1887,36 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>bt_cover_open</tabstop>
+  <tabstop>cb_manual</tabstop>
+  <tabstop>cb_safety_override</tabstop>
+  <tabstop>co_serial_ports</tabstop>
+  <tabstop>bt_lens_heating</tabstop>
+  <tabstop>bt_camera_heating</tabstop>
+  <tabstop>bt_fan</tabstop>
+  <tabstop>bt_intensifier</tabstop>
+  <tabstop>le_ufo_path</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>bt_change_ufo</tabstop>
+  <tabstop>bt_ufo</tabstop>
   <tabstop>le_station_id</tabstop>
   <tabstop>le_ip</tabstop>
   <tabstop>sb_port</tabstop>
+  <tabstop>dsb_latitude</tabstop>
+  <tabstop>dsb_longitude</tabstop>
+  <tabstop>dsb_altitude</tabstop>
+  <tabstop>dsb_darkness_limit</tabstop>
+  <tabstop>dsb_humidity_limit_lower</tabstop>
+  <tabstop>dsb_humidity_limit_upper</tabstop>
+  <tabstop>bt_station_reset</tabstop>
+  <tabstop>bt_station_apply</tabstop>
+  <tabstop>le_primary</tabstop>
+  <tabstop>bt_primary</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>le_permanent</tabstop>
+  <tabstop>bt_permanent</tabstop>
+  <tabstop>cb_debug</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
+  <tabstop>tb_log</tabstop>
  </tabstops>
  <resources>
   <include location="images.qrc"/>

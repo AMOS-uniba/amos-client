@@ -79,6 +79,7 @@ private slots:
     void display_time(void);
     void display_sun_properties(void);
 
+    void display_window_title(void);
 
     void display_serial_port_info(void);
     void display_basic_data(void);

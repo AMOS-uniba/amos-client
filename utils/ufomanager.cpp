@@ -30,6 +30,9 @@ QString UfoManager::state_string() const {
         case UfoState::RUNNING:
             return "running";
             break;
+        default:
+            return "undefined";
+            break;
     }
 }
 

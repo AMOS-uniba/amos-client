@@ -18,10 +18,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->load_settings();
 
     this->create_timers();
-    this->display_cover_status();
-    this->display_station_config();
-    this->display_storage_status();
-    this->display_ufo_state();
 
     logger.set_display_widget(this->ui->tb_log);
     logger.info("Client initialized");
@@ -48,12 +44,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->tray_icon->show();
 
-    connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
-    connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
-
-    /*connect(&this->comm_thread, &CommThread::response, this, [=](const QByteArray &m){ logger.info(m); });
-    connect(&this->comm_thread, &CommThread::error, this, [=](const QString &m){ logger.error(m); });
-    connect(&this->comm_thread, &CommThread::timeout, this, [=](const QString &m){ logger.warning(m); });*/
+    this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
+    this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
     this->connect(this->station->dome(), &Dome::state_updated_S, this, &MainWindow::display_basic_data);
     this->connect(this->station->dome(), &Dome::state_updated_T, this, &MainWindow::display_env_data);
@@ -61,6 +53,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->connect(this->station, &Station::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->cb_manual, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
+
+    this->display_cover_status();
+    this->display_station_config();
+    this->display_storage_status();
+    this->display_ufo_state();
+    this->display_window_title();
 }
 
 void MainWindow::init_serial_ports(void) {
@@ -69,70 +67,6 @@ void MainWindow::init_serial_ports(void) {
     for (QSerialPortInfo sp: this->serial_ports) {
         this->ui->co_serial_ports->addItem(sp.portName());
     }
-}
-
-void MainWindow::load_settings(void) {
-    try {
-        QString ip = this->settings->value("server/ip", "127.0.0.1").toString();
-        unsigned short port = this->settings->value("server/port", 4805).toInt();
-        QString station_id = this->settings->value("station/id", "none").toString();
-
-        this->ufo = new UfoManager();
-        this->ufo->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
-
-        this->station = new Station(station_id);
-        this->station->set_server(new Server(QHostAddress(ip), port, station_id));
-        this->station->set_storages(
-            QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
-            QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
-        );
-        this->station->set_position(
-            this->settings->value("station/latitude", 0).toDouble(),
-            this->settings->value("station/longitude", 0).toDouble(),
-            this->settings->value("station/altitude", 0).toDouble()
-        );
-        this->station->set_darkness_limit(this->settings->value("limits/darkness", -12.0).toDouble());
-        this->station->set_humidity_limits(
-            this->settings->value("limits/humidity_lower", 75.0).toDouble(),
-            this->settings->value("limits/humidity_upper", 80.0).toDouble()
-        );
-
-        bool debug = this->settings->value("debug", false).toBool();
-        logger.set_level(debug ? Level::Debug : Level::Info);
-        this->ui->cb_debug->setChecked(debug);
-
-        this->station->set_manual_control(this->settings->value("manual", false).toBool());
-        this->ui->cb_manual->setChecked(this->station->is_manual());
-    } catch (ConfigurationError &e) {
-        QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
-        QMessageBox box;
-        box.setText(postmortem);
-        box.setIcon(QMessageBox::Icon::Critical);
-        box.setWindowIcon(QIcon(":/images/blue.ico"));
-        box.setWindowTitle("Configuration error");
-        box.setStandardButtons(QMessageBox::Ok);
-        box.exec();
-
-        logger.fatal(postmortem);
-        exit(-4);
-    }
-}
-
-void MainWindow::create_timers(void) {
-    this->timer_heartbeat = new QTimer(this);
-    this->timer_heartbeat->setInterval(60 * 1000);
-    this->connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::send_heartbeat);
-    this->timer_heartbeat->start();
-
-    this->timer_display = new QTimer(this);
-    this->timer_display->setInterval(100);
-    this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::process_display_timer);
-    this->timer_display->start();
-
-    this->timer_watchdog = new QTimer(this);
-    this->timer_watchdog->setInterval(1000);
-    this->connect(this->timer_watchdog, &QTimer::timeout, this, &MainWindow::process_watchdog_timer);
-    this->timer_watchdog->start();
 }
 
 MainWindow::~MainWindow() {
@@ -153,30 +87,6 @@ void MainWindow::message_clicked() {
 
 void MainWindow::on_actionExit_triggered() {
     QApplication::quit();
-}
-
-void MainWindow::process_display_timer(void) {
-    this->display_time();
-    this->display_basic_data();
-    this->display_env_data();
-    this->display_cover_status();
-    this->display_sun_properties();
-    this->display_serial_port_info();
-}
-
-void MainWindow::process_watchdog_timer(void) {
-    if (this->station->dome()->serial_port_info() != "open") {
-        this->init_serial_ports();
-    }
-
-    this->setWindowTitle(QString("AMOS client [%1 mode]").arg(this->station->is_manual() ? "manual" : "automatic"));
-    this->set_icon(this->station->determine_state());
-    this->display_ufo_state();
-}
-
-void MainWindow::send_heartbeat(void) {
-    this->station->log_state();
-    this->station->send_heartbeat();
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
@@ -236,6 +146,31 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
     this->display_cover_status();
+    this->display_window_title();
+}
+
+void MainWindow::on_cb_safety_override_stateChanged(int state) {
+    if (state == Qt::CheckState::Checked) {
+        QMessageBox box;
+        box.setText("You are about to override the safety mechanisms!");
+        box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
+        box.setIcon(QMessageBox::Icon::Warning);
+        box.setWindowIcon(QIcon(":/images/blue.ico"));
+        box.setWindowTitle("Safety mechanism override");
+        box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
+        int choice = box.exec();
+
+        switch (choice) {
+            case QMessageBox::Ok:
+                this->station->set_safety_override(true);
+                break;
+            case QMessageBox::Cancel:
+            default:
+                this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
+                break;
+        }
+    }
+    this->display_window_title();
 }
 
 void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
@@ -280,29 +215,6 @@ void MainWindow::on_bt_cover_open_clicked(void) {
 void MainWindow::on_bt_cover_close_clicked(void) {
     logger.info("Manual command to close the cover");
     this->station->close_cover();
-}
-
-void MainWindow::on_cb_safety_override_stateChanged(int state) {
-    if (state == Qt::CheckState::Checked) {
-        QMessageBox box;
-        box.setText("You are about to override the safety mechanisms!");
-        box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
-        box.setIcon(QMessageBox::Icon::Warning);
-        box.setWindowIcon(QIcon(":/images/blue.ico"));
-        box.setWindowTitle("Safety mechanism override");
-        box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-        int choice = box.exec();
-
-        switch (choice) {
-            case QMessageBox::Ok:
-                this->station->set_safety_override(true);
-                break;
-            case QMessageBox::Cancel:
-            default:
-                this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
-                break;
-        }
-    }
 }
 
 void MainWindow::on_actionManual_control_triggered() {

@@ -50,19 +50,26 @@ void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb
 void MainWindow::display_cover_status(void) {
     const DomeStateS &stateS = this->station->dome()->state_S();
     QString text;
+    QString colour;
 
     if (stateS.is_valid()) {
         if (stateS.servo_moving()) {
             text = stateS.servo_direction() ? "opening..." : "closing";
+            colour = stateS.servo_direction() ? "hsv(120, 255, 96)" : "hsv(240, 255, 96)";
         } else {
             text = stateS.cover_safety_position() ? "peeking" :
                  stateS.dome_open_sensor_active() ? "open" :
-                 stateS.dome_closed_sensor_active() ? "closed" : "inconsistent!";
+                 stateS.dome_closed_sensor_active() ? "closed" : "inconsistent";
+            colour = stateS.cover_safety_position() ? "hsv(180, 255, 160)" :
+                 stateS.dome_open_sensor_active() ? "hsv(120, 255, 192)" :
+                 stateS.dome_closed_sensor_active() ? "black" : "red";
         }
     } else {
-        text = "invalid";
+        text = "no data";
+        colour = "gray";
     }
     this->ui->lb_cover_state->setText(text);
+    this->ui->lb_cover_state->setStyleSheet(QString("QLabel {color: %1; }").arg(colour));
 
     // Set cover shaft position
     const DomeStateZ &stateZ = this->station->dome()->state_Z();
@@ -88,7 +95,7 @@ void MainWindow::display_basic_data(void) {
         this->ui->bt_cover_open->setEnabled(!state.dome_open_sensor_active() && this->station->is_manual());
         this->ui->bt_cover_close->setEnabled(!state.dome_closed_sensor_active() && this->station->is_manual());
     } else {
-        this->ui->lb_time_alive->setText("???");
+        this->ui->lb_time_alive->setText("?");
         this->ui->bt_cover_open->setEnabled(false);
         this->ui->bt_cover_close->setEnabled(false);
     }
@@ -175,7 +182,7 @@ void MainWindow::display_time(void) {
 }
 
 void MainWindow::display_serial_port_info(void) {
-    this->ui->lb_serial_port->setText(this->station->dome()->serial_port_info());
+    this->ui->lb_serial_port->setText(this->station->dome()->serial_port_state().display_string());
     this->ui->lb_serial_data->setText(this->station->dome()->state_S().is_valid() ? "valid data" : "no data");
 }
 
@@ -207,4 +214,11 @@ void MainWindow::display_sun_properties(void) {
 
     auto ecl = Universe::compute_sun_ecl();
     this->ui->lb_ecl_longitude->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
+}
+
+void MainWindow::display_window_title(void) {
+    this->setWindowTitle(QString("AMOS client [%1 mode]%2")
+                         .arg(this->station->is_manual() ? "manual" : "automatic")
+                         .arg(this->station->is_safety_overridden() ? " [safety override]" : "")
+    );
 }

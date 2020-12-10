@@ -2,29 +2,32 @@
 
 extern EventLogger logger;
 
-const Request Dome::RequestBasic        = Request('S', "basic data request");
-const Request Dome::RequestEnv          = Request('T', "environment data request");
-const Request Dome::RequestShaft        = Request('Z', "shaft position request");
+const Request Dome::RequestBasic                = Request('S', "basic data request");
+const Request Dome::RequestEnv                  = Request('T', "environment data request");
+const Request Dome::RequestShaft                = Request('Z', "shaft position request");
 
-const Command Dome::CommandNoOp         = Command('\x00', "no operation");
-const Command Dome::CommandOpenCover    = Command('\x01', "open cover");
-const Command Dome::CommandCloseCover   = Command('\x02', "close cover");
-const Command Dome::CommandFanOn        = Command('\x05', "turn on fan");
-const Command Dome::CommandFanOff       = Command('\x06', "turn off fan");
-const Command Dome::CommandIIOn         = Command('\x07', "turn on image intensifier");
-const Command Dome::CommandIIOff        = Command('\x08', "turn off image intensifier");
-const Command Dome::CommandHotwireOn    = Command('\x09', "turn on hotwire");
-const Command Dome::CommandHotwireOff   = Command('\x0A', "turn off hotwire");
-const Command Dome::CommandResetSlave   = Command('\x0B', "reset slave");
+const Command Dome::CommandNoOp                 = Command('\x00', "no operation");
+const Command Dome::CommandOpenCover            = Command('\x01', "open cover");
+const Command Dome::CommandCloseCover           = Command('\x02', "close cover");
+const Command Dome::CommandFanOn                = Command('\x05', "turn on fan");
+const Command Dome::CommandFanOff               = Command('\x06', "turn off fan");
+const Command Dome::CommandIIOn                 = Command('\x07', "turn on image intensifier");
+const Command Dome::CommandIIOff                = Command('\x08', "turn off image intensifier");
+const Command Dome::CommandHotwireOn            = Command('\x09', "turn on hotwire");
+const Command Dome::CommandHotwireOff           = Command('\x0A', "turn off hotwire");
+const Command Dome::CommandResetSlave           = Command('\x0B', "reset slave");
 
+const SerialPortState Dome::SerialPortNotSet    = SerialPortState('N', "not set");
+const SerialPortState Dome::SerialPortOpen      = SerialPortState('O', "open");
+const SerialPortState Dome::SerialPortError     = SerialPortState('E', "error");
 
 Dome::Dome() {
     this->m_address = 0x99;
 
-    this->refresh_timer = new QTimer(this);
-    this->refresh_timer->setInterval(Dome::REFRESH);
-    this->connect(this->refresh_timer, &QTimer::timeout, this, &Dome::request_status);
-    this->refresh_timer->start();
+    this->m_refresh_timer = new QTimer(this);
+    this->m_refresh_timer->setInterval(Dome::REFRESH);
+    this->connect(this->m_refresh_timer, &QTimer::timeout, this, &Dome::request_status);
+    this->m_refresh_timer->start();
 
     this->m_serial_port = nullptr;
 
@@ -34,7 +37,7 @@ Dome::Dome() {
 
 Dome::~Dome() {
     delete this->m_serial_port;
-    delete this->refresh_timer;
+    delete this->m_refresh_timer;
     delete this->m_buffer;
 }
 
@@ -46,7 +49,7 @@ void Dome::clear_serial_port(void) {
     delete this->m_serial_port;
 }
 
-void Dome::reset_serial_port(const QString& port) {
+void Dome::reset_serial_port(const QString &port) {
     if (this->m_serial_port != nullptr) {
         delete this->m_serial_port;
     }
@@ -61,7 +64,19 @@ void Dome::reset_serial_port(const QString& port) {
     this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
 }
 
-const QString Dome::serial_port_info(void) const {
+SerialPortState Dome::serial_port_state(void) const {
+    if (this->m_serial_port == nullptr) {
+        return Dome::SerialPortNotSet;
+    } else {
+        return this->m_serial_port->isOpen() ? Dome::SerialPortOpen : Dome::SerialPortError;
+    }
+}
+
+QString Dome::serial_port_info(void) const {
+    if (this->m_serial_port == nullptr) {
+        return "no";
+    }
+
     if (this->m_serial_port->isOpen()) {
         return "open";
     } else {
@@ -77,19 +92,24 @@ QJsonObject Dome::json(void) const {
     };
 }
 
-void Dome::send_command(const Command& command) const {
+void Dome::send_command(const Command &command) const {
     logger.debug(QString("Sending a command '%1'").arg(command.display_name()));
     this->send(command.for_telegram());
 }
 
-void Dome::send_request(const Request& request) const {
+void Dome::send_request(const Request &request) const {
     logger.debug(QString("Sending a request '%1'").arg(request.display_name()));
     this->send(request.for_telegram());
 }
 
-void Dome::send(const QByteArray& message) const {
-    Telegram telegram(this->m_address, message);
-    this->m_serial_port->write(telegram.compose());
+void Dome::send(const QByteArray &message) const {
+    if (this->m_serial_port == nullptr) {
+        logger.debug_error("Cannot send, no serial port set");
+        return;
+    } else {
+        Telegram telegram(this->m_address, message);
+        this->m_serial_port->write(telegram.compose());
+    }
 }
 
 void Dome::process_response(void) {

@@ -9,57 +9,6 @@
 
 #include "forward.h"
 
-enum class CoverState {
-    OPEN,
-    OPENING,
-    CLOSING,
-    CLOSED,
-    SAFETY,
-    UNKNOWN,
-};                              // we might split OPENING and CLOSING to include
-                                // the information if it is before or after SAFETY
-
-enum class TernaryState {
-    ON,
-    OFF,
-    UNKNOWN,
-};
-
-struct State {
-    char code;
-    QString display_name;
-};
-
-struct CommandInfo {
-    char code;
-    QString display_name;
-};
-
-/*
-class CommThread: public QThread {
-    Q_OBJECT
-public:
-    explicit CommThread(QObject *parent = nullptr);
-    ~CommThread(void);
-
-    void transaction(const QString &port_name, int wait_timeout, const QByteArray &request);
-signals:
-    void response(const QByteArray &message);
-    void error(const QString &message);
-    void timeout(const QString &message);
-private:
-    void run(void) override;
-
-    QString port_name;
-    QByteArray request;
-    int wait_timeout = 0;
-    QMutex mutex;
-    QWaitCondition condition;
-    bool quit = false;
-};
-
-*/
-
 class Dome: public QObject {
     Q_OBJECT
 private:
@@ -70,7 +19,7 @@ private:
     QDateTime m_last_received;
 
     QSerialPort *m_serial_port;
-    QTimer *refresh_timer;
+    QTimer *m_refresh_timer;
 
     SerialBuffer *m_buffer;
 
@@ -95,22 +44,25 @@ public:
     const static Command CommandHotwireOn, CommandHotwireOff;
     const static Command CommandResetSlave;
 
+    const static SerialPortState SerialPortNotSet, SerialPortOpen, SerialPortError;
+
     Dome();
     ~Dome();
 
     void clear_serial_port(void);
-    void reset_serial_port(const QString& port);
+    void reset_serial_port(const QString &port);
 
     const QDateTime& last_received(void) const;
-    const QString serial_port_info(void) const;
+    SerialPortState serial_port_state(void) const;
+    QString serial_port_info(void) const;
 
     const DomeStateS& state_S(void) const;
     const DomeStateT& state_T(void) const;
     const DomeStateZ& state_Z(void) const;
 
-    void send_command(const Command& command) const;
-    void send_request(const Request& request) const;
-    void send(const QByteArray& message) const;
+    void send_command(const Command &command) const;
+    void send_request(const Request &request) const;
+    void send(const QByteArray &message) const;
 
     QJsonObject json(void) const;
 
@@ -123,7 +75,7 @@ public slots:
 signals:
     void read_timeout(void) const;
     void write_timeout(void) const;
-    void response_received(const QByteArray& response) const;
+    void response_received(const QByteArray &response) const;
 
     void state_updated_S(void) const;
     void state_updated_T(void) const;

@@ -53,7 +53,7 @@ Station::~Station(void) {
     }
 }
 
-void Station::set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir) {
+void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanent_storage_dir) {
     this->m_primary_storage = new Storage("primary", primary_storage_dir);
     this->m_permanent_storage = new Storage("permanent", permanent_storage_dir);
 }
@@ -95,7 +95,7 @@ double Station::latitude(void) const { return this->m_latitude; }
 double Station::longitude(void) const { return this->m_longitude; }
 double Station::altitude(void) const { return this->m_altitude; }
 
-void Station::set_id(const QString& new_id) {
+void Station::set_id(const QString &new_id) {
     if (new_id.length() > 4) {
         throw ConfigurationError(QString("Cannot set station id to '%1'").arg(new_id));
     }
@@ -107,7 +107,7 @@ void Station::set_id(const QString& new_id) {
 const QString& Station::get_id(void) const { return this->m_id; }
 
 // Darkness limit settings
-bool Station::is_dark(const QDateTime& time) const {
+bool Station::is_dark(const QDateTime &time) const {
     return (this->sun_altitude(time) < this->m_darkness_limit);
 }
 
@@ -216,12 +216,10 @@ void Station::log_state(void) {
 
 // Perform automatic state checks
 void Station::automatic_check(void) {
-    logger.debug("Automatic check");
-
     const DomeStateS &stateS = this->m_dome->state_S();
 
     if (!stateS.is_valid()) {
-        logger.warning("S state is not valid, automatic loop skipped");
+        logger.debug_error("[AUTO] S state is not valid, automatic loop skipped");
         return;
     }
 

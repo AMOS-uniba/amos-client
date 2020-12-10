@@ -2,16 +2,29 @@
 #define DOMESTATE_H
 
 #include <QString>
+#include <QSerialPort>
 
 #include "forward.h"
 
-enum class SerialPortState {
-    CLOSED,
-    OPEN,
-    ERROR,
-    NO_PORTS,
+class SerialPortState {
+private:
+    unsigned char m_code;
+    QString m_display_string;
+public:
+    SerialPortState(unsigned char code, const QString &display_name);
+    unsigned char code(void) const;
+    const QString& display_string(void) const;
 };
 
+enum class CoverState {
+    OPEN,
+    OPENING,
+    CLOSING,
+    CLOSED,
+    SAFETY,
+    UNKNOWN,
+};                              // we might split OPENING and CLOSING to include
+                                // the information if it is before or after SAFETY
 
 class DomeState {
 private:

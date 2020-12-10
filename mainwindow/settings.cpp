@@ -1,6 +1,55 @@
 #include "include.h"
 #include "ui_mainwindow.h"
 
+extern EventLogger logger;
+
+void MainWindow::load_settings(void) {
+    try {
+        QString ip = this->settings->value("server/ip", "127.0.0.1").toString();
+        unsigned short port = this->settings->value("server/port", 4805).toInt();
+        QString station_id = this->settings->value("station/id", "none").toString();
+
+        this->ufo = new UfoManager();
+        this->ufo->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
+
+        this->station = new Station(station_id);
+        this->station->set_server(new Server(QHostAddress(ip), port, station_id));
+        this->station->set_storages(
+            QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
+            QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
+        );
+        this->station->set_position(
+            this->settings->value("station/latitude", 0).toDouble(),
+            this->settings->value("station/longitude", 0).toDouble(),
+            this->settings->value("station/altitude", 0).toDouble()
+        );
+        this->station->set_darkness_limit(this->settings->value("limits/darkness", -12.0).toDouble());
+        this->station->set_humidity_limits(
+            this->settings->value("limits/humidity_lower", 75.0).toDouble(),
+            this->settings->value("limits/humidity_upper", 80.0).toDouble()
+        );
+
+        bool debug = this->settings->value("debug", false).toBool();
+        logger.set_level(debug ? Level::Debug : Level::Info);
+        this->ui->cb_debug->setChecked(debug);
+
+        this->station->set_manual_control(this->settings->value("manual", false).toBool());
+        this->ui->cb_manual->setChecked(this->station->is_manual());
+    } catch (ConfigurationError &e) {
+        QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
+        QMessageBox box;
+        box.setText(postmortem);
+        box.setIcon(QMessageBox::Icon::Critical);
+        box.setWindowIcon(QIcon(":/images/blue.ico"));
+        box.setWindowTitle("Configuration error");
+        box.setStandardButtons(QMessageBox::Ok);
+        box.exec();
+
+        logger.fatal(postmortem);
+        exit(-4);
+    }
+}
+
 // Handles
 void MainWindow::on_bt_station_apply_clicked() {
     this->station->set_id(this->ui->le_station_id->text());
