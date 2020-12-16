@@ -23,6 +23,8 @@ QT_FORWARD_DECLARE_CLASS(BaseLogger);
 QT_FORWARD_DECLARE_CLASS(EventLogger);
 QT_FORWARD_DECLARE_CLASS(StateLogger);
 
+QT_FORWARD_DECLARE_CLASS(UfoManager);
+
 #include "utils/stationstate.h"
 #include "utils/domestate.h"
 #include "utils/serialbuffer.h"

@@ -9,11 +9,12 @@ void MainWindow::load_settings(void) {
         unsigned short port = this->settings->value("server/port", 4805).toInt();
         QString station_id = this->settings->value("station/id", "none").toString();
 
-        this->ufo = new UfoManager();
-        this->ufo->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
-
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
+
+        this->station->set_ufo_manager(new UfoManager());
+        this->station->ufo_manager()->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
+
         this->station->set_storages(
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
             QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
@@ -52,22 +53,50 @@ void MainWindow::load_settings(void) {
 
 // Handles
 void MainWindow::on_bt_station_apply_clicked() {
-    this->station->set_id(this->ui->le_station_id->text());
-    this->station->server()->set_url(
-        QHostAddress(this->ui->le_ip->text()),
-        this->ui->sb_port->value(),
-        this->station->get_id()
-    );
-    this->station->set_position(
-        this->ui->dsb_latitude->value(),
-        this->ui->dsb_longitude->value(),
-        this->ui->dsb_altitude->value()
-    );
-    this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
-    this->station->set_humidity_limits(
-        this->ui->dsb_humidity_limit_lower->value(),
-        this->ui->dsb_humidity_limit_upper->value()
-    );
+    // If ID is changed
+    if (this->ui->le_station_id->text() != this->station->get_id()) {
+        // Update the ID
+        this->station->set_id(this->ui->le_station_id->text());
+
+        // If IP or port are changed, also update the server settings
+        if ((this->ui->le_ip->text() != this->station->server()->address().toString()) ||
+            (this->ui->sb_port->value() != this->station->server()->port())) {
+            this->station->server()->set_url(
+                QHostAddress(this->ui->le_ip->text()),
+                this->ui->sb_port->value(),
+                this->station->get_id()
+            );
+        }
+    }
+
+    // Update the position, if changed
+    if (
+        (this->ui->dsb_latitude->value() != this->station->latitude()) ||
+        (this->ui->dsb_longitude->value() != this->station->longitude()) ||
+        (this->ui->dsb_altitude->value() != this->station->altitude())
+    ) {
+        this->station->set_position(
+            this->ui->dsb_latitude->value(),
+            this->ui->dsb_longitude->value(),
+            this->ui->dsb_altitude->value()
+        );
+    }
+
+    // Update the darkness limit, if changed
+    if (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) {
+        this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
+    }
+
+    // Update the humidity limits, if changed
+    if (
+        (this->ui->dsb_humidity_limit_upper->value() != this->station->humidity_limit_upper()) ||
+        (this->ui->dsb_humidity_limit_lower->value() != this->station->humidity_limit_lower())
+    ) {
+        this->station->set_humidity_limits(
+            this->ui->dsb_humidity_limit_lower->value(),
+            this->ui->dsb_humidity_limit_upper->value()
+        );
+    }
 
     // Store all new values in permanent settings
     this->settings->setValue("server/ip", this->station->server()->address().toString());
@@ -100,7 +129,7 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
-void MainWindow::station_edited(void) {
+void MainWindow::on_station_edited(void) {
     this->button_station_toggle(
         (this->ui->le_station_id->text() != this->station->get_id()) ||
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||

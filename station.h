@@ -36,11 +36,11 @@ private:
     StateLogger *m_state_logger;
     Dome *m_dome;
     Server *m_server;
+    UfoManager *m_ufo_manager;
 
     QNetworkAccessManager *m_network_manager;
-    QTimer *m_timer_automatic, *m_timer_file_watchdog;
-
-    QString m_ufo_path;
+    QTimer *m_timer_automatic;
+    QTimer *m_timer_file_watchdog;
 public:
     Station(const QString& id);
     ~Station(void);
@@ -51,8 +51,8 @@ public:
 
     // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
-    Storage& primary_storage(void);
-    Storage& permanent_storage(void);
+    Storage* primary_storage(void);
+    Storage* permanent_storage(void);
 
     void set_server(Server *server);
     Server* server(void);
@@ -82,6 +82,9 @@ public:
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
+
+    void set_ufo_manager(UfoManager *ufo_manager);
+    UfoManager* ufo_manager(void) const;
 
     void set_manual_control(bool manual);
     bool is_manual(void) const;

@@ -22,7 +22,7 @@ void Sighting::init_files(const QString &prefix) {
         this->try_open(file);
     }
 
-    logger.info(QString("Created a new sighting '%1*'").arg(prefix));
+    logger.info(QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
     this->m_timestamp = QFileInfo(this->m_xml).birthTime();
 }
 

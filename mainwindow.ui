@@ -499,7 +499,43 @@
              <string>Cover</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="4" column="3">
+             <item row="8" column="0" colspan="4">
+              <layout class="QHBoxLayout" name="hl_openclose">
+               <item>
+                <widget class="QPushButton" name="bt_cover_open">
+                 <property name="text">
+                  <string>open</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bt_cover_close">
+                 <property name="text">
+                  <string>close</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="6" column="3">
+              <widget class="QLabel" name="lb_cover_safety_position">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
               <widget class="QLabel" name="lb_dome_closed_sensor">
                <property name="font">
                 <font>
@@ -514,6 +550,77 @@
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_servo_blocked">
+               <property name="text">
+                <string>Blocked</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_dome_moving">
+               <property name="text">
+                <string>Servo moving</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="3">
+              <widget class="QLabel" name="lb_servo_blocked">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_dome_closed_sensor">
+               <property name="text">
+                <string>Closed dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_dome_open_sensor">
+               <property name="text">
+                <string>Open dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QLabel" name="lb_dome_open_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="lx_cover_safety_position">
+               <property name="text">
+                <string>Safety position</string>
                </property>
               </widget>
              </item>
@@ -536,120 +643,7 @@
                </property>
               </widget>
              </item>
-             <item row="5" column="3">
-              <widget class="QLabel" name="lb_cover_safety_position">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="lx_dome_open_sensor">
-               <property name="text">
-                <string>Open dome sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="3">
-              <widget class="QLabel" name="lb_servo_blocked">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="0" colspan="4">
-              <widget class="QProgressBar" name="progress_cover">
-               <property name="maximum">
-                <number>401</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-               <property name="format">
-                <string>%v/%m</string>
-               </property>
-              </widget>
-             </item>
              <item row="2" column="3">
-              <widget class="QLabel" name="lb_dome_cover_direction">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lx_dome_cover_direction">
-               <property name="text">
-                <string>Servo direction</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="3">
-              <widget class="QLabel" name="lb_dome_open_sensor">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="lx_servo_blocked">
-               <property name="text">
-                <string>Blocked</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lx_dome_moving">
-               <property name="text">
-                <string>Servo moving</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="3">
               <widget class="QLabel" name="lb_dome_moving">
                <property name="font">
                 <font>
@@ -667,37 +661,43 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="lx_dome_closed_sensor">
+             <item row="3" column="3">
+              <widget class="QLabel" name="lb_dome_cover_direction">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
                <property name="text">
-                <string>Closed dome sensor</string>
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="lx_cover_safety_position">
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_dome_cover_direction">
                <property name="text">
-                <string>Safety position</string>
+                <string>Servo direction</string>
                </property>
               </widget>
              </item>
-             <item row="7" column="0" colspan="4">
-              <layout class="QHBoxLayout" name="hl_openclose">
-               <item>
-                <widget class="QPushButton" name="bt_cover_open">
-                 <property name="text">
-                  <string>open</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="bt_cover_close">
-                 <property name="text">
-                  <string>close</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
+             <item row="1" column="0" colspan="4">
+              <widget class="QProgressBar" name="progress_cover">
+               <property name="maximum">
+                <number>401</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m</string>
+               </property>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -1004,7 +1004,7 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="cb_ufo_auto">
             <property name="text">
              <string>Auto start/stop</string>
             </property>
@@ -1058,113 +1058,6 @@
           <string>Station information</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_3">
-          <item row="5" column="2" colspan="3">
-           <widget class="QDoubleSpinBox" name="dsb_latitude">
-            <property name="toolTip">
-             <string>geographic latitude of the station</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="showGroupSeparator" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="suffix">
-             <string>°</string>
-            </property>
-            <property name="decimals">
-             <number>6</number>
-            </property>
-            <property name="minimum">
-             <double>-90.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>90.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.000001000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="2" colspan="3">
-           <widget class="QDoubleSpinBox" name="dsb_altitude">
-            <property name="toolTip">
-             <string>altitude above mean sea level</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="showGroupSeparator" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="suffix">
-             <string> m</string>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <double>0.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>65535.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2" colspan="3">
-           <widget class="QLineEdit" name="le_station_id">
-            <property name="text">
-             <string>none</string>
-            </property>
-            <property name="maxLength">
-             <number>4</number>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="2" colspan="3">
-           <widget class="QDoubleSpinBox" name="dsb_darkness_limit">
-            <property name="toolTip">
-             <string>darkness limit for opening the cover</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="showGroupSeparator" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="suffix">
-             <string>°</string>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <double>-18.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>0.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>0.100000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="10" column="0">
-           <widget class="QLabel" name="lx_alt">
-            <property name="text">
-             <string>Altitude</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="lx_ip">
             <property name="text">
@@ -1175,68 +1068,49 @@
             </property>
            </widget>
           </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="lx_lon">
+          <item row="6" column="0">
+           <widget class="QLabel" name="lx_lat">
             <property name="text">
-             <string>Longitude</string>
+             <string>Latitude</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
-          <item row="15" column="0" colspan="5">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QPushButton" name="bt_station_reset">
-              <property name="toolTip">
-               <string>reset the changes</string>
-              </property>
-              <property name="text">
-               <string>Reset changes</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="bt_station_apply">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="toolTip">
-               <string>save the changes</string>
-              </property>
-              <property name="text">
-               <string>No changes</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="8" column="2" colspan="3">
-           <widget class="QDoubleSpinBox" name="dsb_longitude">
-            <property name="toolTip">
-             <string>geographic longitude of the station</string>
+          <item row="14" column="3">
+           <widget class="QLabel" name="lx_humidity_upper">
+            <property name="text">
+             <string>upper</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
-            <property name="showGroupSeparator" stdset="0">
-             <bool>true</bool>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="le_ip">
+            <property name="inputMask">
+             <string/>
             </property>
-            <property name="suffix">
-             <string>°</string>
+            <property name="text">
+             <string>none</string>
             </property>
-            <property name="decimals">
-             <number>6</number>
+            <property name="maxLength">
+             <number>32767</number>
             </property>
-            <property name="minimum">
-             <double>-180.000000000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
             </property>
-            <property name="maximum">
-             <double>180.000000000000000</double>
+           </widget>
+          </item>
+          <item row="14" column="0">
+           <widget class="QLabel" name="lx_humidity_lower">
+            <property name="text">
+             <string>Humidity limit lower</string>
             </property>
-            <property name="singleStep">
-             <double>0.000001000000000</double>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1265,27 +1139,7 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="lx_lat">
-            <property name="text">
-             <string>Latitude</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="0">
-           <widget class="QLabel" name="lx_humidity_lower">
-            <property name="text">
-             <string>Humidity limit lower</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="11" column="0">
+          <item row="13" column="0">
            <widget class="QLabel" name="lx_darkness_limit">
             <property name="text">
              <string>Sun altitude limit</string>
@@ -1295,71 +1149,7 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="3">
-           <widget class="QLabel" name="lx_port">
-            <property name="text">
-             <string>port</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="2">
-           <widget class="QLineEdit" name="le_ip">
-            <property name="inputMask">
-             <string/>
-            </property>
-            <property name="text">
-             <string>none</string>
-            </property>
-            <property name="maxLength">
-             <number>32767</number>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="lx_id">
-            <property name="text">
-             <string>Station ID</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="2">
-           <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
-            <property name="toolTip">
-             <string>open only if humidity is below this level</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-            <property name="showGroupSeparator" stdset="0">
-             <bool>true</bool>
-            </property>
-            <property name="suffix">
-             <string>%</string>
-            </property>
-            <property name="decimals">
-             <number>1</number>
-            </property>
-            <property name="minimum">
-             <double>0.000000000000000</double>
-            </property>
-            <property name="maximum">
-             <double>100.000000000000000</double>
-            </property>
-            <property name="singleStep">
-             <double>1.000000000000000</double>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="4">
+          <item row="14" column="4">
            <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
             <property name="toolTip">
              <string>close if humidity exceeds this level</string>
@@ -1387,13 +1177,237 @@
             </property>
            </widget>
           </item>
-          <item row="12" column="3">
-           <widget class="QLabel" name="lx_humidity_upper">
-            <property name="text">
-             <string>upper</string>
+          <item row="13" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_darkness_limit">
+            <property name="toolTip">
+             <string>darkness limit for opening the cover</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>-18.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="17" column="0" colspan="5">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QPushButton" name="bt_station_reset">
+              <property name="toolTip">
+               <string>reset the changes</string>
+              </property>
+              <property name="text">
+               <string>Reset changes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="bt_station_apply">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>save the changes</string>
+              </property>
+              <property name="text">
+               <string>No changes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="lx_id">
+            <property name="text">
+             <string>Station ID</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="14" column="2">
+           <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
+            <property name="toolTip">
+             <string>open only if humidity is below this level</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>%</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2" colspan="3">
+           <widget class="QLineEdit" name="le_station_id">
+            <property name="text">
+             <string>none</string>
+            </property>
+            <property name="maxLength">
+             <number>4</number>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_latitude">
+            <property name="toolTip">
+             <string>geographic latitude of the station</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>6</number>
+            </property>
+            <property name="minimum">
+             <double>-90.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>90.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.000001000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="0">
+           <widget class="QLabel" name="lx_alt">
+            <property name="text">
+             <string>Altitude</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="3">
+           <widget class="QLabel" name="lx_port">
+            <property name="text">
+             <string>port</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_longitude">
+            <property name="toolTip">
+             <string>geographic longitude of the station</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string>°</string>
+            </property>
+            <property name="decimals">
+             <number>6</number>
+            </property>
+            <property name="minimum">
+             <double>-180.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>180.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.000001000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="11" column="2" colspan="3">
+           <widget class="QDoubleSpinBox" name="dsb_altitude">
+            <property name="toolTip">
+             <string>altitude above mean sea level</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="showGroupSeparator" stdset="0">
+             <bool>true</bool>
+            </property>
+            <property name="suffix">
+             <string> m</string>
+            </property>
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.000000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>65535.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="5">
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="lx_lon">
+            <property name="text">
+             <string>Longitude</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="12" column="0" colspan="5">
+           <widget class="Line" name="line_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
@@ -1895,7 +1909,7 @@
   <tabstop>bt_fan</tabstop>
   <tabstop>bt_intensifier</tabstop>
   <tabstop>le_ufo_path</tabstop>
-  <tabstop>checkBox</tabstop>
+  <tabstop>cb_ufo_auto</tabstop>
   <tabstop>bt_change_ufo</tabstop>
   <tabstop>bt_ufo</tabstop>
   <tabstop>le_station_id</tabstop>

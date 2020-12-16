@@ -23,19 +23,19 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     logger.info("Client initialized");
 
     // connect signals for handling of edits of station position
-    this->connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
+    this->connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     // connect signals for handling of edits of server address
-    this->connect(this->ui->le_station_id, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::station_edited);
+    this->connect(this->ui->le_station_id, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     // connect signals for handling of edits of safety limits
-    this->connect(this->ui->dsb_darkness_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->dsb_humidity_limit_lower, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
-    this->connect(this->ui->dsb_humidity_limit_upper, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::station_edited);
+    this->connect(this->ui->dsb_darkness_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_lower, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_upper, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     this->init_serial_ports();
     this->create_actions();
@@ -79,7 +79,6 @@ MainWindow::~MainWindow() {
 
     delete this->universe;
     delete this->station;
-    delete this->ufo;
 }
 
 void MainWindow::message_clicked() {
@@ -93,11 +92,11 @@ void MainWindow::on_button_send_heartbeat_pressed() {
     this->send_heartbeat();
 }
 
-void MainWindow::set_storage(Storage &storage, QLineEdit *edit) {
+void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
-        QString("Select %1 storage directory").arg(storage.get_name()),
-        storage.get_directory().path(),
+        QString("Select %1 storage directory").arg(storage->get_name()),
+        storage->get_directory().path(),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
 
@@ -105,10 +104,10 @@ void MainWindow::set_storage(Storage &storage, QLineEdit *edit) {
         logger.debug("Directory selection aborted");
         return;
     } else {
-        storage.set_directory(new_dir);
+        storage->set_directory(new_dir);
         edit->setText(new_dir);
         this->display_storage_status();
-        this->settings->setValue(QString("storage/%1").arg(storage.get_name()), new_dir);
+        this->settings->setValue(QString("storage/%1").arg(storage->get_name()), new_dir);
     }
 }
 
@@ -137,14 +136,11 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
     this->station->set_manual_control((bool) enable);
 
     this->settings->setValue("manual", this->station->is_manual());
-    this->ui->bt_camera_heating->setEnabled(this->station->is_manual());
-    this->ui->bt_lens_heating->setEnabled(this->station->is_manual());
-    this->ui->bt_intensifier->setEnabled(this->station->is_manual());
-    this->ui->bt_fan->setEnabled(this->station->is_manual());
 
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
+    this->display_device_buttons_state();
     this->display_cover_status();
     this->display_window_title();
 }
@@ -185,8 +181,10 @@ void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
 
 void MainWindow::on_bt_lens_heating_clicked(void) {
     if (this->station->dome()->state_S().lens_heating_active()) {
+        logger.info("Manual command: turn off the hotwire");
         this->station->turn_off_hotwire();
     } else {
+        logger.info("Manual command: turn on the hotwire");
         this->station->turn_on_hotwire();
     }
 }
@@ -194,26 +192,30 @@ void MainWindow::on_bt_lens_heating_clicked(void) {
 void MainWindow::on_bt_intensifier_clicked(void) {
     if (this->station->dome()->state_S().intensifier_active()) {
         this->station->turn_off_intensifier();
+        logger.info("Manual command: turn off the intensifier");
     } else {
         this->station->turn_on_intensifier();
+        logger.info("Manual command: turn on the intensifier");
     }
 }
 
 void MainWindow::on_bt_fan_clicked(void) {
     if (this->station->dome()->state_S().fan_active()) {
         this->station->turn_off_fan();
+        logger.info("Manual command: turn off the fan");
     } else {
         this->station->turn_on_fan();
+        logger.info("Manual command: turn on the fan");
     }
 }
 
 void MainWindow::on_bt_cover_open_clicked(void) {
-    logger.info("Manual command to open the cover");
+    logger.info("Manual command: open the cover");
     this->station->open_cover();
 }
 
 void MainWindow::on_bt_cover_close_clicked(void) {
-    logger.info("Manual command to close the cover");
+    logger.info("Manual command: close the cover");
     this->station->close_cover();
 }
 
@@ -234,10 +236,11 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
         return;
     } else {
         this->settings->setValue("ufo/path", filename);
-        this->reset_ufo();
+        this->station->ufo_manager()->set_path(filename);
+        this->display_ufo_state();
     }
 }
 
-void MainWindow::reset_ufo(void) {
-    this->display_ufo_state();
+void MainWindow::on_checkBox_stateChanged(int enable) {
+
 }

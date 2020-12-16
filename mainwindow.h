@@ -43,7 +43,6 @@ private:
 
     Station *station = nullptr;
     Universe *universe = nullptr;
-    UfoManager *ufo = nullptr;
 
     QAction *minimizeAction;
     QAction *maximizeAction;
@@ -55,12 +54,12 @@ private:
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
 
-    void set_storage(Storage& storage, QLineEdit *edit);
-    void display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le);
+    void set_storage(Storage *storage, QLineEdit *edit);
+    void display_storage_status(const Storage *storage, QProgressBar *pb, QLineEdit *le);
 
     void display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off);
-    void display_device_button(bool on, QPushButton *button);
-    void display_sensor_value(float value, QLabel *label, const QString& unit);
+    void display_device_button(QPushButton *button, bool on);
+    void display_sensor_value(QLabel *label, float value, const QString& unit);
 
     //CommThread comm_thread;
 
@@ -85,6 +84,7 @@ private slots:
     void display_basic_data(void);
     void display_env_data(void);
     void display_shaft_position(void);
+    void display_device_buttons_state(void);
 
     void display_cover_status(void);
     void display_storage_status(void);
@@ -97,7 +97,7 @@ private slots:
     void button_station_toggle(bool enable);
     void on_bt_station_reset_clicked();
     void on_bt_station_apply_clicked();
-    void station_edited(void);
+    void on_station_edited(void);
 
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
@@ -125,6 +125,6 @@ private slots:
     void on_actionManual_control_triggered();
 
     void on_bt_change_ufo_clicked();
-    void reset_ufo();
+    void on_checkBox_stateChanged(int arg1);
 };
 #endif // MAINWINDOW_H

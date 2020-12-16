@@ -14,15 +14,17 @@ void MainWindow::display_S_state_bit(bool value, QLabel *label, const QString &o
     label->setStyleSheet(QString("QLabel { color: %1; }").arg(valid ? value ? colour_on : colour_off : "gray"));
 }
 
-/* Display action button text for value `on` in button `button` */
-void MainWindow::display_device_button(bool on, QPushButton *button) {
+/*  Display action button text for value `on` in button `button`.
+ *  The button is enabled only if the S state is valid, the station is in manual mode */
+void MainWindow::display_device_button(QPushButton *button, bool on) {
     bool valid = this->station->dome()->state_S().is_valid();
+    button->setEnabled(valid && this->station->is_manual());
     button->setText(valid ? on ? "turn off" : "turn on" : "no connection");
 }
 
 /*  DRY helper function
  *  Display sensor output `value` in `label` with unit `unit` */
-void MainWindow::display_sensor_value(float value, QLabel *label, const QString &unit) {
+void MainWindow::display_sensor_value(QLabel *label, float value, const QString &unit) {
     if (this->station->dome()->state_T().is_valid()) {
         label->setText(QString("%1 %2").arg(value, 4, 'f', 1).arg(unit));
         if (unit == "°C") {
@@ -38,13 +40,13 @@ void MainWindow::display_sensor_value(float value, QLabel *label, const QString 
 
 /*  DRY helper function
  *  Display status of `storage` in QProgressBar `pb` and QLineEdit `le` */
-void MainWindow::display_storage_status(const Storage& storage, QProgressBar *pb, QLineEdit *le) {
-    QStorageInfo info = storage.info();
+void MainWindow::display_storage_status(const Storage *storage, QProgressBar *pb, QLineEdit *le) {
+    QStorageInfo info = storage->info();
     unsigned int total = (int) ((double) info.bytesTotal() / (1 << 30));
     unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
     pb->setMaximum(total);
     pb->setValue(total - used);
-    le->setText(storage.get_directory().path());
+    le->setText(storage->get_directory().path());
 }
 
 void MainWindow::display_cover_status(void) {
@@ -91,13 +93,8 @@ void MainWindow::display_basic_data(void) {
                                          .arg(hours, 2, 10, QChar('0'))
                                          .arg(minutes, 2, 10, QChar('0'))
                                          .arg(seconds, 2, 10, QChar('0')));
-
-        this->ui->bt_cover_open->setEnabled(!state.dome_open_sensor_active() && this->station->is_manual());
-        this->ui->bt_cover_close->setEnabled(!state.dome_closed_sensor_active() && this->station->is_manual());
     } else {
         this->ui->lb_time_alive->setText("?");
-        this->ui->bt_cover_open->setEnabled(false);
-        this->ui->bt_cover_close->setEnabled(false);
     }
 
     // Basic byte
@@ -111,17 +108,12 @@ void MainWindow::display_basic_data(void) {
     this->display_S_state_bit(state.fan_active(),                   this->ui->lb_fan,                   "on", "off", "green", "black");
     this->display_S_state_bit(state.intensifier_active(),           this->ui->lb_intensifier,           "on", "off", "green", "black");
 
-    this->display_device_button(state.lens_heating_active(),        this->ui->bt_lens_heating);
-    this->display_device_button(state.camera_heating_active(),      this->ui->bt_camera_heating);
-    this->display_device_button(state.fan_active(),                 this->ui->bt_fan);
-    this->display_device_button(state.intensifier_active(),         this->ui->bt_intensifier);
-
     // Environment byte
     this->display_S_state_bit(state.rain_sensor_active(),           this->ui->lb_rain_sensor,           "raining", "not raining", "blue", "black");
     this->display_S_state_bit(state.light_sensor_active(),          this->ui->lb_light_sensor,          "light", "no light", "light-blue", "black");
-    this->display_S_state_bit(state.computer_power_sensor_active(), this->ui->lb_computer_power,        "powered", "not powered", "green", "red");
+    this->display_S_state_bit(state.computer_power_sensor_active(), this->ui->lb_computer_power,        "powered", "not powered", "black", "red");
     this->display_S_state_bit(state.cover_safety_position(),        this->ui->lb_cover_safety_position, "safety", "no", "blue", "black");
-    this->display_S_state_bit(state.servo_blocked(),                this->ui->lb_servo_blocked,         "blocked", "no", "blue", "black");
+    this->display_S_state_bit(state.servo_blocked(),                this->ui->lb_servo_blocked,         "blocked", "no", "red", "black");
 
     // Errors byte
     this->display_S_state_bit(state.error_t_lens(),                 this->ui->lb_error_t_lens,          "error",    "ok", "red", "black");
@@ -132,6 +124,20 @@ void MainWindow::display_basic_data(void) {
     this->display_S_state_bit(state.error_computer_power(),         this->ui->lb_error_computer_power,  "error",    "ok", "red", "black");
     this->display_S_state_bit(state.error_t_CPU(),                  this->ui->lb_error_t_CPU,           "error",    "ok", "red", "black");
     this->display_S_state_bit(state.emergency_closing_rain(),       this->ui->lb_error_rain,            "closed",   "ok", "red", "black");
+
+    // Also display the correct labels on device control buttons
+    this->display_device_buttons_state();
+}
+
+void MainWindow::display_device_buttons_state(void) {
+    const DomeStateS &state = this->station->dome()->state_S();
+    this->display_device_button(this->ui->bt_lens_heating,          state.lens_heating_active());
+    this->display_device_button(this->ui->bt_camera_heating,        state.camera_heating_active());
+    this->display_device_button(this->ui->bt_fan,                   state.fan_active());
+    this->display_device_button(this->ui->bt_intensifier,           state.intensifier_active());
+
+    this->ui->bt_cover_close->setEnabled(state.is_valid() && this->station->is_manual() && !this->station->dome()->state_S().dome_closed_sensor_active());
+    this->ui->bt_cover_open->setEnabled(state.is_valid() && this->station->is_manual() && !this->station->dome()->state_S().dome_open_sensor_active());
 }
 
 void MainWindow::display_env_data(void) {
@@ -140,10 +146,10 @@ void MainWindow::display_env_data(void) {
         this->ui->group_environment->setTitle(QString("Environment (%1 s)").arg(state.age(), 3, 'f', 1));
     }
 
-    this->display_sensor_value(state.temperature_lens(),    this->ui->lb_t_lens,    "°C");
-    this->display_sensor_value(state.temperature_cpu(),     this->ui->lb_t_cpu,     "°C");
-    this->display_sensor_value(state.temperature_sht(),     this->ui->lb_t_sht,     "°C");
-    this->display_sensor_value(state.humidity_sht(),        this->ui->lb_h_sht,     "%");
+    this->display_sensor_value(this->ui->lb_t_lens, state.temperature_lens(),   "°C");
+    this->display_sensor_value(this->ui->lb_t_cpu,  state.temperature_cpu(),    "°C");
+    this->display_sensor_value(this->ui->lb_t_sht,  state.temperature_sht(),    "°C");
+    this->display_sensor_value(this->ui->lb_h_sht,  state.humidity_sht(),       "%");
 }
 
 void MainWindow::display_shaft_position(void) {
@@ -171,8 +177,8 @@ void MainWindow::display_station_config(void) {
 }
 
 void MainWindow::display_ufo_state(void) {
-    this->ui->le_ufo_path->setText(this->ufo->path());
-    this->ui->lb_ufo_state->setText(this->ufo->state_string());
+    this->ui->le_ufo_path->setText(this->station->ufo_manager()->path());
+    this->ui->lb_ufo_state->setText(this->station->ufo_manager()->state_string());
     this->display_storage_status();
 }
 

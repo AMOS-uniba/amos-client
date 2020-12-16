@@ -25,7 +25,7 @@ QString Station::temperature_colour(float temperature) {
     return QString("hsv(%1, %2, %3)").arg(h).arg(s).arg(v);
 }
 
-Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING), m_ufo_path("") {
+Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING) {
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
 
@@ -47,10 +47,8 @@ Station::~Station(void) {
     delete this->m_timer_automatic;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
-
-    if (this->m_server != nullptr) {
-        delete this->m_server;
-    }
+    delete this->m_ufo_manager;
+    delete this->m_server;
 }
 
 void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanent_storage_dir) {
@@ -58,16 +56,15 @@ void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanen
     this->m_permanent_storage = new Storage("permanent", permanent_storage_dir);
 }
 
-Storage& Station::primary_storage(void) { return *this->m_primary_storage; }
-Storage& Station::permanent_storage(void) { return *this->m_permanent_storage; }
+void Station::set_ufo_manager(UfoManager *ufo_manager) { this->m_ufo_manager = ufo_manager; }
+UfoManager* Station::ufo_manager(void) const { return this->m_ufo_manager; }
 
+Storage* Station::primary_storage(void) { return this->m_primary_storage; }
+Storage* Station::permanent_storage(void) { return this->m_permanent_storage; }
 Dome* Station::dome(void) const { return this->m_dome; }
 
 // Server getters and setters
-void Station::set_server(Server *server) {
-    this->m_server = server;
-}
-
+void Station::set_server(Server *server) { this->m_server = server; }
 Server* Station::server(void) { return this->m_server; }
 
 // Position getters and setters
@@ -331,19 +328,19 @@ void Station::turn_off_intensifier(void) {
 }
 
 StationState Station::determine_state(void) const {
-    if (this->is_manual()) {
-        return StationState::MANUAL;
-    }
-
     if (this->m_dome->state_S().is_valid()) {
-        if (this->is_dark()) {
-            if (this->m_dome->state_S().dome_open_sensor_active() && this->m_dome->state_S().intensifier_active()) {
-                return StationState::OBSERVING;
-            } else {
-                return StationState::NOT_OBSERVING;
-            }
+        if (this->is_manual()) {
+            return StationState::MANUAL;
         } else {
-            return StationState::DAY;
+            if (this->is_dark()) {
+                if (this->m_dome->state_S().dome_open_sensor_active() && this->m_dome->state_S().intensifier_active()) {
+                    return StationState::OBSERVING;
+                } else {
+                    return StationState::NOT_OBSERVING;
+                }
+            } else {
+                return StationState::DAY;
+            }
         }
     } else {
         return StationState::DOME_UNREACHABLE;
@@ -370,9 +367,15 @@ StationState Station::state(void) {
 
 void Station::file_check(void) {
     logger.debug("Checking files...");
-    for (auto sighting: this->primary_storage().list_new_sightings()) {
+    for (auto sighting: this->primary_storage()->list_new_sightings()) {
         this->send_sighting(sighting);
         this->move_sighting(sighting);
+    }
+
+    if (this->is_dark()) {
+        this->m_ufo_manager->start_ufo();
+    } else {
+        this->m_ufo_manager->kill_ufo();
     }
 }
 

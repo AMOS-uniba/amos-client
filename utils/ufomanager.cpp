@@ -6,9 +6,7 @@
 
 extern EventLogger logger;
 
-UfoManager::UfoManager(): m_state(UfoState::NOT_RUNNING) {
-
-}
+UfoManager::UfoManager(): m_state(UfoState::NOT_RUNNING) {}
 
 UfoManager::~UfoManager(void) {
 
@@ -28,7 +26,7 @@ QString UfoManager::state_string() const {
             return "not running";
             break;
         case UfoState::RUNNING:
-            return "running";
+            return QString("running (%1)").arg(this->m_process.pid()->dwProcessId);
             break;
         default:
             return "undefined";
@@ -36,21 +34,53 @@ QString UfoManager::state_string() const {
     }
 }
 
+void UfoManager::update_state(QProcess::ProcessState state) {
+    switch (state) {
+        case QProcess::Running: {
+            this->m_state = UfoState::RUNNING;
+            break;
+        }
+        case QProcess::NotRunning:
+        case QProcess::Starting: {
+            this->m_state = UfoState::NOT_RUNNING;
+            break;
+        }
+    }
+}
+
 bool UfoManager::is_running() {
     this->m_frame = FindWindowA(nullptr, "UFOCaptureHD2");
     if (this->m_frame == nullptr) {
+        if (this->m_state == UfoState::RUNNING) {
+            emit this->ufo_killed();
+        }
         this->m_state = UfoState::NOT_RUNNING;
         return false;
     } else {
+        if (this->m_state != UfoState::RUNNING) {
+            emit this->ufo_started();
+        }
         this->m_state = UfoState::RUNNING;
         return true;
     }
 }
 
 void UfoManager::start_ufo(void) {
-    logger.info("Started UFO");
-    if (this->m_state == UfoState::NOT_RUNNING) {
-        QProcess::startDetached(this->m_path, {}, QFileInfo(this->m_path).absoluteDir().path(), &this->m_pid);
+    switch (this->m_state) {
+        case UfoState::RUNNING: {
+            logger.info("Already running");
+            break;
+        }
+        case UfoState::NOT_RUNNING: {
+            logger.info("Starting UFO");
+            this->connect(&this->m_process, &QProcess::stateChanged, this, &UfoManager::update_state);
+            this->m_process.start(this->m_path, {}, QIODevice::ReadWrite);
+            break;
+        }
+        default: {
+            logger.info("Cannot run UFO");
+            break;
+        }
     }
 }
 
@@ -64,7 +94,7 @@ void UfoManager::kill_ufo(void) {
             SetActiveWindow(child);
             SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
         }
-        Sleep(500);
+        emit this->ufo_killed();
     }
 }
 

@@ -12,7 +12,7 @@ enum class UfoState {
     NOT_FOUND,
     NOT_EXE,
     NOT_RUNNING,
-    RUNNING
+    RUNNING,
 };
 
 
@@ -23,7 +23,9 @@ private:
     QString m_path;
     qint64 m_pid;
 
+    QProcess m_process;
     UfoState m_state;
+    void update_state(QProcess::ProcessState);
 public:
     UfoManager();
     ~UfoManager(void);
@@ -39,6 +41,9 @@ public:
 
     void set_path(const QString &path);
     const QString& path() const;
+signals:
+    void ufo_started(void) const;
+    void ufo_killed(void) const;
 };
 
 #endif // UFOMANAGER_H
