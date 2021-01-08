@@ -38,6 +38,7 @@ SOURCES += \
     server.cpp \
     station.cpp \
     storage.cpp \
+    utils/diskmanager.cpp \
     utils/domestate.cpp \
     utils/exception.cpp \
     utils/request.cpp \
@@ -73,6 +74,7 @@ HEADERS += \
     server.h \
     station.h \
     storage.h \
+    utils/diskmanager.h \
     utils/domestate.h \
     utils/exception.h \
     utils/request.h \

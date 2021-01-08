@@ -36,6 +36,7 @@ void Server::set_url(const QHostAddress &address, const unsigned short port, con
             .arg(this->m_port)
             .arg(station_id)
     );
+    logger.info(QString("[Server] Set address to %1:%2").arg(this->m_address.toString()).arg(this->m_port));
 }
 
 void Server::send_heartbeat(const QJsonObject &heartbeat) const {
@@ -69,7 +70,7 @@ void Server::heartbeat_response(void) {
 }
 
 void Server::send_sighting(const Sighting &sighting) const {
-    logger.info(QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
+    logger.debug(QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
 
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 

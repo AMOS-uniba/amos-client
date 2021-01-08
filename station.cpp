@@ -9,7 +9,7 @@ QString Station::temperature_colour(float temperature) {
     if (temperature < 0.0) {
         h = 180 - 4.0 * temperature;
         s = (1 + temperature / 50.0) * 255;
-        v = 255;
+        v = 200;
     } else {
         if (temperature < 15) {
             h = 180 - 6.0 * temperature;
@@ -25,7 +25,12 @@ QString Station::temperature_colour(float temperature) {
     return QString("hsv(%1, %2, %3)").arg(h).arg(s).arg(v);
 }
 
-Station::Station(const QString& id): m_id(id), m_state(StationState::NOT_OBSERVING) {
+Station::Station(const QString& id):
+    m_id(id),
+    m_manual_control(false),
+    m_safety_override(false),
+    m_state(StationState::NOT_OBSERVING)
+{
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
 
@@ -372,11 +377,7 @@ void Station::file_check(void) {
         this->move_sighting(sighting);
     }
 
-    if (this->is_dark()) {
-        this->m_ufo_manager->start_ufo();
-    } else {
-        this->m_ufo_manager->kill_ufo();
-    }
+    this->m_ufo_manager->auto_action(this->is_dark());
 }
 
 void Station::send_sighting(const Sighting &sighting) {

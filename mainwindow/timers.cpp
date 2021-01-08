@@ -28,9 +28,9 @@ void MainWindow::process_display_timer(void) {
 }
 
 void MainWindow::process_watchdog_timer(void) {
-    if (this->station->dome()->serial_port_info() != "open") {
-        this->init_serial_ports();
-    }
+    /*if (this->station->dome()->serial_port_info() != "open") {
+        this->display_serial_ports();
+    }*/
 
     this->set_icon(this->station->determine_state());
     this->display_ufo_state();

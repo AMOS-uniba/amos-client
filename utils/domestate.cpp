@@ -22,7 +22,7 @@ float DomeState::deciint(const QByteArray &chunk) {
 }
 
 bool DomeState::is_valid(void) const {
-    return (this->m_valid && (this->age() < 5));
+    return (this->m_valid && (this->age() < 1.5));
 }
 
 const QDateTime& DomeState::timestamp(void) const {

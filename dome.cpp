@@ -47,21 +47,26 @@ const QDateTime& Dome::last_received(void) const {
 
 void Dome::clear_serial_port(void) {
     delete this->m_serial_port;
+    this->m_serial_port = nullptr;
 }
 
-void Dome::reset_serial_port(const QString &port) {
-    if (this->m_serial_port != nullptr) {
-        delete this->m_serial_port;
-    }
+void Dome::set_serial_port(const QString &port) {
+    this->clear_serial_port();
 
     this->m_serial_port = new QSerialPort(this);
     this->m_serial_port->setPortName(port);
     this->m_serial_port->setBaudRate(QSerialPort::Baud9600);
     this->m_serial_port->setDataBits(QSerialPort::Data8);
-    this->m_serial_port->open(QSerialPort::ReadWrite);
 
-    this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
-    this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
+    if (this->m_serial_port->open(QSerialPort::ReadWrite)) {
+        this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
+        this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
+        logger.info(QString("Opened serial port %1").arg(this->m_serial_port->portName()));
+    } else {
+        logger.error(QString("Could not open serial port %1: %2")
+                     .arg(this->m_serial_port->portName())
+                     .arg(this->m_serial_port->errorString()));
+    }
 }
 
 SerialPortState Dome::serial_port_state(void) const {
@@ -108,8 +113,12 @@ void Dome::send(const QByteArray &message) const {
         logger.debug_error("Cannot send, no serial port set");
         return;
     } else {
-        Telegram telegram(this->m_address, message);
-        this->m_serial_port->write(telegram.compose());
+        if (!this->m_serial_port->isOpen()) {
+            logger.debug_error(QString("Cannot send, serial port %1 is not open").arg(this->m_serial_port->portName()));
+        } else {
+            Telegram telegram(this->m_address, message);
+            this->m_serial_port->write(telegram.compose());
+        }
     }
 }
 

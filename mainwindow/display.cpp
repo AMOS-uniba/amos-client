@@ -176,8 +176,11 @@ void MainWindow::display_station_config(void) {
     this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
-void MainWindow::display_ufo_state(void) {
+void MainWindow::display_ufo_settings(void) {
     this->ui->le_ufo_path->setText(this->station->ufo_manager()->path());
+}
+
+void MainWindow::display_ufo_state(void) {
     this->ui->lb_ufo_state->setText(this->station->ufo_manager()->state_string());
     this->display_storage_status();
 }
@@ -228,3 +231,12 @@ void MainWindow::display_window_title(void) {
                          .arg(this->station->is_safety_overridden() ? " [safety override]" : "")
     );
 }
+
+void MainWindow::display_serial_ports(void) {
+    this->ui->co_serial_ports->clear();
+    serial_ports = QSerialPortInfo::availablePorts();
+    for (QSerialPortInfo sp: serial_ports) {
+        this->ui->co_serial_ports->addItem(sp.portName());
+    }
+}
+

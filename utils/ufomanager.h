@@ -23,6 +23,7 @@ private:
     QString m_path;
     qint64 m_pid;
 
+    bool m_autostart;
     QProcess m_process;
     UfoState m_state;
     void update_state(QProcess::ProcessState);
@@ -34,13 +35,17 @@ public:
     QString state_string(void) const;
 
     bool is_running(void);
+    void auto_action(bool is_dark);
     void start_ufo(void);
-    void kill_ufo(void);
+    void stop_ufo(void);
 
     qint64 pid(void) const;
 
     void set_path(const QString &path);
     const QString& path() const;
+
+    bool autostart(void) const;
+    void set_autostart(bool enable);
 signals:
     void ufo_started(void) const;
     void ufo_killed(void) const;

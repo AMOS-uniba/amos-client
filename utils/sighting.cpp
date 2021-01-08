@@ -3,33 +3,25 @@
 extern EventLogger logger;
 
 Sighting::Sighting(const QString& prefix) {
-    this->init_files(prefix);
+    this->m_jpg = this->try_open(QString("%1P.jpg").arg(prefix));
+    this->m_xml = this->try_open(QString("%1.xml").arg(prefix));
+    this->m_bmp = this->try_open(QString("%1M.bmp").arg(prefix));
+    this->m_avi = this->try_open(QString("%1.avi").arg(prefix));
+    this->m_files = {this->m_jpg, this->m_xml, this->m_bmp, this->m_avi};
+
+    logger.info(QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
+    this->m_timestamp = QFileInfo(this->m_xml).birthTime();
 }
 
 Sighting::~Sighting(void) {
     this->m_files.clear();
 }
 
-void Sighting::init_files(const QString &prefix) {
-    this->m_jpg = QString("%1P.jpg").arg(prefix);
-    this->m_xml = QString("%1.xml").arg(prefix);
-    this->m_bmp = QString("%1M.bmp").arg(prefix);
-    this->m_avi = QString("%1.avi").arg(prefix);
-
-    this->m_files = {this->m_jpg, this->m_xml, this->m_bmp, this->m_avi};
-
-    for (auto file: this->m_files) {
-        this->try_open(file);
-    }
-
-    logger.info(QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
-    this->m_timestamp = QFileInfo(this->m_xml).birthTime();
-}
-
-void Sighting::try_open(const QString &path) {
+const QString& Sighting::try_open(const QString &path) {
     if (!QFileInfo(path).exists()) {
          throw RuntimeException(QString("Could not open sighting file %1").arg(path));
     }
+    return path;
 }
 
 qint64 Sighting::avi_size(void) const {
@@ -37,13 +29,24 @@ qint64 Sighting::avi_size(void) const {
     return info.exists() ? info.size() : -1;
 }
 
-void Sighting::move(const QString &path) {
-    logger.info(QString("Moving to %1").arg(path));
-    QDir().mkpath(path);
+void Sighting::move(const QString &prefix) {
+    logger.debug(QString("Moving to %1").arg(prefix));
+    QDir().mkpath(prefix);
 
     for (auto &file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(path).arg(QFileInfo(file).fileName());
+        QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
         QFile::rename(file, new_path);
+        file = new_path;
+    }
+}
+
+void Sighting::copy(const QString &prefix) {
+    logger.debug(QString("Moving to %1").arg(prefix));
+    QDir().mkpath(prefix);
+
+    for (auto &file: this->m_files) {
+        QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
+        QFile::copy(file, new_path);
         file = new_path;
     }
 }

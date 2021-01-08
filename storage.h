@@ -19,7 +19,12 @@ public:
 
     QVector<Sighting> list_new_sightings(void);
     void move_sighting(Sighting& sighting);
+    void copy_sighting(Sighting& sighting);
+
 public slots:
+
+signals:
+    void sighting_found(void) const;
 };
 
 

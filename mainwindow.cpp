@@ -13,16 +13,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->ui->tb_log->setColumnWidth(0, 140);
     this->ui->tb_log->setColumnWidth(1, 80);
 
+    this->display_serial_ports();
+
+    logger.set_display_widget(this->ui->tb_log);
+    logger.info("Client initialized");
+
+    // connect signals for handling of edits of station position
     this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
     this->create_timers();
 
-    logger.set_display_widget(this->ui->tb_log);
-    logger.info("Client initialized");
-
-    // connect signals for handling of edits of station position
     this->connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
     this->connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
     this->connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
@@ -37,7 +39,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->dsb_humidity_limit_lower, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
     this->connect(this->ui->dsb_humidity_limit_upper, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
-    this->init_serial_ports();
     this->create_actions();
     this->create_tray_icon();
     this->set_icon(StationState::NOT_OBSERVING);
@@ -59,14 +60,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->display_storage_status();
     this->display_ufo_state();
     this->display_window_title();
-}
-
-void MainWindow::init_serial_ports(void) {
-    this->ui->co_serial_ports->clear();
-    this->serial_ports = QSerialPortInfo::availablePorts();
-    for (QSerialPortInfo sp: this->serial_ports) {
-        this->ui->co_serial_ports->addItem(sp.portName());
-    }
 }
 
 MainWindow::~MainWindow() {
@@ -120,7 +113,7 @@ void MainWindow::on_bt_permanent_clicked() {
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {
-    this->settings->setValue("debug", debug);
+    this->settings->setValue("debug", bool(debug));
 
     logger.set_level(debug ? Level::Debug : Level::Info);
     logger.warning(QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
@@ -147,13 +140,15 @@ void MainWindow::on_cb_manual_stateChanged(int enable) {
 
 void MainWindow::on_cb_safety_override_stateChanged(int state) {
     if (state == Qt::CheckState::Checked) {
-        QMessageBox box;
-        box.setText("You are about to override the safety mechanisms!");
+        QMessageBox box(
+                        QMessageBox::Icon::Warning,
+                        "Safety mechanism override",
+                        "You are about to override the safety mechanisms!",
+                        QMessageBox::Ok | QMessageBox::Cancel,
+                        this
+                    );
         box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
-        box.setIcon(QMessageBox::Icon::Warning);
         box.setWindowIcon(QIcon(":/images/blue.ico"));
-        box.setWindowTitle("Safety mechanism override");
-        box.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
         int choice = box.exec();
 
         switch (choice) {
@@ -165,18 +160,10 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
                 this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
                 break;
         }
+    } else {
+        this->station->set_safety_override(false);
     }
     this->display_window_title();
-}
-
-void MainWindow::on_co_serial_ports_currentIndexChanged(int index) {
-    if (index == -1) {
-        logger.warning("No serial ports found");
-        this->station->dome()->clear_serial_port();
-    } else {
-        logger.info(QString("Serial port set to %1").arg(this->serial_ports[index].portName()));
-        this->station->dome()->reset_serial_port(this->serial_ports[index].portName());
-    }
 }
 
 void MainWindow::on_bt_lens_heating_clicked(void) {
@@ -224,7 +211,7 @@ void MainWindow::on_actionManual_control_triggered() {
 }
 
 void MainWindow::on_bt_change_ufo_clicked(void) {
-     QString filename = QFileDialog::getOpenFileName(
+    QString filename = QFileDialog::getOpenFileName(
         this,
         "Select UFO executable",
         QString(),
@@ -235,12 +222,45 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
         logger.debug("Directory selection aborted");
         return;
     } else {
-        this->settings->setValue("ufo/path", filename);
-        this->station->ufo_manager()->set_path(filename);
-        this->display_ufo_state();
+        if (filename == this->station->ufo_manager()->path()) {
+            logger.debug("[UFO] Path not changed");
+        } else {
+            logger.debug("[UFO] Path changed");
+            this->settings->setValue("ufo/path", filename);
+            this->station->ufo_manager()->set_path(filename);
+            this->display_ufo_settings();
+        }
     }
 }
 
-void MainWindow::on_checkBox_stateChanged(int enable) {
+void MainWindow::on_cb_ufo_auto_stateChanged(int enable) {
+    this->station->ufo_manager()->set_autostart((bool) enable);
+    this->settings->setValue("ufo/autostart", this->station->ufo_manager()->autostart());
+}
+
+void MainWindow::on_bt_ufo_clicked() {
+    if (this->station->ufo_manager()->is_running()) {
+        this->station->ufo_manager()->start_ufo();
+    } else {
+        this->station->ufo_manager()->stop_ufo();
+    }
+}
+
+void MainWindow::on_co_serial_ports_activated(int index) {
+    QString port = this->serial_ports[index].portName();
+
+    if (this->ui->co_serial_ports->count() == 0) {
+        logger.warning("No serial ports found");
+        this->station->dome()->clear_serial_port();
+    } else {
+        if (index == -1) {
+            logger.warning("Index is -1");
+            this->station->dome()->clear_serial_port();
+        } else {
+            logger.info(QString("Serial port set to %1").arg(port));
+            this->station->dome()->set_serial_port(port);
+            this->settings->setValue("dome/port", port);
+        }
+    }
 
 }

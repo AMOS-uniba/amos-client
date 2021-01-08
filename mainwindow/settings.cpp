@@ -14,6 +14,9 @@ void MainWindow::load_settings(void) {
 
         this->station->set_ufo_manager(new UfoManager());
         this->station->ufo_manager()->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
+        this->station->ufo_manager()->set_autostart(this->settings->value("ufo/autostart", true).toBool());
+        this->ui->cb_ufo_auto->setChecked(this->station->ufo_manager()->autostart());
+        this->display_ufo_settings();
 
         this->station->set_storages(
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
@@ -36,6 +39,17 @@ void MainWindow::load_settings(void) {
 
         this->station->set_manual_control(this->settings->value("manual", false).toBool());
         this->ui->cb_manual->setChecked(this->station->is_manual());
+        this->ui->cb_safety_override->setEnabled(this->station->is_manual());
+
+        logger.debug("Now setting serial ports...");
+        serial_ports = QSerialPortInfo::availablePorts();
+
+        for (QSerialPortInfo sp: this->serial_ports) {
+            if (sp.portName() == this->settings->value("dome/port")) {
+                this->ui->co_serial_ports->setCurrentText(sp.portName());
+                this->station->dome()->set_serial_port(sp.portName());
+            }
+        }
     } catch (ConfigurationError &e) {
         QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
         QMessageBox box;
@@ -55,18 +69,17 @@ void MainWindow::load_settings(void) {
 void MainWindow::on_bt_station_apply_clicked() {
     // If ID is changed
     if (this->ui->le_station_id->text() != this->station->get_id()) {
-        // Update the ID
         this->station->set_id(this->ui->le_station_id->text());
+    }
 
-        // If IP or port are changed, also update the server settings
-        if ((this->ui->le_ip->text() != this->station->server()->address().toString()) ||
-            (this->ui->sb_port->value() != this->station->server()->port())) {
-            this->station->server()->set_url(
-                QHostAddress(this->ui->le_ip->text()),
-                this->ui->sb_port->value(),
-                this->station->get_id()
-            );
-        }
+    // If IP or port are changed, update the server settings
+    if ((this->ui->le_ip->text() != this->station->server()->address().toString()) ||
+        (this->ui->sb_port->value() != this->station->server()->port())) {
+        this->station->server()->set_url(
+            QHostAddress(this->ui->le_ip->text()),
+            this->ui->sb_port->value(),
+            this->station->get_id()
+        );
     }
 
     // Update the position, if changed

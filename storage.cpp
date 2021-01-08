@@ -60,3 +60,11 @@ void Storage::move_sighting(Sighting &sighting) {
         .arg(QDateTime::currentDateTimeUtc().toString("yyyy/MM/dd"))
     );
 }
+
+void Storage::copy_sighting(Sighting &sighting) {
+    logger.debug("Copying a sighting...");
+    sighting.copy(QString("%1/%2/")
+        .arg(this->m_root_directory.path())
+        .arg(QDateTime::currentDateTimeUtc().toString("yyyy/MM/dd"))
+    );
+}

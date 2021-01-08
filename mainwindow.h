@@ -38,9 +38,6 @@ private:
     Ui::MainWindow *ui;
     QSettings *settings;
 
-    double sun_azimuth = 0;
-    double sun_altitude = 0;
-
     Station *station = nullptr;
     Universe *universe = nullptr;
 
@@ -68,7 +65,7 @@ private:
 private slots:
     void load_settings(void);
     void create_timers(void);
-    void init_serial_ports(void);
+    void display_serial_ports(void);
 
     void on_actionExit_triggered();
 
@@ -89,7 +86,10 @@ private slots:
     void display_cover_status(void);
     void display_storage_status(void);
     void display_station_config(void);
+    void display_ufo_settings(void);
     void display_ufo_state(void);
+
+    void on_station_edited(void);
 
     void send_heartbeat(void);
     void on_button_send_heartbeat_pressed();
@@ -97,15 +97,13 @@ private slots:
     void button_station_toggle(bool enable);
     void on_bt_station_reset_clicked();
     void on_bt_station_apply_clicked();
-    void on_station_edited(void);
 
     void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
 
     void on_cb_manual_stateChanged(int enable);
     void on_cb_debug_stateChanged(int debug);
-
-    void on_co_serial_ports_currentIndexChanged(int index);
+    void on_co_serial_ports_activated(int index);
 
     // Tray and messaging
     void set_icon(const StationState &state);
@@ -125,6 +123,7 @@ private slots:
     void on_actionManual_control_triggered();
 
     void on_bt_change_ufo_clicked();
-    void on_checkBox_stateChanged(int arg1);
+    void on_cb_ufo_auto_stateChanged(int arg1);
+    void on_bt_ufo_clicked();
 };
 #endif // MAINWINDOW_H

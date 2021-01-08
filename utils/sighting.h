@@ -14,9 +14,7 @@ private:
 
     QVector<QString> m_files;
 
-    void try_open(const QString &path);
-
-    void init_files(const QString &prefix);
+    const QString& try_open(const QString &path);
 public:
     Sighting(const QString &prefix);
     ~Sighting(void);
@@ -26,6 +24,7 @@ public:
     QHttpPart json_metadata(void) const;
 
     void move(const QString &prefix);
+    void copy(const QString &prefix);
     qint64 avi_size(void) const;
 };
 

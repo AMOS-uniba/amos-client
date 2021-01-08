@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1041</width>
+    <width>1211</width>
     <height>912</height>
    </rect>
   </property>
@@ -110,7 +110,11 @@
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QComboBox" name="co_serial_ports"/>
+           <widget class="QComboBox" name="co_serial_ports">
+            <property name="placeholderText">
+             <string>none available</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1">
            <widget class="QCheckBox" name="cb_safety_override">
@@ -955,6 +959,153 @@
      </widget>
     </item>
     <item>
+     <widget class="QFrame" name="frame">
+      <layout class="QGridLayout" name="grid_log">
+       <item row="0" column="0">
+        <widget class="QCheckBox" name="cb_debug">
+         <property name="text">
+          <string>Debug output</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QLabel" name="label_heartbeat">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>? s</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="5">
+        <widget class="QTableWidget" name="tb_log">
+         <property name="lineWidth">
+          <number>1</number>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOn</enum>
+         </property>
+         <property name="editTriggers">
+          <set>QAbstractItemView::NoEditTriggers</set>
+         </property>
+         <property name="alternatingRowColors">
+          <bool>true</bool>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="horizontalScrollMode">
+          <enum>QAbstractItemView::ScrollPerPixel</enum>
+         </property>
+         <property name="gridStyle">
+          <enum>Qt::NoPen</enum>
+         </property>
+         <property name="wordWrap">
+          <bool>false</bool>
+         </property>
+         <property name="rowCount">
+          <number>0</number>
+         </property>
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <attribute name="horizontalHeaderMinimumSectionSize">
+          <number>45</number>
+         </attribute>
+         <attribute name="horizontalHeaderDefaultSectionSize">
+          <number>88</number>
+         </attribute>
+         <attribute name="horizontalHeaderHighlightSections">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="horizontalHeaderStretchLastSection">
+          <bool>true</bool>
+         </attribute>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+         <attribute name="verticalHeaderMinimumSectionSize">
+          <number>18</number>
+         </attribute>
+         <attribute name="verticalHeaderDefaultSectionSize">
+          <number>18</number>
+         </attribute>
+         <column>
+          <property name="text">
+           <string>Timestamp</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Level</string>
+          </property>
+          <property name="textAlignment">
+           <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Message</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_hb">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Next heartbeat in</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="button_send_heartbeat">
+         <property name="text">
+          <string>Send heartbeat</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
      <widget class="QFrame" name="frame_station">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -1479,7 +1630,7 @@
                <property name="maximumSize">
                 <size>
                  <width>16777215</width>
-                 <height>50</height>
+                 <height>110</height>
                 </size>
                </property>
               </widget>
@@ -1532,7 +1683,7 @@
        <item>
         <widget class="QGroupBox" name="group_sun">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -1563,18 +1714,12 @@
             <property name="text">
              <string>Ecliptical longitude λ</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
            </widget>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="lb_eq_lon">
             <property name="text">
              <string>Right ascension α</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1634,18 +1779,12 @@
             <property name="text">
              <string>Altitude θ</string>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
            </widget>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="lb_eq_lat">
             <property name="text">
              <string>Declination δ</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1670,9 +1809,6 @@
            <widget class="QLabel" name="lb_hor_az">
             <property name="text">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -1713,150 +1849,6 @@
       </layout>
      </widget>
     </item>
-    <item>
-     <widget class="QFrame" name="frame">
-      <layout class="QGridLayout" name="grid_log">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="cb_debug">
-         <property name="text">
-          <string>Debug output</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QLabel" name="label_heartbeat">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>50</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>? s</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="5">
-        <widget class="QTableWidget" name="tb_log">
-         <property name="lineWidth">
-          <number>1</number>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOn</enum>
-         </property>
-         <property name="alternatingRowColors">
-          <bool>true</bool>
-         </property>
-         <property name="selectionMode">
-          <enum>QAbstractItemView::NoSelection</enum>
-         </property>
-         <property name="horizontalScrollMode">
-          <enum>QAbstractItemView::ScrollPerPixel</enum>
-         </property>
-         <property name="gridStyle">
-          <enum>Qt::NoPen</enum>
-         </property>
-         <property name="wordWrap">
-          <bool>false</bool>
-         </property>
-         <property name="rowCount">
-          <number>0</number>
-         </property>
-         <property name="columnCount">
-          <number>3</number>
-         </property>
-         <attribute name="horizontalHeaderMinimumSectionSize">
-          <number>45</number>
-         </attribute>
-         <attribute name="horizontalHeaderDefaultSectionSize">
-          <number>88</number>
-         </attribute>
-         <attribute name="horizontalHeaderHighlightSections">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="horizontalHeaderStretchLastSection">
-          <bool>true</bool>
-         </attribute>
-         <attribute name="verticalHeaderVisible">
-          <bool>false</bool>
-         </attribute>
-         <attribute name="verticalHeaderMinimumSectionSize">
-          <number>18</number>
-         </attribute>
-         <attribute name="verticalHeaderDefaultSectionSize">
-          <number>18</number>
-         </attribute>
-         <column>
-          <property name="text">
-           <string>Timestamp</string>
-          </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Level</string>
-          </property>
-          <property name="textAlignment">
-           <set>AlignCenter</set>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>Message</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="label_hb">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Next heartbeat in</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="button_send_heartbeat">
-         <property name="text">
-          <string>Send heartbeat</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </widget>
-    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -1864,7 +1856,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1041</width>
+     <width>1211</width>
      <height>21</height>
     </rect>
    </property>
