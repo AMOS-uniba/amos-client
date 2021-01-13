@@ -1,15 +1,10 @@
 #include "statelogger.h"
 
-StateLogger::StateLogger(QObject *parent, const QString &filename): BaseLogger(parent, filename) {}
-
-StateLogger::~StateLogger(void) {
-    if (this->m_file != nullptr) {
-        this->m_file->close();
-    }
-}
+StateLogger::StateLogger(QObject *parent, const QString &filename):
+    BaseLogger(parent, filename) {}
 
 QString StateLogger::format(const QDateTime &timestamp, const QString &message) const {
-    return QString("%1 %2").arg(timestamp.toString(Qt::ISODate)).arg(message);
+    return QString("%1 %2").arg(timestamp.toString(Qt::ISODate), message);
 }
 
 void StateLogger::log(const QString &message) const {

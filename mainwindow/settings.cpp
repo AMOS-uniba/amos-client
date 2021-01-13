@@ -12,15 +12,19 @@ void MainWindow::load_settings(void) {
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
 
-        this->station->set_ufo_manager(new UfoManager());
-        this->station->ufo_manager()->set_path(this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
-        this->station->ufo_manager()->set_autostart(this->settings->value("ufo/autostart", true).toBool());
-        this->ui->cb_ufo_auto->setChecked(this->station->ufo_manager()->autostart());
+        // Create the UFO manager
+        this->station->set_ufo_manager(new UfoManager(
+            this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString(),
+            this->settings->value("ufo/autostart", false).toBool()
+        ));
         this->display_ufo_settings();
 
         this->station->set_storages(
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
             QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
+        );
+        this->station->set_scanner(
+            QDir(this->settings->value("storage/watch", "C:\\Data").toString())
         );
         this->station->set_position(
             this->settings->value("station/latitude", 0).toDouble(),
@@ -65,9 +69,9 @@ void MainWindow::load_settings(void) {
     }
 }
 
-// Handles
+// Handle changes in station settings
 void MainWindow::on_bt_station_apply_clicked() {
-    // If ID is changed
+    // Update ID, if changed
     if (this->ui->le_station_id->text() != this->station->get_id()) {
         this->station->set_id(this->ui->le_station_id->text());
     }
@@ -129,6 +133,7 @@ void MainWindow::on_bt_station_apply_clicked() {
 }
 
 void MainWindow::on_bt_station_reset_clicked() {
+    logger.debug("Discard changes to station settings");
     this->ui->le_station_id->setText(this->station->get_id());
     this->ui->le_ip->setText(this->station->server()->address().toString());
     this->ui->sb_port->setValue(this->station->server()->port());
@@ -156,7 +161,7 @@ void MainWindow::on_station_edited(void) {
     );
 }
 
-void MainWindow::button_station_toggle(bool enable) {
-    this->ui->bt_station_apply->setText(QString("%1 changes").arg(enable ? "Apply" : "No"));
-    this->ui->bt_station_apply->setEnabled(enable);
+void MainWindow::button_station_toggle(bool changed) {
+    this->ui->bt_station_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
+    this->ui->bt_station_apply->setEnabled(changed);
 }

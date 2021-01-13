@@ -12,19 +12,15 @@ public:
     Storage(const QString &name, const QDir &directory);
     QStorageInfo info(void) const;
     QJsonObject json(void) const;
-    const QString& get_name(void) const;
+    const QString& name(void) const;
 
-    const QDir& get_directory(void) const;
-    void set_directory(const QDir &dir);
+    const QDir current_directory(void) const;
+    const QDir& root_directory(void) const;
+    void set_root_directory(const QDir &dir);
 
-    QVector<Sighting> list_new_sightings(void);
-    void move_sighting(Sighting& sighting);
-    void copy_sighting(Sighting& sighting);
 
 public slots:
-
-signals:
-    void sighting_found(void) const;
+    void store_sighting(Sighting &sighting, bool del = false) const;
 };
 
 

@@ -36,28 +36,29 @@ void Server::set_url(const QHostAddress &address, const unsigned short port, con
             .arg(this->m_port)
             .arg(station_id)
     );
-    logger.info(QString("[Server] Set address to %1:%2").arg(this->m_address.toString()).arg(this->m_port));
+    logger.info(Concern::Server, QString("Address set to %1:%2").arg(this->m_address.toString()).arg(this->m_port));
 }
 
 void Server::send_heartbeat(const QJsonObject &heartbeat) const {
-    logger.debug(QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
+    logger.debug(Concern::Server, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
-    logger.debug(QString("Heartbeat assembled: '%1'").arg(QString(message)));
+    logger.debug(Concern::Server, QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
     QNetworkReply *reply = this->m_network_manager->post(request, message);
     this->connect(reply, &QNetworkReply::errorOccurred, this, &Server::heartbeat_error);
 }
 
 void Server::heartbeat_error(QNetworkReply::NetworkError error) {
-    logger.error(QString("Heartbeat could not be sent: error %1").arg(error));
+    logger.error(Concern::Server, QString("Heartbeat could not be sent: error %1").arg(error));
 }
 
 void Server::heartbeat_ok(QNetworkReply* reply) {
     logger.debug(
+        Concern::Server,
         QString("Heartbeat received (HTTP code %1), response \"%2\"")
                 .arg(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString())
                 .arg(QString(reply->readAll()))
@@ -66,11 +67,11 @@ void Server::heartbeat_ok(QNetworkReply* reply) {
 }
 
 void Server::heartbeat_response(void) {
-    logger.debug("Heartbeat response");
+    logger.debug(Concern::Server, "Heartbeat response");
 }
 
 void Server::send_sighting(const Sighting &sighting) const {
-    logger.debug(QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
+    logger.debug(Concern::Server, QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
 
     QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 

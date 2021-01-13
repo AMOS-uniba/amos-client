@@ -14,6 +14,7 @@
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
 #include <QSerialPortInfo>
+#include <QDesktopServices>
 
 #include "forward.h"
 
@@ -91,14 +92,13 @@ private slots:
 
     void on_station_edited(void);
 
-    void send_heartbeat(void);
+    void heartbeat(void);
     void on_button_send_heartbeat_pressed();
 
-    void button_station_toggle(bool enable);
+    void button_station_toggle(bool changed);
     void on_bt_station_reset_clicked();
     void on_bt_station_apply_clicked();
 
-    void on_bt_primary_clicked();
     void on_bt_permanent_clicked();
 
     void on_cb_manual_stateChanged(int enable);
@@ -125,5 +125,8 @@ private slots:
     void on_bt_change_ufo_clicked();
     void on_cb_ufo_auto_stateChanged(int arg1);
     void on_bt_ufo_clicked();
+    void on_bt_watch_directory_clicked();
+    void on_bt_watch_open_clicked();
+    void on_bt_permanent_open_clicked();
 };
 #endif // MAINWINDOW_H

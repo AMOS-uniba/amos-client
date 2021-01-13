@@ -6,7 +6,10 @@
 
 extern EventLogger logger;
 
-UfoManager::UfoManager(): m_autostart(false), m_state(UfoState::NOT_RUNNING) {}
+UfoManager::UfoManager(const QString &path, bool autostart):
+    m_path(path),
+    m_autostart(autostart),
+    m_state(UfoState::NOT_RUNNING) {}
 
 UfoManager::~UfoManager(void) {
     this->stop_ufo();
@@ -67,10 +70,10 @@ bool UfoManager::is_running() {
 }
 
 void UfoManager::auto_action(bool is_dark) {
-    logger.debug("[UFO] Automatic action");
+    logger.debug(Concern::UFO, "Automatic action");
 
     if (this->m_autostart) {
-        if (/* is_dark */ true) {
+        if (/* is_dark */ true) { // Temporarily disabled for testing!
             this->start_ufo();
         } else {
             this->stop_ufo();
@@ -82,11 +85,11 @@ void UfoManager::start_ufo(void) {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
-            logger.debug("[UFO] Already running");
+            logger.debug(Concern::UFO, "Already running");
             break;
         }
         case QProcess::ProcessState::NotRunning: {
-            logger.info("[UFO] Starting");
+            logger.info(Concern::UFO, "Starting");
             this->connect(&this->m_process, &QProcess::stateChanged, this, &UfoManager::update_state);
             this->m_process.start(this->m_path, {}, QIODevice::ReadWrite);
             break;

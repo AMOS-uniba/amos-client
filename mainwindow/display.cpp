@@ -46,7 +46,7 @@ void MainWindow::display_storage_status(const Storage *storage, QProgressBar *pb
     unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
     pb->setMaximum(total);
     pb->setValue(total - used);
-    le->setText(storage->get_directory().path());
+    le->setText(storage->root_directory().path());
 }
 
 void MainWindow::display_cover_status(void) {
@@ -177,12 +177,12 @@ void MainWindow::display_station_config(void) {
 }
 
 void MainWindow::display_ufo_settings(void) {
+    this->ui->cb_ufo_auto->setChecked(this->station->ufo_manager()->autostart());
     this->ui->le_ufo_path->setText(this->station->ufo_manager()->path());
 }
 
 void MainWindow::display_ufo_state(void) {
     this->ui->lb_ufo_state->setText(this->station->ufo_manager()->state_string());
-    this->display_storage_status();
 }
 
 void MainWindow::display_time(void) {

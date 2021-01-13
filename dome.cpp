@@ -61,9 +61,9 @@ void Dome::set_serial_port(const QString &port) {
     if (this->m_serial_port->open(QSerialPort::ReadWrite)) {
         this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
         this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
-        logger.info(QString("Opened serial port %1").arg(this->m_serial_port->portName()));
+        logger.info(Concern::SerialPort, QString("Opened %1").arg(this->m_serial_port->portName()));
     } else {
-        logger.error(QString("Could not open serial port %1: %2")
+        logger.error(Concern::SerialPort, QString("Could not open %1: %2")
                      .arg(this->m_serial_port->portName())
                      .arg(this->m_serial_port->errorString()));
     }
@@ -99,18 +99,18 @@ QJsonObject Dome::json(void) const {
 }
 
 void Dome::send_command(const Command &command) const {
-    logger.debug(QString("Sending a command '%1'").arg(command.display_name()));
+    logger.debug(Concern::SerialPort, QString("Sending a command '%1'").arg(command.display_name()));
     this->send(command.for_telegram());
 }
 
 void Dome::send_request(const Request &request) const {
-    logger.debug(QString("Sending a request '%1'").arg(request.display_name()));
+    logger.debug(Concern::SerialPort, QString("Sending a request '%1'").arg(request.display_name()));
     this->send(request.for_telegram());
 }
 
 void Dome::send(const QByteArray &message) const {
     if (this->m_serial_port == nullptr) {
-        logger.debug_error("Cannot send, no serial port set");
+        logger.debug_error(Concern::SerialPort, "Cannot send, no serial port set");
         return;
     } else {
         if (!this->m_serial_port->isOpen()) {
@@ -156,14 +156,14 @@ void Dome::process_message(const QByteArray &message) {
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));
         }
     } catch (MalformedTelegram &e) {
-        logger.error(QString("Malformed message '%1'").arg(QString(message)));
+        logger.error(Concern::SerialPort, QString("Malformed message '%1'").arg(QString(message)));
     } catch (InvalidState &e) {
-        logger.error(QString("Invalid state: '%1'").arg(e.what()));
+        logger.error(Concern::SerialPort, QString("Invalid state message: '%1'").arg(e.what()));
     }
 }
 
 void Dome::handle_error(QSerialPort::SerialPortError error) {
-    logger.error(QString("Serial port error %1: %2").arg(error).arg(this->m_serial_port->errorString()));
+    logger.error(Concern::SerialPort, QString("Error %1: %2").arg(error).arg(this->m_serial_port->errorString()));
 }
 
 const DomeStateS& Dome::state_S(void) const { return this->m_state_S; }

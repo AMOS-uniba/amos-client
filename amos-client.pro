@@ -25,6 +25,7 @@ SOURCES += \
     APC/APC_Sun.cpp \
     APC/APC_Time.cpp \
     APC/APC_VecMat3D.cpp \
+    filesystemscanner.cpp \
     logging/baselogger.cpp \
     logging/eventlogger.cpp \
     logging/statelogger.cpp \
@@ -38,7 +39,6 @@ SOURCES += \
     server.cpp \
     station.cpp \
     storage.cpp \
-    utils/diskmanager.cpp \
     utils/domestate.cpp \
     utils/exception.cpp \
     utils/request.cpp \
@@ -63,6 +63,7 @@ HEADERS += \
     APC/APC_Sun.h \
     APC/APC_Time.h \
     APC/APC_VecMat3D.h \
+    filesystemscanner.h \
     logging/baselogger.h \
     logging/eventlogger.h \
     logging/statelogger.h \
@@ -74,7 +75,6 @@ HEADERS += \
     server.h \
     station.h \
     storage.h \
-    utils/diskmanager.h \
     utils/domestate.h \
     utils/exception.h \
     utils/request.h \

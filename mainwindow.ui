@@ -1023,7 +1023,7 @@
           <number>0</number>
          </property>
          <property name="columnCount">
-          <number>3</number>
+          <number>4</number>
          </property>
          <attribute name="horizontalHeaderMinimumSectionSize">
           <number>45</number>
@@ -1060,6 +1060,11 @@
           </property>
           <property name="textAlignment">
            <set>AlignCenter</set>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>Concern</string>
           </property>
          </column>
          <column>
@@ -1129,6 +1134,159 @@
        <property name="bottomMargin">
         <number>0</number>
        </property>
+       <item>
+        <widget class="QGroupBox" name="group_sun">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="title">
+          <string>Sun</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_6">
+          <item row="1" column="1">
+           <widget class="QLabel" name="lb_hor_altitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="lb_ecl_lon">
+            <property name="text">
+             <string>Ecliptical longitude λ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lb_eq_lon">
+            <property name="text">
+             <string>Right ascension α</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QLabel" name="lb_eq_latitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lb_eq_longitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLabel" name="lb_hor_azimuth">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lb_hor_alt">
+            <property name="text">
+             <string>Altitude θ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="lb_eq_lat">
+            <property name="text">
+             <string>Declination δ</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLabel" name="lb_ecl_longitude">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???°</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lb_hor_az">
+            <property name="text">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QLabel" name="lb_sun_status">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>???</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
        <item>
         <widget class="QGroupBox" name="group_ufo">
          <property name="sizePolicy">
@@ -1364,7 +1522,7 @@
                <string>reset the changes</string>
               </property>
               <property name="text">
-               <string>Reset changes</string>
+               <string>Discard changes</string>
               </property>
              </widget>
             </item>
@@ -1584,29 +1742,12 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QGroupBox" name="gb_primary">
+           <widget class="QGroupBox" name="group_scan">
             <property name="title">
-             <string>Primary</string>
+             <string>Watch directory</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
-             <item row="0" column="1">
-              <widget class="QPushButton" name="bt_primary">
-               <property name="text">
-                <string>Change</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="le_primary">
-               <property name="cursor">
-                <cursorShape>ForbiddenCursor</cursorShape>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
               <widget class="QProgressBar" name="pb_primary">
                <property name="maximum">
                 <number>400</number>
@@ -1619,33 +1760,22 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="QListWidget" name="listWidget">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>16777215</width>
-                 <height>110</height>
-                </size>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="bt_watch_change">
+               <property name="text">
+                <string>Change</string>
                </property>
               </widget>
              </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="gb_permanent">
-            <property name="title">
-             <string>Permanent</string>
-            </property>
-            <layout class="QGridLayout" name="gridLayout_9">
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="le_permanent">
+             <item row="1" column="1">
+              <widget class="QPushButton" name="bt_watch_open">
+               <property name="text">
+                <string>Open</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLineEdit" name="le_primary">
                <property name="cursor">
                 <cursorShape>ForbiddenCursor</cursorShape>
                </property>
@@ -1654,14 +1784,16 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="bt_permanent">
-               <property name="text">
-                <string>Change</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="group_store">
+            <property name="title">
+             <string>Permanent storage</string>
+            </property>
+            <layout class="QGridLayout" name="gridLayout_9">
+             <item row="2" column="0" colspan="2">
               <widget class="QProgressBar" name="pb_permanent">
                <property name="maximum">
                 <number>400</number>
@@ -1674,160 +1806,31 @@
                </property>
               </widget>
              </item>
+             <item row="1" column="0">
+              <widget class="QPushButton" name="bt_permanent">
+               <property name="text">
+                <string>Change</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="bt_permanent_open">
+               <property name="text">
+                <string>Open</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0" colspan="2">
+              <widget class="QLineEdit" name="le_permanent">
+               <property name="cursor">
+                <cursorShape>ForbiddenCursor</cursorShape>
+               </property>
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
-        <widget class="QGroupBox" name="group_sun">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="title">
-          <string>Sun</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="1" column="1">
-           <widget class="QLabel" name="lb_hor_altitude">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="lb_ecl_lon">
-            <property name="text">
-             <string>Ecliptical longitude λ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="lb_eq_lon">
-            <property name="text">
-             <string>Right ascension α</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="lb_eq_latitude">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="lb_eq_longitude">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="lb_hor_azimuth">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lb_hor_alt">
-            <property name="text">
-             <string>Altitude θ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lb_eq_lat">
-            <property name="text">
-             <string>Declination δ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="1">
-           <widget class="QLabel" name="lb_ecl_longitude">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lb_hor_az">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="lb_sun_status">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
            </widget>
           </item>
          </layout>
@@ -1916,10 +1919,7 @@
   <tabstop>bt_station_reset</tabstop>
   <tabstop>bt_station_apply</tabstop>
   <tabstop>le_primary</tabstop>
-  <tabstop>bt_primary</tabstop>
-  <tabstop>listWidget</tabstop>
   <tabstop>le_permanent</tabstop>
-  <tabstop>bt_permanent</tabstop>
   <tabstop>cb_debug</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
   <tabstop>tb_log</tabstop>

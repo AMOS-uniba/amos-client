@@ -30,6 +30,7 @@ private:
 
     StationState m_state;
 
+    FileSystemScanner *m_filesystemscanner;
     Storage *m_primary_storage;
     Storage *m_permanent_storage;
 
@@ -49,10 +50,13 @@ public:
     void check_state(void);
     StationState state(void);
 
+    void set_scanner(const QDir &directory);
+    FileSystemScanner* scanner(void) const;
+
     // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
-    Storage* primary_storage(void);
-    Storage* permanent_storage(void);
+    Storage* primary_storage(void) const;
+    Storage* permanent_storage(void) const;
 
     void set_server(Server *server);
     Server* server(void);
@@ -96,9 +100,6 @@ public:
 
     QJsonObject prepare_heartbeat(void) const;
 
-    void send_sighting(const Sighting &sighting);
-    void move_sighting(Sighting &sighting);
-
     // Command wrappers
     void open_cover(void);
     void close_cover(void);
@@ -120,6 +121,7 @@ public slots:
     void log_state(void);
 
     void send_heartbeat(void);
+    void process_sightings(QVector<Sighting> sightings);
 
 signals:
     void state_changed(void) const;

@@ -15,6 +15,7 @@
 #include "mainwindow.h"
 #include "server.h"
 #include "storage.h"
+#include "filesystemscanner.h"
 #include "station.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"

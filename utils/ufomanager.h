@@ -28,7 +28,7 @@ private:
     UfoState m_state;
     void update_state(QProcess::ProcessState);
 public:
-    UfoManager();
+    UfoManager(const QString &path, bool autostart);
     ~UfoManager(void);
 
     UfoState state(void) const;

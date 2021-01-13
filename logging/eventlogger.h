@@ -20,6 +20,17 @@ enum class Level {
     Fatal = 0,
 };
 
+enum class Concern {
+    Generic,
+    SerialPort,
+    Server,
+    Sightings,
+    Configuration,
+    Automatic,
+    Heartbeat,
+    UFO,
+};
+
 struct LevelInfo {
     QString code;
     QString name;
@@ -33,12 +44,12 @@ private:
     Level logging_level;
 
     const static QMap<Level, LevelInfo> Levels;
+    const static QMap<Concern, QString> Concerns;
 
-    QString format(const QDateTime &timestamp, Level level, const QString& message) const;
-    void write(Level level, const QString &message) const;
+    QString format(const QDateTime &timestamp, Level level, const QString &concern, const QString& message) const;
+    void write(Level level, Concern concern, const QString &message) const;
 public:
     explicit EventLogger(QObject *parent, const QString &filename);
-    ~EventLogger(void);
 
     void set_display_widget(QTableWidget *widget);
     void set_level(Level new_level);
@@ -50,6 +61,14 @@ public:
     void warning(const QString &message) const;
     void error(const QString &message) const;
     void fatal(const QString &message) const;
+
+    void detail(Concern concern, const QString &message) const;
+    void debug(Concern concern, const QString &message) const;
+    void debug_error(Concern concern, const QString &message) const;
+    void info(Concern concern, const QString &message) const;
+    void warning(Concern concern, const QString &message) const;
+    void error(Concern concern, const QString &message) const;
+    void fatal(Concern concern, const QString &message) const;
 };
 
 #endif // LOG_H

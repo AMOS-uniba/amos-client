@@ -1,9 +1,21 @@
-#include "baselogger.h"
+#include "include.h"
 
-BaseLogger::BaseLogger(QObject *parent, const QString &filename): QObject(parent) {
-    if (!filename.isEmpty()) {
-        this->m_file = new QFile();
-        this->m_file->setFileName(filename);
+BaseLogger::BaseLogger(QObject *parent, const QString &filename):
+    QObject(parent),
+    m_filename(filename)
+{
+}
+
+void BaseLogger::initialize(void) {
+    this->m_directory.setPath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    qDebug() << this->m_directory.path();
+
+    if (!QDir().mkpath(this->m_directory.path())) {
+        throw ConfigurationError(QString("Could not create log folder %1").arg(this->m_directory.path()));
+    }
+
+    if (!this->m_filename.isEmpty()) {
+        this->m_file = new QFile(QString("%1/%2").arg(this->m_directory.path(), this->m_filename));
         this->m_file->open(QIODevice::Append | QIODevice::Text);
     }
 }

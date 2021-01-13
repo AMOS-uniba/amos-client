@@ -19,13 +19,14 @@ public:
     Sighting(const QString &prefix);
     ~Sighting(void);
 
+    qint64 avi_size(void) const;
+
     QHttpPart jpg_part(void) const;
     QHttpPart xml_part(void) const;
     QHttpPart json_metadata(void) const;
 
     void move(const QString &prefix);
-    void copy(const QString &prefix);
-    qint64 avi_size(void) const;
+    void copy(const QString &prefix) const;
 };
 
 #endif // SIGHTING_H

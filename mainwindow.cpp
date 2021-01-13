@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 #include "include.h"
 
-
 extern EventLogger logger;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -82,14 +81,14 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 void MainWindow::on_button_send_heartbeat_pressed() {
-    this->send_heartbeat();
+    this->heartbeat();
 }
 
 void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
-        QString("Select %1 storage directory").arg(storage->get_name()),
-        storage->get_directory().path(),
+        QString("Select %1 storage directory").arg(storage->name()),
+        storage->root_directory().path(),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
 
@@ -97,15 +96,11 @@ void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
         logger.debug("Directory selection aborted");
         return;
     } else {
-        storage->set_directory(new_dir);
+        storage->set_root_directory(new_dir);
         edit->setText(new_dir);
         this->display_storage_status();
-        this->settings->setValue(QString("storage/%1").arg(storage->get_name()), new_dir);
+        this->settings->setValue(QString("storage/%1").arg(storage->name()), new_dir);
     }
-}
-
-void MainWindow::on_bt_primary_clicked() {
-    this->set_storage(this->station->primary_storage(), this->ui->le_primary);
 }
 
 void MainWindow::on_bt_permanent_clicked() {
@@ -263,4 +258,31 @@ void MainWindow::on_co_serial_ports_activated(int index) {
         }
     }
 
+}
+
+void MainWindow::on_bt_watch_directory_clicked() {
+    QString new_dir = QFileDialog::getExistingDirectory(
+        this,
+        "Select UFO output directory to watch",
+        this->station->scanner()->directory().path(),
+        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
+    );
+
+    if (new_dir == "") {
+        logger.debug("Watch directory selection aborted");
+    } else {
+        this->station->set_scanner(new_dir);
+        this->ui->le_primary->setText(new_dir);
+        this->display_storage_status();
+        this->settings->setValue(QString("storage/watch"), new_dir);
+        logger.info(QString("Watch directory set to %1").arg(new_dir));
+    }
+}
+
+void MainWindow::on_bt_watch_open_clicked() {
+    QDesktopServices::openUrl(this->station->scanner()->directory().path());
+}
+
+void MainWindow::on_bt_permanent_open_clicked() {
+    QDesktopServices::openUrl(this->station->primary_storage()->current_directory().path());
 }

@@ -29,12 +29,13 @@ Station::Station(const QString& id):
     m_id(id),
     m_manual_control(false),
     m_safety_override(false),
-    m_state(StationState::NOT_OBSERVING)
+    m_state(StationState::NOT_OBSERVING),
+    m_filesystemscanner(nullptr),
+    m_server(nullptr)
 {
     this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
-
-    this->m_server = nullptr;
+    this->m_state_logger->initialize();
 
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
@@ -50,11 +51,20 @@ Station::Station(const QString& id):
 Station::~Station(void) {
     delete this->m_dome;
     delete this->m_timer_automatic;
+    delete this->m_filesystemscanner;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
     delete this->m_ufo_manager;
     delete this->m_server;
 }
+
+void Station::set_scanner(const QDir &directory) {
+    delete this->m_filesystemscanner;
+    this->m_filesystemscanner = new FileSystemScanner(directory);
+    this->connect(this->m_filesystemscanner, &FileSystemScanner::sightings_found, this, &Station::process_sightings);
+}
+
+FileSystemScanner* Station::scanner(void) const { return this->m_filesystemscanner; }
 
 void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanent_storage_dir) {
     this->m_primary_storage = new Storage("primary", primary_storage_dir);
@@ -64,8 +74,8 @@ void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanen
 void Station::set_ufo_manager(UfoManager *ufo_manager) { this->m_ufo_manager = ufo_manager; }
 UfoManager* Station::ufo_manager(void) const { return this->m_ufo_manager; }
 
-Storage* Station::primary_storage(void) { return this->m_primary_storage; }
-Storage* Station::permanent_storage(void) { return this->m_permanent_storage; }
+Storage* Station::primary_storage(void) const { return this->m_primary_storage; }
+Storage* Station::permanent_storage(void) const { return this->m_permanent_storage; }
 Dome* Station::dome(void) const { return this->m_dome; }
 
 // Server getters and setters
@@ -90,7 +100,7 @@ void Station::set_position(const double new_latitude, const double new_longitude
     this->m_latitude = new_latitude;
     this->m_longitude = new_longitude;
     this->m_altitude = new_altitude;
-    logger.info(QString("Station position set to %1°, %2°, %3 m").arg(this->m_latitude).arg(this->m_longitude).arg(this->m_altitude));
+    logger.info(Concern::Configuration, QString("Station position set to %1°, %2°, %3 m").arg(this->m_latitude).arg(this->m_longitude).arg(this->m_altitude));
 }
 
 double Station::latitude(void) const { return this->m_latitude; }
@@ -103,7 +113,7 @@ void Station::set_id(const QString &new_id) {
     }
 
     this->m_id = new_id;
-    logger.info(QString("Station id set to '%1'").arg(this->m_id));
+    logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_id));
 }
 
 const QString& Station::get_id(void) const { return this->m_id; }
@@ -121,7 +131,7 @@ void Station::set_darkness_limit(const double new_darkness_limit) {
     }
 
     this->m_darkness_limit = new_darkness_limit;
-    logger.info(QString("Station's darkness limit set to %1°").arg(m_darkness_limit));
+    logger.info(Concern::Configuration, QString("Station's darkness limit set to %1°").arg(m_darkness_limit));
 }
 
 // Humidity limit settings
@@ -143,7 +153,8 @@ void Station::set_humidity_limits(const double new_lower, const double new_upper
 
     this->m_humidity_limit_lower = new_lower;
     this->m_humidity_limit_upper = new_upper;
-    logger.info(QString("Station's humidity limits set to %1% - %2%")
+    logger.info(Concern::Configuration,
+                QString("Station's humidity limits set to %1% - %2%")
                 .arg(this->m_humidity_limit_lower)
                 .arg(this->m_humidity_limit_upper)
     );
@@ -179,7 +190,7 @@ void Station::set_safety_override(bool override) {
     if (this->m_manual_control) {
         this->m_safety_override = override;
     } else {
-        logger.error("Cannot override safety when not in manual mode!");
+        logger.error(Concern::SerialPort, "Cannot override safety when not in manual mode!");
     }
 }
 
@@ -223,16 +234,16 @@ void Station::automatic_check(void) {
     const DomeStateS &stateS = this->m_dome->state_S();
 
     if (!stateS.is_valid()) {
-        logger.debug_error("[AUTO] S state is not valid, automatic loop skipped");
+        logger.debug_error(Concern::Automatic, "S state is not valid, automatic loop skipped");
         return;
     }
 
     // Emergency: close the cover, unless safety overridden
     if (stateS.dome_open_sensor_active() && !this->is_dark()) {
         if (this->m_safety_override) {
-            logger.warning("[AUTO] Emergency override active, not closing");
+            logger.warning(Concern::Automatic, "Emergency override active, not closing");
         } else {
-            logger.warning("[AUTO] Closed the cover (not dark enough)");
+            logger.warning(Concern::Automatic, "Closed the cover (not dark enough)");
             this->close_cover();
         }
     }
@@ -240,46 +251,46 @@ void Station::automatic_check(void) {
     // Emergency: turn off the image intensifier, unless safety overridden
     if (stateS.intensifier_active() && !this->is_dark()) {
         if (this->m_safety_override) {
-            logger.warning("[AUTO] Emergency override active, not turning off the intensifier");
+            logger.warning(Concern::Automatic, "Emergency override active, not turning off the intensifier");
         } else {
-            logger.warning("[AUTO] Turned off the image intensifier (not dark enough)");
+            logger.warning(Concern::Automatic, "Turned off the image intensifier (not dark enough)");
             this->turn_off_intensifier();
         }
     }
 
     if (this->m_manual_control) {
         // If we are in manual mode, pass other automatic checks
-        logger.debug("Manual control mode, passing");
+        logger.debug(Concern::Automatic, "Manual control mode, passing");
     } else {
         if (this->is_dark()) {
             // If it is dark, it is not raining, humidity is low and the computer is running, start observing
             if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active() && !this->is_humid()) {
-                logger.info("[AUTO] Opened the cover");
+                logger.info(Concern::Automatic, "Opened the cover");
                 this->open_cover();
             }
 
             if (stateS.dome_open_sensor_active()) {
                 // If the dome is open, turn on the image intensifier and the fan
                 if (!stateS.intensifier_active()) {
-                    logger.info("[AUTO] Cover open, turned on the image intensifier");
+                    logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
                     this->turn_on_intensifier();
                 }
 
                 if (!stateS.fan_active()) {
-                    logger.info("[AUTO] Turned on the fan");
+                    logger.info(Concern::Automatic, "Turned on the fan");
                     this->turn_on_fan();
                 }
 
                 // But if humidity is very high, close the cover
                 if (this->is_very_humid()) {
-                    logger.info("[AUTO] Closed the cover (high humidity)");
+                    logger.info(Concern::Automatic, "Closed the cover (high humidity)");
                     this->close_cover();
                 }
             }
 
             // If the dome is closed, turn off the intensifier
             if (stateS.dome_closed_sensor_active() && stateS.intensifier_active()) {
-                logger.info("[AUTO] Cover is closed, turned off the intensifier");
+                logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
                 this->turn_off_intensifier();
             }
         }
@@ -323,7 +334,7 @@ void Station::turn_on_intensifier(void) {
     if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
         this->m_dome->send_command(Dome::CommandIIOn);
     } else {
-        logger.warning("Command ignored, sun is too high and override is not active");
+        logger.warning(Concern::SerialPort, "Command ignored, sun is too high and override is not active");
     }
 }
 
@@ -371,19 +382,15 @@ StationState Station::state(void) {
 }
 
 void Station::file_check(void) {
-    logger.debug("Checking files...");
-    for (auto sighting: this->primary_storage()->list_new_sightings()) {
-        this->send_sighting(sighting);
-        this->move_sighting(sighting);
-    }
+    logger.debug(Concern::Automatic, "Checking files...");
 
     this->m_ufo_manager->auto_action(this->is_dark());
 }
 
-void Station::send_sighting(const Sighting &sighting) {
-    this->m_server->send_sighting(sighting);
-}
-
-void Station::move_sighting(Sighting &sighting) {
-    this->m_primary_storage->move_sighting(sighting);
+void Station::process_sightings(QVector<Sighting> sightings) {
+    for (auto &sighting: sightings) {
+        this->m_server->send_sighting(sighting);
+        this->m_permanent_storage->store_sighting(sighting);
+        this->m_primary_storage->store_sighting(sighting, false);
+    }
 }

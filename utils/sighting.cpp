@@ -9,7 +9,7 @@ Sighting::Sighting(const QString& prefix) {
     this->m_avi = this->try_open(QString("%1.avi").arg(prefix));
     this->m_files = {this->m_jpg, this->m_xml, this->m_bmp, this->m_avi};
 
-    logger.info(QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
+    logger.info(Concern::Sightings, QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
     this->m_timestamp = QFileInfo(this->m_xml).birthTime();
 }
 
@@ -30,7 +30,7 @@ qint64 Sighting::avi_size(void) const {
 }
 
 void Sighting::move(const QString &prefix) {
-    logger.debug(QString("Moving to %1").arg(prefix));
+    logger.debug(Concern::Sightings, QString("Moving to %1").arg(prefix));
     QDir().mkpath(prefix);
 
     for (auto &file: this->m_files) {
@@ -40,14 +40,13 @@ void Sighting::move(const QString &prefix) {
     }
 }
 
-void Sighting::copy(const QString &prefix) {
-    logger.debug(QString("Moving to %1").arg(prefix));
+void Sighting::copy(const QString &prefix) const {
+    logger.debug(Concern::Sightings, QString("Moving to %1").arg(prefix));
     QDir().mkpath(prefix);
 
     for (auto &file: this->m_files) {
         QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
         QFile::copy(file, new_path);
-        file = new_path;
     }
 }
 
