@@ -8,7 +8,6 @@ BaseLogger::BaseLogger(QObject *parent, const QString &filename):
 
 void BaseLogger::initialize(void) {
     this->m_directory.setPath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
-    qDebug() << this->m_directory.path();
 
     if (!QDir().mkpath(this->m_directory.path())) {
         throw ConfigurationError(QString("Could not create log folder %1").arg(this->m_directory.path()));

@@ -29,7 +29,7 @@ QString UfoManager::state_string() const {
             return "not running";
             break;
         case UfoState::RUNNING:
-            return QString("running (%1)").arg(this->m_process.pid()->dwProcessId);
+            return QString("running (%1)").arg(this->m_process.processId());
             break;
         default:
             return "undefined";
@@ -91,7 +91,7 @@ void UfoManager::start_ufo(void) {
         case QProcess::ProcessState::NotRunning: {
             logger.info(Concern::UFO, "Starting");
             this->connect(&this->m_process, &QProcess::stateChanged, this, &UfoManager::update_state);
-            this->m_process.start(this->m_path, {}, QIODevice::ReadWrite);
+            this->m_process.startDetached(this->m_path, {});
             break;
         }
     }

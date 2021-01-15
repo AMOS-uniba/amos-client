@@ -14,15 +14,17 @@ const QMap<Level, LevelInfo> EventLogger::Levels = {
     {Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
 };
 
-const QMap<Concern, QString> EventLogger::Concerns = {
-    {Concern::Automatic, "auto"},
-    {Concern::Configuration, "config"},
-    {Concern::Generic, "-"},
-    {Concern::Heartbeat, "heartbeat"},
-    {Concern::SerialPort, "serial"},
-    {Concern::Server, "server"},
-    {Concern::Sightings, "sightings"},
-    {Concern::UFO, "UFO"}
+const QMap<Concern, ConcernInfo> EventLogger::Concerns = {
+    {Concern::Automatic, {"AUT", "auto"}},
+    {Concern::Configuration, {"CFG", "config"}},
+    {Concern::Generic, {"---", "-"}},
+    {Concern::Heartbeat, {"HBT", "heartbeat"}},
+    {Concern::SerialPort, {"SRP", "serial"}},
+    {Concern::Server, {"SRV", "server"}},
+    {Concern::Sightings, {"SGH", "sightings"}},
+    {Concern::UFO, {"UFO", "UFO"}},
+    {Concern::Operation, {"OPE", "operation"}},
+    {Concern::Storage, {"STO", "storage"}}
 };
 
 void EventLogger::set_display_widget(QTableWidget *widget) {
@@ -30,7 +32,7 @@ void EventLogger::set_display_widget(QTableWidget *widget) {
 }
 
 QString EventLogger::format(const QDateTime &timestamp, Level level, const QString &concern, const QString &message) const {
-    return QString("%1 [%2] [%3] %4")
+    return QString("%1 %2 | %3: %4")
             .arg(timestamp.toString(Qt::ISODate))
             .arg(EventLogger::Levels[level].code)
             .arg(concern)
@@ -43,7 +45,7 @@ void EventLogger::write(Level level, Concern concern, const QString &message) co
     }
 
     QDateTime now = QDateTime::currentDateTimeUtc();
-    QString full = this->format(now, level, EventLogger::Concerns[concern], message);
+    QString full = this->format(now, level, EventLogger::Concerns[concern].code, message);
     QTextStream out(this->m_file);
     out.setCodec("UTF-8");
 
@@ -63,7 +65,7 @@ void EventLogger::write(Level level, Concern concern, const QString &message) co
         item_level->setTextAlignment(Qt::AlignCenter);
         this->m_display->setItem(this->m_display->rowCount() - 1, 1, item_level);
 
-        QTableWidgetItem *item_concern = new QTableWidgetItem(EventLogger::Concerns[concern]);
+        QTableWidgetItem *item_concern = new QTableWidgetItem(EventLogger::Concerns[concern].name);
         item_concern->setForeground(EventLogger::Levels[level].colour);
         item_concern->setTextAlignment(Qt::AlignCenter);
         this->m_display->setItem(this->m_display->rowCount() - 1, 2, item_concern);

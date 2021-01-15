@@ -73,8 +73,9 @@ private slots:
     void process_display_timer(void);
     void process_watchdog_timer(void);
 
+    // Display
     void display_time(void);
-    void display_sun_properties(void);
+    void display_sun_data(void);
 
     void display_window_title(void);
 
@@ -111,6 +112,7 @@ private slots:
     void show_message();
     void message_clicked();
 
+    // Dome control slots
     void on_bt_lens_heating_clicked();
     void on_bt_intensifier_clicked();
     void on_bt_fan_clicked();
@@ -125,8 +127,8 @@ private slots:
     void on_bt_change_ufo_clicked();
     void on_cb_ufo_auto_stateChanged(int arg1);
     void on_bt_ufo_clicked();
-    void on_bt_watch_directory_clicked();
-    void on_bt_watch_open_clicked();
     void on_bt_permanent_open_clicked();
+    void on_bt_watchdir_open_clicked();
+    void on_bt_watchdir_change_clicked();
 };
 #endif // MAINWINDOW_H

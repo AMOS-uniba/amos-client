@@ -16,7 +16,7 @@ void FileSystemScanner::scan(void) const {
     QVector<Sighting> sightings;
 
     QString dir = this->m_directory.path();
-    logger.debug(QString("Listing files in %1").arg(dir));
+    logger.debug(Concern::Storage, QString("Listing files in %1").arg(dir));
 
     QStringList xmls = this->m_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
@@ -27,12 +27,12 @@ void FileSystemScanner::scan(void) const {
 
             sightings.append(Sighting(prefix));
         } catch (RuntimeException &e) {
-            logger.error(QString("Could not create a sighting: %1").arg(e.what()));
+            logger.error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
         }
-
     }
 
     if (sightings.count() > 0) {
+        logger.debug(Concern::Sightings, QString("%1 sightings found").arg(sightings.count()));
         emit this->sightings_found(sightings);
     }
 }

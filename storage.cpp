@@ -26,7 +26,7 @@ const QDir& Storage::root_directory(void) const {
 }
 
 void Storage::set_root_directory(const QDir &dir) {
-    logger.info(QString("Storage '%1' set to %2").arg(this->m_name).arg(dir.path()));
+    logger.info(Concern::Storage, QString("Storage '%1' set to %2").arg(this->m_name).arg(dir.path()));
     this->m_root_directory = dir;
 }
 

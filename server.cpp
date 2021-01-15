@@ -53,7 +53,13 @@ void Server::send_heartbeat(const QJsonObject &heartbeat) const {
 }
 
 void Server::heartbeat_error(QNetworkReply::NetworkError error) {
-    logger.error(Concern::Server, QString("Heartbeat could not be sent: error %1").arg(error));
+    auto reply = static_cast<QNetworkReply*>(sender());
+    logger.error(Concern::Server,
+                 QString("Heartbeat could not be sent: %1 (error %2: %3)")
+                    .arg(QString(reply->readAll()))
+                    .arg(error)
+                    .arg(reply->errorString())
+    );
 }
 
 void Server::heartbeat_ok(QNetworkReply* reply) {
@@ -64,10 +70,6 @@ void Server::heartbeat_ok(QNetworkReply* reply) {
                 .arg(QString(reply->readAll()))
     );
     reply->deleteLater();
-}
-
-void Server::heartbeat_response(void) {
-    logger.debug(Concern::Server, "Heartbeat response");
 }
 
 void Server::send_sighting(const Sighting &sighting) const {

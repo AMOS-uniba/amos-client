@@ -179,6 +179,34 @@ double Station::sun_azimuth(const QDateTime& time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
+QDateTime Station::next_sunrise(void) const {
+    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 3600) * 3600);
+    double oldalt = this->sun_altitude(now);
+    for (int i = 1; i < 1440; ++i) {
+        QDateTime moment = now.addSecs(60 * i);
+        double alt = this->sun_altitude(moment);
+        if ((oldalt < 0) && (alt > 0)) {
+            return moment;
+        }
+        oldalt = alt;
+    }
+    return QDateTime();
+}
+
+QDateTime Station::next_sunset(void) const {
+    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 3600) * 3600);
+    double oldalt = this->sun_altitude(now);
+    for (int i = 1; i < 1440; ++i) {
+        QDateTime moment = now.addSecs(60 * i);
+        double alt = this->sun_altitude(moment);
+        if ((oldalt > 0) && (alt < 0)) {
+            return moment;
+        }
+        oldalt = alt;
+    }
+    return QDateTime();
+}
+
 // Manual and safety getters and setters
 void Station::set_manual_control(bool manual) {
     this->m_manual_control = manual;
@@ -264,7 +292,12 @@ void Station::automatic_check(void) {
     } else {
         if (this->is_dark()) {
             // If it is dark, it is not raining, humidity is low and the computer is running, start observing
-            if (stateS.dome_closed_sensor_active() && !stateS.rain_sensor_active() && stateS.computer_power_sensor_active() && !this->is_humid()) {
+            if (
+                stateS.dome_closed_sensor_active() &&
+                !stateS.rain_sensor_active() &&
+                stateS.computer_power_sensor_active() &&
+                !this->is_humid()
+            ) {
                 logger.info(Concern::Automatic, "Opened the cover");
                 this->open_cover();
             }
@@ -390,7 +423,7 @@ void Station::file_check(void) {
 void Station::process_sightings(QVector<Sighting> sightings) {
     for (auto &sighting: sightings) {
         this->m_server->send_sighting(sighting);
-        this->m_permanent_storage->store_sighting(sighting);
-        this->m_primary_storage->store_sighting(sighting, false);
+        this->m_permanent_storage->store_sighting(sighting, false);
+        this->m_primary_storage->store_sighting(sighting, true);
     }
 }

@@ -87,6 +87,9 @@ public:
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
 
+    QDateTime next_sunrise(void) const;
+    QDateTime next_sunset(void) const;
+
     void set_ufo_manager(UfoManager *ufo_manager);
     UfoManager* ufo_manager(void) const;
 

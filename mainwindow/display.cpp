@@ -5,6 +5,8 @@
 #include <QLabel>
 #include <QPushButton>
 
+extern EventLogger logger;
+
 /* Display boolean bit `value` in `label`
    using string `on` with colour `colour_on` if true
    using string `off` with colour `colour_off` if false */
@@ -195,11 +197,11 @@ void MainWindow::display_serial_port_info(void) {
     this->ui->lb_serial_data->setText(this->station->dome()->state_S().is_valid() ? "valid data" : "no data");
 }
 
-void MainWindow::display_sun_properties(void) {
+void MainWindow::display_sun_data(void) {
     auto hor = this->station->sun_position();
-    this->ui->lb_hor_altitude->setText(QString("%1°").arg(hor.theta * Deg, 3, 'f', 3));
-    this->ui->lb_hor_altitude->setStyleSheet(QString("QLabel { color: %1; }").arg(Universe::altitude_colour(hor.theta * Deg)));
-    this->ui->lb_hor_azimuth->setText(QString("%1°").arg(fmod(hor.phi * Deg + 360.0, 360.0), 3, 'f', 3));
+    this->ui->lb_sun_alt->setText(QString("%1°").arg(hor.theta * Deg, 3, 'f', 3));
+    this->ui->lb_sun_alt->setStyleSheet(QString("QLabel { color: %1; }").arg(Universe::altitude_colour(hor.theta * Deg)));
+    this->ui->lb_sun_az->setText(QString("%1°").arg(fmod(hor.phi * Deg + 360.0, 360.0), 3, 'f', 3));
 
     if (hor.theta * Deg > 0) {
         this->ui->lb_sun_status->setText("day");
@@ -218,11 +220,14 @@ void MainWindow::display_sun_properties(void) {
     }
 
     auto equ = Universe::compute_sun_equ();
-    this->ui->lb_eq_latitude->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
-    this->ui->lb_eq_longitude->setText(QString("%1°").arg(equ[phi] * Deg, 3, 'f', 3));
+    this->ui->lb_sun_dec->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
+    this->ui->lb_sun_ra->setText(QString("%1°").arg(equ[phi] * Deg, 3, 'f', 3));
 
     auto ecl = Universe::compute_sun_ecl();
-    this->ui->lb_ecl_longitude->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
+    this->ui->lb_sun_ecl_lon->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
+
+    this->ui->lb_sunrise->setText(this->station->next_sunrise().toString("hh:mm"));
+    this->ui->lb_sunset->setText(this->station->next_sunset().toString("hh:mm"));
 }
 
 void MainWindow::display_window_title(void) {
@@ -233,6 +238,7 @@ void MainWindow::display_window_title(void) {
 }
 
 void MainWindow::display_serial_ports(void) {
+    logger.debug(Concern::SerialPort, "Displaying serial ports");
     this->ui->co_serial_ports->clear();
     serial_ports = QSerialPortInfo::availablePorts();
     for (QSerialPortInfo sp: serial_ports) {

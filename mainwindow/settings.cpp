@@ -19,12 +19,12 @@ void MainWindow::load_settings(void) {
         ));
         this->display_ufo_settings();
 
+        this->station->set_scanner(
+            QDir(this->settings->value("storage/watch", "C:\\Data").toString())
+        );
         this->station->set_storages(
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
             QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
-        );
-        this->station->set_scanner(
-            QDir(this->settings->value("storage/watch", "C:\\Data").toString())
         );
         this->station->set_position(
             this->settings->value("station/latitude", 0).toDouble(),
@@ -45,11 +45,11 @@ void MainWindow::load_settings(void) {
         this->ui->cb_manual->setChecked(this->station->is_manual());
         this->ui->cb_safety_override->setEnabled(this->station->is_manual());
 
-        logger.debug("Now setting serial ports...");
+        logger.debug(Concern::Configuration, "Initializing serial ports...");
         serial_ports = QSerialPortInfo::availablePorts();
 
         for (QSerialPortInfo sp: this->serial_ports) {
-            if (sp.portName() == this->settings->value("dome/port")) {
+            if (sp.portName() == this->settings->value("dome/port").toString()) {
                 this->ui->co_serial_ports->setCurrentText(sp.portName());
                 this->station->dome()->set_serial_port(sp.portName());
             }
@@ -64,21 +64,22 @@ void MainWindow::load_settings(void) {
         box.setStandardButtons(QMessageBox::Ok);
         box.exec();
 
-        logger.fatal(postmortem);
+        logger.fatal(Concern::Configuration, postmortem);
         exit(-4);
     }
 }
 
 // Handle changes in station settings
 void MainWindow::on_bt_station_apply_clicked() {
-    // Update ID, if changed
-    if (this->ui->le_station_id->text() != this->station->get_id()) {
-        this->station->set_id(this->ui->le_station_id->text());
-    }
-
-    // If IP or port are changed, update the server settings
-    if ((this->ui->le_ip->text() != this->station->server()->address().toString()) ||
-        (this->ui->sb_port->value() != this->station->server()->port())) {
+    // If ID, IP or port are changed, update the server settings
+    if (
+        (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
+        (this->ui->sb_port->value() != this->station->server()->port()) ||
+        (this->ui->le_station_id->text() != this->station->get_id())
+    ) {
+        if (this->ui->le_station_id->text() != this->station->get_id()) {
+            this->station->set_id(this->ui->le_station_id->text());
+        }
         this->station->server()->set_url(
             QHostAddress(this->ui->le_ip->text()),
             this->ui->sb_port->value(),
@@ -133,7 +134,7 @@ void MainWindow::on_bt_station_apply_clicked() {
 }
 
 void MainWindow::on_bt_station_reset_clicked() {
-    logger.debug("Discard changes to station settings");
+    logger.debug(Concern::Configuration, "Discard changes to station settings");
     this->ui->le_station_id->setText(this->station->get_id());
     this->ui->le_ip->setText(this->station->server()->address().toString());
     this->ui->sb_port->setValue(this->station->server()->port());

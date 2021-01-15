@@ -23,7 +23,7 @@ private:
 private slots:
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_ok(QNetworkReply *reply);
-    void heartbeat_response(void);
+  //  void heartbeat_response(void);
 public:
     Server(const QHostAddress &address, const unsigned short port, const QString &station_id);
     ~Server(void);

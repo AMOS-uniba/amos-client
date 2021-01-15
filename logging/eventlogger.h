@@ -20,21 +20,28 @@ enum class Level {
     Fatal = 0,
 };
 
-enum class Concern {
-    Generic,
-    SerialPort,
-    Server,
-    Sightings,
-    Configuration,
-    Automatic,
-    Heartbeat,
-    UFO,
-};
-
 struct LevelInfo {
     QString code;
     QString name;
     Qt::GlobalColor colour;
+};
+
+enum class Concern {
+    Generic,        // Default
+    SerialPort,     // Connection to the dome
+    Server,         // Connection to server
+    Sightings,      // Sighting objects
+    Configuration,  // User and file configuration
+    Operation,      // Manual operation
+    Automatic,      // Automatic actions
+    Heartbeat,      // Heartbeats
+    UFO,            // UFO manager
+    Storage,        // Scanned directories and storage
+};
+
+struct ConcernInfo {
+    QString code;
+    QString name;
 };
 
 class EventLogger: public BaseLogger {
@@ -44,7 +51,7 @@ private:
     Level logging_level;
 
     const static QMap<Level, LevelInfo> Levels;
-    const static QMap<Concern, QString> Concerns;
+    const static QMap<Concern, ConcernInfo> Concerns;
 
     QString format(const QDateTime &timestamp, Level level, const QString &concern, const QString& message) const;
     void write(Level level, Concern concern, const QString &message) const;

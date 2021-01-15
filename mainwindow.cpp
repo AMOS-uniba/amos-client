@@ -10,15 +10,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->universe = new Universe();
 
     this->ui->tb_log->setColumnWidth(0, 140);
-    this->ui->tb_log->setColumnWidth(1, 80);
+    this->ui->tb_log->setColumnWidth(1, 72);
+    this->ui->tb_log->setColumnWidth(2, 72);
 
     this->display_serial_ports();
 
     logger.set_display_widget(this->ui->tb_log);
-    logger.info("Client initialized");
+    logger.info(Concern::Operation, "Client initialized");
 
     // connect signals for handling of edits of station position
-    this->settings = new QSettings("settings.ini", QSettings::IniFormat, this);
+    this->settings = new QSettings(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation), "settings.ini"), QSettings::IniFormat, this);
     this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
@@ -62,7 +63,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 }
 
 MainWindow::~MainWindow() {
-    logger.info("Terminating normally");
+    logger.info(Concern::Operation, "Terminating normally");
 
     delete this->ui;
     delete this->timer_display;
@@ -93,7 +94,7 @@ void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
     );
 
     if (new_dir == "") {
-        logger.debug("Directory selection aborted");
+        logger.debug(Concern::Configuration, "Directory selection aborted");
         return;
     } else {
         storage->set_root_directory(new_dir);
@@ -111,14 +112,14 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     this->settings->setValue("debug", bool(debug));
 
     logger.set_level(debug ? Level::Debug : Level::Info);
-    logger.warning(QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
+    logger.warning(Concern::Operation, QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
 }
 
 void MainWindow::on_cb_manual_stateChanged(int enable) {
     if (enable) {
-        logger.warning("Switched to manual mode");
+        logger.warning(Concern::Operation, "Switched to manual mode");
     } else {
-        logger.warning("Switched to automatic mode");
+        logger.warning(Concern::Operation, "Switched to automatic mode");
     }
 
     this->station->set_manual_control((bool) enable);
@@ -163,10 +164,10 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
 
 void MainWindow::on_bt_lens_heating_clicked(void) {
     if (this->station->dome()->state_S().lens_heating_active()) {
-        logger.info("Manual command: turn off the hotwire");
+        logger.info(Concern::Operation, "Manual command: turn off the hotwire");
         this->station->turn_off_hotwire();
     } else {
-        logger.info("Manual command: turn on the hotwire");
+        logger.info(Concern::Operation, "Manual command: turn on the hotwire");
         this->station->turn_on_hotwire();
     }
 }
@@ -174,30 +175,30 @@ void MainWindow::on_bt_lens_heating_clicked(void) {
 void MainWindow::on_bt_intensifier_clicked(void) {
     if (this->station->dome()->state_S().intensifier_active()) {
         this->station->turn_off_intensifier();
-        logger.info("Manual command: turn off the intensifier");
+        logger.info(Concern::Operation, "Manual command: turn off the intensifier");
     } else {
         this->station->turn_on_intensifier();
-        logger.info("Manual command: turn on the intensifier");
+        logger.info(Concern::Operation, "Manual command: turn on the intensifier");
     }
 }
 
 void MainWindow::on_bt_fan_clicked(void) {
     if (this->station->dome()->state_S().fan_active()) {
         this->station->turn_off_fan();
-        logger.info("Manual command: turn off the fan");
+        logger.info(Concern::Operation, "Manual command: turn off the fan");
     } else {
         this->station->turn_on_fan();
-        logger.info("Manual command: turn on the fan");
+        logger.info(Concern::Operation, "Manual command: turn on the fan");
     }
 }
 
 void MainWindow::on_bt_cover_open_clicked(void) {
-    logger.info("Manual command: open the cover");
+    logger.info(Concern::Operation, "Manual command: open the cover");
     this->station->open_cover();
 }
 
 void MainWindow::on_bt_cover_close_clicked(void) {
-    logger.info("Manual command: close the cover");
+    logger.info(Concern::Operation, "Manual command: close the cover");
     this->station->close_cover();
 }
 
@@ -214,13 +215,13 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
     );
 
     if (filename == "") {
-        logger.debug("Directory selection aborted");
+        logger.debug(Concern::UFO, "Directory selection aborted");
         return;
     } else {
         if (filename == this->station->ufo_manager()->path()) {
-            logger.debug("[UFO] Path not changed");
+            logger.debug(Concern::UFO, "Path not changed");
         } else {
-            logger.debug("[UFO] Path changed");
+            logger.debug(Concern::UFO, "Path changed");
             this->settings->setValue("ufo/path", filename);
             this->station->ufo_manager()->set_path(filename);
             this->display_ufo_settings();
@@ -245,14 +246,14 @@ void MainWindow::on_co_serial_ports_activated(int index) {
     QString port = this->serial_ports[index].portName();
 
     if (this->ui->co_serial_ports->count() == 0) {
-        logger.warning("No serial ports found");
+        logger.warning(Concern::SerialPort, "No serial ports found");
         this->station->dome()->clear_serial_port();
     } else {
         if (index == -1) {
-            logger.warning("Index is -1");
+            logger.warning(Concern::SerialPort, "Index is -1");
             this->station->dome()->clear_serial_port();
         } else {
-            logger.info(QString("Serial port set to %1").arg(port));
+            logger.info(Concern::SerialPort, QString("Serial port set to %1").arg(port));
             this->station->dome()->set_serial_port(port);
             this->settings->setValue("dome/port", port);
         }
@@ -260,7 +261,7 @@ void MainWindow::on_co_serial_ports_activated(int index) {
 
 }
 
-void MainWindow::on_bt_watch_directory_clicked() {
+void MainWindow::on_bt_watchdir_change_clicked() {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
         "Select UFO output directory to watch",
@@ -269,17 +270,17 @@ void MainWindow::on_bt_watch_directory_clicked() {
     );
 
     if (new_dir == "") {
-        logger.debug("Watch directory selection aborted");
+        logger.debug(Concern::Storage, "Watch directory selection aborted");
     } else {
         this->station->set_scanner(new_dir);
         this->ui->le_primary->setText(new_dir);
         this->display_storage_status();
         this->settings->setValue(QString("storage/watch"), new_dir);
-        logger.info(QString("Watch directory set to %1").arg(new_dir));
+        logger.info(Concern::Storage, QString("Watch directory set to %1").arg(new_dir));
     }
 }
 
-void MainWindow::on_bt_watch_open_clicked() {
+void MainWindow::on_bt_watchdir_open_clicked() {
     QDesktopServices::openUrl(this->station->scanner()->directory().path());
 }
 
