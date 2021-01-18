@@ -103,6 +103,7 @@ void MainWindow::on_bt_station_apply_clicked() {
     // Update the darkness limit, if changed
     if (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) {
         this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
+        this->display_sun_longterm();
     }
 
     // Update the humidity limits, if changed

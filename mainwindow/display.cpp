@@ -219,6 +219,10 @@ void MainWindow::display_sun_data(void) {
         }
     }
 
+}
+
+// Display slowly varying properties of the Sun (somewhat computationally expensive)
+void MainWindow::display_sun_longterm(void) {
     auto equ = Universe::compute_sun_equ();
     this->ui->lb_sun_dec->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
     this->ui->lb_sun_ra->setText(QString("%1°").arg(equ[phi] * Deg, 3, 'f', 3));
@@ -226,8 +230,11 @@ void MainWindow::display_sun_data(void) {
     auto ecl = Universe::compute_sun_ecl();
     this->ui->lb_sun_ecl_lon->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
 
+    // Compute and display sunrise and sunset
+    this->ui->lb_sun_close->setText(this->station->next_sun_crossing(this->station->darkness_limit(), true).toString("hh:mm"));
     this->ui->lb_sunrise->setText(this->station->next_sunrise().toString("hh:mm"));
     this->ui->lb_sunset->setText(this->station->next_sunset().toString("hh:mm"));
+    this->ui->lb_sun_open->setText(this->station->next_sun_crossing(this->station->darkness_limit(), false).toString("hh:mm"));
 }
 
 void MainWindow::display_window_title(void) {

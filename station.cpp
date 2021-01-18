@@ -180,29 +180,32 @@ double Station::sun_azimuth(const QDateTime& time) const {
 }
 
 QDateTime Station::next_sunrise(void) const {
-    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 3600) * 3600);
-    double oldalt = this->sun_altitude(now);
-    for (int i = 1; i < 1440; ++i) {
-        QDateTime moment = now.addSecs(60 * i);
-        double alt = this->sun_altitude(moment);
-        if ((oldalt < 0) && (alt > 0)) {
-            return moment;
-        }
-        oldalt = alt;
-    }
-    return QDateTime();
+    return this->next_sun_crossing(-0.5, true, 60);
 }
 
 QDateTime Station::next_sunset(void) const {
-    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 3600) * 3600);
+    return this->next_sun_crossing(-0.5, false, 60);
+}
+
+/* Compute next sun crossing of almucantar `altitude` in the specified direction
+ * with resolution of `resolution` seconds (optional, default = 60) */
+QDateTime Station::next_sun_crossing(double altitude, bool direction_up, int resolution) const {
+    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 60) * 60);
     double oldalt = this->sun_altitude(now);
-    for (int i = 1; i < 1440; ++i) {
-        QDateTime moment = now.addSecs(60 * i);
-        double alt = this->sun_altitude(moment);
-        if ((oldalt > 0) && (alt < 0)) {
-            return moment;
+
+    for (int i = 1; i < 86400 / resolution; ++i) {
+        QDateTime moment = now.addSecs(resolution * i);
+        double newalt = this->sun_altitude(moment);
+        if (direction_up) {
+            if ((oldalt < altitude) && (newalt > altitude)) {
+                return moment;
+            }
+        } else {
+            if ((oldalt > altitude) && (newalt < altitude)) {
+                return moment;
+            }
         }
-        oldalt = alt;
+        oldalt = newalt;
     }
     return QDateTime();
 }

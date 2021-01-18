@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->display_storage_status();
     this->display_ufo_state();
     this->display_window_title();
+    this->process_longterm_timer();
 }
 
 MainWindow::~MainWindow() {

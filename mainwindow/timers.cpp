@@ -16,6 +16,11 @@ void MainWindow::create_timers(void) {
     this->timer_watchdog->setInterval(1000);
     this->connect(this->timer_watchdog, &QTimer::timeout, this, &MainWindow::process_watchdog_timer);
     this->timer_watchdog->start();
+
+    this->timer_longterm = new QTimer(this);
+    this->timer_longterm->setInterval(360000);
+    this->connect(this->timer_longterm, &QTimer::timeout, this, &MainWindow::process_longterm_timer);
+    this->timer_longterm->start();
 }
 
 void MainWindow::process_display_timer(void) {
@@ -25,6 +30,10 @@ void MainWindow::process_display_timer(void) {
     this->display_cover_status();
     this->display_sun_data();
     this->display_serial_port_info();
+}
+
+void MainWindow::process_longterm_timer(void) {
+    this->display_sun_longterm();
 }
 
 void MainWindow::process_watchdog_timer(void) {

@@ -35,7 +35,7 @@ public:
     ~MainWindow();
 
 private:
-    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
+    QTimer *timer_display, *timer_heartbeat, *timer_watchdog, *timer_longterm;
     Ui::MainWindow *ui;
     QSettings *settings;
 
@@ -72,10 +72,12 @@ private slots:
 
     void process_display_timer(void);
     void process_watchdog_timer(void);
+    void process_longterm_timer(void);
 
     // Display
     void display_time(void);
     void display_sun_data(void);
+    void display_sun_longterm(void);
 
     void display_window_title(void);
 
