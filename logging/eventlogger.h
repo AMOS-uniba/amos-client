@@ -61,14 +61,6 @@ public:
     void set_display_widget(QTableWidget *widget);
     void set_level(Level new_level);
 
-    void detail(const QString &message) const;
-    void debug(const QString &message) const;
-    void debug_error(const QString &message) const;
-    void info(const QString &message) const;
-    void warning(const QString &message) const;
-    void error(const QString &message) const;
-    void fatal(const QString &message) const;
-
     void detail(Concern concern, const QString &message) const;
     void debug(Concern concern, const QString &message) const;
     void debug_error(Concern concern, const QString &message) const;

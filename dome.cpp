@@ -62,6 +62,8 @@ void Dome::set_serial_port(const QString &port) {
         this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &Dome::process_response);
         this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &Dome::handle_error);
         logger.info(Concern::SerialPort, QString("Opened %1").arg(this->m_serial_port->portName()));
+
+        emit this->serial_port_changed(port);
     } else {
         logger.error(Concern::SerialPort, QString("Could not open %1: %2")
                      .arg(this->m_serial_port->portName())
@@ -114,7 +116,7 @@ void Dome::send(const QByteArray &message) const {
         return;
     } else {
         if (!this->m_serial_port->isOpen()) {
-            logger.debug_error(QString("Cannot send, serial port %1 is not open").arg(this->m_serial_port->portName()));
+            logger.debug_error(Concern::SerialPort, QString("Cannot send, serial port %1 is not open").arg(this->m_serial_port->portName()));
         } else {
             Telegram telegram(this->m_address, message);
             this->m_serial_port->write(telegram.compose());

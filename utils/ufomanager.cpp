@@ -9,7 +9,10 @@ extern EventLogger logger;
 UfoManager::UfoManager(const QString &path, bool autostart):
     m_path(path),
     m_autostart(autostart),
-    m_state(UfoState::NOT_RUNNING) {}
+    m_process(this),
+    m_state(UfoState::NOT_RUNNING)
+{}
+
 
 UfoManager::~UfoManager(void) {
     this->stop_ufo();
@@ -90,8 +93,11 @@ void UfoManager::start_ufo(void) {
         }
         case QProcess::ProcessState::NotRunning: {
             logger.info(Concern::UFO, "Starting");
+            this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+            this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
+//            this->m_process.setProgram()
             this->connect(&this->m_process, &QProcess::stateChanged, this, &UfoManager::update_state);
-            this->m_process.startDetached(this->m_path, {});
+            this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
             break;
         }
     }

@@ -84,14 +84,6 @@ void EventLogger::set_level(Level new_level) {
     this->logging_level = new_level;
 }
 
-void EventLogger::detail(const QString &message) const { this->write(Level::DebugDetail, Concern::Generic, message); }
-void EventLogger::debug_error(const QString &message) const { this->write(Level::DebugError, Concern::Generic, message); }
-void EventLogger::debug(const QString &message) const { this->write(Level::Debug, Concern::Generic, message); }
-void EventLogger::info(const QString &message) const { this->write(Level::Info, Concern::Generic, message); }
-void EventLogger::warning(const QString &message) const { this->write(Level::Warning, Concern::Generic, message); }
-void EventLogger::error(const QString &message) const { this->write(Level::Error, Concern::Generic, message); }
-void EventLogger::fatal(const QString &message) const { this->write(Level::Fatal, Concern::Generic, message); }
-
 void EventLogger::detail(Concern concern, const QString &message) const { this->write(Level::DebugDetail, concern, message); }
 void EventLogger::debug_error(Concern concern, const QString &message) const { this->write(Level::DebugError, concern, message); }
 void EventLogger::debug(Concern concern, const QString &message) const { this->write(Level::Debug, concern, message); }

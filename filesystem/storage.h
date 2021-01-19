@@ -1,24 +1,21 @@
 #include "forward.h"
 
+#include "filesystem/manager.h"
+
 #ifndef STORAGE_H
 #define STORAGE_H
 
-class Storage {
+class Storage: public FileSystemManager {
 private:
     QString m_name;
-    QDir m_root_directory;
-    QDir m_active_directory;
 public:
     Storage(const QString &name, const QDir &directory);
-    QStorageInfo info(void) const;
     QJsonObject json(void) const;
     const QString& name(void) const;
 
-    const QDir current_directory(void) const;
-    const QDir& root_directory(void) const;
-    void set_root_directory(const QDir &dir);
+    const QDir current_directory(const QDateTime &datetime = QDateTime::currentDateTimeUtc()) const;
 
-
+    void set_directory(const QDir &dir) override;
 public slots:
     void store_sighting(Sighting &sighting, bool del = false) const;
 };

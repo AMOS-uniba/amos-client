@@ -35,6 +35,10 @@ public:
 public slots:
     void send_heartbeat(const QJsonObject &heartbeat) const;
     void send_sighting(const Sighting &sighting) const;
+
+signals:
+    void heartbeat_sent(void) const;
+    void url_set(const QString &new_url) const;
 };
 
 #endif // SERVER_H

@@ -26,6 +26,8 @@ void MainWindow::load_settings(void) {
             QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
             QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
         );
+        this->display_permanent_storage_current_directory();
+
         this->station->set_position(
             this->settings->value("station/latitude", 0).toDouble(),
             this->settings->value("station/longitude", 0).toDouble(),

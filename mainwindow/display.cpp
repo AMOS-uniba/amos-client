@@ -48,7 +48,7 @@ void MainWindow::display_storage_status(const Storage *storage, QProgressBar *pb
     unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
     pb->setMaximum(total);
     pb->setValue(total - used);
-    le->setText(storage->root_directory().path());
+    le->setText(storage->directory().path());
 }
 
 void MainWindow::display_cover_status(void) {
@@ -159,8 +159,15 @@ void MainWindow::display_shaft_position(void) {
     this->ui->progress_cover->setValue(state.shaft_position());
 }
 
-void MainWindow::display_storage_status(void) {
-    this->display_storage_status(this->station->primary_storage(), this->ui->pb_primary, this->ui->le_primary);
+void MainWindow::display_storages(void) {
+    this->ui->le_watchdir->setText(this->station->scanner()->directory().path());
+
+    auto info = this->station->scanner()->info();
+    unsigned int total = (int) ((double) info.bytesTotal() / (1 << 30));
+    unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
+    this->ui->pb_watchdir->setMaximum(total);
+    this->ui->pb_watchdir->setValue(total - used);
+
     this->display_storage_status(this->station->permanent_storage(), this->ui->pb_permanent, this->ui->le_permanent);
 }
 
@@ -232,8 +239,8 @@ void MainWindow::display_sun_longterm(void) {
 
     // Compute and display sunrise and sunset
     this->ui->lb_sun_close->setText(this->station->next_sun_crossing(this->station->darkness_limit(), true).toString("hh:mm"));
-    this->ui->lb_sunrise->setText(this->station->next_sunrise().toString("hh:mm"));
-    this->ui->lb_sunset->setText(this->station->next_sunset().toString("hh:mm"));
+    this->ui->lb_sunrise->setText(this->station->next_sun_crossing(-0.5, true).toString("hh:mm"));
+    this->ui->lb_sunset->setText(this->station->next_sun_crossing(-0.5, false).toString("hh:mm"));
     this->ui->lb_sun_open->setText(this->station->next_sun_crossing(this->station->darkness_limit(), false).toString("hh:mm"));
 }
 
@@ -253,3 +260,9 @@ void MainWindow::display_serial_ports(void) {
     }
 }
 
+void MainWindow::display_permanent_storage_current_directory(void) {
+    this->ui->lb_permanent_current->setText(
+        QString("Currently <b>%1</b>")
+            .arg(QDir::cleanPath(this->station->permanent_storage()->current_directory().path()))
+    );
+}

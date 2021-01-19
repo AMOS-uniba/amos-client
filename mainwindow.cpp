@@ -57,10 +57,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->display_cover_status();
     this->display_station_config();
-    this->display_storage_status();
+    this->display_storages();
     this->display_ufo_state();
     this->display_window_title();
     this->process_longterm_timer();
+
+    this->connect(this->station->permanent_storage(), &FileSystemManager::directory_set, this, &MainWindow::display_permanent_storage_current_directory);
+    this->connect(this->station->scanner(), static_cast<void (FileSystemManager::*)(const QDir&)>(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
 }
 
 MainWindow::~MainWindow() {
@@ -90,7 +93,7 @@ void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
         QString("Select %1 storage directory").arg(storage->name()),
-        storage->root_directory().path(),
+        storage->directory().path(),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
 
@@ -98,9 +101,9 @@ void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
         logger.debug(Concern::Configuration, "Directory selection aborted");
         return;
     } else {
-        storage->set_root_directory(new_dir);
+        storage->set_directory(new_dir);
         edit->setText(new_dir);
-        this->display_storage_status();
+        this->display_storages();
         this->settings->setValue(QString("storage/%1").arg(storage->name()), new_dir);
     }
 }
@@ -116,15 +119,10 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     logger.warning(Concern::Operation, QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
 }
 
-void MainWindow::on_cb_manual_stateChanged(int enable) {
-    if (enable) {
-        logger.warning(Concern::Operation, "Switched to manual mode");
-    } else {
-        logger.warning(Concern::Operation, "Switched to automatic mode");
-    }
+void MainWindow::on_cb_manual_stateChanged(int manual) {
+    logger.warning(Concern::Operation, QString("Switched to %1 mode").arg(manual ? "manual" : "automatic"));
 
-    this->station->set_manual_control((bool) enable);
-
+    this->station->set_manual_control((bool) manual);
     this->settings->setValue("manual", this->station->is_manual());
 
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
@@ -274,17 +272,15 @@ void MainWindow::on_bt_watchdir_change_clicked() {
         logger.debug(Concern::Storage, "Watch directory selection aborted");
     } else {
         this->station->set_scanner(new_dir);
-        this->ui->le_primary->setText(new_dir);
-        this->display_storage_status();
+        this->ui->le_watchdir->setText(new_dir);
         this->settings->setValue(QString("storage/watch"), new_dir);
-        logger.info(Concern::Storage, QString("Watch directory set to %1").arg(new_dir));
     }
 }
 
 void MainWindow::on_bt_watchdir_open_clicked() {
-    QDesktopServices::openUrl(this->station->scanner()->directory().path());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->scanner()->directory().path()));
 }
 
 void MainWindow::on_bt_permanent_open_clicked() {
-    QDesktopServices::openUrl(this->station->primary_storage()->current_directory().path());
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->primary_storage()->current_directory().path()));
 }

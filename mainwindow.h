@@ -57,7 +57,7 @@ private:
 
     void display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off);
     void display_device_button(QPushButton *button, bool on);
-    void display_sensor_value(QLabel *label, float value, const QString& unit);
+    void display_sensor_value(QLabel *label, float value, const QString &unit = "");
 
     //CommThread comm_thread;
 
@@ -88,10 +88,12 @@ private slots:
     void display_device_buttons_state(void);
 
     void display_cover_status(void);
-    void display_storage_status(void);
+    void display_storages(void);
     void display_station_config(void);
     void display_ufo_settings(void);
     void display_ufo_state(void);
+
+    void display_permanent_storage_current_directory(void);
 
     void on_station_edited(void);
 
@@ -104,7 +106,7 @@ private slots:
 
     void on_bt_permanent_clicked();
 
-    void on_cb_manual_stateChanged(int enable);
+    void on_cb_manual_stateChanged(int manual);
     void on_cb_debug_stateChanged(int debug);
     void on_co_serial_ports_activated(int index);
 

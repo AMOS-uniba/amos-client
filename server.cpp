@@ -36,7 +36,10 @@ void Server::set_url(const QHostAddress &address, const unsigned short port, con
             .arg(this->m_port)
             .arg(station_id)
     );
-    logger.info(Concern::Server, QString("Address set to %1:%2").arg(this->m_address.toString()).arg(this->m_port));
+    QString full_address = QString("%1:%2").arg(this->m_address.toString()).arg(this->m_port);
+    logger.info(Concern::Server, QString("Address set to %1").arg(full_address));
+
+    emit this->url_set(full_address);
 }
 
 void Server::send_heartbeat(const QJsonObject &heartbeat) const {
@@ -70,6 +73,8 @@ void Server::heartbeat_ok(QNetworkReply* reply) {
                 .arg(QString(reply->readAll()))
     );
     reply->deleteLater();
+
+    emit this->heartbeat_sent();
 }
 
 void Server::send_sighting(const Sighting &sighting) const {

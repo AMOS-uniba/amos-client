@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1211</width>
-    <height>912</height>
+    <width>1204</width>
+    <height>947</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -326,6 +326,7 @@
                 <font>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -358,6 +359,7 @@
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -382,6 +384,7 @@
                 <font>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -399,6 +402,7 @@
                 <font>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -416,6 +420,7 @@
                 <font>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -462,6 +467,7 @@
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -480,6 +486,7 @@
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -1607,7 +1614,7 @@
              <string>°</string>
             </property>
             <property name="decimals">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="minimum">
              <double>-18.000000000000000</double>
@@ -1616,7 +1623,7 @@
              <double>0.000000000000000</double>
             </property>
             <property name="singleStep">
-             <double>0.100000000000000</double>
+             <double>0.500000000000000</double>
             </property>
            </widget>
           </item>
@@ -1854,7 +1861,7 @@
             </property>
             <layout class="QGridLayout" name="gridLayout_10">
              <item row="2" column="0" colspan="2">
-              <widget class="QProgressBar" name="pb_primary">
+              <widget class="QProgressBar" name="pb_watchdir">
                <property name="maximum">
                 <number>400</number>
                </property>
@@ -1881,9 +1888,12 @@
               </widget>
              </item>
              <item row="0" column="0" colspan="2">
-              <widget class="QLineEdit" name="le_primary">
+              <widget class="QLineEdit" name="le_watchdir">
                <property name="cursor">
                 <cursorShape>ForbiddenCursor</cursorShape>
+               </property>
+               <property name="text">
+                <string>undefined</string>
                </property>
                <property name="readOnly">
                 <bool>true</bool>
@@ -1899,7 +1909,14 @@
              <string>Permanent storage</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_9">
-             <item row="2" column="0" colspan="2">
+             <item row="2" column="0">
+              <widget class="QPushButton" name="bt_permanent">
+               <property name="text">
+                <string>Change</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2">
               <widget class="QProgressBar" name="pb_permanent">
                <property name="maximum">
                 <number>400</number>
@@ -1912,14 +1929,7 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="bt_permanent">
-               <property name="text">
-                <string>Change</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
+             <item row="2" column="1">
               <widget class="QPushButton" name="bt_permanent_open">
                <property name="text">
                 <string>Open</string>
@@ -1931,8 +1941,18 @@
                <property name="cursor">
                 <cursorShape>ForbiddenCursor</cursorShape>
                </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
                <property name="readOnly">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="QLabel" name="lb_permanent_current">
+               <property name="text">
+                <string>undefined</string>
                </property>
               </widget>
              </item>
@@ -1965,7 +1985,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1211</width>
+     <width>1204</width>
      <height>21</height>
     </rect>
    </property>
@@ -2024,7 +2044,7 @@
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>bt_station_reset</tabstop>
   <tabstop>bt_station_apply</tabstop>
-  <tabstop>le_primary</tabstop>
+  <tabstop>le_watchdir</tabstop>
   <tabstop>le_permanent</tabstop>
   <tabstop>cb_debug</tabstop>
   <tabstop>button_send_heartbeat</tabstop>

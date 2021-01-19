@@ -53,6 +53,11 @@ public:
     void set_scanner(const QDir &directory);
     FileSystemScanner* scanner(void) const;
 
+
+    Dome* dome(void) const;
+
+    QJsonObject prepare_heartbeat(void) const;
+
     // G&S for storage
     void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
     Storage* primary_storage(void) const;
@@ -67,10 +72,11 @@ public:
     double longitude(void) const;
     double altitude(void) const;
 
+    // G&S for ID
     const QString& get_id(void) const;
     void set_id(const QString& new_id);
 
-    // Darkness getters and setters
+    // Darkness limit getters and setters
     bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     void set_darkness_limit(const double new_altitude_dark);
     double darkness_limit(void) const;
@@ -88,21 +94,16 @@ public:
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
 
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
-    QDateTime next_sunrise(void) const;
-    QDateTime next_sunset(void) const;
 
     void set_ufo_manager(UfoManager *ufo_manager);
     UfoManager* ufo_manager(void) const;
 
+    // Manual control and
     void set_manual_control(bool manual);
     bool is_manual(void) const;
 
     void set_safety_override(bool override);
     bool is_safety_overridden(void) const;
-
-    Dome* dome(void) const;
-
-    QJsonObject prepare_heartbeat(void) const;
 
     // Command wrappers
     void open_cover(void);
@@ -129,6 +130,11 @@ public slots:
 
 signals:
     void state_changed(void) const;
+
+    void id_changed(void) const;
+    void position_changed(void) const;
+    void darkness_limit_changed(double new_limit) const;
+    void humidity_limits_changed(double new_low, double new_high) const;
 };
 
 #endif // STATION_H

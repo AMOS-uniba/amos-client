@@ -101,6 +101,8 @@ void Station::set_position(const double new_latitude, const double new_longitude
     this->m_longitude = new_longitude;
     this->m_altitude = new_altitude;
     logger.info(Concern::Configuration, QString("Station position set to %1°, %2°, %3 m").arg(this->m_latitude).arg(this->m_longitude).arg(this->m_altitude));
+
+    emit this->position_changed();
 }
 
 double Station::latitude(void) const { return this->m_latitude; }
@@ -114,6 +116,8 @@ void Station::set_id(const QString &new_id) {
 
     this->m_id = new_id;
     logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_id));
+
+    emit this->id_changed();
 }
 
 const QString& Station::get_id(void) const { return this->m_id; }
@@ -127,11 +131,13 @@ double Station::darkness_limit(void) const { return this->m_darkness_limit; }
 
 void Station::set_darkness_limit(const double new_darkness_limit) {
     if ((new_darkness_limit < -18) || (new_darkness_limit > 0)) {
-        throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(m_darkness_limit));
+        throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(new_darkness_limit));
     }
 
     this->m_darkness_limit = new_darkness_limit;
-    logger.info(Concern::Configuration, QString("Station's darkness limit set to %1°").arg(m_darkness_limit));
+    logger.info(Concern::Configuration, QString("Station's darkness limit set to %1°").arg(this->m_darkness_limit));
+
+    emit this->darkness_limit_changed(new_darkness_limit);
 }
 
 // Humidity limit settings
@@ -158,6 +164,8 @@ void Station::set_humidity_limits(const double new_lower, const double new_upper
                 .arg(this->m_humidity_limit_lower)
                 .arg(this->m_humidity_limit_upper)
     );
+
+    emit this->humidity_limits_changed(new_lower, new_upper);
 }
 
 Polar Station::sun_position(const QDateTime& time) const {
@@ -177,14 +185,6 @@ double Station::sun_altitude(const QDateTime& time) const {
 
 double Station::sun_azimuth(const QDateTime& time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
-}
-
-QDateTime Station::next_sunrise(void) const {
-    return this->next_sun_crossing(-0.5, true, 60);
-}
-
-QDateTime Station::next_sunset(void) const {
-    return this->next_sun_crossing(-0.5, false, 60);
 }
 
 /* Compute next sun crossing of almucantar `altitude` in the specified direction
@@ -294,15 +294,27 @@ void Station::automatic_check(void) {
         logger.debug(Concern::Automatic, "Manual control mode, passing");
     } else {
         if (this->is_dark()) {
-            // If it is dark, it is not raining, humidity is low and the computer is running, start observing
-            if (
-                stateS.dome_closed_sensor_active() &&
-                !stateS.rain_sensor_active() &&
-                stateS.computer_power_sensor_active() &&
-                !this->is_humid()
-            ) {
-                logger.info(Concern::Automatic, "Opened the cover");
-                this->open_cover();
+            if (stateS.dome_closed_sensor_active()) {
+                if (stateS.rain_sensor_active()) {
+                    logger.debug(Concern::Automatic, "Will not open: raining");
+                } else {
+                    if (!stateS.computer_power_sensor_active()) {
+                        logger.debug(Concern::Automatic, "Will not open: master power off");
+                    } else {
+                        if (this->is_humid()) {
+                            logger.debug(Concern::Automatic, "Will not open: humidity is too high");
+                        } else {
+                            logger.info(Concern::Automatic, "Opened the cover");
+                            this->open_cover();
+                        }
+                    }
+                }
+
+                // If the dome is closed, also turn off the intensifier
+                if (stateS.intensifier_active()) {
+                    logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
+                    this->turn_off_intensifier();
+                }
             }
 
             if (stateS.dome_open_sensor_active()) {
@@ -322,12 +334,6 @@ void Station::automatic_check(void) {
                     logger.info(Concern::Automatic, "Closed the cover (high humidity)");
                     this->close_cover();
                 }
-            }
-
-            // If the dome is closed, turn off the intensifier
-            if (stateS.dome_closed_sensor_active() && stateS.intensifier_active()) {
-                logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
-                this->turn_off_intensifier();
             }
         }
     }

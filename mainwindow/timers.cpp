@@ -43,7 +43,7 @@ void MainWindow::process_watchdog_timer(void) {
 
     this->set_icon(this->station->determine_state());
     this->display_ufo_state();
-    this->display_storage_status();
+    this->display_storages();
 }
 
 void MainWindow::heartbeat(void) {

@@ -3,12 +3,14 @@
 extern EventLogger logger;
 
 FileSystemScanner::FileSystemScanner(const QDir &directory):
-    m_directory(directory)
+    FileSystemManager(directory)
 {
     this->m_timer = new QTimer(this);
     this->m_timer->setInterval(1000);
     this->connect(this->m_timer, &QTimer::timeout, this, &FileSystemScanner::scan);
     this->m_timer->start();
+
+    logger.info(Concern::Storage, QString("Watching UFO output in %1").arg(directory.path()));
 }
 
 
@@ -37,4 +39,7 @@ void FileSystemScanner::scan(void) const {
     }
 }
 
-QDir FileSystemScanner::directory(void) const { return this->m_directory; }
+void FileSystemScanner::set_directory(const QDir &directory) {
+    logger.info(Concern::Storage, QString("Scanner directory set to %1").arg(directory.path()));
+    FileSystemManager::set_directory(directory);
+}
