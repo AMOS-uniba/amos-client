@@ -74,6 +74,7 @@ void MainWindow::display_cover_status(void) {
     }
     this->ui->lb_cover_state->setText(text);
     this->ui->lb_cover_state->setStyleSheet(QString("QLabel {color: %1; }").arg(colour));
+    this->ui->lb_cover_comment->setText(this->station->state().display_string());
 
     // Set cover shaft position
     const DomeStateZ &stateZ = this->station->dome()->state_Z();

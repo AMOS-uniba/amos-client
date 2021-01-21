@@ -18,3 +18,7 @@ void FileSystemManager::set_directory(const QDir &dir) {
 
     emit this->directory_set(dir.path());
 }
+
+void FileSystemManager::open_in_explorer(void) const {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->directory().path()));
+}

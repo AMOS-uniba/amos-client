@@ -30,7 +30,9 @@ QT_FORWARD_DECLARE_CLASS(FileSystemScanner);
 
 QT_FORWARD_DECLARE_CLASS(UfoManager);
 
-#include "utils/stationstate.h"
+#include "utils/state/state.h"
+#include "utils/state/stationstate.h"
+#include "utils/state/serialportstate.h"
 #include "utils/domestate.h"
 #include "utils/serialbuffer.h"
 #include "utils/sighting.h"

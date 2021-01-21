@@ -25,24 +25,23 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->create_timers();
 
-    this->connect(this->ui->dsb_latitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_longitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_altitude, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     // connect signals for handling of edits of server address
-    this->connect(this->ui->le_station_id, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->le_ip, static_cast<void (QLineEdit::*)(const QString&)>(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->sb_port, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->le_station_id, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->le_ip, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     // connect signals for handling of edits of safety limits
-    this->connect(this->ui->dsb_darkness_limit, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_lower, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_upper, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
 
     this->create_actions();
     this->create_tray_icon();
-    this->set_icon(StationState::NOT_OBSERVING);
-
+    this->set_icon(Station::NotObserving);
     this->tray_icon->show();
 
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
@@ -53,7 +52,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->dome(), &Dome::state_updated_Z, this, &MainWindow::display_shaft_position);
 
     this->connect(this->station, &Station::state_changed, this, &MainWindow::show_message);
-    this->connect(this->ui->cb_manual, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
+    this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
 
     this->display_cover_status();
     this->display_station_config();
@@ -63,7 +62,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->process_longterm_timer();
 
     this->connect(this->station->permanent_storage(), &FileSystemManager::directory_set, this, &MainWindow::display_permanent_storage_current_directory);
-    this->connect(this->station->scanner(), static_cast<void (FileSystemManager::*)(const QDir&)>(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
+    this->connect(this->station->scanner(), QOverload<const QDir&>::of(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
+
+    this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
 }
 
 MainWindow::~MainWindow() {
@@ -278,9 +279,9 @@ void MainWindow::on_bt_watchdir_change_clicked() {
 }
 
 void MainWindow::on_bt_watchdir_open_clicked() {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->scanner()->directory().path()));
+    this->station->scanner()->open_in_explorer();
 }
 
 void MainWindow::on_bt_permanent_open_clicked() {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->primary_storage()->current_directory().path()));
+    this->station->permanent_storage()->open_in_explorer();
 }

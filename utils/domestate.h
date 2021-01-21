@@ -6,25 +6,7 @@
 
 #include "forward.h"
 
-class SerialPortState {
-private:
-    unsigned char m_code;
-    QString m_display_string;
-public:
-    SerialPortState(unsigned char code, const QString &display_name);
-    unsigned char code(void) const;
-    const QString& display_string(void) const;
-};
 
-enum class CoverState {
-    OPEN,
-    OPENING,
-    CLOSING,
-    CLOSED,
-    SAFETY,
-    UNKNOWN,
-};                              // we might split OPENING and CLOSING to include
-                                // the information if it is before or after SAFETY
 
 class DomeState {
 private:
@@ -40,7 +22,6 @@ public:
     bool is_valid(void) const;
     virtual QJsonValue json(void) const = 0;
 };
-
 
 
 class DomeStateS: public DomeState {

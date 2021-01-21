@@ -13,6 +13,8 @@ public:
 
     virtual void set_directory(const QDir &dir);
     QDir directory(void) const;
+
+    void open_in_explorer(void) const;
 signals:
     void directory_set(const QDir &dir);
 };

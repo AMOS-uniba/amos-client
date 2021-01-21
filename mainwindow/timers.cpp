@@ -41,7 +41,6 @@ void MainWindow::process_watchdog_timer(void) {
         this->display_serial_ports();
     }
 
-    this->set_icon(this->station->determine_state());
     this->display_ufo_state();
     this->display_storages();
 }

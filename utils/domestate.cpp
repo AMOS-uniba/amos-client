@@ -3,13 +3,6 @@
 extern EventLogger logger;
 
 
-SerialPortState::SerialPortState(unsigned char code, const QString &display_string):
-    m_code(code),
-    m_display_string(display_string) {}
-
-unsigned char SerialPortState::code(void) const { return this->m_code; }
-const QString& SerialPortState::display_string(void) const { return this->m_display_string; }
-
 
 DomeState::DomeState(void):
     m_timestamp(QDateTime::currentDateTimeUtc()),

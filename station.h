@@ -29,6 +29,7 @@ private:
     bool m_safety_override;
 
     StationState m_state;
+    void set_state(StationState new_state);
 
     FileSystemScanner *m_filesystemscanner;
     Storage *m_primary_storage;
@@ -43,11 +44,11 @@ private:
     QTimer *m_timer_automatic;
     QTimer *m_timer_file_watchdog;
 public:
+    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, Raining, Humid, NoMasterPower;
+
     Station(const QString& id);
     ~Station(void);
 
-    StationState determine_state(void) const;
-    void check_state(void);
     StationState state(void);
 
     void set_scanner(const QDir &directory);
@@ -129,7 +130,7 @@ public slots:
     void process_sightings(QVector<Sighting> sightings);
 
 signals:
-    void state_changed(void) const;
+    void state_changed(StationState state) const;
 
     void id_changed(void) const;
     void position_changed(void) const;

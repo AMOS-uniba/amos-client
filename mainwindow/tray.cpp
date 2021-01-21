@@ -2,6 +2,8 @@
 
 #include <QMenu>
 
+extern EventLogger logger;
+
 void MainWindow::closeEvent(QCloseEvent *event) {
    /* if (this->tray_icon->isVisible()) {
         this->hide();
@@ -23,6 +25,8 @@ void MainWindow::create_tray_icon() {
 
     this->tray_icon = new QSystemTrayIcon(this);
     this->tray_icon->setContextMenu(trayIconMenu);
+
+    logger.info(Concern::Configuration, "Tray icon created");
 }
 
 void MainWindow::create_actions() {
@@ -40,33 +44,9 @@ void MainWindow::create_actions() {
 }
 
 void MainWindow::set_icon(const StationState &state) {
-    QIcon icon;
-    QString tooltip;
-    switch (state) {
-        case StationState::MANUAL:
-            icon = QIcon(":/images/green.ico");
-            tooltip = "Manual control enabled";
-            break;
-        case StationState::DAY:
-            icon = QIcon(":/images/yellow.ico");
-            tooltip = "Day, not observing";
-            break;
-        case StationState::OBSERVING:
-            icon = QIcon(":/images/blue.ico");
-            tooltip = "Observation in progress";
-            break;
-        case StationState::NOT_OBSERVING:
-            icon = QIcon(":/images/grey.ico");
-            tooltip = "Not observing";
-            break;
-        case StationState::DOME_UNREACHABLE:
-            icon = QIcon(":/images/red.ico");
-            tooltip = "Dome is not responding";
-            break;
-    }
-
-    this->tray_icon->setIcon(icon);
-    this->tray_icon->setToolTip(QString("AMOS controller\n%1").arg(tooltip));
+    logger.warning(Concern::Operation, QString("Icon '%1' %2").arg(QString(state.code()), state.tooltip()));
+    this->tray_icon->setIcon(QIcon(":/images/green.ico"));//state.icon());
+    this->tray_icon->setToolTip(QString("AMOS client\n%1").arg(state.tooltip()));
 }
 
 void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
@@ -87,11 +67,5 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::show_message(void) {
-    switch (this->station->state()) {
-        case StationState::DAY:
-            this->tray_icon->showMessage("AMOS controller", "AMOS is working", QIcon(":/images/images/blue.ico"), 5000);
-            break;
-        default:
-            break;
-    }
+    this->tray_icon->showMessage("AMOS controller", this->station->state().tooltip(), this->station->state().icon(), 5000);
 }

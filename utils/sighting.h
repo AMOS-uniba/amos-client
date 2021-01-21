@@ -9,7 +9,7 @@
 
 class Sighting {
 private:
-    QString m_jpg, m_xml, m_bmp, m_avi;
+    QString m_prefix, m_jpg, m_xml, m_bmp, m_avi;
     QDateTime m_timestamp;
 
     QVector<QString> m_files;
@@ -27,6 +27,8 @@ public:
 
     void move(const QString &prefix);
     void copy(const QString &prefix) const;
+
+    bool hack_Y16(void) const;
 };
 
 #endif // SIGHTING_H

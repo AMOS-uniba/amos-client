@@ -320,6 +320,38 @@
              <string>Environment</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_11">
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_light_sensor">
+               <property name="text">
+                <string>Light sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_t_lens">
+               <property name="text">
+                <string>Lens temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lb_t_lens">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <strikeout>false</strikeout>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="1">
               <widget class="QLabel" name="lb_t_sht">
                <property name="font">
@@ -338,17 +370,10 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="lx_t_lens">
+             <item row="2" column="0">
+              <widget class="QLabel" name="lx_t_sht">
                <property name="text">
-                <string>Lens temperature</string>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="lx_h_sht">
-               <property name="text">
-                <string>SHT humidity</string>
+                <string>SHT temperature</string>
                </property>
               </widget>
              </item>
@@ -371,46 +396,10 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="lx_t_sht">
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_rain_sensor">
                <property name="text">
-                <string>SHT temperature</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="lb_t_lens">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <strikeout>false</strikeout>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="lb_t_cpu">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <strikeout>false</strikeout>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <string>Rain sensor</string>
                </property>
               </widget>
              </item>
@@ -432,36 +421,40 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lx_t_cpu">
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_h_sht">
                <property name="text">
-                <string>Processor temperature</string>
+                <string>SHT humidity</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="lx_rain_sensor">
+             <item row="1" column="1">
+              <widget class="QLabel" name="lb_t_cpu">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <strikeout>false</strikeout>
+                 <kerning>true</kerning>
+                </font>
+               </property>
                <property name="text">
-                <string>Rain sensor</string>
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="lx_light_sensor">
-               <property name="text">
-                <string>Light sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
+             <item row="6" column="0">
               <widget class="QLabel" name="lx_computer_power">
                <property name="text">
                 <string>Master power</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="lb_light_sensor">
+             <item row="6" column="1">
+              <widget class="QLabel" name="lb_computer_power">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -479,8 +472,15 @@
                </property>
               </widget>
              </item>
-             <item row="7" column="1">
-              <widget class="QLabel" name="lb_computer_power">
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_t_cpu">
+               <property name="text">
+                <string>Processor temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="lb_light_sensor">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -513,128 +513,10 @@
              <string>Cover</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="8" column="0" colspan="4">
-              <layout class="QHBoxLayout" name="hl_openclose">
-               <item>
-                <widget class="QPushButton" name="bt_cover_open">
-                 <property name="text">
-                  <string>open</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="bt_cover_close">
-                 <property name="text">
-                  <string>close</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="6" column="3">
-              <widget class="QLabel" name="lb_cover_safety_position">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="3">
-              <widget class="QLabel" name="lb_dome_closed_sensor">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="lx_servo_blocked">
-               <property name="text">
-                <string>Blocked</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
+             <item row="3" column="0">
               <widget class="QLabel" name="lx_dome_moving">
                <property name="text">
                 <string>Servo moving</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="3">
-              <widget class="QLabel" name="lb_servo_blocked">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="lx_dome_closed_sensor">
-               <property name="text">
-                <string>Closed dome sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="lx_dome_open_sensor">
-               <property name="text">
-                <string>Open dome sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="3">
-              <widget class="QLabel" name="lb_dome_open_sensor">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="lx_cover_safety_position">
-               <property name="text">
-                <string>Safety position</string>
                </property>
               </widget>
              </item>
@@ -657,8 +539,28 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="3">
-              <widget class="QLabel" name="lb_dome_moving">
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_dome_cover_direction">
+               <property name="text">
+                <string>Servo direction</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="4">
+              <widget class="QProgressBar" name="progress_cover">
+               <property name="maximum">
+                <number>401</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="3">
+              <widget class="QLabel" name="lb_dome_closed_sensor">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
@@ -676,6 +578,110 @@
               </widget>
              </item>
              <item row="3" column="3">
+              <widget class="QLabel" name="lb_dome_moving">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="lx_dome_closed_sensor">
+               <property name="text">
+                <string>Closed dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_dome_open_sensor">
+               <property name="text">
+                <string>Open dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0" colspan="4">
+              <layout class="QHBoxLayout" name="hl_openclose">
+               <item>
+                <widget class="QPushButton" name="bt_cover_open">
+                 <property name="text">
+                  <string>open</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bt_cover_close">
+                 <property name="text">
+                  <string>close</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="7" column="3">
+              <widget class="QLabel" name="lb_cover_safety_position">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="3">
+              <widget class="QLabel" name="lb_servo_blocked">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="3">
+              <widget class="QLabel" name="lb_dome_open_sensor">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
               <widget class="QLabel" name="lb_dome_cover_direction">
                <property name="font">
                 <font>
@@ -693,23 +699,36 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="lx_dome_cover_direction">
+             <item row="8" column="0">
+              <widget class="QLabel" name="lx_servo_blocked">
                <property name="text">
-                <string>Servo direction</string>
+                <string>Blocked</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_cover_safety_position">
+               <property name="text">
+                <string>Safety position</string>
                </property>
               </widget>
              </item>
              <item row="1" column="0" colspan="4">
-              <widget class="QProgressBar" name="progress_cover">
-               <property name="maximum">
-                <number>401</number>
+              <widget class="QLabel" name="lb_cover_comment">
+               <property name="font">
+                <font>
+                 <pointsize>10</pointsize>
+                 <weight>50</weight>
+                 <italic>false</italic>
+                 <bold>false</bold>
+                 <kerning>true</kerning>
+                </font>
                </property>
-               <property name="value">
-                <number>0</number>
+               <property name="text">
+                <string>undefined</string>
                </property>
-               <property name="format">
-                <string>%v/%m</string>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
                </property>
               </widget>
              </item>
