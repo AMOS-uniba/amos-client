@@ -59,9 +59,13 @@ private:
     void display_device_button(QPushButton *button, bool on);
     void display_sensor_value(QLabel *label, float value, const QString &unit = "");
 
+    QMap<Icon, QIcon> icons;
+
     //CommThread comm_thread;
 
     QList<QSerialPortInfo> serial_ports;
+
+    static QString format_duration(unsigned int seconds);
 
 private slots:
     void load_settings(void);
@@ -134,5 +138,6 @@ private slots:
     void on_bt_permanent_open_clicked();
     void on_bt_watchdir_open_clicked();
     void on_bt_watchdir_change_clicked();
+    void on_actionLogging_options_triggered();
 };
 #endif // MAINWINDOW_H

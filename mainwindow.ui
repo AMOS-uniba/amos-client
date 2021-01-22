@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1204</width>
-    <height>947</height>
+    <width>1279</width>
+    <height>970</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -513,53 +513,28 @@
              <string>Cover</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_2">
-             <item row="3" column="0">
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_dome_closed_sensor">
+               <property name="text">
+                <string>Closed dome sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
               <widget class="QLabel" name="lx_dome_moving">
                <property name="text">
                 <string>Servo moving</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0" colspan="4">
-              <widget class="QLabel" name="lb_cover_state">
-               <property name="font">
-                <font>
-                 <pointsize>12</pointsize>
-                 <weight>75</weight>
-                 <italic>false</italic>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
+             <item row="9" column="0">
+              <widget class="QLabel" name="lx_servo_blocked">
                <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignCenter</set>
+                <string>Blocked</string>
                </property>
               </widget>
              </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="lx_dome_cover_direction">
-               <property name="text">
-                <string>Servo direction</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="4">
-              <widget class="QProgressBar" name="progress_cover">
-               <property name="maximum">
-                <number>401</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-               <property name="format">
-                <string>%v/%m</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="3">
+             <item row="7" column="3">
               <widget class="QLabel" name="lb_dome_closed_sensor">
                <property name="font">
                 <font>
@@ -577,57 +552,14 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="3">
-              <widget class="QLabel" name="lb_dome_moving">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
              <item row="6" column="0">
-              <widget class="QLabel" name="lx_dome_closed_sensor">
-               <property name="text">
-                <string>Closed dome sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="0">
               <widget class="QLabel" name="lx_dome_open_sensor">
                <property name="text">
                 <string>Open dome sensor</string>
                </property>
               </widget>
              </item>
-             <item row="9" column="0" colspan="4">
-              <layout class="QHBoxLayout" name="hl_openclose">
-               <item>
-                <widget class="QPushButton" name="bt_cover_open">
-                 <property name="text">
-                  <string>open</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="bt_cover_close">
-                 <property name="text">
-                  <string>close</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </item>
-             <item row="7" column="3">
+             <item row="8" column="3">
               <widget class="QLabel" name="lb_cover_safety_position">
                <property name="font">
                 <font>
@@ -645,43 +577,25 @@
                </property>
               </widget>
              </item>
-             <item row="8" column="3">
-              <widget class="QLabel" name="lb_servo_blocked">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
+             <item row="10" column="0" colspan="4">
+              <layout class="QHBoxLayout" name="hl_openclose">
+               <item>
+                <widget class="QPushButton" name="bt_cover_open">
+                 <property name="text">
+                  <string>open</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="bt_cover_close">
+                 <property name="text">
+                  <string>close</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
              </item>
              <item row="5" column="3">
-              <widget class="QLabel" name="lb_dome_open_sensor">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="3">
               <widget class="QLabel" name="lb_dome_cover_direction">
                <property name="font">
                 <font>
@@ -700,30 +614,107 @@
               </widget>
              </item>
              <item row="8" column="0">
-              <widget class="QLabel" name="lx_servo_blocked">
-               <property name="text">
-                <string>Blocked</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
               <widget class="QLabel" name="lx_cover_safety_position">
                <property name="text">
                 <string>Safety position</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="4">
-              <widget class="QLabel" name="lb_cover_comment">
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_dome_cover_direction">
+               <property name="text">
+                <string>Servo direction</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="3">
+              <widget class="QLabel" name="lb_dome_open_sensor">
                <property name="font">
                 <font>
-                 <pointsize>10</pointsize>
-                 <weight>50</weight>
-                 <italic>false</italic>
-                 <bold>false</bold>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
                  <kerning>true</kerning>
                 </font>
                </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="3">
+              <widget class="QLabel" name="lb_dome_moving">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="4">
+              <widget class="QProgressBar" name="progress_cover">
+               <property name="maximum">
+                <number>401</number>
+               </property>
+               <property name="value">
+                <number>0</number>
+               </property>
+               <property name="format">
+                <string>%v/%m</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="3">
+              <widget class="QLabel" name="lb_servo_blocked">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="4">
+              <widget class="QLabel" name="lb_cover_state">
+               <property name="font">
+                <font>
+                 <pointsize>12</pointsize>
+                 <weight>75</weight>
+                 <italic>false</italic>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="4">
+              <widget class="QLabel" name="lb_cover_comment">
                <property name="text">
                 <string>undefined</string>
                </property>
@@ -990,39 +981,7 @@
     <item>
      <widget class="QFrame" name="frame">
       <layout class="QGridLayout" name="grid_log">
-       <item row="0" column="0">
-        <widget class="QCheckBox" name="cb_debug">
-         <property name="text">
-          <string>Debug output</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="4">
-        <widget class="QLabel" name="label_heartbeat">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>50</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>? s</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="5">
+       <item row="5" column="0" colspan="7">
         <widget class="QTableWidget" name="tb_log">
          <property name="lineWidth">
           <number>1</number>
@@ -1103,8 +1062,63 @@
          </column>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="label_hb">
+       <item row="0" column="1" rowspan="4">
+        <widget class="QPushButton" name="button_send_heartbeat">
+         <property name="text">
+          <string>Send heartbeat</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="6">
+        <widget class="QLabel" name="lb_next_heartbeat">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>? s</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QLabel" name="lb_uptime">
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>? s</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0" rowspan="2">
+        <widget class="QCheckBox" name="cb_debug">
+         <property name="text">
+          <string>Debug output</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="3">
+        <widget class="QLabel" name="lx_next_heartbeat">
          <property name="minimumSize">
           <size>
            <width>50</width>
@@ -1116,14 +1130,20 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="button_send_heartbeat">
+       <item row="0" column="3">
+        <widget class="QLabel" name="lx_uptime">
+         <property name="minimumSize">
+          <size>
+           <width>50</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="text">
-          <string>Send heartbeat</string>
+          <string>Uptime</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
+       <item row="0" column="2" rowspan="2">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -1928,14 +1948,21 @@
              <string>Permanent storage</string>
             </property>
             <layout class="QGridLayout" name="gridLayout_9">
-             <item row="2" column="0">
+             <item row="5" column="0">
               <widget class="QPushButton" name="bt_permanent">
                <property name="text">
                 <string>Change</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="0" colspan="2">
+             <item row="2" column="0" colspan="2">
+              <widget class="QLabel" name="lb_permanent_current">
+               <property name="text">
+                <string>undefined</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0" colspan="2">
               <widget class="QProgressBar" name="pb_permanent">
                <property name="maximum">
                 <number>400</number>
@@ -1948,14 +1975,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QPushButton" name="bt_permanent_open">
-               <property name="text">
-                <string>Open</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
+             <item row="1" column="0" colspan="2">
               <widget class="QLineEdit" name="le_permanent">
                <property name="cursor">
                 <cursorShape>ForbiddenCursor</cursorShape>
@@ -1968,10 +1988,17 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="QLabel" name="lb_permanent_current">
+             <item row="5" column="1">
+              <widget class="QPushButton" name="bt_permanent_open">
                <property name="text">
-                <string>undefined</string>
+                <string>Open</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QCheckBox" name="cb_permanent_enabled">
+               <property name="text">
+                <string>Also copy to permanent storage</string>
                </property>
               </widget>
              </item>
@@ -2004,7 +2031,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1204</width>
+     <width>1279</width>
      <height>21</height>
     </rect>
    </property>
@@ -2012,9 +2039,10 @@
     <property name="title">
      <string>Operation</string>
     </property>
-    <addaction name="actionManual_control"/>
+    <addaction name="actionLogging_options"/>
+    <addaction name="action_manual"/>
     <addaction name="separator"/>
-    <addaction name="actionExit"/>
+    <addaction name="action_exit"/>
    </widget>
    <addaction name="menuOperation"/>
   </widget>
@@ -2023,12 +2051,12 @@
     <bool>true</bool>
    </property>
   </widget>
-  <action name="actionExit">
+  <action name="action_exit">
    <property name="text">
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionManual_control">
+  <action name="action_manual">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -2037,6 +2065,14 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+M</string>
+   </property>
+  </action>
+  <action name="actionLogging_options">
+   <property name="text">
+    <string>Logging options</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>
@@ -2065,7 +2101,6 @@
   <tabstop>bt_station_apply</tabstop>
   <tabstop>le_watchdir</tabstop>
   <tabstop>le_permanent</tabstop>
-  <tabstop>cb_debug</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
   <tabstop>tb_log</tabstop>
  </tabstops>

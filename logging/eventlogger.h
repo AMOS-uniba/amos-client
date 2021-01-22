@@ -42,6 +42,7 @@ enum class Concern {
 struct ConcernInfo {
     QString code;
     QString name;
+    QString caption;
 };
 
 class EventLogger: public BaseLogger {
@@ -51,7 +52,8 @@ private:
     Level logging_level;
 
     const static QMap<Level, LevelInfo> Levels;
-    const static QMap<Concern, ConcernInfo> Concerns;
+
+    QMap<Concern, bool> debug_visible;
 
     QString format(const QDateTime &timestamp, Level level, const QString &concern, const QString& message) const;
     void write(Level level, Concern concern, const QString &message) const;
@@ -68,6 +70,10 @@ public:
     void warning(Concern concern, const QString &message) const;
     void error(Concern concern, const QString &message) const;
     void fatal(Concern concern, const QString &message) const;
+
+    const static QMap<Concern, ConcernInfo> Concerns;
+    void set_debug_visible(Concern concern, bool visible);
+    bool is_debug_visible(Concern concern) const;
 };
 
 #endif // LOG_H

@@ -32,7 +32,10 @@ void MainWindow::display_sensor_value(QLabel *label, float value, const QString 
         if (unit == "°C") {
             label->setStyleSheet(QString("QLabel { color: %1; }").arg(Station::temperature_colour(value)));
         } else {
-            label->setStyleSheet(QString("QLabel { color: black; }"));
+            label->setStyleSheet(QString("QLabel { color: %1; }").arg(
+                (value < this->station->humidity_limit_lower()) ? "black" :
+                    (value < this->station->humidity_limit_upper()) ? "blue" : "red"
+            ));
         }
     } else {
         label->setText(QString("? %1").arg(unit));
@@ -86,16 +89,7 @@ void MainWindow::display_basic_data(void) {
     const DomeStateS &state = this->station->dome()->state_S();
 
     if (state.is_valid()) {
-        unsigned int time_alive = state.time_alive();
-        unsigned int days = time_alive / 86400;
-        unsigned int hours = (time_alive % 86400) / 3600;
-        unsigned int minutes = (time_alive % 3600) / 60;
-        unsigned int seconds = time_alive % 60;
-        this->ui->lb_time_alive->setText(QString("%1d %2:%3:%4")
-                                         .arg(days)
-                                         .arg(hours, 2, 10, QChar('0'))
-                                         .arg(minutes, 2, 10, QChar('0'))
-                                         .arg(seconds, 2, 10, QChar('0')));
+        this->ui->lb_time_alive->setText(this->format_duration(state.time_alive()));
     } else {
         this->ui->lb_time_alive->setText("?");
     }
@@ -197,7 +191,10 @@ void MainWindow::display_ufo_state(void) {
 
 void MainWindow::display_time(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
-    ui->label_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
+    ui->lb_next_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
+    this->ui->lb_uptime->setText(
+        this->format_duration(this->settings->value("run/last_run").toDateTime().secsTo(QDateTime::currentDateTimeUtc()))
+    );
 }
 
 void MainWindow::display_serial_port_info(void) {

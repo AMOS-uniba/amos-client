@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include "include.h"
 
+#include "logging/loggingdialog.h"
+
 extern EventLogger logger;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
@@ -41,7 +43,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->create_actions();
     this->create_tray_icon();
-    this->set_icon(Station::NotObserving);
+    this->icons = {
+        {Icon::Daylight, QIcon(":/images/yellow.ico")},
+        {Icon::Failure, QIcon(":/images/red.ico")},
+        {Icon::Manual, QIcon(":/images/green.ico")},
+        {Icon::Observing, QIcon(":/images/blue.ico")},
+        {Icon::NotObserving, QIcon(":/images/grey.ico")},
+    };
+    this->set_icon(Station::Manual);
     this->tray_icon->show();
 
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
@@ -65,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->scanner(), QOverload<const QDir&>::of(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
 
     this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
+    this->set_icon(this->station->state());
 }
 
 MainWindow::~MainWindow() {
@@ -77,6 +87,19 @@ MainWindow::~MainWindow() {
 
     delete this->universe;
     delete this->station;
+}
+
+QString MainWindow::format_duration(unsigned int duration) {
+    unsigned int days = duration / 86400;
+    unsigned int hours = (duration % 86400) / 3600;
+    unsigned int minutes = (duration % 3600) / 60;
+    unsigned int seconds = duration % 60;
+
+    return QString("%1d %2:%3:%4")
+        .arg(days)
+        .arg(hours, 2, 10, QChar('0'))
+        .arg(minutes, 2, 10, QChar('0'))
+        .arg(seconds, 2, 10, QChar('0'));
 }
 
 void MainWindow::message_clicked() {
@@ -284,4 +307,9 @@ void MainWindow::on_bt_watchdir_open_clicked() {
 
 void MainWindow::on_bt_permanent_open_clicked() {
     this->station->permanent_storage()->open_in_explorer();
+}
+
+void MainWindow::on_actionLogging_options_triggered() {
+    LoggingDialog dialog(this);
+    dialog.exec();
 }

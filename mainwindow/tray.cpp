@@ -25,8 +25,6 @@ void MainWindow::create_tray_icon() {
 
     this->tray_icon = new QSystemTrayIcon(this);
     this->tray_icon->setContextMenu(trayIconMenu);
-
-    logger.info(Concern::Configuration, "Tray icon created");
 }
 
 void MainWindow::create_actions() {
@@ -44,8 +42,7 @@ void MainWindow::create_actions() {
 }
 
 void MainWindow::set_icon(const StationState &state) {
-    logger.warning(Concern::Operation, QString("Icon '%1' %2").arg(QString(state.code()), state.tooltip()));
-    this->tray_icon->setIcon(QIcon(":/images/green.ico"));//state.icon());
+    this->tray_icon->setIcon(this->icons[state.icon()]);
     this->tray_icon->setToolTip(QString("AMOS client\n%1").arg(state.tooltip()));
 }
 
@@ -67,5 +64,5 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::show_message(void) {
-    this->tray_icon->showMessage("AMOS controller", this->station->state().tooltip(), this->station->state().icon(), 5000);
+    this->tray_icon->showMessage("AMOS controller", this->station->state().tooltip(), QIcon(":/images/blue.ico"), 5000);
 }

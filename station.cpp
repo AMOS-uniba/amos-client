@@ -4,15 +4,14 @@
 
 extern EventLogger logger;
 
-const StationState Station::Daylight            = StationState('D', "daylight", QIcon(":/images/yellow.ico"), "not observing, daylight");
-const StationState Station::Observing           = StationState('O', "observing", QIcon(":/images/blue.ico"), "observation in progress");
-const StationState Station::NotObserving        = StationState('N', "not observing", QIcon(":/images/grey.ico"), "observation stopped");
-const StationState Station::Manual              = StationState('M', "manual", QIcon(":/images/green.ico"), "manual control enabled");
-const StationState Station::DomeUnreachable     = StationState('U', "dome unreachable", QIcon(":/images/red.ico"), "serial port has no connection");
-const StationState Station::Raining             = StationState('R', "raining", QIcon(":/images/grey.ico"), "rain sensor active");
-const StationState Station::Humid               = StationState('H', "humid", QIcon(":/images/grey.ico"), "humidity limit reached");
-const StationState Station::NoMasterPower       = StationState('P', "no master power", QIcon(":/images/grey.ico"), "master power sensor inactive");
-
+const StationState Station::Daylight            = StationState('D', "daylight", Icon::Daylight, "not observing, daylight");
+const StationState Station::Observing           = StationState('O', "observing", Icon::Observing, "observation in progress");
+const StationState Station::NotObserving        = StationState('N', "not observing", Icon::NotObserving, "observation stopped");
+const StationState Station::Manual              = StationState('M', "manual", Icon::Manual, "manual control enabled");
+const StationState Station::DomeUnreachable     = StationState('U', "dome unreachable", Icon::Failure, "serial port has no connection");
+const StationState Station::RainOrHumid         = StationState('R', "rain or high humidity", Icon::NotObserving, "rain sensor active or humidity too high");
+const StationState Station::Humid               = StationState('H', "humid", Icon::NotObserving, "humidity limit reached");
+const StationState Station::NoMasterPower       = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
 
 QString Station::temperature_colour(float temperature) {
     float h = 0, s = 0, v = 0;
@@ -310,12 +309,12 @@ void Station::automatic_check(void) {
             if (stateS.dome_closed_sensor_active()) {
                 if (stateS.rain_sensor_active()) {
                     logger.debug(Concern::Automatic, "Will not open: raining");
-                    this->set_state(Station::Raining);
+                    this->set_state(Station::RainOrHumid);
                 } else {
                     if (stateS.computer_power_sensor_active()) {
                         if (this->is_humid()) {
                             logger.debug(Concern::Automatic, "Will not open: humidity is too high");
-                            this->set_state(Station::Humid);
+                            this->set_state(Station::RainOrHumid);
                         } else {
                             logger.info(Concern::Automatic, "Opening the cover");
                             this->open_cover();
@@ -330,33 +329,33 @@ void Station::automatic_check(void) {
                 if (stateS.intensifier_active()) {
                     logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
                     this->turn_off_intensifier();
+                    this->set_state(Station::NotObserving);
                 }
             } else {
-                logger.debug(Concern::Automatic, "Will not open: daylight");
-            }
+                if (stateS.dome_open_sensor_active()) {
+                    // If the dome is open, turn on the image intensifier and the fan
+                    if (stateS.intensifier_active()) {
+                        logger.debug(Concern::Automatic, "Intensifier active");
+                        this->set_state(Station::Observing);
+                    } else {
+                        logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
+                        this->turn_on_intensifier();
+                    }
 
-            if (stateS.dome_open_sensor_active()) {
-                // If the dome is open, turn on the image intensifier and the fan
-                if (stateS.intensifier_active()) {
-                    logger.debug(Concern::Automatic, "Intensifier active");
-                    this->set_state(Station::Observing);
+                    if (!stateS.fan_active()) {
+                        logger.info(Concern::Automatic, "Turned on the fan");
+                        this->turn_on_fan();
+                    }
+
+                    // But if humidity is very high, close the cover
+                    if (this->is_very_humid()) {
+                        logger.info(Concern::Automatic, "Closed the cover (high humidity)");
+                        this->set_state(Station::Humid);
+                        this->close_cover();
+                    }
                 } else {
-                    logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
-                    this->turn_on_intensifier();
+                    this->set_state(Station::NotObserving);
                 }
-
-                if (!stateS.fan_active()) {
-                    logger.info(Concern::Automatic, "Turned on the fan");
-                    this->turn_on_fan();
-                }
-
-                // But if humidity is very high, close the cover
-                if (this->is_very_humid()) {
-                    logger.info(Concern::Automatic, "Closed the cover (high humidity)");
-                    this->close_cover();
-                }
-            } else {
-                this->set_state(Station::NotObserving);
             }
         } else {
             logger.debug(Concern::Automatic, "Will not open: daylight");
@@ -412,12 +411,11 @@ void Station::turn_off_intensifier(void) {
 }
 
 void Station::set_state(StationState new_state) {
-    logger.info(Concern::Operation, QString("State set to %1 %2").arg(QString(new_state.code()), new_state.display_string()));
-  //  if (new_state != this->m_state) {
-        logger.info(Concern::Operation, QString("State changed to %1").arg(new_state.display_string()));
+    if (new_state != this->m_state) {
+        logger.debug(Concern::Operation, QString("State changed from %1 to %2").arg(this->state().display_string(), new_state.display_string()));
         this->m_state = new_state;
         emit this->state_changed(this->m_state);
-    //}
+    }
 }
 
 void Station::send_heartbeat(void) {

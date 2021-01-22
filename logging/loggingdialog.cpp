@@ -1,0 +1,50 @@
+#include <QCheckBox>
+
+#include "loggingdialog.h"
+#include "ui_loggingdialog.h"
+
+#include "eventlogger.h"
+
+extern EventLogger logger;
+
+LoggingDialog::LoggingDialog(QWidget *parent):
+    QDialog(parent),
+    ui(new Ui::LoggingDialog)
+{
+    this->ui->setupUi(this);
+
+    for (auto concern = EventLogger::Concerns.keyBegin(); concern != EventLogger::Concerns.keyEnd(); ++concern) {
+        const ConcernInfo& info = EventLogger::Concerns[*concern];
+        QCheckBox *checkbox = new QCheckBox(info.name, this);
+        this->checkboxes.append(checkbox);
+        this->ui->vl_checkboxes->addWidget(checkbox);
+        checkbox->setObjectName(info.name);
+        checkbox->setText(info.caption);
+        checkbox->setCheckState(logger.is_debug_visible(*concern) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    }
+}
+
+LoggingDialog::~LoggingDialog() {
+    delete ui;
+}
+
+void LoggingDialog::on_buttons_rejected() {
+    this->close();
+}
+
+void LoggingDialog::on_cb_all_stateChanged(int checked) {
+    for (auto &&checkbox: this->checkboxes) {
+        checkbox->setCheckState(checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    }
+}
+
+void LoggingDialog::on_buttons_accepted() {
+    auto concerns = EventLogger::Concerns;
+    for (auto&& checkbox: this->checkboxes) {
+        for (auto concern = concerns.cbegin(); concern != concerns.cend(); ++concern) {
+            if (concern.value().name == checkbox->objectName()) {
+                logger.set_debug_visible(concern.key(), (checkbox->checkState() == Qt::CheckState::Checked));
+            }
+        }
+    }
+}

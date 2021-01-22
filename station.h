@@ -44,7 +44,7 @@ private:
     QTimer *m_timer_automatic;
     QTimer *m_timer_file_watchdog;
 public:
-    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, Raining, Humid, NoMasterPower;
+    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, Humid, NoMasterPower;
 
     Station(const QString& id);
     ~Station(void);

@@ -2,29 +2,42 @@
 
 EventLogger::EventLogger(QObject *parent, const QString &filename):
     BaseLogger(parent, filename),
-    logging_level(Level::Info) {}
+    logging_level(Level::Info),
+    debug_visible({
+        {Concern::Automatic,        true},
+        {Concern::Configuration,    true},
+        {Concern::Generic,          true},
+        {Concern::Heartbeat,        true},
+        {Concern::SerialPort,       true},
+        {Concern::Server,           true},
+        {Concern::Sightings,        true},
+        {Concern::UFO,              true},
+        {Concern::Operation,        true},
+        {Concern::Storage,          true},
+    })
+{}
 
 const QMap<Level, LevelInfo> EventLogger::Levels = {
     {Level::DebugDetail, {"DTL", "debug detail", Qt::gray}},
     {Level::Debug, {"DBG", "debug", Qt::darkGray}},
     {Level::DebugError, {"DBE", "debug error", Qt::red}},
     {Level::Info, {"INF", "info", Qt::black}},
-    {Level::Warning, {"WAR", "warning", Qt::magenta}},
+    {Level::Warning, {"WAR", "warning", Qt::blue}},
     {Level::Error, {"ERR", "error", Qt::red}},
     {Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
 };
 
 const QMap<Concern, ConcernInfo> EventLogger::Concerns = {
-    {Concern::Automatic, {"AUT", "auto"}},
-    {Concern::Configuration, {"CFG", "config"}},
-    {Concern::Generic, {"---", "-"}},
-    {Concern::Heartbeat, {"HBT", "heartbeat"}},
-    {Concern::SerialPort, {"SRP", "serial"}},
-    {Concern::Server, {"SRV", "server"}},
-    {Concern::Sightings, {"SGH", "sightings"}},
-    {Concern::UFO, {"UFO", "UFO"}},
-    {Concern::Operation, {"OPE", "operation"}},
-    {Concern::Storage, {"STO", "storage"}}
+    {Concern::Automatic,        {"AUT", "auto",         "Automatic actions"}},
+    {Concern::Configuration,    {"CFG", "config",       "Configuration"}},
+    {Concern::Generic,          {"---", "-",            "Generic"}},
+    {Concern::Heartbeat,        {"HBT", "heartbeat",    "Heartbeats"}},
+    {Concern::SerialPort,       {"SRP", "serial",       "Serial port communiation"}},
+    {Concern::Server,           {"SRV", "server",       "Server connection"}},
+    {Concern::Sightings,        {"SGH", "sightings",    "Sightings"}},
+    {Concern::UFO,              {"UFO", "UFO",          "UFO management"}},
+    {Concern::Operation,        {"OPE", "operation",    "Operation"}},
+    {Concern::Storage,          {"STO", "storage",      "Storage management"}}
 };
 
 void EventLogger::set_display_widget(QTableWidget *widget) {
@@ -84,11 +97,34 @@ void EventLogger::set_level(Level new_level) {
     this->logging_level = new_level;
 }
 
-void EventLogger::detail(Concern concern, const QString &message) const { this->write(Level::DebugDetail, concern, message); }
-void EventLogger::debug_error(Concern concern, const QString &message) const { this->write(Level::DebugError, concern, message); }
-void EventLogger::debug(Concern concern, const QString &message) const { this->write(Level::Debug, concern, message); }
-void EventLogger::info(Concern concern, const QString &message) const { this->write(Level::Info, concern, message); }
-void EventLogger::warning(Concern concern, const QString &message) const { this->write(Level::Warning, concern, message); }
-void EventLogger::error(Concern concern, const QString &message) const { this->write(Level::Error, concern, message); }
 void EventLogger::fatal(Concern concern, const QString &message) const { this->write(Level::Fatal, concern, message); }
+void EventLogger::error(Concern concern, const QString &message) const { this->write(Level::Error, concern, message); }
+void EventLogger::warning(Concern concern, const QString &message) const { this->write(Level::Warning, concern, message); }
+void EventLogger::info(Concern concern, const QString &message) const { this->write(Level::Info, concern, message); }
 
+void EventLogger::debug(Concern concern, const QString &message) const {
+    if (this->debug_visible[concern]) {
+        this->write(Level::Debug, concern, message);
+    }
+}
+
+void EventLogger::debug_error(Concern concern, const QString &message) const {
+    if (this->debug_visible[concern]) {
+        this->write(Level::DebugError, concern, message);
+    }
+}
+
+void EventLogger::detail(Concern concern, const QString &message) const {
+    if (this->debug_visible[concern]) {
+        this->write(Level::DebugDetail, concern, message);
+    }
+}
+
+void EventLogger::set_debug_visible(Concern concern, bool visible) {
+    this->debug_visible[concern] = visible;
+    this->info(Concern::Automatic, QString("%1 now enabled").arg(this->Concerns[concern].name));
+}
+
+bool EventLogger::is_debug_visible(Concern concern) const {
+    return (this->debug_visible[concern]);
+}

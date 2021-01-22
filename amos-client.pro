@@ -30,6 +30,7 @@ SOURCES += \
     filesystem/scanner.cpp \
     logging/baselogger.cpp \
     logging/eventlogger.cpp \
+    logging/loggingdialog.cpp \
     logging/statelogger.cpp \
     dome.cpp \
     main.cpp \
@@ -72,6 +73,7 @@ HEADERS += \
     filesystem/storage.h \
     logging/baselogger.h \
     logging/eventlogger.h \
+    logging/loggingdialog.h \
     logging/statelogger.h \
     dome.h \
     forward.h \
@@ -93,6 +95,7 @@ HEADERS += \
     utils/universe.h
 
 FORMS += \
+    logging/loggingdialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.
