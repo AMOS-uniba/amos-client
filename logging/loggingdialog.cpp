@@ -21,7 +21,10 @@ LoggingDialog::LoggingDialog(QWidget *parent):
         checkbox->setObjectName(info.name);
         checkbox->setText(info.caption);
         checkbox->setCheckState(logger.is_debug_visible(*concern) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
+        this->connect(checkbox, &QCheckBox::stateChanged, this, &LoggingDialog::set_checkbox_all);
     }
+    this->set_checkbox_all();
 }
 
 LoggingDialog::~LoggingDialog() {
@@ -32,10 +35,15 @@ void LoggingDialog::on_buttons_rejected() {
     this->close();
 }
 
-void LoggingDialog::on_cb_all_stateChanged(int checked) {
+void LoggingDialog::set_checkbox_all() {
+    bool all = true;
     for (auto &&checkbox: this->checkboxes) {
-        checkbox->setCheckState(checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+        all &= (checkbox->checkState() == Qt::CheckState::Checked);
     }
+    this->ui->cb_all->setCheckState(all ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+}
+
+void LoggingDialog::on_cb_all_stateChanged(int checked) {
 }
 
 void LoggingDialog::on_buttons_accepted() {
@@ -46,5 +54,11 @@ void LoggingDialog::on_buttons_accepted() {
                 logger.set_debug_visible(concern.key(), (checkbox->checkState() == Qt::CheckState::Checked));
             }
         }
+    }
+}
+
+void LoggingDialog::on_cb_all_clicked(bool checked) {
+    for (auto &&checkbox: this->checkboxes) {
+        checkbox->setCheckState(checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     }
 }

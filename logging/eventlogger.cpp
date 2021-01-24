@@ -122,7 +122,6 @@ void EventLogger::detail(Concern concern, const QString &message) const {
 
 void EventLogger::set_debug_visible(Concern concern, bool visible) {
     this->debug_visible[concern] = visible;
-    this->info(Concern::Automatic, QString("%1 now enabled").arg(this->Concerns[concern].name));
 }
 
 bool EventLogger::is_debug_visible(Concern concern) const {

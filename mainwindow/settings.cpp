@@ -168,4 +168,5 @@ void MainWindow::on_station_edited(void) {
 void MainWindow::button_station_toggle(bool changed) {
     this->ui->bt_station_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
     this->ui->bt_station_apply->setEnabled(changed);
+    this->ui->bt_station_reset->setEnabled(changed);
 }

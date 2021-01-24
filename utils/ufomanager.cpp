@@ -76,7 +76,7 @@ void UfoManager::auto_action(bool is_dark) {
     logger.debug(Concern::UFO, "Automatic action");
 
     if (this->m_autostart) {
-        if (/* is_dark */ true) { // Temporarily disabled for testing!
+        if (is_dark) {
             this->start_ufo();
         } else {
             this->stop_ufo();

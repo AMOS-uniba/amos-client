@@ -22,6 +22,8 @@ private slots:
 
     void on_buttons_accepted();
     void on_buttons_rejected();
-};
+    void set_checkbox_all();
+    void on_cb_all_clicked(bool checked);
+    };
 
 #endif // LOGGINGDIALOG_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1279</width>
+    <width>1044</width>
     <height>970</height>
    </rect>
   </property>
@@ -981,7 +981,28 @@
     <item>
      <widget class="QFrame" name="frame">
       <layout class="QGridLayout" name="grid_log">
-       <item row="5" column="0" colspan="7">
+       <item row="1" column="3">
+        <widget class="QLabel" name="lx_next_heartbeat">
+         <property name="text">
+          <string>Next heartbeat in</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" rowspan="4">
+        <widget class="QPushButton" name="button_send_heartbeat">
+         <property name="text">
+          <string>Send heartbeat</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="lx_uptime">
+         <property name="text">
+          <string>Client uptime</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0" colspan="7">
         <widget class="QTableWidget" name="tb_log">
          <property name="lineWidth">
           <number>1</number>
@@ -1062,13 +1083,6 @@
          </column>
         </widget>
        </item>
-       <item row="0" column="1" rowspan="4">
-        <widget class="QPushButton" name="button_send_heartbeat">
-         <property name="text">
-          <string>Send heartbeat</string>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="6">
         <widget class="QLabel" name="lb_next_heartbeat">
          <property name="minimumSize">
@@ -1084,6 +1098,19 @@
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
+       </item>
+       <item row="0" column="2" rowspan="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item row="0" column="6">
         <widget class="QLabel" name="lb_uptime">
@@ -1116,45 +1143,6 @@
           <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item row="1" column="3">
-        <widget class="QLabel" name="lx_next_heartbeat">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Next heartbeat in</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="lx_uptime">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Uptime</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="2" rowspan="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
@@ -1669,16 +1657,6 @@
           <item row="17" column="0" colspan="5">
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
-             <widget class="QPushButton" name="bt_station_reset">
-              <property name="toolTip">
-               <string>reset the changes</string>
-              </property>
-              <property name="text">
-               <string>Discard changes</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <widget class="QPushButton" name="bt_station_apply">
               <property name="enabled">
                <bool>false</bool>
@@ -1688,6 +1666,19 @@
               </property>
               <property name="text">
                <string>No changes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="bt_station_reset">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="toolTip">
+               <string>reset the changes</string>
+              </property>
+              <property name="text">
+               <string>Discard changes</string>
               </property>
              </widget>
             </item>
@@ -2031,7 +2022,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1279</width>
+     <width>1044</width>
      <height>21</height>
     </rect>
    </property>
@@ -2098,7 +2089,6 @@
   <tabstop>dsb_humidity_limit_lower</tabstop>
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>bt_station_reset</tabstop>
-  <tabstop>bt_station_apply</tabstop>
   <tabstop>le_watchdir</tabstop>
   <tabstop>le_permanent</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
