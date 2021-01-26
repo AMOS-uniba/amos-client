@@ -64,5 +64,5 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
 }
 
 void MainWindow::show_message(void) {
-    this->tray_icon->showMessage("AMOS controller", this->station->state().tooltip(), QIcon(":/images/blue.ico"), 5000);
+    this->tray_icon->showMessage("AMOS controller", this->station->state().tooltip(), this->icons[this->station->state().icon()], 5000);
 }

@@ -1,5 +1,7 @@
 #include "include.h"
 
+extern EventLogger logger;
+
 Request::Request(unsigned char code, const QString &display_name):
     m_code(code),
     m_display_name(display_name) {}

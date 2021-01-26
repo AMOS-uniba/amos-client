@@ -139,5 +139,6 @@ private slots:
     void on_bt_watchdir_open_clicked();
     void on_bt_watchdir_change_clicked();
     void on_actionLogging_options_triggered();
+    void on_cb_permanent_enabled_clicked();
 };
 #endif // MAINWINDOW_H

@@ -32,10 +32,22 @@ const QString& Storage::name(void) const {
 }
 
 void Storage::store_sighting(Sighting &sighting, bool del) const {
-    if (del) {
-        sighting.move(this->current_directory().path());
+    if (this->m_enabled) {
+        if (del) {
+            sighting.move(this->current_directory().path());
+        } else {
+            sighting.copy(this->current_directory().path());
+        }
     } else {
-        sighting.copy(this->current_directory().path());
+        logger.debug(Concern::Storage, QString("Storage %1 disabled, not %2ing").arg(this->m_name).arg(del ? "mov" : "copy"));
     }
 }
 
+void Storage::set_enabled(bool enabled) {
+    logger.info(Concern::Storage, QString("Storage %1 is now %2abled").arg(this->m_name).arg(enabled ? "en" : "dis"));
+
+    if (enabled != this->m_enabled) {
+        this->m_enabled = enabled;
+        emit this->toggled(this->m_enabled);
+    }
+}

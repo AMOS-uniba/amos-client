@@ -10,7 +10,6 @@ const StationState Station::NotObserving        = StationState('N', "not observi
 const StationState Station::Manual              = StationState('M', "manual", Icon::Manual, "manual control enabled");
 const StationState Station::DomeUnreachable     = StationState('U', "dome unreachable", Icon::Failure, "serial port has no connection");
 const StationState Station::RainOrHumid         = StationState('R', "rain or high humidity", Icon::NotObserving, "rain sensor active or humidity too high");
-const StationState Station::Humid               = StationState('H', "humid", Icon::NotObserving, "humidity limit reached");
 const StationState Station::NoMasterPower       = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
 
 QString Station::temperature_colour(float temperature) {
@@ -242,6 +241,7 @@ QJsonObject Station::prepare_heartbeat(void) const {
         {"auto", !this->is_manual()},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->m_dome->json()},
+        {"st", QString(this->m_state.code())},
         {"disk", QJsonObject {
             {"prim", this->m_primary_storage->json()},
             {"perm", this->m_permanent_storage->json()},
@@ -311,17 +311,12 @@ void Station::automatic_check(void) {
                     logger.debug(Concern::Automatic, "Will not open: raining");
                     this->set_state(Station::RainOrHumid);
                 } else {
-                    if (stateS.computer_power_sensor_active()) {
-                        if (this->is_humid()) {
-                            logger.debug(Concern::Automatic, "Will not open: humidity is too high");
-                            this->set_state(Station::RainOrHumid);
-                        } else {
-                            logger.info(Concern::Automatic, "Opening the cover");
-                            this->open_cover();
-                        }
+                    if (this->is_humid()) {
+                        logger.debug(Concern::Automatic, "Will not open: humidity is too high");
+                        this->set_state(Station::RainOrHumid);
                     } else {
-                        logger.debug(Concern::Automatic, "Will not open: master power off");
-                        this->set_state(Station::NoMasterPower);
+                        logger.info(Concern::Automatic, "Opening the cover");
+                        this->open_cover();
                     }
                 }
 
@@ -350,7 +345,7 @@ void Station::automatic_check(void) {
                     // But if humidity is very high, close the cover
                     if (this->is_very_humid()) {
                         logger.info(Concern::Automatic, "Closed the cover (high humidity)");
-                        this->set_state(Station::Humid);
+                        this->set_state(Station::RainOrHumid);
                         this->close_cover();
                     }
                 } else {

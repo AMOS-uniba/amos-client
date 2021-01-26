@@ -43,9 +43,6 @@ void LoggingDialog::set_checkbox_all() {
     this->ui->cb_all->setCheckState(all ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
-void LoggingDialog::on_cb_all_stateChanged(int checked) {
-}
-
 void LoggingDialog::on_buttons_accepted() {
     auto concerns = EventLogger::Concerns;
     for (auto&& checkbox: this->checkboxes) {
@@ -55,6 +52,7 @@ void LoggingDialog::on_buttons_accepted() {
             }
         }
     }
+    //logger.save_settings();
 }
 
 void LoggingDialog::on_cb_all_clicked(bool checked) {

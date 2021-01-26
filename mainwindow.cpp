@@ -74,6 +74,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->scanner(), QOverload<const QDir&>::of(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
 
     this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
+    this->connect(this->ui->cb_permanent_enabled, &QCheckBox::toggled, this->station->permanent_storage(), &Storage::set_enabled);
     this->set_icon(this->station->state());
 }
 
@@ -312,4 +313,7 @@ void MainWindow::on_bt_permanent_open_clicked() {
 void MainWindow::on_actionLogging_options_triggered() {
     LoggingDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::on_cb_permanent_enabled_clicked() {
 }

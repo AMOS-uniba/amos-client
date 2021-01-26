@@ -4,6 +4,7 @@
 
 MainWindow* main_window;
 EventLogger logger(main_window, "events.log");
+//QSettings settings(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation), "settings.ini"), QSettings::IniFormat);
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);

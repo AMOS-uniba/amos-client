@@ -11,12 +11,14 @@ public:
     FileSystemManager(const QDir &directory);
     QStorageInfo info(void) const;
 
-    virtual void set_directory(const QDir &dir);
     QDir directory(void) const;
+    virtual void set_directory(const QDir &dir);
 
+public slots:
     void open_in_explorer(void) const;
+
 signals:
-    void directory_set(const QDir &dir);
+    void directory_set(const QDir &dir) const;
 };
 
 #endif // FILESYSTEMMANAGER_H
