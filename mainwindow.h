@@ -37,7 +37,6 @@ public:
 private:
     QTimer *timer_display, *timer_heartbeat, *timer_watchdog, *timer_longterm;
     Ui::MainWindow *ui;
-    QSettings *settings;
 
     Station *station = nullptr;
     Universe *universe = nullptr;
@@ -72,7 +71,10 @@ private slots:
     void create_timers(void);
     void display_serial_ports(void);
 
-    void on_actionExit_triggered();
+    // Menu actions
+    void on_action_exit_triggered();
+    void on_action_manual_triggered();
+    void on_action_logging_options_triggered();
 
     void process_display_timer(void);
     void process_watchdog_timer(void);
@@ -99,7 +101,7 @@ private slots:
 
     void display_permanent_storage_current_directory(void);
 
-    void on_station_edited(void);
+    void slot_station_edited(void);
 
     void heartbeat(void);
     void on_button_send_heartbeat_pressed();
@@ -130,15 +132,15 @@ private slots:
 
     void on_cb_safety_override_stateChanged(int arg1);
 
-    void on_actionManual_control_triggered();
-
     void on_bt_change_ufo_clicked();
     void on_cb_ufo_auto_stateChanged(int arg1);
     void on_bt_ufo_clicked();
     void on_bt_permanent_open_clicked();
     void on_bt_watchdir_open_clicked();
     void on_bt_watchdir_change_clicked();
-    void on_actionLogging_options_triggered();
-    void on_cb_permanent_enabled_clicked();
+
+    void on_action_open_log_triggered();
+    void on_action_open_config_triggered();
+    void on_action_open_stat_triggered();
 };
 #endif // MAINWINDOW_H

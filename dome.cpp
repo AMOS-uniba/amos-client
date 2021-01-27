@@ -4,7 +4,11 @@ extern EventLogger logger;
 
 const Request Dome::RequestBasic                = Request('S', "basic data request");
 const Request Dome::RequestEnv                  = Request('T', "environment data request");
+#ifdef OLD_PROTOCOL
+const Request Dome::RequestShaft                = Request('W', "shaft position request (old protocol)");
+#else
 const Request Dome::RequestShaft                = Request('Z', "shaft position request");
+#endif
 
 const Command Dome::CommandNoOp                 = Command('\x00', "no operation");
 const Command Dome::CommandOpenCover            = Command('\x01', "open cover");
@@ -150,6 +154,9 @@ void Dome::process_message(const QByteArray &message) {
                 this->m_state_T = DomeStateT(decoded);
                 emit this->state_updated_T();
                 break;
+#ifdef OLD_PROTOCOL
+            case 'W':
+#endif
             case 'Z':
                 this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z();

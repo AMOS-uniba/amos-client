@@ -5,6 +5,7 @@
 #include "logging/loggingdialog.h"
 
 extern EventLogger logger;
+extern QSettings *settings;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     this->ui->setupUi(this);
@@ -21,25 +22,25 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     logger.info(Concern::Operation, "Client initialized");
 
     // connect signals for handling of edits of station position
-    this->settings = new QSettings(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation), "settings.ini"), QSettings::IniFormat, this);
-    this->settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
+    settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
+    settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
     this->create_timers();
 
-    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
     // connect signals for handling of edits of server address
-    this->connect(this->ui->le_station_id, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->le_ip, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->le_station_id, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->le_ip, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
     // connect signals for handling of edits of safety limits
-    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::on_station_edited);
+    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
     this->create_actions();
     this->create_tray_icon();
@@ -76,6 +77,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
     this->connect(this->ui->cb_permanent_enabled, &QCheckBox::toggled, this->station->permanent_storage(), &Storage::set_enabled);
     this->set_icon(this->station->state());
+
+#ifdef OLD_PROTOCOL
+    this->ui->progress_cover->setMaximum(26);
+#endif
 }
 
 MainWindow::~MainWindow() {
@@ -106,7 +111,7 @@ QString MainWindow::format_duration(unsigned int duration) {
 void MainWindow::message_clicked() {
 }
 
-void MainWindow::on_actionExit_triggered() {
+void MainWindow::on_action_exit_triggered() {
     QApplication::quit();
 }
 
@@ -129,7 +134,7 @@ void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
         storage->set_directory(new_dir);
         edit->setText(new_dir);
         this->display_storages();
-        this->settings->setValue(QString("storage/%1").arg(storage->name()), new_dir);
+        settings->setValue(QString("storage/%1").arg(storage->name()), new_dir);
     }
 }
 
@@ -138,7 +143,7 @@ void MainWindow::on_bt_permanent_clicked() {
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {
-    this->settings->setValue("debug", bool(debug));
+    settings->setValue("debug", bool(debug));
 
     logger.set_level(debug ? Level::Debug : Level::Info);
     logger.warning(Concern::Operation, QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
@@ -148,7 +153,7 @@ void MainWindow::on_cb_manual_stateChanged(int manual) {
     logger.warning(Concern::Operation, QString("Switched to %1 mode").arg(manual ? "manual" : "automatic"));
 
     this->station->set_manual_control((bool) manual);
-    this->settings->setValue("manual", this->station->is_manual());
+    settings->setValue("manual", this->station->is_manual());
 
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
@@ -226,10 +231,6 @@ void MainWindow::on_bt_cover_close_clicked(void) {
     this->station->close_cover();
 }
 
-void MainWindow::on_actionManual_control_triggered() {
-    this->ui->cb_manual->click();
-}
-
 void MainWindow::on_bt_change_ufo_clicked(void) {
     QString filename = QFileDialog::getOpenFileName(
         this,
@@ -246,7 +247,7 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
             logger.debug(Concern::UFO, "Path not changed");
         } else {
             logger.debug(Concern::UFO, "Path changed");
-            this->settings->setValue("ufo/path", filename);
+            settings->setValue("ufo/path", filename);
             this->station->ufo_manager()->set_path(filename);
             this->display_ufo_settings();
         }
@@ -255,7 +256,7 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
 
 void MainWindow::on_cb_ufo_auto_stateChanged(int enable) {
     this->station->ufo_manager()->set_autostart((bool) enable);
-    this->settings->setValue("ufo/autostart", this->station->ufo_manager()->autostart());
+    settings->setValue("ufo/autostart", this->station->ufo_manager()->autostart());
 }
 
 void MainWindow::on_bt_ufo_clicked() {
@@ -279,7 +280,7 @@ void MainWindow::on_co_serial_ports_activated(int index) {
         } else {
             logger.info(Concern::SerialPort, QString("Serial port set to %1").arg(port));
             this->station->dome()->set_serial_port(port);
-            this->settings->setValue("dome/port", port);
+            settings->setValue("dome/port", port);
         }
     }
 
@@ -298,7 +299,7 @@ void MainWindow::on_bt_watchdir_change_clicked() {
     } else {
         this->station->set_scanner(new_dir);
         this->ui->le_watchdir->setText(new_dir);
-        this->settings->setValue(QString("storage/watch"), new_dir);
+        settings->setValue(QString("storage/watch"), new_dir);
     }
 }
 
@@ -310,10 +311,23 @@ void MainWindow::on_bt_permanent_open_clicked() {
     this->station->permanent_storage()->open_in_explorer();
 }
 
-void MainWindow::on_actionLogging_options_triggered() {
+void MainWindow::on_action_manual_triggered() {
+    this->ui->cb_manual->click();
+}
+
+void MainWindow::on_action_logging_options_triggered() {
     LoggingDialog dialog(this);
     dialog.exec();
 }
 
-void MainWindow::on_cb_permanent_enabled_clicked() {
+void MainWindow::on_action_open_log_triggered() {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(logger.filename()));
+}
+
+void MainWindow::on_action_open_stat_triggered() {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->state_logger_filename()));
+}
+
+void MainWindow::on_action_open_config_triggered() {
+    QDesktopServices::openUrl(QUrl::fromLocalFile(settings->fileName()));
 }

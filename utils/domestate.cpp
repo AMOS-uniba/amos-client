@@ -41,6 +41,7 @@ DomeStateS::DomeStateS(const QByteArray &response) {
     if ((response[0] != 'S') && (response[0] != 'C')) {
         throw InvalidState(QString("Invalid first char of S state message '%1'").arg(QString(QChar(response[0]))));
     }
+
     this->m_basic     = response[1];
     this->m_env       = response[2];
     this->m_errors    = response[3];
@@ -125,6 +126,9 @@ DomeStateT::DomeStateT(const QByteArray &response) {
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong T-state length %1").arg(response.length()));
     }
+    if (response[0] != 'T') {
+        throw InvalidState(QString("Invalid first char of T state message '%1'").arg(QString(QChar(response[0]))));
+    }
 
     this->m_temp_lens  = DomeStateT::deciint(response.mid(1, 2));
     this->m_temp_cpu   = DomeStateT::deciint(response.mid(3, 2));
@@ -160,11 +164,23 @@ DomeStateZ::DomeStateZ(void): DomeState() {
 }
 
 DomeStateZ::DomeStateZ(const QByteArray &response) {
+#ifdef OLD_PROTOCOL
+    if (response.length() != 9) {
+        throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
+    }
+    if (response[0] != 'W') {
+        throw InvalidState(QString("Invalid first char of W state message '%1'").arg(QString(QChar(response[0]))));
+    }
+    memcpy(&this->m_shaft_position, response.mid(7, 2).data(), 2);
+#else
     if (response.length() != 3) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }
-
+    if (response[0] != 'Z') {
+        throw InvalidState(QString("Invalid first char of Z state message '%1'").arg(QString(QChar(response[0]))));
+    }
     memcpy(&this->m_shaft_position, response.mid(1, 2).data(), 2);
+#endif
 
     this->m_valid = true;
     logger.debug(Concern::SerialPort, QString("Z state received: %1").arg(this->m_shaft_position));

@@ -19,6 +19,10 @@ void BaseLogger::initialize(void) {
     }
 }
 
+QString BaseLogger::filename(void) const {
+    return this->m_file->fileName();
+}
+
 BaseLogger::~BaseLogger(void) {
     if (this->m_file != nullptr) {
         this->m_file->close();

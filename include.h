@@ -1,3 +1,5 @@
+//#define OLD_PROTOCOL 1
+
 #ifndef INCLUDE_H
 #define INCLUDE_H
 

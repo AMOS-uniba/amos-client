@@ -13,7 +13,7 @@ class Dome: public QObject {
     Q_OBJECT
 private:
     constexpr static unsigned int REFRESH = 300;
-    const static Request RequestBasic, RequestEnv, RequestShaft;
+    const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
 
     unsigned char m_address;
     QDateTime m_last_received;

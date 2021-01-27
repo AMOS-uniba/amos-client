@@ -270,6 +270,10 @@ void Station::log_state(void) {
     this->m_state_logger->log(line);
 }
 
+QString Station::state_logger_filename(void) const {
+    return this->m_state_logger->filename();
+}
+
 // Perform automatic state checks
 void Station::automatic_check(void) {
     const DomeStateS &stateS = this->m_dome->state_S();

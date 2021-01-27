@@ -2,48 +2,51 @@
 #include "ui_mainwindow.h"
 
 extern EventLogger logger;
+extern QSettings *settings;
 
 void MainWindow::load_settings(void) {
     try {
-        QString ip = this->settings->value("server/ip", "127.0.0.1").toString();
-        unsigned short port = this->settings->value("server/port", 4805).toInt();
-        QString station_id = this->settings->value("station/id", "none").toString();
+        logger.info(Concern::Operation, QString("Reading settings from %1").arg(settings->fileName()));
+
+        QString ip = settings->value("server/ip", "127.0.0.1").toString();
+        unsigned short port = settings->value("server/port", 4805).toInt();
+        QString station_id = settings->value("station/id", "none").toString();
 
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
 
         // Create the UFO manager
         this->station->set_ufo_manager(new UfoManager(
-            this->settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString(),
-            this->settings->value("ufo/autostart", false).toBool()
+            settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString(),
+            settings->value("ufo/autostart", false).toBool()
         ));
         this->display_ufo_settings();
 
         this->station->set_scanner(
-            QDir(this->settings->value("storage/watch", "C:\\Data").toString())
+            QDir(settings->value("storage/watch", "C:\\Data").toString())
         );
         this->station->set_storages(
-            QDir(this->settings->value("storage/primary", "C:\\Data").toString()),
-            QDir(this->settings->value("storage/permanent", "D:\\Data").toString())
+            QDir(settings->value("storage/primary", "C:\\Data").toString()),
+            QDir(settings->value("storage/permanent", "D:\\Data").toString())
         );
         this->display_permanent_storage_current_directory();
 
         this->station->set_position(
-            this->settings->value("station/latitude", 0).toDouble(),
-            this->settings->value("station/longitude", 0).toDouble(),
-            this->settings->value("station/altitude", 0).toDouble()
+            settings->value("station/latitude", 0).toDouble(),
+            settings->value("station/longitude", 0).toDouble(),
+            settings->value("station/altitude", 0).toDouble()
         );
-        this->station->set_darkness_limit(this->settings->value("limits/darkness", -12.0).toDouble());
+        this->station->set_darkness_limit(settings->value("limits/darkness", -12.0).toDouble());
         this->station->set_humidity_limits(
-            this->settings->value("limits/humidity_lower", 75.0).toDouble(),
-            this->settings->value("limits/humidity_upper", 80.0).toDouble()
+            settings->value("limits/humidity_lower", 75.0).toDouble(),
+            settings->value("limits/humidity_upper", 80.0).toDouble()
         );
 
-        bool debug = this->settings->value("debug", false).toBool();
+        bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
         this->ui->cb_debug->setChecked(debug);
 
-        this->station->set_manual_control(this->settings->value("manual", false).toBool());
+        this->station->set_manual_control(settings->value("manual", false).toBool());
         this->ui->cb_manual->setChecked(this->station->is_manual());
         this->ui->cb_safety_override->setEnabled(this->station->is_manual());
 
@@ -51,7 +54,7 @@ void MainWindow::load_settings(void) {
         serial_ports = QSerialPortInfo::availablePorts();
 
         for (QSerialPortInfo sp: this->serial_ports) {
-            if (sp.portName() == this->settings->value("dome/port").toString()) {
+            if (sp.portName() == settings->value("dome/port").toString()) {
                 this->ui->co_serial_ports->setCurrentText(sp.portName());
                 this->station->dome()->set_serial_port(sp.portName());
             }
@@ -120,18 +123,18 @@ void MainWindow::on_bt_station_apply_clicked() {
     }
 
     // Store all new values in permanent settings
-    this->settings->setValue("server/ip", this->station->server()->address().toString());
-    this->settings->setValue("server/port", this->station->server()->port());
-    this->settings->setValue("station/id", this->station->get_id());
-    this->settings->setValue("station/latitude", this->station->latitude());
-    this->settings->setValue("station/longitude", this->station->longitude());
-    this->settings->setValue("station/altitude", this->station->altitude());
+    settings->setValue("server/ip", this->station->server()->address().toString());
+    settings->setValue("server/port", this->station->server()->port());
+    settings->setValue("station/id", this->station->get_id());
+    settings->setValue("station/latitude", this->station->latitude());
+    settings->setValue("station/longitude", this->station->longitude());
+    settings->setValue("station/altitude", this->station->altitude());
 
-    this->settings->setValue("limits/darkness", this->station->darkness_limit());
-    this->settings->setValue("limits/humidity_lower", this->station->humidity_limit_lower());
-    this->settings->setValue("limits/humidity_upper", this->station->humidity_limit_upper());
+    settings->setValue("limits/darkness", this->station->darkness_limit());
+    settings->setValue("limits/humidity_lower", this->station->humidity_limit_lower());
+    settings->setValue("limits/humidity_upper", this->station->humidity_limit_upper());
 
-    this->settings->sync();
+    settings->sync();
 
     this->button_station_toggle(false);
 }
@@ -151,7 +154,7 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
-void MainWindow::on_station_edited(void) {
+void MainWindow::slot_station_edited(void) {
     this->button_station_toggle(
         (this->ui->le_station_id->text() != this->station->get_id()) ||
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||

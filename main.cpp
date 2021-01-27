@@ -4,7 +4,7 @@
 
 MainWindow* main_window;
 EventLogger logger(main_window, "events.log");
-//QSettings settings(QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation), "settings.ini"), QSettings::IniFormat);
+QSettings *settings;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
@@ -12,8 +12,11 @@ int main(int argc, char *argv[]) {
     a.setOrganizationName("AMOS");
     logger.initialize();
 
-    MainWindow w;
-    w.showMaximized();
-    return a.exec();
+    main_window = new MainWindow();
+    main_window->showMaximized();
+
+    int ret = a.exec();
+    delete main_window;
+    return ret;
 }
 

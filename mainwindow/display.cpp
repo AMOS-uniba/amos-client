@@ -6,6 +6,7 @@
 #include <QPushButton>
 
 extern EventLogger logger;
+extern QSettings *settings;
 
 /* Display boolean bit `value` in `label`
    using string `on` with colour `colour_on` if true
@@ -81,8 +82,13 @@ void MainWindow::display_cover_status(void) {
 
     // Set cover shaft position
     const DomeStateZ &stateZ = this->station->dome()->state_Z();
+
     this->ui->progress_cover->setEnabled(stateZ.is_valid());
+    if (stateS.is_valid() && stateS.dome_open_sensor_active() && stateZ.is_valid()) {
+        this->ui->progress_cover->setMaximum(stateZ.shaft_position());
+    }
     this->ui->progress_cover->setValue(stateZ.is_valid() ? stateZ.shaft_position() : 0);
+
 }
 
 void MainWindow::display_basic_data(void) {
@@ -193,7 +199,7 @@ void MainWindow::display_time(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
     ui->lb_next_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
     this->ui->lb_uptime->setText(
-        this->format_duration(this->settings->value("run/last_run").toDateTime().secsTo(QDateTime::currentDateTimeUtc()))
+        this->format_duration(settings->value("run/last_run").toDateTime().secsTo(QDateTime::currentDateTimeUtc()))
     );
 }
 
@@ -243,10 +249,17 @@ void MainWindow::display_sun_longterm(void) {
 }
 
 void MainWindow::display_window_title(void) {
+#ifdef OLD_PROTOCOL
+    this->setWindowTitle(QString("AMOS client (old protocol) [%1 mode]%2")
+                         .arg(this->station->is_manual() ? "manual" : "automatic")
+                         .arg(this->station->is_safety_overridden() ? " [safety override]" : "")
+    );
+#else
     this->setWindowTitle(QString("AMOS client [%1 mode]%2")
                          .arg(this->station->is_manual() ? "manual" : "automatic")
                          .arg(this->station->is_safety_overridden() ? " [safety override]" : "")
     );
+#endif
 }
 
 void MainWindow::display_serial_ports(void) {

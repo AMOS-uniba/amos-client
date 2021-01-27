@@ -93,11 +93,12 @@ public:
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
 
+    // UFo manager getters and setters
     void set_ufo_manager(UfoManager *ufo_manager);
     UfoManager* ufo_manager(void) const;
+
 
     // Manual control and
     void set_manual_control(bool manual);
@@ -118,6 +119,8 @@ public:
 
     void turn_on_fan(void);
     void turn_off_fan(void);
+
+    QString state_logger_filename(void) const;
 
     static QString temperature_colour(float temperature);
 

@@ -1,5 +1,7 @@
 #include "include.h"
 
+extern QSettings *settings;
+
 EventLogger::EventLogger(QObject *parent, const QString &filename):
     BaseLogger(parent, filename),
     logging_level(Level::Info),
@@ -18,26 +20,26 @@ EventLogger::EventLogger(QObject *parent, const QString &filename):
 {}
 
 const QMap<Level, LevelInfo> EventLogger::Levels = {
-    {Level::DebugDetail, {"DTL", "debug detail", Qt::gray}},
-    {Level::Debug, {"DBG", "debug", Qt::darkGray}},
-    {Level::DebugError, {"DBE", "debug error", Qt::red}},
-    {Level::Info, {"INF", "info", Qt::black}},
-    {Level::Warning, {"WAR", "warning", Qt::blue}},
-    {Level::Error, {"ERR", "error", Qt::red}},
-    {Level::Fatal, {"FTL", "fatal", Qt::darkRed}},
+    {Level::DebugDetail,    {"DTL", "debug detail", Qt::gray}},
+    {Level::Debug,          {"DBG", "debug",        Qt::darkGray}},
+    {Level::DebugError,     {"DBE", "debug error",  Qt::red}},
+    {Level::Info,           {"INF", "info",         Qt::black}},
+    {Level::Warning,        {"WAR", "warning",      Qt::blue}},
+    {Level::Error,          {"ERR", "error",        Qt::red}},
+    {Level::Fatal,          {"FTL", "fatal",        Qt::darkRed}},
 };
 
 const QMap<Concern, ConcernInfo> EventLogger::Concerns = {
-    {Concern::Automatic,        {"AUT", "auto",         "Automatic actions"}},
-    {Concern::Configuration,    {"CFG", "config",       "Configuration"}},
-    {Concern::Generic,          {"---", "-",            "Generic"}},
-    {Concern::Heartbeat,        {"HBT", "heartbeat",    "Heartbeats"}},
-    {Concern::SerialPort,       {"SRP", "serial",       "Serial port communiation"}},
-    {Concern::Server,           {"SRV", "server",       "Server connection"}},
-    {Concern::Sightings,        {"SGH", "sightings",    "Sightings"}},
-    {Concern::UFO,              {"UFO", "UFO",          "UFO management"}},
-    {Concern::Operation,        {"OPE", "operation",    "Operation"}},
-    {Concern::Storage,          {"STO", "storage",      "Storage management"}}
+    {Concern::Automatic,        {"AUT", "auto",         "auto",             "Automatic actions"}},
+    {Concern::Configuration,    {"CFG", "config",       "configuration",    "Configuration"}},
+    {Concern::Generic,          {"---", "generic",      "-",                "Generic"}},
+    {Concern::Heartbeat,        {"HBT", "heartbeat",    "heartbeats",       "Heartbeats"}},
+    {Concern::SerialPort,       {"SRP", "serial",       "serial port",      "Serial port communiation"}},
+    {Concern::Server,           {"SRV", "server",       "server",           "Server connection"}},
+    {Concern::Sightings,        {"SGH", "sightings",    "sightings",        "Sightings"}},
+    {Concern::UFO,              {"UFO", "ufo",          "UFO",              "UFO management"}},
+    {Concern::Operation,        {"OPE", "operation",    "operation",        "Operation"}},
+    {Concern::Storage,          {"STO", "storage",      "storage",          "Storage management"}}
 };
 
 void EventLogger::set_display_widget(QTableWidget *widget) {
@@ -78,7 +80,7 @@ void EventLogger::write(Level level, Concern concern, const QString &message) co
         item_level->setTextAlignment(Qt::AlignCenter);
         this->m_display->setItem(this->m_display->rowCount() - 1, 1, item_level);
 
-        QTableWidgetItem *item_concern = new QTableWidgetItem(EventLogger::Concerns[concern].name);
+        QTableWidgetItem *item_concern = new QTableWidgetItem(EventLogger::Concerns[concern].full_name);
         item_concern->setForeground(EventLogger::Levels[level].colour);
         item_concern->setTextAlignment(Qt::AlignCenter);
         this->m_display->setItem(this->m_display->rowCount() - 1, 2, item_concern);
@@ -126,4 +128,20 @@ void EventLogger::set_debug_visible(Concern concern, bool visible) {
 
 bool EventLogger::is_debug_visible(Concern concern) const {
     return (this->debug_visible[concern]);
+}
+
+void EventLogger::load_settings(void) {
+    settings->beginReadArray("logging");
+    for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
+        this->set_debug_visible(concern.key(), settings->value(EventLogger::Concerns[concern.key()].name, false).toBool());
+    }
+    settings->endArray();
+}
+
+void EventLogger::save_settings(void) const {
+    settings->beginGroup("logging");
+    for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
+        settings->setValue(EventLogger::Concerns[concern.key()].name, concern.value());
+    }
+    settings->endGroup();
 }

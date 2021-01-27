@@ -13,6 +13,8 @@ protected:
 public:
     explicit BaseLogger(QObject *parent, const QString &filename);
     void initialize(void);
+
+    QString filename(void) const;
     ~BaseLogger(void);
 };
 

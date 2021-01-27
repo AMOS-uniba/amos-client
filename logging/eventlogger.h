@@ -42,6 +42,7 @@ enum class Concern {
 struct ConcernInfo {
     QString code;
     QString name;
+    QString full_name;
     QString caption;
 };
 
@@ -58,6 +59,8 @@ private:
     QString format(const QDateTime &timestamp, Level level, const QString &concern, const QString& message) const;
     void write(Level level, Concern concern, const QString &message) const;
 public:
+    const static QMap<Concern, ConcernInfo> Concerns;
+
     explicit EventLogger(QObject *parent, const QString &filename);
 
     void set_display_widget(QTableWidget *widget);
@@ -71,9 +74,11 @@ public:
     void error(Concern concern, const QString &message) const;
     void fatal(Concern concern, const QString &message) const;
 
-    const static QMap<Concern, ConcernInfo> Concerns;
     void set_debug_visible(Concern concern, bool visible);
     bool is_debug_visible(Concern concern) const;
+
+    void load_settings(void);
+    void save_settings(void) const;
 };
 
 #endif // LOG_H

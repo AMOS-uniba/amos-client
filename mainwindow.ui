@@ -2030,12 +2030,21 @@
     <property name="title">
      <string>Operation</string>
     </property>
-    <addaction name="actionLogging_options"/>
+    <addaction name="action_logging_options"/>
     <addaction name="action_manual"/>
     <addaction name="separator"/>
     <addaction name="action_exit"/>
    </widget>
+   <widget class="QMenu" name="menu_extras">
+    <property name="title">
+     <string>Extras</string>
+    </property>
+    <addaction name="action_open_log"/>
+    <addaction name="action_open_stat"/>
+    <addaction name="action_open_config"/>
+   </widget>
    <addaction name="menuOperation"/>
+   <addaction name="menu_extras"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -2058,12 +2067,36 @@
     <string notr="true">Ctrl+M</string>
    </property>
   </action>
-  <action name="actionLogging_options">
+  <action name="action_logging_options">
    <property name="text">
     <string>Logging options</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="action_open_log">
+   <property name="text">
+    <string>Open log file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F7</string>
+   </property>
+  </action>
+  <action name="action_open_config">
+   <property name="text">
+    <string>Open configuration file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F12</string>
+   </property>
+  </action>
+  <action name="action_open_stat">
+   <property name="text">
+    <string>Open stat log file</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+F8</string>
    </property>
   </action>
  </widget>
