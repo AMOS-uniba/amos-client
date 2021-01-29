@@ -81,6 +81,10 @@ signals:
     void state_updated_T(void) const;
     void state_updated_Z(void) const;
 
+    void cover_closed(int position) const;
+    void cover_open(int position) const;
+    void cover_moved(int position) const;
+
     void serial_port_changed(const QString &name) const;
 };
 

@@ -16,6 +16,8 @@
 #include "utils/sighting.h"
 #include "utils/ufomanager.h"
 
+#include "amos-widgets/domewidget.h"
+
 #include "mainwindow.h"
 #include "server.h"
 #include "filesystem/storage.h"

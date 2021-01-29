@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1044</width>
-    <height>970</height>
+    <width>1578</width>
+    <height>986</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -74,31 +74,6 @@
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="lb_serial_port">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>undefined</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lx_serial_port">
-            <property name="text">
-             <string>Serial port</string>
-            </property>
-           </widget>
-          </item>
           <item row="3" column="1">
            <widget class="QLabel" name="lb_serial_data">
             <property name="text">
@@ -106,33 +81,6 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="co_serial_ports">
-            <property name="contextMenuPolicy">
-             <enum>Qt::PreventContextMenu</enum>
-            </property>
-            <property name="placeholderText">
-             <string>not selected</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QCheckBox" name="cb_safety_override">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="text">
-             <string>Safety override</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="lx_time_alive">
-            <property name="text">
-             <string>Time alive</string>
             </property>
            </widget>
           </item>
@@ -308,8 +256,71 @@
             </layout>
            </widget>
           </item>
-          <item row="6" column="0" colspan="2">
-           <widget class="QGroupBox" name="group_environment">
+          <item row="3" column="0">
+           <widget class="QLabel" name="lb_serial_port">
+            <property name="font">
+             <font>
+              <pointsize>12</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>undefined</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lb_time_alive">
+            <property name="font">
+             <font>
+              <pointsize>8</pointsize>
+              <weight>75</weight>
+              <bold>true</bold>
+              <kerning>true</kerning>
+             </font>
+            </property>
+            <property name="text">
+             <string>?</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="lx_time_alive">
+            <property name="text">
+             <string>Time alive</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="co_serial_ports">
+            <property name="contextMenuPolicy">
+             <enum>Qt::PreventContextMenu</enum>
+            </property>
+            <property name="placeholderText">
+             <string>not selected</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QCheckBox" name="cb_safety_override">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="text">
+             <string>Safety override</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_errors">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -317,30 +328,16 @@
              </sizepolicy>
             </property>
             <property name="title">
-             <string>Environment</string>
+             <string>Error bits</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_11">
-             <item row="5" column="0">
-              <widget class="QLabel" name="lx_light_sensor">
-               <property name="text">
-                <string>Light sensor</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="lx_t_lens">
-               <property name="text">
-                <string>Lens temperature</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="lb_t_lens">
+            <layout class="QGridLayout" name="gridLayout_5">
+             <item row="2" column="1">
+              <widget class="QLabel" name="lb_error_light">
                <property name="font">
                 <font>
+                 <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
-                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -352,13 +349,13 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
-              <widget class="QLabel" name="lb_t_sht">
+             <item row="1" column="1">
+              <widget class="QLabel" name="lb_error_SHT31">
                <property name="font">
                 <font>
+                 <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
-                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -371,96 +368,51 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="lx_t_sht">
+              <widget class="QLabel" name="lx_error_light">
                <property name="text">
-                <string>SHT temperature</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="1">
-              <widget class="QLabel" name="lb_rain_sensor">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <strikeout>false</strikeout>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <string>Emergency closing (light)</string>
                </property>
               </widget>
              </item>
              <item row="4" column="0">
-              <widget class="QLabel" name="lx_rain_sensor">
+              <widget class="QLabel" name="lx_error_watchdog_reset">
                <property name="text">
-                <string>Rain sensor</string>
+                <string>Watchdog reset</string>
                </property>
               </widget>
              </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="lb_h_sht">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <strikeout>false</strikeout>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="lx_h_sht">
-               <property name="text">
-                <string>SHT humidity</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="lb_t_cpu">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <strikeout>false</strikeout>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLabel" name="lx_computer_power">
-               <property name="text">
-                <string>Master power</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="1">
-              <widget class="QLabel" name="lb_computer_power">
+             <item row="7" column="1">
+              <widget class="QLabel" name="lb_error_computer_power">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
-                 <strikeout>false</strikeout>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="lx_error_computer_power">
+               <property name="text">
+                <string>Master power failure</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lb_error_t_lens">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -473,20 +425,101 @@
               </widget>
              </item>
              <item row="1" column="0">
-              <widget class="QLabel" name="lx_t_cpu">
+              <widget class="QLabel" name="lx_error_SHT31">
                <property name="text">
-                <string>Processor temperature</string>
+                <string>Environment temperature</string>
                </property>
               </widget>
              </item>
-             <item row="5" column="1">
-              <widget class="QLabel" name="lb_light_sensor">
+             <item row="4" column="1">
+              <widget class="QLabel" name="lb_error_watchdog_reset">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
-                 <strikeout>false</strikeout>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_error_t_lens">
+               <property name="text">
+                <string>Lens temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <widget class="QLabel" name="lb_error_brownout_reset">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="lx_error_brownout_reset">
+               <property name="text">
+                <string>Brownout reset</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0">
+              <widget class="QLabel" name="lx_error_t_CPU">
+               <property name="text">
+                <string>CPU temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QLabel" name="lx_error_rain">
+               <property name="text">
+                <string>Emergency closing (rain)</string>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="1">
+              <widget class="QLabel" name="lb_error_t_CPU">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="1">
+              <widget class="QLabel" name="lb_error_rain">
+               <property name="font">
+                <font>
+                 <pointsize>8</pointsize>
+                 <weight>75</weight>
+                 <bold>true</bold>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -726,26 +759,8 @@
             </layout>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="lb_time_alive">
-            <property name="font">
-             <font>
-              <pointsize>8</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>?</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0" colspan="2">
-           <widget class="QGroupBox" name="group_errors">
+          <item row="6" column="0" colspan="2">
+           <widget class="QGroupBox" name="group_environment">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -753,16 +768,30 @@
              </sizepolicy>
             </property>
             <property name="title">
-             <string>Error bits</string>
+             <string>Environment</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_5">
-             <item row="2" column="1">
-              <widget class="QLabel" name="lb_error_light">
+            <layout class="QGridLayout" name="gridLayout_11">
+             <item row="5" column="0">
+              <widget class="QLabel" name="lx_light_sensor">
+               <property name="text">
+                <string>Light sensor</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="lx_t_lens">
+               <property name="text">
+                <string>Lens temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="lb_t_lens">
                <property name="font">
                 <font>
-                 <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -774,13 +803,13 @@
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="lb_error_SHT31">
+             <item row="2" column="1">
+              <widget class="QLabel" name="lb_t_sht">
                <property name="font">
                 <font>
-                 <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -793,76 +822,20 @@
               </widget>
              </item>
              <item row="2" column="0">
-              <widget class="QLabel" name="lx_error_light">
+              <widget class="QLabel" name="lx_t_sht">
                <property name="text">
-                <string>Emergency closing (light)</string>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="lx_error_watchdog_reset">
-               <property name="text">
-                <string>Watchdog reset</string>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="1">
-              <widget class="QLabel" name="lb_error_computer_power">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0">
-              <widget class="QLabel" name="lx_error_computer_power">
-               <property name="text">
-                <string>Master power failure</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="lb_error_t_lens">
-               <property name="font">
-                <font>
-                 <pointsize>8</pointsize>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                 <kerning>true</kerning>
-                </font>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="lx_error_SHT31">
-               <property name="text">
-                <string>Environment temperature</string>
+                <string>SHT temperature</string>
                </property>
               </widget>
              </item>
              <item row="4" column="1">
-              <widget class="QLabel" name="lb_error_watchdog_reset">
+              <widget class="QLabel" name="lb_rain_sensor">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -874,20 +847,45 @@
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="lx_error_t_lens">
+             <item row="4" column="0">
+              <widget class="QLabel" name="lx_rain_sensor">
                <property name="text">
-                <string>Lens temperature</string>
+                <string>Rain sensor</string>
                </property>
               </widget>
              </item>
-             <item row="6" column="1">
-              <widget class="QLabel" name="lb_error_brownout_reset">
+             <item row="3" column="1">
+              <widget class="QLabel" name="lb_h_sht">
                <property name="font">
                 <font>
-                 <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
+                 <kerning>true</kerning>
+                </font>
+               </property>
+               <property name="text">
+                <string>undefined</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="lx_h_sht">
+               <property name="text">
+                <string>SHT humidity</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QLabel" name="lb_t_cpu">
+               <property name="font">
+                <font>
+                 <weight>75</weight>
+                 <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -900,33 +898,20 @@
               </widget>
              </item>
              <item row="6" column="0">
-              <widget class="QLabel" name="lx_error_brownout_reset">
+              <widget class="QLabel" name="lx_computer_power">
                <property name="text">
-                <string>Brownout reset</string>
+                <string>Master power</string>
                </property>
               </widget>
              </item>
-             <item row="8" column="0">
-              <widget class="QLabel" name="lx_error_t_CPU">
-               <property name="text">
-                <string>CPU temperature</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0">
-              <widget class="QLabel" name="lx_error_rain">
-               <property name="text">
-                <string>Emergency closing (rain)</string>
-               </property>
-              </widget>
-             </item>
-             <item row="8" column="1">
-              <widget class="QLabel" name="lb_error_t_CPU">
+             <item row="6" column="1">
+              <widget class="QLabel" name="lb_computer_power">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -938,13 +923,21 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="1">
-              <widget class="QLabel" name="lb_error_rain">
+             <item row="1" column="0">
+              <widget class="QLabel" name="lx_t_cpu">
+               <property name="text">
+                <string>Processor temperature</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLabel" name="lb_light_sensor">
                <property name="font">
                 <font>
                  <pointsize>8</pointsize>
                  <weight>75</weight>
                  <bold>true</bold>
+                 <strikeout>false</strikeout>
                  <kerning>true</kerning>
                 </font>
                </property>
@@ -957,6 +950,13 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="lx_serial_port">
+            <property name="text">
+             <string>Serial port</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -981,28 +981,27 @@
     <item>
      <widget class="QFrame" name="frame">
       <layout class="QGridLayout" name="grid_log">
-       <item row="1" column="3">
-        <widget class="QLabel" name="lx_next_heartbeat">
-         <property name="text">
-          <string>Next heartbeat in</string>
+       <item row="0" column="2">
+        <widget class="DomeWidget" name="dome_widget">
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>200</height>
+          </size>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" rowspan="4">
-        <widget class="QPushButton" name="button_send_heartbeat">
+       <item row="1" column="0" rowspan="2">
+        <widget class="QCheckBox" name="cb_debug">
          <property name="text">
-          <string>Send heartbeat</string>
+          <string>Debug output</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
-        <widget class="QLabel" name="lx_uptime">
-         <property name="text">
-          <string>Client uptime</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0" colspan="7">
+       <item row="7" column="0" colspan="7">
         <widget class="QTableWidget" name="tb_log">
          <property name="lineWidth">
           <number>1</number>
@@ -1083,7 +1082,14 @@
          </column>
         </widget>
        </item>
-       <item row="1" column="6">
+       <item row="2" column="3">
+        <widget class="QLabel" name="lx_next_heartbeat">
+         <property name="text">
+          <string>Next heartbeat in</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="6">
         <widget class="QLabel" name="lb_next_heartbeat">
          <property name="minimumSize">
           <size>
@@ -1099,20 +1105,14 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2" rowspan="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+       <item row="1" column="3">
+        <widget class="QLabel" name="lx_uptime">
+         <property name="text">
+          <string>Client uptime</string>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
+        </widget>
        </item>
-       <item row="0" column="6">
+       <item row="1" column="6">
         <widget class="QLabel" name="lb_uptime">
          <property name="minimumSize">
           <size>
@@ -1134,13 +1134,23 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" rowspan="2">
-        <widget class="QCheckBox" name="cb_debug">
-         <property name="text">
-          <string>Debug output</string>
+       <item row="1" column="2" rowspan="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="checked">
-          <bool>true</bool>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1" rowspan="4">
+        <widget class="QPushButton" name="button_send_heartbeat">
+         <property name="text">
+          <string>Send heartbeat</string>
          </property>
         </widget>
        </item>
@@ -2022,7 +2032,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1044</width>
+     <width>1578</width>
      <height>21</height>
     </rect>
    </property>
@@ -2100,6 +2110,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DomeWidget</class>
+   <extends>QWidget</extends>
+   <header>amos-widgets/domewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>cb_manual</tabstop>
   <tabstop>cb_safety_override</tabstop>

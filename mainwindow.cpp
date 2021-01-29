@@ -4,6 +4,8 @@
 
 #include "logging/loggingdialog.h"
 
+#include "amos-widgets/domewidget.h"
+
 extern EventLogger logger;
 extern QSettings *settings;
 
@@ -78,8 +80,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->cb_permanent_enabled, &QCheckBox::toggled, this->station->permanent_storage(), &Storage::set_enabled);
     this->set_icon(this->station->state());
 
+    this->connect(this->station->dome(), &Dome::cover_moved, this->ui->dome_widget, &DomeWidget::set_cover_position);
+    this->connect(this->station->dome(), &Dome::cover_open, this->ui->dome_widget, &DomeWidget::set_cover_maximum);
+    this->connect(this->station->dome(), &Dome::cover_open, this->ui->progress_cover, &QProgressBar::setMaximum);
+    this->connect(this->station->dome(), &Dome::cover_closed, this->ui->dome_widget, &DomeWidget::set_cover_minimum);
+    this->connect(this->station->dome(), &Dome::cover_closed, this->ui->progress_cover, &QProgressBar::setMinimum);
+
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
+    this->ui->dome_widget->set_cover_maximum(26);
 #endif
 }
 

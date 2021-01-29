@@ -82,27 +82,15 @@ public:
 };
 
 
-class DomeStateW: public DomeState {
-private:
-    unsigned short int m_shaft_position;
-public:
-    DomeStateW(void);
-    DomeStateW(const QByteArray &response);
-
-    unsigned short int shaft_position(void) const;
-
-    QJsonValue json(void) const override;
-};
-
 
 class DomeStateZ: public DomeState {
 private:
-    unsigned short int m_shaft_position;
+    short int m_shaft_position;
 public:
     DomeStateZ(void);
     DomeStateZ(const QByteArray &response);
 
-    unsigned short int shaft_position(void) const;
+    short int shaft_position(void) const;
 
     QJsonValue json(void) const override;
 };

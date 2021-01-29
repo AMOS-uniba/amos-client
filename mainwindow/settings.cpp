@@ -22,25 +22,8 @@ void MainWindow::load_settings(void) {
         ));
         this->display_ufo_settings();
 
-        this->station->set_scanner(
-            QDir(settings->value("storage/watch", "C:\\Data").toString())
-        );
-        this->station->set_storages(
-            QDir(settings->value("storage/primary", "C:\\Data").toString()),
-            QDir(settings->value("storage/permanent", "D:\\Data").toString())
-        );
-        this->display_permanent_storage_current_directory();
+        this->load_settings_storage();
 
-        this->station->set_position(
-            settings->value("station/latitude", 0).toDouble(),
-            settings->value("station/longitude", 0).toDouble(),
-            settings->value("station/altitude", 0).toDouble()
-        );
-        this->station->set_darkness_limit(settings->value("limits/darkness", -12.0).toDouble());
-        this->station->set_humidity_limits(
-            settings->value("limits/humidity_lower", 75.0).toDouble(),
-            settings->value("limits/humidity_upper", 80.0).toDouble()
-        );
 
         bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
@@ -72,6 +55,39 @@ void MainWindow::load_settings(void) {
         logger.fatal(Concern::Configuration, postmortem);
         exit(-4);
     }
+}
+
+void MainWindow::load_settings_storage(void) {
+    settings->beginGroup("storage");
+    this->station->set_scanner(
+        QDir(settings->value("watch/path", "C:\\Data").toString())
+    );
+    this->station->set_storages(
+        QDir(settings->value("primary/path", "C:\\Data").toString()),
+        QDir(settings->value("permanent/path", "D:\\Data").toString())
+    );
+    this->station->primary_storage()->set_enabled(
+        settings->value("primary/enabled", true).toBool()
+    );
+    this->station->permanent_storage()->set_enabled(
+        settings->value("permanent/enabled", true).toBool()
+    );
+    this->display_permanent_storage_current_directory();
+    settings->endGroup();
+}
+
+void MainWindow::load_settings_station(void) {
+    settings->beginGroup("station");
+    this->station->set_position(
+        settings->value("latitude", 0).toDouble(),
+        settings->value("longitude", 0).toDouble(),
+        settings->value("altitude", 0).toDouble()
+    );
+    this->station->set_darkness_limit(settings->value("limits/darkness", -12.0).toDouble());
+    this->station->set_humidity_limits(
+        settings->value("humidity/lower", 75.0).toDouble(),
+        settings->value("humidity/upper", 80.0).toDouble()
+    );
 }
 
 // Handle changes in station settings

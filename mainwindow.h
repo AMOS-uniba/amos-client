@@ -68,6 +68,9 @@ private:
 
 private slots:
     void load_settings(void);
+    void load_settings_storage(void);
+    void load_settings_station(void);
+
     void create_timers(void);
     void display_serial_ports(void);
 

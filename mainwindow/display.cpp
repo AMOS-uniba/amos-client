@@ -84,8 +84,10 @@ void MainWindow::display_cover_status(void) {
     const DomeStateZ &stateZ = this->station->dome()->state_Z();
 
     this->ui->progress_cover->setEnabled(stateZ.is_valid());
-    if (stateS.is_valid() && stateS.dome_open_sensor_active() && stateZ.is_valid()) {
-        this->ui->progress_cover->setMaximum(stateZ.shaft_position());
+    if (stateS.is_valid() && stateZ.is_valid()) {
+        if (stateS.dome_open_sensor_active()) {
+            this->ui->progress_cover->setMaximum(stateZ.shaft_position());
+        }
     }
     this->ui->progress_cover->setValue(stateZ.is_valid() ? stateZ.shaft_position() : 0);
 

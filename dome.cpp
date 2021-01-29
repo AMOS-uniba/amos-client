@@ -149,6 +149,16 @@ void Dome::process_message(const QByteArray &message) {
             case 'S':
                 this->m_state_S = DomeStateS(decoded);
                 emit this->state_updated_S();
+
+                if (this->m_state_Z.is_valid()) {
+                    if (this->m_state_S.dome_open_sensor_active()) {
+                        emit this->cover_open(this->m_state_Z.shaft_position());
+                    }
+                    if (this->m_state_S.dome_closed_sensor_active()) {
+                        emit this->cover_closed(this->m_state_Z.shaft_position());
+                    }
+                }
+
                 break;
             case 'T':
                 this->m_state_T = DomeStateT(decoded);
@@ -160,6 +170,7 @@ void Dome::process_message(const QByteArray &message) {
             case 'Z':
                 this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z();
+                emit this->cover_moved(this->m_state_Z.shaft_position());
                 break;
             default:
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));

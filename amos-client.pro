@@ -1,11 +1,10 @@
 QT      += core gui
 QT      += serialport
-QT      += network
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT      += network widgets uiplugin
 
 CONFIG += c++11
 CONFIG += static
+CONFIG += plugin
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -51,7 +50,8 @@ SOURCES += \
     utils/state/stationstate.cpp \
     utils/telegram.cpp \
     utils/ufomanager.cpp \
-    utils/universe.cpp
+    utils/universe.cpp \
+    amos-widgets/domewidget.cpp
 
 HEADERS += \
     APC/APC_Cheb.h \
@@ -79,7 +79,6 @@ HEADERS += \
     forward.h \
     include.h \
     mainwindow.h \
-    serialbuffer.h \
     server.h \
     station.h \
     utils/domestate.h \
@@ -92,7 +91,8 @@ HEADERS += \
     utils/state/stationstate.h \
     utils/telegram.h \
     utils/ufomanager.h \
-    utils/universe.h
+    utils/universe.h \
+    amos-widgets/domewidget.h
 
 FORMS += \
     logging/loggingdialog.ui \

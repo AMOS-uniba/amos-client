@@ -186,7 +186,7 @@ DomeStateZ::DomeStateZ(const QByteArray &response) {
     logger.debug(Concern::SerialPort, QString("Z state received: %1").arg(this->m_shaft_position));
 }
 
-unsigned short int DomeStateZ::shaft_position(void) const {
+short int DomeStateZ::shaft_position(void) const {
     return this->m_shaft_position;
 }
 
