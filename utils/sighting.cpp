@@ -5,13 +5,22 @@ extern EventLogger logger;
 Sighting::Sighting(const QString& prefix):
     m_prefix(prefix)
 {
-    this->m_jpg = this->try_open(QString("%1P.jpg").arg(prefix));
-    this->m_xml = this->try_open(QString("%1.xml").arg(prefix));
-    this->m_bmp = this->try_open(QString("%1M.bmp").arg(prefix));
-    this->m_avi = this->try_open(QString("%1.avi").arg(prefix));
+    this->m_jpg = this->try_open(QString("%1P.jpg").arg(prefix), false);
+    this->m_xml = this->try_open(QString("%1.xml").arg(prefix), true);
+    this->m_bmp = this->try_open(QString("%1M.bmp").arg(prefix), false);
+    this->m_avi = this->try_open(QString("%1.avi").arg(prefix), false);
     this->m_files = {this->m_jpg, this->m_xml, this->m_bmp, this->m_avi};
 
-    logger.info(Concern::Sightings, QString("Created a new sighting '%1*' (%2 MB)").arg(prefix).arg(this->avi_size() / (1 << 20)));
+    logger.info(Concern::Sightings, QString("Created a new sighting '%1*' (%2 MB) (%3)")
+                .arg(prefix)
+                .arg(this->avi_size() / (1 << 20))
+                .arg(QStringList({
+                    (this->m_xml == "") ? "XML" : "---",
+                    (this->m_jpg == "") ? "JPG" : "---",
+                    (this->m_bmp == "") ? "BMP" : "---",
+                    (this->m_avi == "") ? "AVI" : "---"
+                }).join("+"))
+    );
     this->m_timestamp = QFileInfo(this->m_xml).birthTime();
     this->hack_Y16();
 }
@@ -20,11 +29,16 @@ Sighting::~Sighting(void) {
     this->m_files.clear();
 }
 
-const QString& Sighting::try_open(const QString &path) {
-    if (!QFileInfo(path).exists()) {
-         throw RuntimeException(QString("Could not open sighting file %1").arg(path));
+QString Sighting::try_open(const QString &path, bool require) {
+    if (QFileInfo(path).exists()) {
+        return path;
+    } else {
+        if (require) {
+            throw RuntimeException(QString("Could not open sighting file %1").arg(path));
+        } else {
+            return "";
+        }
     }
-    return path;
 }
 
 qint64 Sighting::avi_size(void) const {
@@ -65,14 +79,18 @@ void Sighting::copy(const QString &prefix) const {
 
 QHttpPart Sighting::jpg_part(void) const {
     QHttpPart jpg_part;
-    jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
-    jpg_part.setHeader(
-        QNetworkRequest::ContentDispositionHeader,
-        QString("form-data; name=\"jpg\"; filename=\"%1\"").arg(QFileInfo(this->m_jpg).fileName())
-    );
-    QFile jpg_file(this->m_jpg);
-    jpg_file.open(QIODevice::ReadOnly);
-    jpg_part.setBody(jpg_file.readAll());
+    if (this->m_xml == "") {
+        logger.error(Concern::Sightings, QString("XML file not present in sighting %1").arg(this->m_prefix));
+    } else {
+        jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
+        jpg_part.setHeader(
+            QNetworkRequest::ContentDispositionHeader,
+            QString("form-data; name=\"jpg\"; filename=\"%1\"").arg(QFileInfo(this->m_jpg).fileName())
+        );
+        QFile jpg_file(this->m_jpg);
+        jpg_file.open(QIODevice::ReadOnly);
+        jpg_part.setBody(jpg_file.readAll());
+    }
     return jpg_part;
 }
 

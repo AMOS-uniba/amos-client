@@ -38,7 +38,9 @@ Station::Station(const QString& id):
     m_manual_control(false),
     m_safety_override(false),
     m_state(Station::NotObserving),
-    m_filesystemscanner(nullptr),
+    m_scanner(nullptr),
+    m_primary_storage(nullptr),
+    m_permanent_storage(nullptr),
     m_server(nullptr)
 {
     this->m_dome = new Dome();
@@ -59,31 +61,23 @@ Station::Station(const QString& id):
 Station::~Station(void) {
     delete this->m_dome;
     delete this->m_timer_automatic;
-    delete this->m_filesystemscanner;
+    delete this->m_scanner;
     delete this->m_primary_storage;
     delete this->m_permanent_storage;
     delete this->m_ufo_manager;
     delete this->m_server;
 }
 
-void Station::set_scanner(const QDir &directory) {
-    delete this->m_filesystemscanner;
-    this->m_filesystemscanner = new FileSystemScanner(directory);
-    this->connect(this->m_filesystemscanner, &FileSystemScanner::sightings_found, this, &Station::process_sightings);
-}
-
-FileSystemScanner* Station::scanner(void) const { return this->m_filesystemscanner; }
-
-void Station::set_storages(const QDir &primary_storage_dir, const QDir &permanent_storage_dir) {
-    this->m_primary_storage = new Storage("primary", primary_storage_dir);
-    this->m_permanent_storage = new Storage("permanent", permanent_storage_dir);
+void Station::set_storages(QStorageBox *primary_storage, QStorageBox *permanent_storage) {
+    this->m_primary_storage = primary_storage;
+    this->m_permanent_storage = permanent_storage;
 }
 
 void Station::set_ufo_manager(UfoManager *ufo_manager) { this->m_ufo_manager = ufo_manager; }
 UfoManager* Station::ufo_manager(void) const { return this->m_ufo_manager; }
 
-Storage* Station::primary_storage(void) const { return this->m_primary_storage; }
-Storage* Station::permanent_storage(void) const { return this->m_permanent_storage; }
+QStorageBox* Station::primary_storage(void) const { return this->m_primary_storage; }
+QStorageBox* Station::permanent_storage(void) const { return this->m_permanent_storage; }
 Dome* Station::dome(void) const { return this->m_dome; }
 
 // Server getters and setters
@@ -195,7 +189,7 @@ double Station::sun_azimuth(const QDateTime& time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
-/* Compute next sun crossing of almucantar `altitude` in the specified direction
+/* Compute next crossing of the Sun through the almucantar `altitude` in the specified direction (up/down)
  * with resolution of `resolution` seconds (optional, default = 60) */
 QDateTime Station::next_sun_crossing(double altitude, bool direction_up, int resolution) const {
     QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 60) * 60);
@@ -258,9 +252,10 @@ void Station::log_state(void) {
     const DomeStateS& stateS = this->dome()->state_S();
     const DomeStateT& stateT = this->dome()->state_T();
     const DomeStateZ& stateZ = this->dome()->state_Z();
-    QString line = QString("%1 %2° %3C %4C %5C %6% %7")
+    QString line = QString("%1 %2° %3 %4C %5C %6C %7% %8")
                         .arg(QString(stateS.full_text()))
                         .arg(this->sun_altitude(), 5, 'f', 1)
+                        .arg(QString(this->state().code()))
                         .arg(stateT.temperature_sht(), 5, 'f', 1)
                         .arg(stateT.temperature_lens(), 5, 'f', 1)
                         .arg(stateT.temperature_cpu(), 5, 'f', 1)
@@ -334,7 +329,7 @@ void Station::automatic_check(void) {
                 if (stateS.dome_open_sensor_active()) {
                     // If the dome is open, turn on the image intensifier and the fan
                     if (stateS.intensifier_active()) {
-                        logger.debug(Concern::Automatic, "Intensifier active");
+                        logger.detail(Concern::Automatic, "Intensifier active");
                         this->set_state(Station::Observing);
                     } else {
                         logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
@@ -426,8 +421,6 @@ StationState Station::state(void) {
 }
 
 void Station::file_check(void) {
-    logger.debug(Concern::Automatic, "Checking files...");
-
     this->m_ufo_manager->auto_action(this->is_dark());
 }
 

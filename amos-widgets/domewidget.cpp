@@ -42,7 +42,7 @@ void DomeWidget::drawWidget(QPainter &qp) {
     QColor black(0, 0, 0);
     QSize size(this->size());
 
-    float angle = ((float) (this->m_cover_position - this->m_cover_minimum) / (float) (this->m_cover_maximum - this->m_cover_minimum)) * M_PI_2 * 0.9 + 1;
+    float angle = ((float) (this->m_cover_position - this->m_cover_minimum) / (float) (this->m_cover_maximum - this->m_cover_minimum)) * M_PI_2 * 0.9;
     float w = size.width() - 1;
     float h = size.height() - 1;
     float scale = (w < h ? w : h);

@@ -4,7 +4,6 @@ QT      += network widgets uiplugin
 
 CONFIG += c++11
 CONFIG += static
-CONFIG += plugin
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -24,9 +23,6 @@ SOURCES += \
     APC/APC_Sun.cpp \
     APC/APC_Time.cpp \
     APC/APC_VecMat3D.cpp \
-    filesystem/manager.cpp \
-    filesystem/storage.cpp \
-    filesystem/scanner.cpp \
     logging/baselogger.cpp \
     logging/eventlogger.cpp \
     logging/loggingdialog.cpp \
@@ -51,7 +47,13 @@ SOURCES += \
     utils/telegram.cpp \
     utils/ufomanager.cpp \
     utils/universe.cpp \
-    amos-widgets/domewidget.cpp
+    widgets/domewidget.cpp \
+    widgets/qdisplayline.cpp \
+    widgets/qfilesystembox.cpp \
+    widgets/qscannerbox.cpp \
+    widgets/qstoragebox.cpp \
+    widgets/qsunline.cpp \
+    widgets/qsuninfo.cpp
 
 HEADERS += \
     APC/APC_Cheb.h \
@@ -68,9 +70,6 @@ HEADERS += \
     APC/APC_Sun.h \
     APC/APC_Time.h \
     APC/APC_VecMat3D.h \
-    filesystem/manager.h \
-    filesystem/scanner.h \
-    filesystem/storage.h \
     logging/baselogger.h \
     logging/eventlogger.h \
     logging/loggingdialog.h \
@@ -92,11 +91,21 @@ HEADERS += \
     utils/telegram.h \
     utils/ufomanager.h \
     utils/universe.h \
-    amos-widgets/domewidget.h
+    widgets/domewidget.h \
+    widgets/qdisplayline.h \
+    widgets/qfilesystembox.h \
+    widgets/qscannerbox.h \
+    widgets/qstoragebox.h \
+    widgets/qsunline.h \
+    widgets/qsuninfo.h
 
 FORMS += \
     logging/loggingdialog.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    widgets/qdisplayline.ui \
+    widgets/qsuninfo.ui \
+    widgets/qsunline.ui \
+    widgets/qsuninfo.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

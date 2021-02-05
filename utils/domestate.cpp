@@ -62,7 +62,11 @@ bool DomeStateS::fan_active(void) const                     { return this->m_bas
 
 bool DomeStateS::rain_sensor_active(void) const             { return this->m_env & 0x01; }
 bool DomeStateS::light_sensor_active(void) const            { return this->m_env & 0x02; }
+#ifdef OLD_PROTOCOL
+bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x08; }
+#else
 bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x04; }
+#endif
 bool DomeStateS::cover_safety_position(void) const          { return this->m_env & 0x20; }
 bool DomeStateS::servo_blocked(void) const                  { return this->m_env & 0x80; }
 

@@ -35,7 +35,7 @@ public:
     ~MainWindow();
 
 private:
-    QTimer *timer_display, *timer_heartbeat, *timer_watchdog, *timer_longterm;
+    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
     Ui::MainWindow *ui;
 
     Station *station = nullptr;
@@ -50,9 +50,6 @@ private:
 
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
-
-    void set_storage(Storage *storage, QLineEdit *edit);
-    void display_storage_status(const Storage *storage, QProgressBar *pb, QLineEdit *le);
 
     void display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off);
     void display_device_button(QPushButton *button, bool on);
@@ -81,12 +78,9 @@ private slots:
 
     void process_display_timer(void);
     void process_watchdog_timer(void);
-    void process_longterm_timer(void);
 
     // Display
     void display_time(void);
-    void display_sun_data(void);
-    void display_sun_longterm(void);
 
     void display_window_title(void);
 
@@ -97,12 +91,9 @@ private slots:
     void display_device_buttons_state(void);
 
     void display_cover_status(void);
-    void display_storages(void);
     void display_station_config(void);
     void display_ufo_settings(void);
     void display_ufo_state(void);
-
-    void display_permanent_storage_current_directory(void);
 
     void slot_station_edited(void);
 
@@ -112,8 +103,6 @@ private slots:
     void button_station_toggle(bool changed);
     void on_bt_station_reset_clicked();
     void on_bt_station_apply_clicked();
-
-    void on_bt_permanent_clicked();
 
     void on_cb_manual_stateChanged(int manual);
     void on_cb_debug_stateChanged(int debug);
@@ -138,9 +127,6 @@ private slots:
     void on_bt_change_ufo_clicked();
     void on_cb_ufo_auto_stateChanged(int arg1);
     void on_bt_ufo_clicked();
-    void on_bt_permanent_open_clicked();
-    void on_bt_watchdir_open_clicked();
-    void on_bt_watchdir_change_clicked();
 
     void on_action_open_log_triggered();
     void on_action_open_config_triggered();

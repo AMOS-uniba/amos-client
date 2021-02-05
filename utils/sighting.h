@@ -14,7 +14,7 @@ private:
 
     QVector<QString> m_files;
 
-    const QString& try_open(const QString &path);
+    QString try_open(const QString &path, bool require);
 public:
     Sighting(const QString &prefix);
     ~Sighting(void);

@@ -166,8 +166,9 @@ void Dome::process_message(const QByteArray &message) {
                 break;
 #ifdef OLD_PROTOCOL
             case 'W':
-#endif
+#else
             case 'Z':
+#endif
                 this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z();
                 emit this->cover_moved(this->m_state_Z.shaft_position());

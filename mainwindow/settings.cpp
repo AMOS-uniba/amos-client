@@ -14,6 +14,7 @@ void MainWindow::load_settings(void) {
 
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
+        this->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
 
         // Create the UFO manager
         this->station->set_ufo_manager(new UfoManager(
@@ -23,7 +24,7 @@ void MainWindow::load_settings(void) {
         this->display_ufo_settings();
 
         this->load_settings_storage();
-
+        this->load_settings_station();
 
         bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
@@ -59,35 +60,33 @@ void MainWindow::load_settings(void) {
 
 void MainWindow::load_settings_storage(void) {
     settings->beginGroup("storage");
-    this->station->set_scanner(
-        QDir(settings->value("watch/path", "C:\\Data").toString())
-    );
-    this->station->set_storages(
-        QDir(settings->value("primary/path", "C:\\Data").toString()),
-        QDir(settings->value("permanent/path", "D:\\Data").toString())
-    );
-    this->station->primary_storage()->set_enabled(
-        settings->value("primary/enabled", true).toBool()
-    );
-    this->station->permanent_storage()->set_enabled(
-        settings->value("permanent/enabled", true).toBool()
-    );
-    this->display_permanent_storage_current_directory();
+    this->ui->scanner->set_directory(QDir(settings->value("scanner_path", "C:\\Data").toString()));
+    this->ui->scanner->set_enabled(settings->value("scanner_enabled", true).toBool());
+    this->ui->scanner->scan_info();
+
+    this->ui->storage_primary->set_directory(QDir(settings->value("primary_path", "C:\\Data").toString()));
+    this->ui->storage_primary->set_enabled(settings->value("primary_enabled", true).toBool());
+    this->ui->storage_primary->scan_info();
+
+    this->ui->storage_permanent->set_directory(QDir(settings->value("permanent_path", "D:\\Data").toString()));
+    this->ui->storage_permanent->set_enabled(settings->value("permanent_enabled", true).toBool());
+    this->ui->storage_permanent->scan_info();
     settings->endGroup();
 }
 
 void MainWindow::load_settings_station(void) {
     settings->beginGroup("station");
     this->station->set_position(
-        settings->value("latitude", 0).toDouble(),
-        settings->value("longitude", 0).toDouble(),
+        settings->value("latitude", 48).toDouble(),
+        settings->value("longitude", 17).toDouble(),
         settings->value("altitude", 0).toDouble()
     );
-    this->station->set_darkness_limit(settings->value("limits/darkness", -12.0).toDouble());
+    this->station->set_darkness_limit(settings->value("darkness", -12.0).toDouble());
     this->station->set_humidity_limits(
-        settings->value("humidity/lower", 75.0).toDouble(),
-        settings->value("humidity/upper", 80.0).toDouble()
+        settings->value("humidity_lower", 75.0).toDouble(),
+        settings->value("humidity_upper", 80.0).toDouble()
     );
+    settings->endGroup();
 }
 
 // Handle changes in station settings
@@ -124,7 +123,7 @@ void MainWindow::on_bt_station_apply_clicked() {
     // Update the darkness limit, if changed
     if (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) {
         this->station->set_darkness_limit(this->ui->dsb_darkness_limit->value());
-        this->display_sun_longterm();
+        this->ui->sun_info->update_long_term();
     }
 
     // Update the humidity limits, if changed
@@ -141,14 +140,17 @@ void MainWindow::on_bt_station_apply_clicked() {
     // Store all new values in permanent settings
     settings->setValue("server/ip", this->station->server()->address().toString());
     settings->setValue("server/port", this->station->server()->port());
-    settings->setValue("station/id", this->station->get_id());
-    settings->setValue("station/latitude", this->station->latitude());
-    settings->setValue("station/longitude", this->station->longitude());
-    settings->setValue("station/altitude", this->station->altitude());
 
-    settings->setValue("limits/darkness", this->station->darkness_limit());
-    settings->setValue("limits/humidity_lower", this->station->humidity_limit_lower());
-    settings->setValue("limits/humidity_upper", this->station->humidity_limit_upper());
+    settings->beginGroup("station");
+    settings->setValue("id", this->station->get_id());
+    settings->setValue("latitude", this->station->latitude());
+    settings->setValue("longitude", this->station->longitude());
+    settings->setValue("altitude", this->station->altitude());
+
+    settings->setValue("darkness", this->station->darkness_limit());
+    settings->setValue("humidity_lower", this->station->humidity_limit_lower());
+    settings->setValue("humidity_upper", this->station->humidity_limit_upper());
+    settings->endGroup();
 
     settings->sync();
 

@@ -32,8 +32,9 @@ private:
     void set_state(StationState new_state);
 
     FileSystemScanner *m_filesystemscanner;
-    Storage *m_primary_storage;
-    Storage *m_permanent_storage;
+    QScannerBox *m_scanner;
+    QStorageBox *m_primary_storage;
+    QStorageBox *m_permanent_storage;
 
     StateLogger *m_state_logger;
     Dome *m_dome;
@@ -60,9 +61,9 @@ public:
     QJsonObject prepare_heartbeat(void) const;
 
     // G&S for storage
-    void set_storages(const QDir& primary_storage_dir, const QDir& permanent_storage_dir);
-    Storage* primary_storage(void) const;
-    Storage* permanent_storage(void) const;
+    void set_storages(QStorageBox *primary_storage, QStorageBox *permanent_storage);
+    QStorageBox* primary_storage(void) const;
+    QStorageBox* permanent_storage(void) const;
 
     void set_server(Server *server);
     Server* server(void);

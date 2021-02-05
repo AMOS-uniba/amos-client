@@ -11,6 +11,8 @@ extern QSettings *settings;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
     this->ui->setupUi(this);
+    this->ui->storage_primary->set_name("primary");
+    this->ui->storage_permanent->set_name("permanent");
 
     this->universe = new Universe();
 
@@ -27,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
     settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
+
+    this->ui->sun_info->set_station(this->station);
 
     this->create_timers();
 
@@ -68,16 +72,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->display_cover_status();
     this->display_station_config();
-    this->display_storages();
     this->display_ufo_state();
     this->display_window_title();
-    this->process_longterm_timer();
-
-    this->connect(this->station->permanent_storage(), &FileSystemManager::directory_set, this, &MainWindow::display_permanent_storage_current_directory);
-    this->connect(this->station->scanner(), QOverload<const QDir&>::of(&FileSystemManager::directory_set), this, &MainWindow::display_storages);
 
     this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
-    this->connect(this->ui->cb_permanent_enabled, &QCheckBox::toggled, this->station->permanent_storage(), &Storage::set_enabled);
     this->set_icon(this->station->state());
 
     this->connect(this->station->dome(), &Dome::cover_moved, this->ui->dome_widget, &DomeWidget::set_cover_position);
@@ -86,6 +84,10 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station->dome(), &Dome::cover_closed, this->ui->dome_widget, &DomeWidget::set_cover_minimum);
     this->connect(this->station->dome(), &Dome::cover_closed, this->ui->progress_cover, &QProgressBar::setMinimum);
 
+    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->station, &Station::process_sightings);
+
+    this->ui->sun_info->update_short_term();
+    this->ui->sun_info->update_long_term();
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);
@@ -126,29 +128,6 @@ void MainWindow::on_action_exit_triggered() {
 
 void MainWindow::on_button_send_heartbeat_pressed() {
     this->heartbeat();
-}
-
-void MainWindow::set_storage(Storage *storage, QLineEdit *edit) {
-    QString new_dir = QFileDialog::getExistingDirectory(
-        this,
-        QString("Select %1 storage directory").arg(storage->name()),
-        storage->directory().path(),
-        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
-    );
-
-    if (new_dir == "") {
-        logger.debug(Concern::Configuration, "Directory selection aborted");
-        return;
-    } else {
-        storage->set_directory(new_dir);
-        edit->setText(new_dir);
-        this->display_storages();
-        settings->setValue(QString("storage/%1").arg(storage->name()), new_dir);
-    }
-}
-
-void MainWindow::on_bt_permanent_clicked() {
-    this->set_storage(this->station->permanent_storage(), this->ui->le_permanent);
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {
@@ -293,31 +272,6 @@ void MainWindow::on_co_serial_ports_activated(int index) {
         }
     }
 
-}
-
-void MainWindow::on_bt_watchdir_change_clicked() {
-    QString new_dir = QFileDialog::getExistingDirectory(
-        this,
-        "Select UFO output directory to watch",
-        this->station->scanner()->directory().path(),
-        QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
-    );
-
-    if (new_dir == "") {
-        logger.debug(Concern::Storage, "Watch directory selection aborted");
-    } else {
-        this->station->set_scanner(new_dir);
-        this->ui->le_watchdir->setText(new_dir);
-        settings->setValue(QString("storage/watch"), new_dir);
-    }
-}
-
-void MainWindow::on_bt_watchdir_open_clicked() {
-    this->station->scanner()->open_in_explorer();
-}
-
-void MainWindow::on_bt_permanent_open_clicked() {
-    this->station->permanent_storage()->open_in_explorer();
 }
 
 void MainWindow::on_action_manual_triggered() {

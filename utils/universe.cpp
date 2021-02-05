@@ -26,14 +26,14 @@ Vec3D Universe::compute_sun_equ(const QDateTime& time) {
     return Vec3D(Polar(ra, dec));
 }
 
-QString Universe::altitude_colour(double altitude) {
+QColor Universe::altitude_colour(double altitude) {
     if (altitude < 0) {
-        return QString("hsv(240, 50%, %1%)").arg(altitude * 50.0 / 90.0 + 50.0);
+        return QColor::fromHslF(2.0 / 3.0, 0.5, 0.5 + altitude / 90.0 * 0.5);
     } else {
         if (altitude < 30) {
-            return QString("hsv(%1, 100%, 80%)").arg(altitude + 30.0);
+            return QColor::fromHslF((altitude + 30) / 360.0, 1, 0.5);
         } else {
-            return QString("hsv(60, %1%, %1%)").arg(70.0 + (20.0 * altitude - 30.0) / 60);
+            return QColor::fromHslF(1.0 / 6.0, (70.0 + 20 * (altitude - 30.0)) / 60.0, (70.0 + 20.0 * altitude - 30.0) / 60.0);
         }
     }
 }

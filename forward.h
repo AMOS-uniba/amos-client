@@ -28,6 +28,10 @@ QT_FORWARD_DECLARE_CLASS(FileSystemManager);
 QT_FORWARD_DECLARE_CLASS(Storage);
 QT_FORWARD_DECLARE_CLASS(FileSystemScanner);
 
+QT_FORWARD_DECLARE_CLASS(QFileSystemBox);
+QT_FORWARD_DECLARE_CLASS(QScannerBox);
+QT_FORWARD_DECLARE_CLASS(QStorageBox);
+
 QT_FORWARD_DECLARE_CLASS(UfoManager);
 
 #include "utils/state/state.h"

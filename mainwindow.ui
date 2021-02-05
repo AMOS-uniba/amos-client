@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1578</width>
-    <height>986</height>
+    <width>1277</width>
+    <height>971</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -981,16 +981,6 @@
     <item>
      <widget class="QFrame" name="frame">
       <layout class="QGridLayout" name="grid_log">
-       <item row="0" column="2">
-        <widget class="DomeWidget" name="dome_widget">
-         <property name="minimumSize">
-          <size>
-           <width>250</width>
-           <height>200</height>
-          </size>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="0" rowspan="2">
         <widget class="QCheckBox" name="cb_debug">
          <property name="text">
@@ -1082,10 +1072,35 @@
          </column>
         </widget>
        </item>
-       <item row="2" column="3">
-        <widget class="QLabel" name="lx_next_heartbeat">
+       <item row="0" column="0" colspan="7">
+        <widget class="DomeWidget" name="dome_widget" native="true">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>150</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="6">
+        <widget class="QLabel" name="lb_uptime">
+         <property name="minimumSize">
+          <size>
+           <width>80</width>
+           <height>0</height>
+          </size>
+         </property>
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>Next heartbeat in</string>
+          <string>? s</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -1112,28 +1127,6 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="6">
-        <widget class="QLabel" name="lb_uptime">
-         <property name="minimumSize">
-          <size>
-           <width>80</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>? s</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
        <item row="1" column="2" rowspan="2">
         <spacer name="horizontalSpacer">
          <property name="orientation">
@@ -1151,6 +1144,13 @@
         <widget class="QPushButton" name="button_send_heartbeat">
          <property name="text">
           <string>Send heartbeat</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="lx_next_heartbeat">
+         <property name="text">
+          <string>Next heartbeat in</string>
          </property>
         </widget>
        </item>
@@ -1182,259 +1182,16 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QGroupBox" name="group_sun">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+        <widget class="QSunInfo" name="sun_info">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
          </property>
          <property name="title">
-          <string>Sun</string>
+          <string>Sun info</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_6">
-          <item row="6" column="1">
-           <widget class="QLabel" name="lb_sun_ecl_lon">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="1">
-           <widget class="QLabel" name="lb_sun_close">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>??:??</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="7" column="0" colspan="2">
-           <widget class="Line" name="line_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0">
-           <widget class="QLabel" name="lx_sun_dec">
-            <property name="text">
-             <string>Declination δ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLabel" name="lb_sun_alt">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="1">
-           <widget class="QLabel" name="lb_sunset">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>??:??</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="lx_sun_az">
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Azimuth a&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
-          <item row="8" column="0">
-           <widget class="QLabel" name="lx_sun_close">
-            <property name="text">
-             <string>Dome closing</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
-           <widget class="QLabel" name="lb_sun_status">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="lb_sun_az">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="lx_sun_alt">
-            <property name="text">
-             <string>Altitude θ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="0">
-           <widget class="QLabel" name="lx_sun_ra">
-            <property name="text">
-             <string>Right ascension α</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="0">
-           <widget class="QLabel" name="lx_sunrise">
-            <property name="text">
-             <string>Sunrise</string>
-            </property>
-           </widget>
-          </item>
-          <item row="9" column="1">
-           <widget class="QLabel" name="lb_sunrise">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>??:??</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="5" column="1">
-           <widget class="QLabel" name="lb_sun_ra">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="12" column="0">
-           <widget class="QLabel" name="lx_sunset">
-            <property name="text">
-             <string>Sunset</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLabel" name="lb_sun_dec">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>???°</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="6" column="0">
-           <widget class="QLabel" name="lx_sun_ecl_lon">
-            <property name="text">
-             <string>Ecliptical longitude λ</string>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="0">
-           <widget class="QLabel" name="lx_sun_open">
-            <property name="text">
-             <string>Dome opening</string>
-            </property>
-           </widget>
-          </item>
-          <item row="13" column="1">
-           <widget class="QLabel" name="lb_sun_open">
-            <property name="font">
-             <font>
-              <weight>75</weight>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>??:??</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
-         </layout>
         </widget>
        </item>
        <item>
@@ -1449,41 +1206,7 @@
           <string>UFO Capture</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0">
-           <widget class="QLineEdit" name="le_ufo_path">
-            <property name="cursor">
-             <cursorShape>ForbiddenCursor</cursorShape>
-            </property>
-            <property name="toolTip">
-             <string>path to monitored executable</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QCheckBox" name="cb_ufo_auto">
-            <property name="text">
-             <string>Auto start/stop</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="bt_ufo">
-            <property name="text">
-             <string>Run UFO</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="bt_change_ufo">
-            <property name="text">
-             <string>Change</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="2">
+          <item row="1" column="0" colspan="2">
            <widget class="QLabel" name="lb_ufo_state">
             <property name="font">
              <font>
@@ -1499,6 +1222,40 @@
             </property>
             <property name="alignment">
              <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="bt_change_ufo">
+            <property name="text">
+             <string>Change</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QCheckBox" name="cb_ufo_auto">
+            <property name="text">
+             <string>Auto start/stop</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLineEdit" name="le_ufo_path">
+            <property name="cursor">
+             <cursorShape>ForbiddenCursor</cursorShape>
+            </property>
+            <property name="toolTip">
+             <string>path to monitored executable</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QPushButton" name="bt_ufo">
+            <property name="text">
+             <string>Run UFO</string>
             </property>
            </widget>
           </item>
@@ -1895,115 +1652,42 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
-           <widget class="QGroupBox" name="group_scan">
+           <widget class="QScannerBox" name="scanner">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
             <property name="title">
              <string>Watch directory</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_10">
-             <item row="2" column="0" colspan="2">
-              <widget class="QProgressBar" name="pb_watchdir">
-               <property name="maximum">
-                <number>400</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-               <property name="format">
-                <string>%v/%m GB</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="bt_watchdir_change">
-               <property name="text">
-                <string>Change</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="bt_watchdir_open">
-               <property name="text">
-                <string>Open</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0" colspan="2">
-              <widget class="QLineEdit" name="le_watchdir">
-               <property name="cursor">
-                <cursorShape>ForbiddenCursor</cursorShape>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="group_store">
+           <widget class="QStorageBox" name="storage_primary">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
+            <property name="title">
+             <string>Primary storage</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QStorageBox" name="storage_permanent">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>50</height>
+             </size>
+            </property>
             <property name="title">
              <string>Permanent storage</string>
             </property>
-            <layout class="QGridLayout" name="gridLayout_9">
-             <item row="5" column="0">
-              <widget class="QPushButton" name="bt_permanent">
-               <property name="text">
-                <string>Change</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="QLabel" name="lb_permanent_current">
-               <property name="text">
-                <string>undefined</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0" colspan="2">
-              <widget class="QProgressBar" name="pb_permanent">
-               <property name="maximum">
-                <number>400</number>
-               </property>
-               <property name="value">
-                <number>0</number>
-               </property>
-               <property name="format">
-                <string>%v/%m GB</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0" colspan="2">
-              <widget class="QLineEdit" name="le_permanent">
-               <property name="cursor">
-                <cursorShape>ForbiddenCursor</cursorShape>
-               </property>
-               <property name="text">
-                <string>undefined</string>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QPushButton" name="bt_permanent_open">
-               <property name="text">
-                <string>Open</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QCheckBox" name="cb_permanent_enabled">
-               <property name="text">
-                <string>Also copy to permanent storage</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
          </layout>
@@ -2032,7 +1716,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1578</width>
+     <width>1277</width>
      <height>21</height>
     </rect>
    </property>
@@ -2114,7 +1798,26 @@
   <customwidget>
    <class>DomeWidget</class>
    <extends>QWidget</extends>
-   <header>amos-widgets/domewidget.h</header>
+   <header>widgets/domewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QStorageBox</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qstoragebox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QScannerBox</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qscannerbox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QSunInfo</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qsuninfo.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -2139,8 +1842,6 @@
   <tabstop>dsb_humidity_limit_lower</tabstop>
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>bt_station_reset</tabstop>
-  <tabstop>le_watchdir</tabstop>
-  <tabstop>le_permanent</tabstop>
   <tabstop>button_send_heartbeat</tabstop>
   <tabstop>tb_log</tabstop>
  </tabstops>

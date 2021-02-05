@@ -44,17 +44,6 @@ void MainWindow::display_sensor_value(QLabel *label, float value, const QString 
     }
 }
 
-/*  DRY helper function
- *  Display status of `storage` in QProgressBar `pb` and QLineEdit `le` */
-void MainWindow::display_storage_status(const Storage *storage, QProgressBar *pb, QLineEdit *le) {
-    QStorageInfo info = storage->info();
-    unsigned int total = (int) ((double) info.bytesTotal() / (1 << 30));
-    unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
-    pb->setMaximum(total);
-    pb->setValue(total - used);
-    le->setText(storage->directory().path());
-}
-
 void MainWindow::display_cover_status(void) {
     const DomeStateS &stateS = this->station->dome()->state_S();
     QString text;
@@ -162,18 +151,6 @@ void MainWindow::display_shaft_position(void) {
     this->ui->progress_cover->setValue(state.shaft_position());
 }
 
-void MainWindow::display_storages(void) {
-    this->ui->le_watchdir->setText(this->station->scanner()->directory().path());
-
-    auto info = this->station->scanner()->info();
-    unsigned int total = (int) ((double) info.bytesTotal() / (1 << 30));
-    unsigned int used = (int) ((double) info.bytesAvailable() / (1 << 30));
-    this->ui->pb_watchdir->setMaximum(total);
-    this->ui->pb_watchdir->setValue(total - used);
-
-    this->display_storage_status(this->station->permanent_storage(), this->ui->pb_permanent, this->ui->le_permanent);
-}
-
 void MainWindow::display_station_config(void) {
     this->ui->le_ip->setText(this->station->server()->address().toString());
     this->ui->sb_port->setValue(this->station->server()->port());
@@ -210,46 +187,6 @@ void MainWindow::display_serial_port_info(void) {
     this->ui->lb_serial_data->setText(this->station->dome()->state_S().is_valid() ? "valid data" : "no data");
 }
 
-void MainWindow::display_sun_data(void) {
-    auto hor = this->station->sun_position();
-    this->ui->lb_sun_alt->setText(QString("%1°").arg(hor.theta * Deg, 3, 'f', 3));
-    this->ui->lb_sun_alt->setStyleSheet(QString("QLabel { color: %1; }").arg(Universe::altitude_colour(hor.theta * Deg)));
-    this->ui->lb_sun_az->setText(QString("%1°").arg(fmod(hor.phi * Deg + 360.0, 360.0), 3, 'f', 3));
-
-    if (hor.theta * Deg > 0) {
-        this->ui->lb_sun_status->setText("day");
-        this->ui->lb_sun_status->setToolTip("Sun is above the horizon");
-        this->ui->lb_sun_status->setStyleSheet(QString("QLabel { color: %1; }").arg(Universe::altitude_colour(hor.theta * Deg)));
-    } else {
-        if (this->station->is_dark()) {
-            this->ui->lb_sun_status->setText("dark enough");
-            this->ui->lb_sun_status->setToolTip("Sun is below the horizon and below the darkness limit");
-            this->ui->lb_sun_status->setStyleSheet("QLabel { color: black; }");
-        } else {
-            this->ui->lb_sun_status->setText("dusk");
-            this->ui->lb_sun_status->setToolTip("Sun is below the horizon, but above the darkness limit");
-            this->ui->lb_sun_status->setStyleSheet("QLabel { color: blue; }");
-        }
-    }
-
-}
-
-// Display slowly varying properties of the Sun (somewhat computationally expensive)
-void MainWindow::display_sun_longterm(void) {
-    auto equ = Universe::compute_sun_equ();
-    this->ui->lb_sun_dec->setText(QString("%1°").arg(equ[theta] * Deg, 3, 'f', 3));
-    this->ui->lb_sun_ra->setText(QString("%1°").arg(equ[phi] * Deg, 3, 'f', 3));
-
-    auto ecl = Universe::compute_sun_ecl();
-    this->ui->lb_sun_ecl_lon->setText(QString("%1°").arg(ecl[phi] * Deg, 3, 'f', 3));
-
-    // Compute and display sunrise and sunset
-    this->ui->lb_sun_close->setText(this->station->next_sun_crossing(this->station->darkness_limit(), true).toString("hh:mm"));
-    this->ui->lb_sunrise->setText(this->station->next_sun_crossing(-0.5, true).toString("hh:mm"));
-    this->ui->lb_sunset->setText(this->station->next_sun_crossing(-0.5, false).toString("hh:mm"));
-    this->ui->lb_sun_open->setText(this->station->next_sun_crossing(this->station->darkness_limit(), false).toString("hh:mm"));
-}
-
 void MainWindow::display_window_title(void) {
 #ifdef OLD_PROTOCOL
     this->setWindowTitle(QString("AMOS client (old protocol) [%1 mode]%2")
@@ -271,11 +208,4 @@ void MainWindow::display_serial_ports(void) {
     for (QSerialPortInfo sp: serial_ports) {
         this->ui->co_serial_ports->addItem(sp.portName());
     }
-}
-
-void MainWindow::display_permanent_storage_current_directory(void) {
-    this->ui->lb_permanent_current->setText(
-        QString("Currently <b>%1</b>")
-            .arg(QDir::cleanPath(this->station->permanent_storage()->current_directory().path()))
-    );
 }
