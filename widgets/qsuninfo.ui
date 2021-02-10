@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>346</width>
-    <height>303</height>
+    <width>282</width>
+    <height>306</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>GroupBox</string>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="title">
    <string>Sun info</string>
@@ -49,20 +52,71 @@
    </item>
    <item row="1" column="0">
     <layout class="QVBoxLayout" name="layout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
      <item>
-      <widget class="QSunLine" name="sl_altitude" native="true"/>
+      <widget class="QFloatLine" name="sl_altitude" native="true"/>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_azimuth" native="true"/>
+      <widget class="QFloatLine" name="sl_azimuth" native="true"/>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_dec" native="true"/>
+      <widget class="QFloatLine" name="sl_dec" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QFloatLine" name="sl_ra" native="true"/>
+      <widget class="QFloatLine" name="sl_ra" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QFloatLine" name="sl_ecl_lon" native="true"/>
+      <widget class="QFloatLine" name="sl_ecl_lon" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFloatLine" name="sl_moon_altitude" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QFloatLine" name="sl_moon_azimuth" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="Line" name="line">
@@ -72,16 +126,44 @@
       </widget>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_dome_close" native="true"/>
+      <widget class="QDateTimeLine" name="sl_dome_close" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_sunrise" native="true"/>
+      <widget class="QDateTimeLine" name="sl_sunrise" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_sunset" native="true"/>
+      <widget class="QDateTimeLine" name="sl_sunset" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
      <item>
-      <widget class="QSunLine" name="sl_dome_open" native="true"/>
+      <widget class="QDateTimeLine" name="sl_dome_open" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>24</height>
+        </size>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -89,15 +171,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QSunLine</class>
+   <class>QFloatLine</class>
    <extends>QWidget</extends>
-   <header>widgets/qsunline.h</header>
+   <header>widgets/lines/qfloatline.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QFloatLine</class>
+   <class>QDateTimeLine</class>
    <extends>QWidget</extends>
-   <header>widgets/qdisplayline.h</header>
+   <header>widgets/lines/qdatetimeline.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

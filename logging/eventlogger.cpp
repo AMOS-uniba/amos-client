@@ -8,7 +8,6 @@ EventLogger::EventLogger(QObject *parent, const QString &filename):
     debug_visible({
         {Concern::Automatic,        true},
         {Concern::Configuration,    true},
-        {Concern::Generic,          true},
         {Concern::Heartbeat,        true},
         {Concern::SerialPort,       true},
         {Concern::Server,           true},
@@ -32,7 +31,6 @@ const QMap<Level, LevelInfo> EventLogger::Levels = {
 const QMap<Concern, ConcernInfo> EventLogger::Concerns = {
     {Concern::Automatic,        {"AUT", "auto",         "auto",             "Automatic actions"}},
     {Concern::Configuration,    {"CFG", "config",       "configuration",    "Configuration"}},
-    {Concern::Generic,          {"---", "generic",      "-",                "Generic"}},
     {Concern::Heartbeat,        {"HBT", "heartbeat",    "heartbeats",       "Heartbeats"}},
     {Concern::SerialPort,       {"SRP", "serial",       "serial port",      "Serial port communiation"}},
     {Concern::Server,           {"SRV", "server",       "server",           "Server connection"}},
@@ -47,7 +45,7 @@ void EventLogger::set_display_widget(QTableWidget *widget) {
 }
 
 QString EventLogger::format(const QDateTime &timestamp, Level level, const QString &concern, const QString &message) const {
-    return QString("%1 %2 | %3: %4")
+    return QString("%1 %2|%3: %4")
             .arg(timestamp.toString(Qt::ISODate))
             .arg(EventLogger::Levels[level].code)
             .arg(concern)

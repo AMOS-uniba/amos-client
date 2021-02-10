@@ -27,7 +27,6 @@ struct LevelInfo {
 };
 
 enum class Concern {
-    Generic,        // Default
     SerialPort,     // Connection to the dome
     Server,         // Connection to server
     Sightings,      // Sighting objects

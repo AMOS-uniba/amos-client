@@ -25,6 +25,9 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_ra->set_title("Right ascension α");
     this->ui->sl_ecl_lon->set_title("Ecliptical longitude λ");
 
+    this->ui->sl_moon_altitude->set_title("Moon altitude");
+    this->ui->sl_moon_azimuth->set_title("Moon azimuth");
+
     this->ui->sl_dome_close->set_title("Dome closing");
     this->ui->sl_sunrise->set_title("Sunrise");
     this->ui->sl_sunset->set_title("Sunset");
@@ -32,13 +35,17 @@ QSunInfo::QSunInfo(QWidget *parent) :
 }
 
 QSunInfo::~QSunInfo() {
-    delete ui;
+    delete this->ui;
 }
 
 void QSunInfo::update_short_term(void) {
     auto hor = this->m_station->sun_position();
     this->ui->sl_altitude->set_value(hor.theta * Deg);
     this->ui->sl_azimuth->set_value(hor.phi * Deg);
+
+    auto moon_hor = this->m_station->moon_position();
+    this->ui->sl_moon_altitude->set_value(moon_hor.theta * Deg);
+    this->ui->sl_moon_azimuth->set_value(moon_hor.phi * Deg);
 
     QColor colour = QColor();
     if (hor.theta > 0) {
@@ -70,8 +77,8 @@ void QSunInfo::update_long_term(void) {
     auto ecl = Universe::compute_sun_ecl();
     this->ui->sl_ecl_lon->set_value(ecl[phi] * Deg);
 
-    this->ui->sl_dome_close->set_time(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), true));
-    this->ui->sl_sunrise->set_time(this->m_station->next_sun_crossing(-0.5, true));
-    this->ui->sl_sunset->set_time(this->m_station->next_sun_crossing(-0.5, false));
-    this->ui->sl_dome_open->set_time(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), false));
+    this->ui->sl_dome_close->set_value(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), true));
+    this->ui->sl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
+    this->ui->sl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
+    this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), false));
 }

@@ -62,7 +62,7 @@ void DomeWidget::drawWidget(QPainter &qp) {
 
     // Lens
     qp.setBrush(QColor(120, 120, 255));
-    qp.drawEllipse(QRectF(-0.05, -0.63, 0.1, 0.06));
+    qp.drawEllipse(QRectF(-0.05, -CameraHeight - 0.03, 0.1, 0.06));
 
     // Camera
     QLinearGradient camera(-CameraWidth / 2, 0, CameraWidth / 2, 0);
@@ -74,6 +74,9 @@ void DomeWidget::drawWidget(QPainter &qp) {
 
     qp.setBrush(QColor(195, 195, 195));
     qp.drawRect(QRectF(-0.2, 0, 0.4, 0.25));
+
+    QPixmap logo(":/images/blue.ico");
+    qp.drawPixmap(QRectF(-0.075, 0.05, 0.15, 0.15), logo.scaled(25, 25, Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF(0, 0, 25, 25));
 
     QLinearGradient cover(0, 0, 0.4, 0);
     cover.setSpread(QLinearGradient::RepeatSpread);

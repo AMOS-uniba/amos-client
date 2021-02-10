@@ -48,11 +48,13 @@ SOURCES += \
     utils/ufomanager.cpp \
     utils/universe.cpp \
     widgets/domewidget.cpp \
-    widgets/qdisplayline.cpp \
+    widgets/lines/qbooleanline.cpp \
+    widgets/lines/qdatetimeline.cpp \
+    widgets/lines/qdisplayline.cpp \
+    widgets/lines/qfloatline.cpp \
     widgets/qfilesystembox.cpp \
     widgets/qscannerbox.cpp \
     widgets/qstoragebox.cpp \
-    widgets/qsunline.cpp \
     widgets/qsuninfo.cpp
 
 HEADERS += \
@@ -92,19 +94,19 @@ HEADERS += \
     utils/ufomanager.h \
     utils/universe.h \
     widgets/domewidget.h \
-    widgets/qdisplayline.h \
+    widgets/lines/qbooleanline.h \
+    widgets/lines/qdatetimeline.h \
+    widgets/lines/qdisplayline.h \
+    widgets/lines/qfloatline.h \
     widgets/qfilesystembox.h \
     widgets/qscannerbox.h \
     widgets/qstoragebox.h \
-    widgets/qsunline.h \
     widgets/qsuninfo.h
 
 FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
-    widgets/qdisplayline.ui \
-    widgets/qsuninfo.ui \
-    widgets/qsunline.ui \
+    widgets/lines/qdisplayline.ui \
     widgets/qsuninfo.ui
 
 # Default rules for deployment.

@@ -12,12 +12,13 @@ public:
 
     Universe();
 
-    static Vec3D compute_sun_ecl(const QDateTime& time = QDateTime::currentDateTimeUtc());
-    static Vec3D compute_sun_equ(const QDateTime& time = QDateTime::currentDateTimeUtc());
+    static Vec3D compute_sun_ecl(const QDateTime &time = QDateTime::currentDateTimeUtc());
+    static Vec3D compute_sun_equ(const QDateTime &time = QDateTime::currentDateTimeUtc());
+    static Vec3D compute_moon_equ(const QDateTime &time = QDateTime::currentDateTimeUtc());
     static QColor altitude_colour(double altitude);
 
-    static double mjd(const QDateTime& time = QDateTime::currentDateTimeUtc());
-    static double julian_centuries(const QDateTime& time = QDateTime::currentDateTimeUtc());
+    static double mjd(const QDateTime &time = QDateTime::currentDateTimeUtc());
+    static double julian_centuries(const QDateTime &time = QDateTime::currentDateTimeUtc());
 };
 
 #endif // UNIVERSE_H

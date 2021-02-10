@@ -170,7 +170,7 @@ void Station::set_humidity_limits(const double new_lower, const double new_upper
     emit this->humidity_limits_changed(new_lower, new_upper);
 }
 
-Polar Station::sun_position(const QDateTime& time) const {
+Polar Station::sun_position(const QDateTime &time) const {
     double alt, az;
     double mjd = Universe::mjd(time);
     double lmst = GMST(mjd) + this->m_longitude * Rad;
@@ -181,11 +181,22 @@ Polar Station::sun_position(const QDateTime& time) const {
     return Polar(az + pi, alt);
 }
 
-double Station::sun_altitude(const QDateTime& time) const {
+Polar Station::moon_position(const QDateTime &time) const {
+    double alt, az;
+    double mjd = Universe::mjd(time);
+    double lmst = GMST(mjd) + this->m_longitude * Rad;
+
+    Vec3D equatorial = Universe::compute_moon_equ(time);
+    Equ2Hor(equatorial[theta], lmst - equatorial[phi], this->m_latitude * Rad, alt, az);
+
+    return Polar(az + pi, alt);
+}
+
+double Station::sun_altitude(const QDateTime &time) const {
     return this->sun_position(time).theta * Deg;
 }
 
-double Station::sun_azimuth(const QDateTime& time) const {
+double Station::sun_azimuth(const QDateTime &time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
 }
 
@@ -224,7 +235,7 @@ void Station::set_safety_override(bool override) {
     if (this->m_manual_control) {
         this->m_safety_override = override;
     } else {
-        logger.error(Concern::SerialPort, "Cannot override safety when not in manual mode!");
+        logger.error(Concern::Operation, "Cannot override safety when not in manual mode!");
     }
 }
 
@@ -282,7 +293,7 @@ void Station::automatic_check(void) {
     // Emergency: close the cover, unless safety overridden
     if (stateS.dome_open_sensor_active() && !this->is_dark()) {
         if (this->m_safety_override) {
-            logger.warning(Concern::Automatic, "Emergency override active, not closing");
+            logger.debug(Concern::Automatic, "Emergency override active, not closing");
         } else {
             logger.warning(Concern::Automatic, "Closed the cover (not dark enough)");
             this->close_cover();
@@ -292,7 +303,7 @@ void Station::automatic_check(void) {
     // Emergency: turn off the image intensifier, unless safety overridden
     if (stateS.intensifier_active() && !this->is_dark()) {
         if (this->m_safety_override) {
-            logger.warning(Concern::Automatic, "Emergency override active, not turning off the intensifier");
+            logger.debug(Concern::Automatic, "Emergency override active, not turning off the intensifier");
         } else {
             logger.warning(Concern::Automatic, "Turned off the image intensifier (not dark enough)");
             this->turn_off_intensifier();

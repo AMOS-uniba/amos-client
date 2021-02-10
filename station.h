@@ -92,6 +92,7 @@ public:
 
     // Sun position functions
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
+    Polar moon_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
