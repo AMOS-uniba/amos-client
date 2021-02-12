@@ -16,6 +16,7 @@ public:
             ValueFormatter<bool> value_formatter = [](bool value) -> QString { return value ? "on" : "off"; }
     );
 public slots:
+    void set_enabled(bool enabled);
     void set_value(bool new_value);
 };
 

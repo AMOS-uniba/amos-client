@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1516</width>
-    <height>1457</height>
+    <width>1483</width>
+    <height>1293</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -963,6 +963,16 @@
         </widget>
        </item>
        <item>
+        <widget class="QDomeInfo" name="dome_info">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -1184,7 +1194,7 @@
        <item>
         <widget class="QSunInfo" name="sun_info">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -1192,7 +1202,13 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>306</height>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>284</height>
           </size>
          </property>
          <property name="title">
@@ -1662,7 +1678,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>50</height>
+              <height>70</height>
              </size>
             </property>
             <property name="title">
@@ -1675,7 +1691,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>50</height>
+              <height>70</height>
              </size>
             </property>
             <property name="title">
@@ -1688,7 +1704,7 @@
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>50</height>
+              <height>70</height>
              </size>
             </property>
             <property name="title">
@@ -1722,7 +1738,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1516</width>
+     <width>1483</width>
      <height>21</height>
     </rect>
    </property>
@@ -1823,6 +1839,12 @@
    <class>QSunInfo</class>
    <extends>QGroupBox</extends>
    <header>widgets/qsuninfo.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QDomeInfo</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qdomeinfo.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

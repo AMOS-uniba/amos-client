@@ -65,6 +65,7 @@ void QSunInfo::update_short_term(void) {
     }
 
     this->ui->lb_sun_status->setStyleSheet(QString("QLabel { color: %1; }").arg(colour.name()));
+//    this->setTitle(QString("Fucking %1").arg(this->height()));
 }
 
 void QSunInfo::set_station(const Station *station) { this->m_station = station; }

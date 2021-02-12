@@ -12,3 +12,11 @@ QBooleanLine::QBooleanLine(
 void QBooleanLine::set_value(bool new_value) {
     this->ui->lb_value->setText(this->m_value_formatter(new_value));
 }
+
+void QBooleanLine::set_enabled(bool enabled) {
+    this->setEnabled(enabled);
+
+    if (!enabled) {
+        this->ui->lb_value->setText("?");
+    }
+}
