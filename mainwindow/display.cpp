@@ -115,12 +115,14 @@ void MainWindow::display_basic_data(void) {
     this->display_S_state_bit(state.emergency_closing_light(),      this->ui->lb_error_light,           "closed",   "ok", "red", "black");
     this->display_S_state_bit(state.error_watchdog_reset(),         this->ui->lb_error_watchdog_reset,  "reset",    "ok", "red", "black");
     this->display_S_state_bit(state.error_brownout_reset(),         this->ui->lb_error_brownout_reset,  "reset",    "ok", "red", "black");
-    this->display_S_state_bit(state.error_computer_power(),         this->ui->lb_error_computer_power,  "error",    "ok", "red", "black");
+    this->display_S_state_bit(state.error_master_power(),           this->ui->lb_error_computer_power,  "error",    "ok", "red", "black");
     this->display_S_state_bit(state.error_t_CPU(),                  this->ui->lb_error_t_CPU,           "error",    "ok", "red", "black");
     this->display_S_state_bit(state.emergency_closing_rain(),       this->ui->lb_error_rain,            "closed",   "ok", "red", "black");
 
     // Also display the correct labels on device control buttons
     this->display_device_buttons_state();
+
+    this->ui->dome_info->display_basic_data(state);
 }
 
 void MainWindow::display_device_buttons_state(void) {
@@ -141,7 +143,7 @@ void MainWindow::display_env_data(void) {
     }
 
     this->display_sensor_value(this->ui->lb_t_lens, state.temperature_lens(),   "°C");
-    this->display_sensor_value(this->ui->lb_t_cpu,  state.temperature_cpu(),    "°C");
+    this->display_sensor_value(this->ui->lb_t_cpu,  state.temperature_CPU(),    "°C");
     this->display_sensor_value(this->ui->lb_t_sht,  state.temperature_sht(),    "°C");
     this->display_sensor_value(this->ui->lb_h_sht,  state.humidity_sht(),       "%");
 }

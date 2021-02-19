@@ -9,16 +9,17 @@ namespace Ui {
 }
 
 template <typename T>
-using ColourFormatter = QColor (*)(T value);
+using ColourFormatter = std::function<QColor(T value)>;
 
 template <typename T>
-using ValueFormatter = QString (*)(T value);
+using ValueFormatter = std::function<QString(T value)>;
 
 
 class QDisplayLine: public QWidget {
     Q_OBJECT
 protected:
     Ui::QDisplayLine *ui;
+    bool m_valid;
 public:
     explicit QDisplayLine(QWidget *parent = nullptr);
     ~QDisplayLine();
@@ -27,6 +28,7 @@ public:
 
 public slots:
     void set_title(const QString &new_title);
+    void set_valid(bool valid);
 };
 
 

@@ -189,7 +189,7 @@ Polar Station::moon_position(const QDateTime &time) const {
     Vec3D equatorial = Universe::compute_moon_equ(time);
     Equ2Hor(equatorial[theta], lmst - equatorial[phi], this->m_latitude * Rad, alt, az);
 
-    return Polar(az + pi, alt);
+    return Polar(fmod(az + pi, 2 * pi), alt);
 }
 
 double Station::sun_altitude(const QDateTime &time) const {
@@ -198,6 +198,14 @@ double Station::sun_altitude(const QDateTime &time) const {
 
 double Station::sun_azimuth(const QDateTime &time) const {
     return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
+}
+
+double Station::moon_altitude(const QDateTime &time) const {
+    return this->moon_position(time).theta * Deg;
+}
+
+double Station::moon_azimuth(const QDateTime &time) const {
+    return fmod(this->moon_position(time).phi * Deg + 360.0, 360.0);
 }
 
 /* Compute next crossing of the Sun through the almucantar `altitude` in the specified direction (up/down)
@@ -269,7 +277,7 @@ void Station::log_state(void) {
                         .arg(QString(this->state().code()))
                         .arg(stateT.temperature_sht(), 5, 'f', 1)
                         .arg(stateT.temperature_lens(), 5, 'f', 1)
-                        .arg(stateT.temperature_cpu(), 5, 'f', 1)
+                        .arg(stateT.temperature_CPU(), 5, 'f', 1)
                         .arg(stateT.humidity_sht(), 5, 'f', 1)
                         .arg(stateZ.shaft_position(), 3);
 

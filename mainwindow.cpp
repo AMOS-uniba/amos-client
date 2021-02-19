@@ -86,6 +86,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->station, &Station::process_sightings);
 
+    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome_info, &QDomeInfo::set_formatters);
+
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
 #ifdef OLD_PROTOCOL

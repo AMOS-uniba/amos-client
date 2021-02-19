@@ -34,6 +34,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    static QString format_duration(unsigned int seconds);
+
 private:
     QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
     Ui::MainWindow *ui;
@@ -60,8 +62,6 @@ private:
     //CommThread comm_thread;
 
     QList<QSerialPortInfo> serial_ports;
-
-    static QString format_duration(unsigned int seconds);
 
 private slots:
     void load_settings(void);

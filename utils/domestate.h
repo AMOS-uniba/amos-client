@@ -14,8 +14,8 @@ private:
 protected:
     static float deciint(const QByteArray &chunk);
     bool m_valid;
-public:
     DomeState(void);
+public:
     const QDateTime& timestamp(void) const;
     float age(void) const;
     void set_valid(void);
@@ -54,7 +54,7 @@ public:
     bool emergency_closing_light(void) const;
     bool error_watchdog_reset(void) const;
     bool error_brownout_reset(void) const;
-    bool error_computer_power(void) const;
+    bool error_master_power(void) const;
     bool error_t_CPU(void) const;
     bool emergency_closing_rain(void) const;
 
@@ -68,13 +68,13 @@ public:
 
 class DomeStateT: public DomeState {
 private:
-    float m_temp_lens, m_temp_cpu, m_temp_sht, m_humi_sht;
+    float m_temp_lens, m_temp_CPU, m_temp_SHT31, m_humi_SHT31;
 public:
     DomeStateT(void);
     DomeStateT(const QByteArray &response);
 
     float temperature_lens(void) const;
-    float temperature_cpu(void) const;
+    float temperature_CPU(void) const;
     float temperature_sht(void) const;
     float humidity_sht(void) const;
 

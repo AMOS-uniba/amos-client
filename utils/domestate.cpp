@@ -27,12 +27,12 @@ float DomeState::age(void) const {
 }
 
 
-DomeStateS::DomeStateS(void): DomeState() {
-    this->m_basic = 0;
-    this->m_env = 0;
-    this->m_errors = 0;
-    this->m_time_alive = 0;
-}
+DomeStateS::DomeStateS(void):
+    DomeState(),
+    m_basic(0),
+    m_env(0),
+    m_errors(0),
+    m_time_alive(0) {}
 
 DomeStateS::DomeStateS(const QByteArray &response) {
     if (response.length() != 8) {
@@ -75,7 +75,7 @@ bool DomeStateS::error_SHT31(void) const                    { return this->m_err
 bool DomeStateS::emergency_closing_light(void) const        { return this->m_errors & 0x04; }
 bool DomeStateS::error_watchdog_reset(void) const           { return this->m_errors & 0x08; }
 bool DomeStateS::error_brownout_reset(void) const           { return this->m_errors & 0x10; }
-bool DomeStateS::error_computer_power(void) const           { return this->m_errors & 0x20; }
+bool DomeStateS::error_master_power(void) const             { return this->m_errors & 0x20; }
 bool DomeStateS::error_t_CPU(void) const                    { return this->m_errors & 0x40; }
 bool DomeStateS::emergency_closing_rain(void) const         { return this->m_errors & 0x80; }
 
@@ -105,7 +105,7 @@ QByteArray DomeStateS::full_text(void) const {
     result[18 + 2] = this->emergency_closing_light()             ? 'L' : '-';
     result[18 + 3] = this->error_watchdog_reset()                ? 'W' : '-';
     result[18 + 4] = this->error_brownout_reset()                ? 'B' : '-';
-    result[18 + 5] = this->error_computer_power()                ? 'P' : '-';
+    result[18 + 5] = this->error_master_power()                  ? 'P' : '-';
     result[18 + 6] = this->error_t_CPU()                         ? 'C' : '-';
     result[18 + 7] = this->emergency_closing_rain()              ? 'R' : '-';
     return result;
@@ -119,12 +119,12 @@ QJsonValue DomeStateS::json() const {
     }
 }
 
-DomeStateT::DomeStateT(void): DomeState() {
-    this->m_temp_lens = 0;
-    this->m_temp_cpu = 0;
-    this->m_temp_sht = 0;
-    this->m_humi_sht = 0;
-}
+DomeStateT::DomeStateT(void):
+    DomeState(),
+    m_temp_lens(0),
+    m_temp_CPU(0),
+    m_temp_SHT31(0),
+    m_humi_SHT31(0) {}
 
 DomeStateT::DomeStateT(const QByteArray &response) {
     if (response.length() != 9) {
@@ -135,24 +135,24 @@ DomeStateT::DomeStateT(const QByteArray &response) {
     }
 
     this->m_temp_lens  = DomeStateT::deciint(response.mid(1, 2));
-    this->m_temp_cpu   = DomeStateT::deciint(response.mid(3, 2));
-    this->m_temp_sht   = DomeStateT::deciint(response.mid(5, 2));
-    this->m_humi_sht   = DomeStateT::deciint(response.mid(7, 2));
+    this->m_temp_CPU   = DomeStateT::deciint(response.mid(3, 2));
+    this->m_temp_SHT31 = DomeStateT::deciint(response.mid(5, 2));
+    this->m_humi_SHT31 = DomeStateT::deciint(response.mid(7, 2));
 
     this->m_valid      = true;
-    logger.debug(Concern::SerialPort, QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_cpu).arg(this->m_temp_sht).arg(this->m_humi_sht));
+    logger.debug(Concern::SerialPort, QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_CPU).arg(this->m_temp_SHT31).arg(this->m_humi_SHT31));
 }
 
 float DomeStateT::temperature_lens(void) const { return this->m_temp_lens; }
-float DomeStateT::temperature_cpu(void) const  { return this->m_temp_cpu; }
-float DomeStateT::temperature_sht(void) const  { return this->m_temp_sht; }
-float DomeStateT::humidity_sht(void) const     { return this->m_humi_sht; }
+float DomeStateT::temperature_CPU(void) const  { return this->m_temp_CPU; }
+float DomeStateT::temperature_sht(void) const  { return this->m_temp_SHT31; }
+float DomeStateT::humidity_sht(void) const     { return this->m_humi_SHT31; }
 
 QJsonValue DomeStateT::json(void) const {
     if (this->is_valid()) {
         return QJsonObject {
             {"t_lens", this->temperature_lens()},
-            {"t_cpu", this->temperature_cpu()},
+            {"t_cpu", this->temperature_CPU()},
             {"t_sht", this->temperature_sht()},
             {"h_sht", this->humidity_sht()},
         };
@@ -163,9 +163,9 @@ QJsonValue DomeStateT::json(void) const {
 
 
 
-DomeStateZ::DomeStateZ(void): DomeState() {
-    this->m_shaft_position = 0;
-}
+DomeStateZ::DomeStateZ(void):
+    DomeState(),
+    m_shaft_position(0) {}
 
 DomeStateZ::DomeStateZ(const QByteArray &response) {
 #ifdef OLD_PROTOCOL
