@@ -16,8 +16,7 @@
 #include "utils/sighting.h"
 #include "utils/ufomanager.h"
 
-#include "amos-widgets/domewidget.h"
-
+#include "widgets/qdomewidget.h"
 #include "widgets/qfilesystembox.h"
 #include "widgets/qscannerbox.h"
 #include "widgets/qstoragebox.h"

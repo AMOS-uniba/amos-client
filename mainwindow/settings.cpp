@@ -15,6 +15,7 @@ void MainWindow::load_settings(void) {
         this->station = new Station(station_id);
         this->station->set_server(new Server(QHostAddress(ip), port, station_id));
         this->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
+        this->station->set_dome(this->ui->dome_info);
 
         // Create the UFO manager
         this->station->set_ufo_manager(new UfoManager(
@@ -26,23 +27,17 @@ void MainWindow::load_settings(void) {
         this->load_settings_storage();
         this->load_settings_station();
 
+        // Load and set debug levels
         bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
         this->ui->cb_debug->setChecked(debug);
 
+        // Load and set manual/automatic mode
         this->station->set_manual_control(settings->value("manual", false).toBool());
         this->ui->cb_manual->setChecked(this->station->is_manual());
+
+        // We do not save override (must be set manually after each start)
         this->ui->cb_safety_override->setEnabled(this->station->is_manual());
-
-        logger.debug(Concern::Configuration, "Initializing serial ports...");
-        serial_ports = QSerialPortInfo::availablePorts();
-
-        for (QSerialPortInfo sp: this->serial_ports) {
-            if (sp.portName() == settings->value("dome/port").toString()) {
-                this->ui->co_serial_ports->setCurrentText(sp.portName());
-                this->station->dome()->set_serial_port(sp.portName());
-            }
-        }
     } catch (ConfigurationError &e) {
         QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
         QMessageBox box;
@@ -58,6 +53,10 @@ void MainWindow::load_settings(void) {
     }
 }
 
+/**
+ * @brief MainWindow::load_settings_storage
+ * Loads and applies settings from the `storage` group
+ */
 void MainWindow::load_settings_storage(void) {
     settings->beginGroup("storage");
     this->ui->scanner->set_directory(QDir(settings->value("scanner_path", "C:\\Data").toString()));
@@ -74,6 +73,10 @@ void MainWindow::load_settings_storage(void) {
     settings->endGroup();
 }
 
+/**
+ * @brief MainWindow::load_settings_station
+ * Loads and applies settings from the `station` group
+ */
 void MainWindow::load_settings_station(void) {
     settings->beginGroup("station");
     this->station->set_position(
@@ -82,15 +85,14 @@ void MainWindow::load_settings_station(void) {
         settings->value("altitude", 0).toDouble()
     );
     this->station->set_darkness_limit(settings->value("darkness", -12.0).toDouble());
-    this->station->set_humidity_limits(
-        settings->value("humidity_lower", 75.0).toDouble(),
-        settings->value("humidity_upper", 80.0).toDouble()
-    );
     settings->endGroup();
 }
 
-// Handle changes in station settings
-void MainWindow::on_bt_station_apply_clicked() {
+/**
+ * @brief MainWindow::on_bt_station_apply_clicked
+ * Handler of changes to the station settings in the GUI
+ */
+void MainWindow::on_bt_station_apply_clicked(void) {
     // If ID, IP or port are changed, update the server settings
     if (
         (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
@@ -126,17 +128,6 @@ void MainWindow::on_bt_station_apply_clicked() {
         this->ui->sun_info->update_long_term();
     }
 
-    // Update the humidity limits, if changed
-    if (
-        (this->ui->dsb_humidity_limit_upper->value() != this->station->humidity_limit_upper()) ||
-        (this->ui->dsb_humidity_limit_lower->value() != this->station->humidity_limit_lower())
-    ) {
-        this->station->set_humidity_limits(
-            this->ui->dsb_humidity_limit_lower->value(),
-            this->ui->dsb_humidity_limit_upper->value()
-        );
-    }
-
     // Store all new values in permanent settings
     settings->setValue("server/ip", this->station->server()->address().toString());
     settings->setValue("server/port", this->station->server()->port());
@@ -148,8 +139,6 @@ void MainWindow::on_bt_station_apply_clicked() {
     settings->setValue("altitude", this->station->altitude());
 
     settings->setValue("darkness", this->station->darkness_limit());
-    settings->setValue("humidity_lower", this->station->humidity_limit_lower());
-    settings->setValue("humidity_upper", this->station->humidity_limit_upper());
     settings->endGroup();
 
     settings->sync();
@@ -168,8 +157,6 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_altitude->setValue(this->station->altitude());
 
     this->ui->dsb_darkness_limit->setValue(this->station->darkness_limit());
-    this->ui->dsb_humidity_limit_lower->setValue(this->station->humidity_limit_lower());
-    this->ui->dsb_humidity_limit_upper->setValue(this->station->humidity_limit_upper());
 }
 
 void MainWindow::slot_station_edited(void) {
@@ -180,9 +167,7 @@ void MainWindow::slot_station_edited(void) {
         (this->ui->dsb_altitude->value() != this->station->altitude()) ||
         (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
         (this->ui->sb_port->value() != this->station->server()->port()) ||
-        (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit()) ||
-        (this->ui->dsb_humidity_limit_lower->value() != this->station->humidity_limit_lower()) ||
-        (this->ui->dsb_humidity_limit_upper->value() != this->station->humidity_limit_upper())
+        (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit())
     );
 }
 

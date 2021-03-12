@@ -20,17 +20,10 @@ void MainWindow::create_timers(void) {
 
 void MainWindow::process_display_timer(void) {
     this->display_time();
-    this->display_basic_data();
-    this->display_env_data();
     this->display_cover_status();
-    this->display_serial_port_info();
 }
 
 void MainWindow::process_watchdog_timer(void) {
-    if (this->station->dome()->serial_port_info() != "open") {
-        this->display_serial_ports();
-    }
-
     this->display_ufo_state();
 }
 

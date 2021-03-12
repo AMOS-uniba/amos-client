@@ -11,6 +11,8 @@ QControlLine::QControlLine(QWidget *parent):
     this->ui->lb_title->setMinimumWidth(100);
     this->ui->lb_value->setMaximumWidth(80);
     this->ui->layout->insertWidget(1, this->bt_toggle);
+
+    this->connect(this->bt_toggle, &QPushButton::clicked, this, &QControlLine::toggled);
 }
 
 void QControlLine::set_value(bool new_value) {

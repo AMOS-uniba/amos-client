@@ -5,7 +5,7 @@
 #include <QWidget>
 #include <QtGui>
 
-class DomeWidget: public QWidget {
+class QDomeWidget: public QWidget {
     Q_OBJECT
 private:
     int m_cover_position;
@@ -16,7 +16,7 @@ protected:
     void drawWidget(QPainter &qp);
 
 public:
-    DomeWidget(QWidget *parent = nullptr);
+    QDomeWidget(QWidget *parent = nullptr);
 public slots:
     void set_cover_position(int new_position);
     void set_cover_minimum(int new_minimum);

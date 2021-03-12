@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QDome</class>
+ <widget class="QGroupBox" name="QDome">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>440</width>
+    <height>681</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>440</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dome</string>
+  </property>
+  <property name="title">
+   <string>Dome</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="6" column="0">
+    <widget class="QGroupBox" name="gb_sensors">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>166</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Sensors</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QFloatLine" name="fl_t_lens" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_t_CPU" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_t_SHT31" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_h_SHT31" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_rain_sensor" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_light_sensor" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_master_power" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QGroupBox" name="gb_serial_port">
+     <property name="title">
+      <string>Serial port</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="lx_serial_port_device">
+        <property name="text">
+         <string>Device</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="co_serial_ports">
+        <property name="contextMenuPolicy">
+         <enum>Qt::PreventContextMenu</enum>
+        </property>
+        <property name="placeholderText">
+         <string>not selected</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="lb_serial_port_state">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="lb_serial_data_state">
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QGroupBox" name="group_settings">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string>Settings</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QLabel" name="lx_humidity_upper">
+        <property name="text">
+         <string>Humidity upper limit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>close if humidity exceeds this level</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="bt_humidity_discard">
+          <property name="text">
+           <string>Discard changes</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bt_humidity_apply">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>open only if humidity is below this level</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lx_humidity_lower">
+        <property name="text">
+         <string>Humidity lower limit</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QGroupBox" name="gb_devices">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>222</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Devices</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QControlLine" name="cl_lens_heating" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_camera_heating" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_fan" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_ii" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>24</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QGroupBox" name="gb_cover">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>222</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Cover</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMaximumSize</enum>
+      </property>
+      <item>
+       <widget class="QLabel" name="lb_cover_state">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lb_cover_comment">
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QProgressBar" name="pb_cover">
+        <property name="maximum">
+         <number>401</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="format">
+         <string>%v/%m</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_servo_moving" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_servo_direction" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_open_dome_sensor" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_closed_dome_sensor" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_safety" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_servo_blocked" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="hl_openclose">
+        <item>
+         <widget class="QPushButton" name="bt_cover_open">
+          <property name="text">
+           <string>open</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bt_cover_close">
+          <property name="text">
+           <string>close</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QDomeWidget" name="picture" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>100</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QGroupBox" name="gb_errors">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>166</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Error bits</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_t_lens" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_t_SHT31" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_light" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_watchdog" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_brownout" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_master" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_t_CPU" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_rain" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>14</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QFloatLine" name="fl_time_alive" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>20</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFloatLine</class>
+   <extends>QWidget</extends>
+   <header>widgets/lines/qfloatline.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QBooleanLine</class>
+   <extends>QWidget</extends>
+   <header>widgets/lines/qbooleanline.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QControlLine</class>
+   <extends>QWidget</extends>
+   <header>widgets/lines/qcontrolline.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QDomeWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/qdomewidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

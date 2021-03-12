@@ -15,6 +15,8 @@ public:
 
 public slots:
     void set_value(bool new_value);
+signals:
+    void toggled(void);
 };
 
 #endif // QCONTROLLINE_H

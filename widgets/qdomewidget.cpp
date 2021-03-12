@@ -1,6 +1,6 @@
-#include "domewidget.h"
+#include "qdomewidget.h"
 
-DomeWidget::DomeWidget(QWidget *parent):
+QDomeWidget::QDomeWidget(QWidget *parent):
     QWidget(parent),
     m_cover_position(0),
     m_cover_minimum(0),
@@ -10,12 +10,12 @@ DomeWidget::DomeWidget(QWidget *parent):
     this->setMinimumWidth(250);
 }
 
-void DomeWidget::set_cover_position(int new_position) {
+void QDomeWidget::set_cover_position(int new_position) {
     this->m_cover_position = new_position;
     this->repaint();
 }
 
-void DomeWidget::set_cover_minimum(int new_minimum) {
+void QDomeWidget::set_cover_minimum(int new_minimum) {
     this->m_cover_minimum = new_minimum;
     if (this->m_cover_position < this->m_cover_minimum) {
         this->m_cover_position = this->m_cover_minimum;
@@ -23,7 +23,7 @@ void DomeWidget::set_cover_minimum(int new_minimum) {
     this->repaint();
 }
 
-void DomeWidget::set_cover_maximum(int new_maximum) {
+void QDomeWidget::set_cover_maximum(int new_maximum) {
     this->m_cover_maximum = new_maximum;
     if (this->m_cover_position > this->m_cover_maximum) {
         this->m_cover_position = this->m_cover_maximum;
@@ -31,14 +31,14 @@ void DomeWidget::set_cover_maximum(int new_maximum) {
     this->repaint();
 }
 
-void DomeWidget::paintEvent(QPaintEvent *e) {
+void QDomeWidget::paintEvent(QPaintEvent *e) {
     QPainter qp(this);
     qp.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     this->drawWidget(qp);
     QWidget::paintEvent(e);
 }
 
-void DomeWidget::drawWidget(QPainter &qp) {
+void QDomeWidget::drawWidget(QPainter &qp) {
     QColor black(0, 0, 0);
     QSize size(this->size());
 

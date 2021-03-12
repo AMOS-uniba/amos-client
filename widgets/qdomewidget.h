@@ -1,11 +1,11 @@
-#ifndef DOMEWIDGET_H
-#define DOMEWIDGET_H
+#ifndef QDOMEWIDGET_H
+#define QDOMEWIDGET_H
 
 #include <QObject>
 #include <QWidget>
 #include <QtGui>
 
-class DomeWidget: public QWidget {
+class QDomeWidget: public QWidget {
     Q_OBJECT
 private:
     int m_cover_position;
@@ -16,11 +16,11 @@ protected:
     void drawWidget(QPainter &qp);
 
 public:
-    DomeWidget(QWidget *parent = nullptr);
+    QDomeWidget(QWidget *parent = nullptr);
 public slots:
     void set_cover_position(int new_position);
     void set_cover_minimum(int new_minimum);
     void set_cover_maximum(int new_maximum);
 };
 
-#endif // DOMEWIDGET_H
+#endif // QDOMEWIDGET_H

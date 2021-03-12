@@ -43,7 +43,6 @@ Station::Station(const QString& id):
     m_permanent_storage(nullptr),
     m_server(nullptr)
 {
-    this->m_dome = new Dome();
     this->m_state_logger = new StateLogger(this, "state.log");
     this->m_state_logger->initialize();
 
@@ -59,7 +58,6 @@ Station::Station(const QString& id):
 }
 
 Station::~Station(void) {
-    delete this->m_dome;
     delete this->m_timer_automatic;
     delete this->m_scanner;
     delete this->m_primary_storage;
@@ -78,7 +76,9 @@ UfoManager* Station::ufo_manager(void) const { return this->m_ufo_manager; }
 
 QStorageBox* Station::primary_storage(void) const { return this->m_primary_storage; }
 QStorageBox* Station::permanent_storage(void) const { return this->m_permanent_storage; }
-Dome* Station::dome(void) const { return this->m_dome; }
+
+void Station::set_dome(QDome *dome) { this->m_dome = dome; }
+QDome* Station::dome(void) const { return this->m_dome; }
 
 // Server getters and setters
 void Station::set_server(Server *server) { this->m_server = server; }
@@ -140,34 +140,6 @@ void Station::set_darkness_limit(const double new_darkness_limit) {
     logger.info(Concern::Configuration, QString("Station's darkness limit set to %1°").arg(this->m_darkness_limit));
 
     emit this->darkness_limit_changed(new_darkness_limit);
-}
-
-// Humidity limit settings
-bool Station::is_humid(void) const {
-    return (this->m_dome->state_T().humidity_sht() >= this->m_humidity_limit_lower);
-}
-
-bool Station::is_very_humid(void) const {
-    return (this->m_dome->state_T().humidity_sht() >= this->m_humidity_limit_upper);
-}
-
-double Station::humidity_limit_lower(void) const { return this->m_humidity_limit_lower; }
-double Station::humidity_limit_upper(void) const { return this->m_humidity_limit_upper; }
-
-void Station::set_humidity_limits(const double new_lower, const double new_upper) {
-    if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper)) {
-        throw ConfigurationError(QString("Invalid humidity limits: %1% - %2%").arg(new_lower).arg(new_upper));
-    }
-
-    this->m_humidity_limit_lower = new_lower;
-    this->m_humidity_limit_upper = new_upper;
-    logger.info(Concern::Configuration,
-                QString("Station's humidity limits set to %1% - %2%")
-                .arg(this->m_humidity_limit_lower)
-                .arg(this->m_humidity_limit_upper)
-    );
-
-    emit this->humidity_limits_changed(new_lower, new_upper);
 }
 
 Polar Station::sun_position(const QDateTime &time) const {
@@ -268,19 +240,10 @@ QJsonObject Station::prepare_heartbeat(void) const {
 }
 
 void Station::log_state(void) {
-    const DomeStateS& stateS = this->dome()->state_S();
-    const DomeStateT& stateT = this->dome()->state_T();
-    const DomeStateZ& stateZ = this->dome()->state_Z();
-    QString line = QString("%1 %2° %3 %4C %5C %6C %7% %8")
-                        .arg(QString(stateS.full_text()))
+    QString line = QString("%1° %2 %3")
                         .arg(this->sun_altitude(), 5, 'f', 1)
                         .arg(QString(this->state().code()))
-                        .arg(stateT.temperature_sht(), 5, 'f', 1)
-                        .arg(stateT.temperature_lens(), 5, 'f', 1)
-                        .arg(stateT.temperature_CPU(), 5, 'f', 1)
-                        .arg(stateT.humidity_sht(), 5, 'f', 1)
-                        .arg(stateZ.shaft_position(), 3);
-
+                        .arg(this->m_dome->status_line());
     this->m_state_logger->log(line);
 }
 
@@ -304,7 +267,7 @@ void Station::automatic_check(void) {
             logger.debug(Concern::Automatic, "Emergency override active, not closing");
         } else {
             logger.warning(Concern::Automatic, "Closed the cover (not dark enough)");
-            this->close_cover();
+            this->dome()->close_cover();
         }
     }
 
@@ -314,7 +277,7 @@ void Station::automatic_check(void) {
             logger.debug(Concern::Automatic, "Emergency override active, not turning off the intensifier");
         } else {
             logger.warning(Concern::Automatic, "Turned off the image intensifier (not dark enough)");
-            this->turn_off_intensifier();
+            this->dome()->turn_off_intensifier();
         }
     }
 
@@ -329,19 +292,19 @@ void Station::automatic_check(void) {
                     logger.debug(Concern::Automatic, "Will not open: raining");
                     this->set_state(Station::RainOrHumid);
                 } else {
-                    if (this->is_humid()) {
+                    if (this->dome()->is_humid()) {
                         logger.debug(Concern::Automatic, "Will not open: humidity is too high");
                         this->set_state(Station::RainOrHumid);
                     } else {
                         logger.info(Concern::Automatic, "Opening the cover");
-                        this->open_cover();
+                        this->m_dome->open_cover();
                     }
                 }
 
                 // If the dome is closed, also turn off the intensifier
                 if (stateS.intensifier_active()) {
                     logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
-                    this->turn_off_intensifier();
+                    this->m_dome->turn_off_intensifier();
                     this->set_state(Station::NotObserving);
                 }
             } else {
@@ -352,19 +315,19 @@ void Station::automatic_check(void) {
                         this->set_state(Station::Observing);
                     } else {
                         logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
-                        this->turn_on_intensifier();
+                        this->m_dome->turn_on_intensifier();
                     }
 
                     if (!stateS.fan_active()) {
                         logger.info(Concern::Automatic, "Turned on the fan");
-                        this->turn_on_fan();
+                        this->m_dome->turn_on_fan();
                     }
 
                     // But if humidity is very high, close the cover
-                    if (this->is_very_humid()) {
+                    if (this->dome()->is_very_humid()) {
                         logger.info(Concern::Automatic, "Closed the cover (high humidity)");
                         this->set_state(Station::RainOrHumid);
-                        this->close_cover();
+                        this->m_dome->close_cover();
                     }
                 } else {
                     this->set_state(Station::NotObserving);
@@ -375,52 +338,6 @@ void Station::automatic_check(void) {
             this->set_state(Station::Daylight);
         }
     }
-}
-
-// High level command to open the cover. Opens only if it is dark, or if in override mode.
-void Station::open_cover(void) {
-    if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
-        this->m_dome->send_command(Dome::CommandOpenCover);
-    }
-}
-
-// High level command to close the cover. Closes anytime.
-void Station::close_cover(void) {
-    this->m_dome->send_command(Dome::CommandCloseCover);
-}
-
-// High level command to turn on the hotwire. Works anytime
-void Station::turn_on_hotwire(void) {
-    this->m_dome->send_command(Dome::CommandHotwireOn);
-}
-
-// High level command to turn off the hotwire. Works anytime
-void Station::turn_off_hotwire(void) {
-    this->m_dome->send_command(Dome::CommandHotwireOff);
-}
-
-// High level command to turn on the fan. Works anytime
-void Station::turn_on_fan(void) {
-    this->m_dome->send_command(Dome::CommandFanOn);
-}
-
-// High level command to turn off the fan. Works anytime
-void Station::turn_off_fan(void) {
-    this->m_dome->send_command(Dome::CommandFanOff);
-}
-
-// High level command to turn on the intensifier. Turns on only if it is dark, or if in override mode.
-void Station::turn_on_intensifier(void) {
-    if (this->is_dark() || (this->m_manual_control && this->m_safety_override)) {
-        this->m_dome->send_command(Dome::CommandIIOn);
-    } else {
-        logger.warning(Concern::SerialPort, "Command ignored, sun is too high and override is not active");
-    }
-}
-
-// High level command to turn off the intensifier. Works anytime
-void Station::turn_off_intensifier(void) {
-    this->m_dome->send_command(Dome::CommandIIOff);
 }
 
 void Station::set_state(StationState new_state) {

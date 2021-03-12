@@ -4,8 +4,6 @@
 
 #include "logging/loggingdialog.h"
 
-#include "amos-widgets/domewidget.h"
-
 extern EventLogger logger;
 extern QSettings *settings;
 
@@ -19,8 +17,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->ui->tb_log->setColumnWidth(0, 140);
     this->ui->tb_log->setColumnWidth(1, 72);
     this->ui->tb_log->setColumnWidth(2, 72);
-
-    this->display_serial_ports();
 
     logger.set_display_widget(this->ui->tb_log);
     logger.info(Concern::Operation, "Client initialized");
@@ -45,8 +41,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // connect signals for handling of edits of safety limits
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
     this->create_actions();
     this->create_tray_icon();
@@ -63,10 +57,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
-    this->connect(this->station->dome(), &Dome::state_updated_S, this, &MainWindow::display_basic_data);
-    this->connect(this->station->dome(), &Dome::state_updated_T, this, &MainWindow::display_env_data);
-    this->connect(this->station->dome(), &Dome::state_updated_Z, this, &MainWindow::display_shaft_position);
-
     this->connect(this->station, &Station::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
 
@@ -78,18 +68,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
     this->set_icon(this->station->state());
 
-    this->connect(this->station->dome(), &Dome::cover_moved, this->ui->dome_widget, &DomeWidget::set_cover_position);
-    this->connect(this->station->dome(), &Dome::cover_open, this->ui->dome_widget, &DomeWidget::set_cover_maximum);
-    this->connect(this->station->dome(), &Dome::cover_open, this->ui->progress_cover, &QProgressBar::setMaximum);
-    this->connect(this->station->dome(), &Dome::cover_closed, this->ui->dome_widget, &DomeWidget::set_cover_minimum);
-    this->connect(this->station->dome(), &Dome::cover_closed, this->ui->progress_cover, &QProgressBar::setMinimum);
-
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->station, &Station::process_sightings);
 
-    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome_info, &QDomeInfo::set_formatters);
+    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome_info, &QDome::set_formatters);
+
+    this->ui->dome_info->list_serial_ports();
 
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
+    this->ui->dome_info->initialize();
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);
@@ -106,6 +93,7 @@ MainWindow::~MainWindow() {
 
     delete this->universe;
     delete this->station;
+    delete settings;
 }
 
 QString MainWindow::format_duration(unsigned int duration) {
@@ -148,7 +136,6 @@ void MainWindow::on_cb_manual_stateChanged(int manual) {
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
-    this->display_device_buttons_state();
     this->display_cover_status();
     this->display_window_title();
 }
@@ -181,6 +168,7 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
     this->display_window_title();
 }
 
+/*
 void MainWindow::on_bt_lens_heating_clicked(void) {
     if (this->station->dome()->state_S().lens_heating_active()) {
         logger.info(Concern::Operation, "Manual command: turn off the hotwire");
@@ -220,6 +208,7 @@ void MainWindow::on_bt_cover_close_clicked(void) {
     logger.info(Concern::Operation, "Manual command: close the cover");
     this->station->close_cover();
 }
+*/
 
 void MainWindow::on_bt_change_ufo_clicked(void) {
     QString filename = QFileDialog::getOpenFileName(
@@ -255,25 +244,6 @@ void MainWindow::on_bt_ufo_clicked() {
     } else {
         this->station->ufo_manager()->stop_ufo();
     }
-}
-
-void MainWindow::on_co_serial_ports_activated(int index) {
-    QString port = this->serial_ports[index].portName();
-
-    if (this->ui->co_serial_ports->count() == 0) {
-        logger.warning(Concern::SerialPort, "No serial ports found");
-        this->station->dome()->clear_serial_port();
-    } else {
-        if (index == -1) {
-            logger.warning(Concern::SerialPort, "Index is -1");
-            this->station->dome()->clear_serial_port();
-        } else {
-            logger.info(Concern::SerialPort, QString("Serial port set to %1").arg(port));
-            this->station->dome()->set_serial_port(port);
-            settings->setValue("dome/port", port);
-        }
-    }
-
 }
 
 void MainWindow::on_action_manual_triggered() {

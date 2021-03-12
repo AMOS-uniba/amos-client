@@ -7,6 +7,7 @@
 
 #include "forward.h"
 #include "APC/APC_include.h"
+#include "widgets/qdome.h"
 
 #ifndef STATION_H
 #define STATION_H
@@ -37,7 +38,7 @@ private:
     QStorageBox *m_permanent_storage;
 
     StateLogger *m_state_logger;
-    Dome *m_dome;
+    QDome *m_dome;
     Server *m_server;
     UfoManager *m_ufo_manager;
 
@@ -55,8 +56,7 @@ public:
     void set_scanner(const QDir &directory);
     FileSystemScanner* scanner(void) const;
 
-
-    Dome* dome(void) const;
+    QDome* dome(void) const;
 
     QJsonObject prepare_heartbeat(void) const;
 
@@ -67,6 +67,8 @@ public:
 
     void set_server(Server *server);
     Server* server(void);
+
+    void set_dome(QDome *dome);
 
     // G&S for position
     void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
@@ -82,13 +84,6 @@ public:
     bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     void set_darkness_limit(const double new_altitude_dark);
     double darkness_limit(void) const;
-
-    // Humidity getters and setters
-    bool is_humid(void) const;
-    bool is_very_humid(void) const;
-    void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
-    double humidity_limit_lower(void) const;
-    double humidity_limit_upper(void) const;
 
     // Sun position functions
     Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
@@ -111,19 +106,6 @@ public:
     void set_safety_override(bool override);
     bool is_safety_overridden(void) const;
 
-    // Command wrappers
-    void open_cover(void);
-    void close_cover(void);
-
-    void turn_on_intensifier(void);
-    void turn_off_intensifier(void);
-
-    void turn_on_hotwire(void);
-    void turn_off_hotwire(void);
-
-    void turn_on_fan(void);
-    void turn_off_fan(void);
-
     QString state_logger_filename(void) const;
 
     static QString temperature_colour(float temperature);
@@ -137,6 +119,8 @@ public slots:
     void process_sightings(QVector<Sighting> sightings);
 
 signals:
+    void manual_mode_changed(bool manual);
+
     void state_changed(StationState state) const;
 
     void id_changed(void) const;

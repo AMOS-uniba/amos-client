@@ -53,10 +53,6 @@ private:
     QSystemTrayIcon *tray_icon;
     QMenu *trayIconMenu;
 
-    void display_S_state_bit(bool value, QLabel *label, const QString &on, const QString &off, const QString &colour_on, const QString &colour_off);
-    void display_device_button(QPushButton *button, bool on);
-    void display_sensor_value(QLabel *label, float value, const QString &unit = "");
-
     QMap<Icon, QIcon> icons;
 
     //CommThread comm_thread;
@@ -69,7 +65,6 @@ private slots:
     void load_settings_station(void);
 
     void create_timers(void);
-    void display_serial_ports(void);
 
     // Menu actions
     void on_action_exit_triggered();
@@ -83,12 +78,6 @@ private slots:
     void display_time(void);
 
     void display_window_title(void);
-
-    void display_serial_port_info(void);
-    void display_basic_data(void);
-    void display_env_data(void);
-    void display_shaft_position(void);
-    void display_device_buttons_state(void);
 
     void display_cover_status(void);
     void display_station_config(void);
@@ -106,7 +95,6 @@ private slots:
 
     void on_cb_manual_stateChanged(int manual);
     void on_cb_debug_stateChanged(int debug);
-    void on_co_serial_ports_activated(int index);
 
     // Tray and messaging
     void set_icon(const StationState &state);
@@ -115,13 +103,14 @@ private slots:
     void message_clicked();
 
     // Dome control slots
+    /*
     void on_bt_lens_heating_clicked();
     void on_bt_intensifier_clicked();
     void on_bt_fan_clicked();
 
     void on_bt_cover_open_clicked();
     void on_bt_cover_close_clicked();
-
+    */
     void on_cb_safety_override_stateChanged(int arg1);
 
     void on_bt_change_ufo_clicked();

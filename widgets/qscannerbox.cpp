@@ -11,7 +11,7 @@ QScannerBox::QScannerBox(QWidget *parent):
 }
 
 void QScannerBox::set_enabled(bool enabled) {
-    logger.info(Concern::Storage, QString("Scanner now %1abled").arg(enabled ? "en" : "dis"));
+    logger.info(Concern::Storage, QString("Scanner %1abled").arg(enabled ? "en" : "dis"));
     QFileSystemBox::set_enabled(enabled);
     settings->setValue(QString("storage/scanner_enabled"), enabled);
 }

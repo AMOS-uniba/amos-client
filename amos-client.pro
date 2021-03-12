@@ -47,13 +47,13 @@ SOURCES += \
     utils/telegram.cpp \
     utils/ufomanager.cpp \
     utils/universe.cpp \
-    widgets/domewidget.cpp \
     widgets/lines/qbooleanline.cpp \
     widgets/lines/qcontrolline.cpp \
     widgets/lines/qdatetimeline.cpp \
     widgets/lines/qdisplayline.cpp \
     widgets/lines/qfloatline.cpp \
-    widgets/qdomeinfo.cpp \
+    widgets/qdome.cpp \
+    widgets/qdomewidget.cpp \
     widgets/qfilesystembox.cpp \
     widgets/qscannerbox.cpp \
     widgets/qstoragebox.cpp \
@@ -95,13 +95,13 @@ HEADERS += \
     utils/telegram.h \
     utils/ufomanager.h \
     utils/universe.h \
-    widgets/domewidget.h \
     widgets/lines/qbooleanline.h \
     widgets/lines/qcontrolline.h \
     widgets/lines/qdatetimeline.h \
     widgets/lines/qdisplayline.h \
     widgets/lines/qfloatline.h \
-    widgets/qdomeinfo.h \
+    widgets/qdome.h \
+    widgets/qdomewidget.h \
     widgets/qfilesystembox.h \
     widgets/qscannerbox.h \
     widgets/qstoragebox.h \
@@ -111,7 +111,7 @@ FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
     widgets/lines/qdisplayline.ui \
-    widgets/qdomeinfo.ui \
+    widgets/qdome.ui \
     widgets/qsuninfo.ui
 
 # Default rules for deployment.

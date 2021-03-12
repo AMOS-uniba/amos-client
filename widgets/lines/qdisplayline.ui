@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>QDisplayLine</class>
  <widget class="QWidget" name="QDisplayLine">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>278</width>
+    <height>18</height>
+   </rect>
+  </property>
   <layout class="QHBoxLayout" name="layout">
    <property name="leftMargin">
     <number>0</number>
@@ -17,6 +25,12 @@
    </property>
    <item>
     <widget class="QLabel" name="lb_title">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>undefined</string>
      </property>
