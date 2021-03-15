@@ -4,6 +4,7 @@
 #include <QGroupBox>
 
 #include "forward.h"
+#include "widgets/lines/qdisplayline.h"
 #include "utils/domestate.h"
 #include "mainwindow.h"
 #include "widgets/qdomewidget.h"
@@ -49,10 +50,11 @@ public:
 
     const static SerialPortState SerialPortNotSet, SerialPortOpen, SerialPortError;
 
+    const static ValueFormatter<double> TemperatureValueFormatter, HumidityValueFormatter;
+    const static ColourFormatter<double> TemperatureColourFormatter;
+
     explicit QDome(QWidget *parent = nullptr);
     ~QDome();
-
-    static QColor temperature_colour(double temperature);
 
     void send_command(const Command &command) const;
     void send_request(const Request &request) const;
@@ -69,7 +71,7 @@ public:
 
     QString status_line(void) const;
 
-    void initialize(void);
+    void initialize(Station * const station);
     void load_settings(void);
 
     // Humidity getters and setters
@@ -95,7 +97,7 @@ private slots:
     void humidity_limits_discard(void);
 
 public slots:
-    void set_formatters(double humidity_limit_lower, double humidity_limit_upper);
+    void set_formatters(void);
 
     void list_serial_ports(void);
     void clear_serial_port(void);

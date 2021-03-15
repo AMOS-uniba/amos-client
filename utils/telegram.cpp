@@ -7,6 +7,8 @@ Telegram::Telegram(const unsigned char address, const QByteArray& message): m_ad
 
 // RAII: construct a new telegram from the received message, includes validation
 Telegram::Telegram(const QByteArray& received) {
+    logger.debug(Concern::SerialPort, QString("New telegram: '%1'").arg(QString(received)));
+
     // Check length of the message
     unsigned char length = received.length();
     if ((length < 8) || (length > Telegram::MAX_LENGTH)) {

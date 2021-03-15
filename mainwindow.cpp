@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
-    this->ui->dome_info->initialize();
+    this->ui->dome_info->initialize(this->station);
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);

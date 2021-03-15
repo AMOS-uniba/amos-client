@@ -17,4 +17,9 @@ QControlLine::QControlLine(QWidget *parent):
 
 void QControlLine::set_value(bool new_value) {
     QBooleanLine::set_value(new_value);
+    this->bt_toggle->setText(new_value ? "Turn off" : "Turn on");
+}
+
+void QControlLine::set_enabled(bool enabled) {
+    this->bt_toggle->setEnabled(enabled);
 }

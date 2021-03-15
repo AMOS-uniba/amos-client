@@ -28,9 +28,15 @@ const SerialPortState QDome::SerialPortNotSet   = SerialPortState('N', "not set"
 const SerialPortState QDome::SerialPortOpen     = SerialPortState('O', "open");
 const SerialPortState QDome::SerialPortError    = SerialPortState('E', "error");
 
+const ValueFormatter<double> QDome::TemperatureValueFormatter = [](double value) {
+    return QString("%1 °C").arg(value, 3, 'f', 1);
+};
 
+const ValueFormatter<double> QDome::HumidityValueFormatter = [](double value) {
+    return QString("%1 %").arg(value, 3, 'f', 1);
+};
 
-QColor QDome::temperature_colour(double temperature) {
+const ColourFormatter<double> QDome::TemperatureColourFormatter = [](double temperature) {
     float h = 0, s = 0, v = 0;
     if (temperature < 0.0) {
         h = 180 - 4.0 * temperature;
@@ -49,25 +55,22 @@ QColor QDome::temperature_colour(double temperature) {
         v = 160;
     }
     return QColor::fromHsv(h, s, v);
-}
-
+};
 
 QDome::QDome(QWidget *parent):
     QGroupBox(parent),
     ui(new Ui::QDome),
     m_station(nullptr),
+    m_serial_port(nullptr),
     m_state_S(),
     m_state_T(),
     m_state_Z()
 {
+    this->m_buffer = new SerialBuffer();
+
     this->ui->setupUi(this);
 
     this->ui->fl_time_alive->set_title("Time alive");
-    this->ui->fl_time_alive->set_value_formatter(
-        [](double value) -> QString {
-            return MainWindow::format_duration((unsigned int) value);
-        }
-    );
 
     this->ui->bl_servo_moving->set_title("Servo moving");
     this->ui->bl_servo_direction->set_title("Servo direction");
@@ -79,7 +82,6 @@ QDome::QDome(QWidget *parent):
     this->ui->cl_lens_heating->set_title("Lens heating");
     this->ui->cl_camera_heating->set_title("Camera heating");
     this->ui->cl_fan->set_title("Fan");
-    this->ui->cl_fan->set_formatters(Qt::green, Qt::black, "on", "off");
     this->ui->cl_ii->set_title("Image intensifier");
 
     this->ui->fl_t_lens->set_title("Lens temperature");
@@ -91,23 +93,16 @@ QDome::QDome(QWidget *parent):
     this->ui->bl_master_power->set_title("Master power");
 
     this->ui->bl_error_t_lens->set_title("Lens temperature");
-    this->ui->bl_error_t_lens->set_formatters(Qt::red, Qt::black, "error", "ok");
     this->ui->bl_error_t_SHT31->set_title("Environment temperature");
-    this->ui->bl_error_t_SHT31->set_formatters(Qt::red, Qt::black, "error", "ok");
     this->ui->bl_error_light->set_title("Emergency closing (light)");
-    this->ui->bl_error_light->set_formatters(Qt::red, Qt::black, "light", "no light");
     this->ui->bl_error_watchdog->set_title("Watchdog reset");
-    this->ui->bl_error_watchdog->set_formatters(Qt::red, Qt::black, "reset", "ok");
     this->ui->bl_error_brownout->set_title("Brownout reset");
-    this->ui->bl_error_brownout->set_formatters(Qt::red, Qt::black, "reset", "ok");
     this->ui->bl_error_master->set_title("Master power");
-    this->ui->bl_error_master->set_formatters(Qt::red, Qt::black, "failed", "ok");
     this->ui->bl_error_t_CPU->set_title("CPU temperature");
-    this->ui->bl_error_t_CPU->set_formatters(Qt::red, Qt::black, "error", "ok");
     this->ui->bl_error_rain->set_title("Emergency closing (rain)");
-    this->ui->bl_error_rain->set_formatters(Qt::red, Qt::black, "closed", "ok");
 
     this->connect(this, &QDome::state_updated_S, this, &QDome::display_basic_data);
+    this->connect(this, &QDome::state_updated_S, this, &QDome::display_dome_state);
     this->connect(this, &QDome::state_updated_T, this, &QDome::display_env_data);
     this->connect(this, &QDome::state_updated_Z, this, &QDome::display_shaft_data);
 
@@ -118,7 +113,9 @@ QDome::QDome(QWidget *parent):
     this->connect(this, &QDome::cover_closed, this->ui->pb_cover, &QProgressBar::setMinimum);
 
 //    this->connect(this->ui->cl_camera_heating, &QControlLine::toggled, this, &QDome::toggle_camera_heating);
+    this->connect(this->ui->cl_lens_heating, &QControlLine::toggled, this, &QDome::toggle_hotwire);
     this->connect(this->ui->cl_fan, &QControlLine::toggled, this, &QDome::toggle_fan);
+    this->connect(this->ui->cl_ii, &QControlLine::toggled, this, &QDome::toggle_intensifier);
 
     this->connect(this->ui->co_serial_ports, &QComboBox::currentTextChanged, this, &QDome::set_serial_port);
 
@@ -127,6 +124,8 @@ QDome::QDome(QWidget *parent):
     this->connect(this->ui->bt_humidity_apply, &QPushButton::clicked, this, &QDome::humidity_limits_apply);
     this->connect(this->ui->bt_humidity_discard, &QPushButton::clicked, this, &QDome::humidity_limits_discard);
     this->connect(this, &QDome::humidity_limits_changed, this, &QDome::humidity_limits_discard);
+
+    this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &QDome::process_message);
 
     this->m_robin_timer = new QTimer(this);
     this->m_robin_timer->setInterval(QDome::REFRESH);
@@ -143,10 +142,14 @@ QDome::~QDome() {
     delete this->ui;
     delete this->m_robin_timer;
     delete this->m_serial_watchdog;
+    delete this->m_buffer;
 }
 
-void QDome::initialize(void) {
+void QDome::initialize(Station * const station) {
+    this->m_station = station;
+
     this->check_serial_port();
+    this->set_formatters();
     this->load_settings();
 
     this->display_basic_data(this->m_state_S);
@@ -166,38 +169,46 @@ void QDome::load_settings(void) {
 /**
  * @brief QDome::set_formatters
  * Resets the formatters for all display lines
- * @param humidity_limit_lower
- * @param humidity_limit_upper
  */
-void QDome::set_formatters(double humidity_limit_lower, double humidity_limit_upper) {
-    ValueFormatter<double> temp_value_formatter = [=](double value) -> QString { return QString("%1 °C").arg(value); };
-    ValueFormatter<double> humi_value_formatter = [=](double value) -> QString { return QString("%1 %%").arg(value); };
+void QDome::set_formatters(void) {
+    this->ui->fl_time_alive->set_value_formatter(MainWindow::format_duration);
 
-    this->ui->bl_servo_moving->set_formatters(Qt::green, Qt::black, "moving", "not moving");
+    this->ui->bl_servo_moving->set_formatters(Qt::darkGreen, Qt::black, "moving", "not moving");
     this->ui->bl_servo_direction->set_formatters(Qt::black, Qt::black, "opening", "closing");
-    this->ui->bl_open_dome_sensor->set_formatters(Qt::green, Qt::black, "active", "not active");
-    this->ui->bl_closed_dome_sensor->set_formatters(Qt::green, Qt::black, "active", "not active");
+    this->ui->bl_open_dome_sensor->set_formatters(Qt::darkGreen, Qt::black, "open", "not open");
+    this->ui->bl_closed_dome_sensor->set_formatters(Qt::darkGreen, Qt::black, "closed", "not closed");
     this->ui->bl_safety->set_formatters(Qt::blue, Qt::black, "safety", "no");
     this->ui->bl_servo_blocked->set_formatters(Qt::red, Qt::black, "blocked", "no");
 
-    this->ui->fl_t_lens->set_value_formatter(temp_value_formatter);
-    this->ui->fl_t_lens->set_colour_formatter(QDome::temperature_colour);
-    this->ui->fl_t_CPU->set_value_formatter(temp_value_formatter);
-    this->ui->fl_t_CPU->set_colour_formatter(QDome::temperature_colour);
-    this->ui->fl_t_SHT31->set_value_formatter(temp_value_formatter);
-    this->ui->fl_t_SHT31->set_colour_formatter(QDome::temperature_colour);
-    this->ui->fl_h_SHT31->set_value_formatter(humi_value_formatter);
+    this->ui->cl_lens_heating->set_formatters(Qt::darkRed, Qt::black, "on", "off");
+    this->ui->cl_camera_heating->set_formatters(Qt::darkRed, Qt::black, "on", "off");
+    this->ui->cl_fan->set_formatters(Qt::darkGreen, Qt::black, "on", "off");
+    this->ui->cl_ii->set_formatters(Qt::darkGreen, Qt::black, "on", "off");
+
+    this->ui->fl_t_lens->set_value_formatter(QDome::TemperatureValueFormatter);
+    this->ui->fl_t_lens->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_t_CPU->set_value_formatter(QDome::TemperatureValueFormatter);
+    this->ui->fl_t_CPU->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_t_SHT31->set_value_formatter(QDome::TemperatureValueFormatter);
+    this->ui->fl_t_SHT31->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_h_SHT31->set_value_formatter(QDome::HumidityValueFormatter);
     this->ui->fl_h_SHT31->set_colour_formatter([=](double humidity) -> QColor {
-        return (humidity < humidity_limit_lower) ? Qt::black :
-            (humidity > humidity_limit_upper) ? Qt::red : Qt::blue;
+        return (humidity < this->humidity_limit_lower()) ? Qt::black :
+            (humidity > this->humidity_limit_upper()) ? Qt::red : Qt::blue;
     });
+
     this->ui->bl_rain_sensor->set_formatters(Qt::blue, Qt::black, "raining", "not raining");
     this->ui->bl_light_sensor->set_formatters(Qt::red, Qt::black, "light", "no light");
-    this->ui->bl_master_power->set_formatters(Qt::black, Qt::red, "powered", "not powered");
+    this->ui->bl_master_power->set_formatters(Qt::darkGreen, Qt::red, "powered", "not powered");
 
-    this->ui->cl_lens_heating->set_formatters(Qt::green, Qt::black, "on", "off");
-    this->ui->cl_camera_heating->set_formatters(Qt::green, Qt::black, "on", "off");
-    this->ui->cl_ii->set_formatters(Qt::green, Qt::black, "on", "off");
+    this->ui->bl_error_t_lens->set_formatters(Qt::red, Qt::black, "error", "ok");
+    this->ui->bl_error_t_SHT31->set_formatters(Qt::red, Qt::black, "error", "ok");
+    this->ui->bl_error_light->set_formatters(Qt::red, Qt::black, "light", "ok");
+    this->ui->bl_error_watchdog->set_formatters(Qt::red, Qt::black, "reset", "ok");
+    this->ui->bl_error_brownout->set_formatters(Qt::red, Qt::black, "reset", "ok");
+    this->ui->bl_error_master->set_formatters(Qt::red, Qt::black, "failed", "ok");
+    this->ui->bl_error_t_CPU->set_formatters(Qt::red, Qt::black, "error", "ok");
+    this->ui->bl_error_rain->set_formatters(Qt::red, Qt::black, "closed", "ok");
 }
 
 void QDome::display_basic_data(const DomeStateS &state) {
@@ -263,6 +274,11 @@ void QDome::display_basic_data(const DomeStateS &state) {
 
     this->ui->bt_cover_close->setEnabled(state.is_valid() && this->m_station->is_manual() && !state.dome_closed_sensor_active());
     this->ui->bt_cover_open->setEnabled(state.is_valid() && this->m_station->is_manual() && !state.dome_open_sensor_active());
+
+    this->ui->cl_lens_heating->set_enabled(state.is_valid() && this->m_station->is_manual());
+    this->ui->cl_camera_heating->set_enabled(state.is_valid() && this->m_station->is_manual());
+    this->ui->cl_fan->set_enabled(state.is_valid() && this->m_station->is_manual());
+    this->ui->cl_ii->set_enabled(state.is_valid() && this->m_station->is_manual());
 }
 
 void QDome::display_env_data(const DomeStateT &state) {
@@ -391,7 +407,7 @@ void QDome::display_serial_port_info(void) const {
     } else {
         if (this->m_serial_port->isOpen()) {
             if (this->state_S().is_valid()) {
-                info = "is open";
+                info = "valid data";
             } else {
                 info = "no data";
             }
@@ -438,13 +454,10 @@ void QDome::send(const QByteArray &message) const {
 }
 
 void QDome::process_response(void) {
-    logger.debug(Concern::SerialPort, QString("Processing a response"));
     QByteArray response;
-
     while (this->m_serial_port->bytesAvailable()) {
         response += this->m_serial_port->readAll();
     }
-
     this->m_buffer->insert(response);
 }
 

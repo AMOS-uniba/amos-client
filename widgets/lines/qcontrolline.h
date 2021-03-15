@@ -15,6 +15,7 @@ public:
 
 public slots:
     void set_value(bool new_value);
+    void set_enabled(bool enabled);
 signals:
     void toggled(void);
 };
