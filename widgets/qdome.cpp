@@ -604,8 +604,8 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
     );
 
     settings->beginGroup("dome");
-    settings->setValue("humidity_level_lower", this->humidity_limit_lower());
-    settings->setValue("humidity_level_upper", this->humidity_limit_upper());
+    settings->setValue("humidity_lower", this->humidity_limit_lower());
+    settings->setValue("humidity_upper", this->humidity_limit_upper());
     settings->endGroup();
 
     this->handle_humidity_limits_changed();

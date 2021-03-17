@@ -3,6 +3,9 @@
 extern EventLogger logger;
 extern QSettings *settings;
 
+QString QStorageBox::DialogTitle(void) const { return "Select storage directory"; }
+QString QStorageBox::AbortMessage(void) const { return "Storage directory selection aborted"; }
+
 QStorageBox::QStorageBox(QWidget *parent):
     QFileSystemBox(parent),
     m_name("")
@@ -33,7 +36,6 @@ void QStorageBox::set_directory(const QDir &new_directory) {
     logger.info(Concern::Storage, QString("Storage '%1': directory set to %2").arg(this->m_name, this->m_directory.path()));
     settings->setValue(QString("storage/%1_path").arg(this->m_name), this->m_directory.path());
 }
-
 
 void QStorageBox::store_sighting(Sighting &sighting, bool del) const {
     if (this->m_enabled) {

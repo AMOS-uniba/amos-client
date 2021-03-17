@@ -26,7 +26,6 @@
 #include "station.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"
-#include "dome.h"
 
 #include <QString>
 #include <QByteArray>

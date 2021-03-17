@@ -27,7 +27,6 @@ SOURCES += \
     logging/eventlogger.cpp \
     logging/loggingdialog.cpp \
     logging/statelogger.cpp \
-    dome.cpp \
     main.cpp \
     mainwindow/display.cpp \
     mainwindow/settings.cpp \
@@ -78,7 +77,6 @@ HEADERS += \
     logging/eventlogger.h \
     logging/loggingdialog.h \
     logging/statelogger.h \
-    dome.h \
     forward.h \
     include.h \
     mainwindow.h \

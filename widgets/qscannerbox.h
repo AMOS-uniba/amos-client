@@ -6,6 +6,11 @@
 class QScannerBox: public QFileSystemBox {
     Q_OBJECT
 private:
+
+protected:
+    virtual QString DialogTitle(void) const override;
+    virtual QString AbortMessage(void) const override;
+
 public:
     explicit QScannerBox(QWidget *parent = nullptr);
     void scan_sightings(void) const;

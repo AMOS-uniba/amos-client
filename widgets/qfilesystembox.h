@@ -21,6 +21,9 @@ class QFileSystemBox: public QGroupBox {
 private:
     bool m_enabled;
 protected:
+    virtual QString DialogTitle(void) const = 0;
+    virtual QString AbortMessage(void) const = 0;
+
     QDir m_directory;
 
     QCheckBox *m_cb_enabled;

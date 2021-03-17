@@ -38,7 +38,6 @@ QFileSystemBox::QFileSystemBox(QWidget *parent):
 
     this->connect(this->m_bt_change, &QPushButton::clicked, this, &QFileSystemBox::select_directory);
     this->connect(this->m_bt_open, &QPushButton::clicked, this, &QFileSystemBox::open_in_explorer);
-
     this->connect(this->m_cb_enabled, &QCheckBox::clicked, this, &QFileSystemBox::set_enabled);
 
     this->scan_info();
@@ -85,17 +84,15 @@ void QFileSystemBox::set_directory(const QDir &new_directory) {
 void QFileSystemBox::select_directory(void) {
     QString new_dir = QFileDialog::getExistingDirectory(
         this,
-        "Select UFO output directory to watch",
+        this->DialogTitle(),
         this->m_directory.path(),
         QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks
     );
 
     if (new_dir == "") {
-        logger.debug(Concern::Storage, "Watch directory selection aborted");
+        logger.debug(Concern::Storage, this->AbortMessage());
     } else {
-        // this->station->set_scanner(new_dir);
         this->set_directory(new_dir);
-        //settings->setValue(QString("storage/watch"), new_dir);
         this->scan_info();
         emit this->directory_changed(this->m_directory);
     }

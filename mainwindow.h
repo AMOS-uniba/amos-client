@@ -18,7 +18,6 @@
 
 #include "forward.h"
 
-#include "dome.h"
 #include "utils/ufomanager.h"
 
 QT_BEGIN_NAMESPACE

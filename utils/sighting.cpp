@@ -58,9 +58,9 @@ void Sighting::move(const QString &new_prefix) {
         }
 
         if (QFile::rename(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Moved %1 to %2").arg(this->m_prefix).arg(new_prefix));
+            logger.debug(Concern::Sightings, QString("Moved %1%3 to %2%3").arg(this->m_prefix, new_prefix, file));
         } else {
-            logger.error(Concern::Sightings, QString("Could not move file %1 to %2").arg(this->m_prefix).arg(new_prefix));
+            logger.error(Concern::Sightings, QString("Could not move file %1%3 to %2%3").arg(this->m_prefix, new_prefix, file));
         }
 
         file = new_path;

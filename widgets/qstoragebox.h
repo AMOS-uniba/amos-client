@@ -20,8 +20,13 @@ class QStorageBox: public QFileSystemBox {
 private:
     bool m_enabled;
     QString m_name;
+protected:
+    virtual QString DialogTitle(void) const override;
+    virtual QString AbortMessage(void) const override;
 public:
     explicit QStorageBox(QWidget *parent = nullptr);
+
+
 
     const QString& name(void) const;
     void set_name(const QString &name);
