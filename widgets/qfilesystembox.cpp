@@ -54,7 +54,6 @@ bool QFileSystemBox::is_enabled(void) const {
 void QFileSystemBox::set_enabled(bool enabled) {
     this->m_enabled = enabled;
     this->m_le_path->setEnabled(enabled);
-    this->m_pb_capacity->setEnabled(enabled);
     this->m_cb_enabled->setCheckState(enabled ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
     if (enabled != this->m_enabled) {

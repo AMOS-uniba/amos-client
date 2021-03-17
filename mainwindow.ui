@@ -801,6 +801,7 @@
     <property name="title">
      <string>Operation</string>
     </property>
+    <addaction name="action_debug"/>
     <addaction name="action_logging_options"/>
     <addaction name="action_manual"/>
     <addaction name="separator"/>
@@ -868,6 +869,17 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F8</string>
+   </property>
+  </action>
+  <action name="action_debug">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Debug logging</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
  </widget>

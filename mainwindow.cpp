@@ -125,6 +125,8 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
 
     logger.set_level(debug ? Level::Debug : Level::Info);
     logger.warning(Concern::Operation, QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
+
+    this->ui->action_debug->setChecked(debug);
 }
 
 void MainWindow::on_cb_manual_stateChanged(int manual) {
@@ -133,6 +135,7 @@ void MainWindow::on_cb_manual_stateChanged(int manual) {
     this->station->set_manual_control((bool) manual);
     settings->setValue("manual", this->station->is_manual());
 
+    this->ui->action_manual->setChecked(this->station->is_manual());
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
@@ -167,48 +170,6 @@ void MainWindow::on_cb_safety_override_stateChanged(int state) {
     }
     this->display_window_title();
 }
-
-/*
-void MainWindow::on_bt_lens_heating_clicked(void) {
-    if (this->station->dome()->state_S().lens_heating_active()) {
-        logger.info(Concern::Operation, "Manual command: turn off the hotwire");
-        this->station->turn_off_hotwire();
-    } else {
-        logger.info(Concern::Operation, "Manual command: turn on the hotwire");
-        this->station->turn_on_hotwire();
-    }
-}
-
-void MainWindow::on_bt_intensifier_clicked(void) {
-    if (this->station->dome()->state_S().intensifier_active()) {
-        this->station->turn_off_intensifier();
-        logger.info(Concern::Operation, "Manual command: turn off the intensifier");
-    } else {
-        this->station->turn_on_intensifier();
-        logger.info(Concern::Operation, "Manual command: turn on the intensifier");
-    }
-}
-
-void MainWindow::on_bt_fan_clicked(void) {
-    if (this->station->dome()->state_S().fan_active()) {
-        this->station->turn_off_fan();
-        logger.info(Concern::Operation, "Manual command: turn off the fan");
-    } else {
-        this->station->turn_on_fan();
-        logger.info(Concern::Operation, "Manual command: turn on the fan");
-    }
-}
-
-void MainWindow::on_bt_cover_open_clicked(void) {
-    logger.info(Concern::Operation, "Manual command: open the cover");
-    this->station->open_cover();
-}
-
-void MainWindow::on_bt_cover_close_clicked(void) {
-    logger.info(Concern::Operation, "Manual command: close the cover");
-    this->station->close_cover();
-}
-*/
 
 void MainWindow::on_bt_change_ufo_clicked(void) {
     QString filename = QFileDialog::getOpenFileName(
@@ -265,4 +226,8 @@ void MainWindow::on_action_open_stat_triggered() {
 
 void MainWindow::on_action_open_config_triggered() {
     QDesktopServices::openUrl(QUrl::fromLocalFile(settings->fileName()));
+}
+
+void MainWindow::on_action_debug_triggered() {
+    this->ui->cb_debug->click();
 }

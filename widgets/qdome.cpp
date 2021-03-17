@@ -158,12 +158,10 @@ void QDome::initialize(Station * const station) {
 }
 
 void QDome::load_settings(void) {
-    settings->beginGroup("dome");
     this->set_humidity_limits(
-        settings->value("humidity_lower", 75.0).toDouble(),
-        settings->value("humidity_upper", 80.0).toDouble()
+        settings->value("dome/humidity_lower", 75.0).toDouble(),
+        settings->value("dome/humidity_upper", 80.0).toDouble()
     );
-    settings->endGroup();
 }
 
 /**
@@ -603,10 +601,8 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
                 .arg(this->m_humidity_limit_upper)
     );
 
-    settings->beginGroup("dome");
-    settings->setValue("humidity_lower", this->humidity_limit_lower());
-    settings->setValue("humidity_upper", this->humidity_limit_upper());
-    settings->endGroup();
+    settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
+    settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
 
     this->handle_humidity_limits_changed();
     emit this->humidity_limits_changed(new_lower, new_upper);

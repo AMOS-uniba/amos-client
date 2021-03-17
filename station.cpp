@@ -59,9 +59,6 @@ Station::Station(const QString& id):
 
 Station::~Station(void) {
     delete this->m_timer_automatic;
-    delete this->m_scanner;
-    delete this->m_primary_storage;
-    delete this->m_permanent_storage;
     delete this->m_ufo_manager;
     delete this->m_server;
 }
@@ -361,6 +358,7 @@ void Station::file_check(void) {
 }
 
 void Station::process_sightings(QVector<Sighting> sightings) {
+    logger.debug(Concern::Sightings, "Processing sightings...");
     for (auto &sighting: sightings) {
         this->m_server->send_sighting(sighting);
         this->m_permanent_storage->store_sighting(sighting, false);

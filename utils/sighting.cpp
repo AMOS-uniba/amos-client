@@ -46,11 +46,11 @@ qint64 Sighting::avi_size(void) const {
     return info.exists() ? info.size() : -1;
 }
 
-void Sighting::move(const QString &new_prefix) {
-    QDir().mkpath(new_prefix);
+void Sighting::move(const QString &prefix) {
+    QDir().mkpath(prefix);
 
     for (auto &file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(new_prefix).arg(QFileInfo(file).fileName());
+        QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
 
         if (QFile::exists(new_path)) {
             logger.warning(Concern::Sightings, QString("Could not move the sighting, have to delete file '%1' first...").arg(new_path));
@@ -58,9 +58,9 @@ void Sighting::move(const QString &new_prefix) {
         }
 
         if (QFile::rename(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Moved %1%3 to %2%3").arg(this->m_prefix, new_prefix, file));
+            logger.debug(Concern::Sightings, QString("Moved %1 to %2").arg(file, new_path));
         } else {
-            logger.error(Concern::Sightings, QString("Could not move file %1%3 to %2%3").arg(this->m_prefix, new_prefix, file));
+            logger.error(Concern::Sightings, QString("Could not move file %1 to %2").arg(file, new_path));
         }
 
         file = new_path;
@@ -68,7 +68,7 @@ void Sighting::move(const QString &new_prefix) {
 }
 
 void Sighting::copy(const QString &prefix) const {
-    logger.debug(Concern::Sightings, QString("Moving to %1").arg(prefix));
+    logger.debug(Concern::Sightings, QString("Copying to %1").arg(prefix));
     QDir().mkpath(prefix);
 
     for (auto &file: this->m_files) {

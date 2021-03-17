@@ -70,6 +70,7 @@ void MainWindow::display_ufo_state(void) {
 
 void MainWindow::display_time(void) {
     statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+
     ui->lb_next_heartbeat->setText(QString("%1 s").arg((double) this->timer_heartbeat->remainingTime() / 1000, 3, 'f', 1));
     this->ui->lb_uptime->setText(
         this->format_duration(settings->value("run/last_run").toDateTime().secsTo(QDateTime::currentDateTimeUtc()))

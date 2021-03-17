@@ -5,7 +5,6 @@
 
 class QScannerBox: public QFileSystemBox {
     Q_OBJECT
-private:
 
 protected:
     virtual QString DialogTitle(void) const override;

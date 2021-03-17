@@ -26,6 +26,7 @@ void MainWindow::load_settings(void) {
 
         this->load_settings_storage();
         this->load_settings_station();
+        logger.load_settings();
 
         // Load and set debug levels
         bool debug = settings->value("debug", false).toBool();
@@ -58,19 +59,17 @@ void MainWindow::load_settings(void) {
  * Loads and applies settings from the `storage` group
  */
 void MainWindow::load_settings_storage(void) {
-    settings->beginGroup("storage");
-    this->ui->scanner->set_directory(QDir(settings->value("scanner_path", "C:\\Data").toString()));
-    this->ui->scanner->set_enabled(settings->value("scanner_enabled", true).toBool());
+    this->ui->scanner->set_directory(QDir(settings->value("storage/scanner_path", "C:\\Data").toString()));
+    this->ui->scanner->set_enabled(settings->value("storage/scanner_enabled", true).toBool());
     this->ui->scanner->scan_info();
 
-    this->ui->storage_primary->set_directory(QDir(settings->value("primary_path", "C:\\Data").toString()));
-    this->ui->storage_primary->set_enabled(settings->value("primary_enabled", true).toBool());
+    this->ui->storage_primary->set_directory(QDir(settings->value("storage/primary_path", "C:\\Data").toString()));
+    this->ui->storage_primary->set_enabled(settings->value("storage/primary_enabled", true).toBool());
     this->ui->storage_primary->scan_info();
 
-    this->ui->storage_permanent->set_directory(QDir(settings->value("permanent_path", "D:\\Data").toString()));
-    this->ui->storage_permanent->set_enabled(settings->value("permanent_enabled", true).toBool());
+    this->ui->storage_permanent->set_directory(QDir(settings->value("storage/permanent_path", "D:\\Data").toString()));
+    this->ui->storage_permanent->set_enabled(settings->value("storage/permanent_enabled", true).toBool());
     this->ui->storage_permanent->scan_info();
-    settings->endGroup();
 }
 
 /**
@@ -78,14 +77,12 @@ void MainWindow::load_settings_storage(void) {
  * Loads and applies settings from the `station` group
  */
 void MainWindow::load_settings_station(void) {
-    settings->beginGroup("station");
     this->station->set_position(
-        settings->value("latitude", 48).toDouble(),
-        settings->value("longitude", 17).toDouble(),
-        settings->value("altitude", 0).toDouble()
+        settings->value("station/latitude", 48).toDouble(),
+        settings->value("station/longitude", 17).toDouble(),
+        settings->value("station/altitude", 0).toDouble()
     );
-    this->station->set_darkness_limit(settings->value("darkness", -12.0).toDouble());
-    settings->endGroup();
+    this->station->set_darkness_limit(settings->value("station/darkness", -12.0).toDouble());
 }
 
 /**
@@ -132,14 +129,11 @@ void MainWindow::on_bt_station_apply_clicked(void) {
     settings->setValue("server/ip", this->station->server()->address().toString());
     settings->setValue("server/port", this->station->server()->port());
 
-    settings->beginGroup("station");
-    settings->setValue("id", this->station->get_id());
-    settings->setValue("latitude", this->station->latitude());
-    settings->setValue("longitude", this->station->longitude());
-    settings->setValue("altitude", this->station->altitude());
-
-    settings->setValue("darkness", this->station->darkness_limit());
-    settings->endGroup();
+    settings->setValue("station/id", this->station->get_id());
+    settings->setValue("station/latitude", this->station->latitude());
+    settings->setValue("station/longitude", this->station->longitude());
+    settings->setValue("station/altitude", this->station->altitude());
+    settings->setValue("station/darkness", this->station->darkness_limit());
 
     settings->sync();
 

@@ -168,16 +168,10 @@
    <item row="7" column="0">
     <widget class="QGroupBox" name="gb_cover">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>222</height>
-      </size>
      </property>
      <property name="title">
       <string>Cover</string>
@@ -319,14 +313,14 @@
         <item>
          <widget class="QPushButton" name="bt_cover_open">
           <property name="text">
-           <string>open</string>
+           <string>Open</string>
           </property>
          </widget>
         </item>
         <item>
          <widget class="QPushButton" name="bt_cover_close">
           <property name="text">
-           <string>close</string>
+           <string>Close</string>
           </property>
          </widget>
         </item>
@@ -388,12 +382,6 @@
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>166</height>
-      </size>
      </property>
      <property name="title">
       <string>Error bits</string>
@@ -537,7 +525,7 @@
         <item>
          <widget class="QPushButton" name="bt_humidity_discard">
           <property name="text">
-           <string>Discard changes</string>
+           <string>Discard</string>
           </property>
          </widget>
         </item>
@@ -597,16 +585,10 @@
    <item row="8" column="0">
     <widget class="QGroupBox" name="gb_devices">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>222</height>
-      </size>
      </property>
      <property name="title">
       <string>Devices</string>

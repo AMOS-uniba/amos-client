@@ -119,5 +119,6 @@ private slots:
     void on_action_open_log_triggered();
     void on_action_open_config_triggered();
     void on_action_open_stat_triggered();
+    void on_action_debug_triggered();
 };
 #endif // MAINWINDOW_H

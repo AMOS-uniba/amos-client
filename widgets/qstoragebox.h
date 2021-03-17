@@ -18,7 +18,6 @@
 class QStorageBox: public QFileSystemBox {
     Q_OBJECT
 private:
-    bool m_enabled;
     QString m_name;
 protected:
     virtual QString DialogTitle(void) const override;

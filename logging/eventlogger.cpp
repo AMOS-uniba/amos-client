@@ -129,17 +129,16 @@ bool EventLogger::is_debug_visible(Concern concern) const {
 }
 
 void EventLogger::load_settings(void) {
-    settings->beginReadArray("logging");
     for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
-        this->set_debug_visible(concern.key(), settings->value(EventLogger::Concerns[concern.key()].name, false).toBool());
+        this->set_debug_visible(
+            concern.key(),
+            settings->value("logging/" + EventLogger::Concerns[concern.key()].name, false).toBool()
+        );
     }
-    settings->endArray();
 }
 
 void EventLogger::save_settings(void) const {
-    settings->beginGroup("logging");
     for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
-        settings->setValue(EventLogger::Concerns[concern.key()].name, concern.value());
+        settings->setValue("logging/" + EventLogger::Concerns[concern.key()].name, concern.value());
     }
-    settings->endGroup();
 }
