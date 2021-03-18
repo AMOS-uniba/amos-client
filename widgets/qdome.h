@@ -72,7 +72,6 @@ public:
     QString status_line(void) const;
 
     void initialize(Station * const station);
-    void load_settings(void);
 
     // Humidity getters and setters
     bool is_humid(void) const;
@@ -82,6 +81,8 @@ public:
     void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
 
 private slots:
+    void load_settings(void);
+
     void display_dome_state(void);
 
     void display_basic_data(const DomeStateS &state);
@@ -92,9 +93,9 @@ private slots:
     void toggle_intensifier(void);
     void toggle_fan(void);
 
-    void handle_humidity_limits_changed(void);
-    void humidity_limits_apply(void);
-    void humidity_limits_discard(void);
+    void handle_settings_changed(void);
+    void apply_settings(void);
+    void discard_settings(void);
 
 public slots:
     void set_formatters(void);
@@ -135,7 +136,7 @@ signals:
 
     void serial_port_changed(const QString &port);
 
-    void humidity_limits_changed(double new_lower, double new_upper);
+    void settings_changed(double new_lower, double new_upper);
 };
 
 #endif // QDOME_H

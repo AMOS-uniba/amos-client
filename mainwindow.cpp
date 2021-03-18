@@ -34,11 +34,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
     this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
-    // connect signals for handling of edits of server address
-    this->connect(this->ui->le_station_id, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->le_ip, QOverload<const QString&>::of(&QLineEdit::textChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-
     // connect signals for handling of edits of safety limits
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
 
@@ -70,13 +65,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->station, &Station::process_sightings);
 
-    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome_info, &QDome::set_formatters);
-
-    this->ui->dome_info->list_serial_ports();
+    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome, &QDome::set_formatters);
 
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
-    this->ui->dome_info->initialize(this->station);
+    this->ui->dome->initialize(this->station);
+    this->ui->server->initialize(this->station);
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);
@@ -114,10 +108,6 @@ void MainWindow::message_clicked() {
 
 void MainWindow::on_action_exit_triggered() {
     QApplication::quit();
-}
-
-void MainWindow::on_button_send_heartbeat_pressed() {
-    this->heartbeat();
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {

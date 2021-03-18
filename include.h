@@ -17,12 +17,13 @@
 #include "utils/ufomanager.h"
 
 #include "widgets/qdomewidget.h"
+#include "widgets/qdome.h"
+#include "widgets/qserver.h"
 #include "widgets/qfilesystembox.h"
 #include "widgets/qscannerbox.h"
 #include "widgets/qstoragebox.h"
 
 #include "mainwindow.h"
-#include "server.h"
 #include "station.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"

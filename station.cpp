@@ -34,7 +34,6 @@ QString Station::temperature_colour(float temperature) {
 }
 
 Station::Station(const QString& id):
-    m_id(id),
     m_manual_control(false),
     m_safety_override(false),
     m_state(Station::NotObserving),
@@ -78,8 +77,8 @@ void Station::set_dome(QDome *dome) { this->m_dome = dome; }
 QDome* Station::dome(void) const { return this->m_dome; }
 
 // Server getters and setters
-void Station::set_server(Server *server) { this->m_server = server; }
-Server* Station::server(void) { return this->m_server; }
+void Station::set_server(QServer *server) { this->m_server = server; }
+QServer* Station::server(void) { return this->m_server; }
 
 // Position getters and setters
 
@@ -107,19 +106,6 @@ void Station::set_position(const double new_latitude, const double new_longitude
 double Station::latitude(void) const { return this->m_latitude; }
 double Station::longitude(void) const { return this->m_longitude; }
 double Station::altitude(void) const { return this->m_altitude; }
-
-void Station::set_id(const QString &new_id) {
-    if (new_id.length() > 4) {
-        throw ConfigurationError(QString("Cannot set station id to '%1'").arg(new_id));
-    }
-
-    this->m_id = new_id;
-    logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_id));
-
-    emit this->id_changed();
-}
-
-const QString& Station::get_id(void) const { return this->m_id; }
 
 // Darkness limit settings
 bool Station::is_dark(const QDateTime &time) const {

@@ -119,11 +119,11 @@ QDome::QDome(QWidget *parent):
 
     this->connect(this->ui->co_serial_ports, &QComboBox::currentTextChanged, this, &QDome::set_serial_port);
 
-    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_humidity_limits_changed);
-    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_humidity_limits_changed);
-    this->connect(this->ui->bt_humidity_apply, &QPushButton::clicked, this, &QDome::humidity_limits_apply);
-    this->connect(this->ui->bt_humidity_discard, &QPushButton::clicked, this, &QDome::humidity_limits_discard);
-    this->connect(this, &QDome::humidity_limits_changed, this, &QDome::humidity_limits_discard);
+    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_settings_changed);
+    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_settings_changed);
+    this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QDome::apply_settings);
+    this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QDome::discard_settings);
+    this->connect(this, &QDome::settings_changed, this, &QDome::discard_settings);
 
     this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &QDome::process_message);
 
@@ -575,7 +575,6 @@ void QDome::turn_on_intensifier(void) {
 }
 void QDome::turn_off_intensifier(void) { this->send_command(QDome::CommandIIOff); }
 
-
 // Humidity limit settings
 bool QDome::is_humid(void) const {
     return (this->state_T().humidity_sht() >= this->m_humidity_limit_lower);
@@ -604,29 +603,28 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
     settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
 
-    this->handle_humidity_limits_changed();
-    emit this->humidity_limits_changed(new_lower, new_upper);
+    emit this->settings_changed(new_lower, new_upper);
 }
 
-void QDome::handle_humidity_limits_changed(void) {
+void QDome::handle_settings_changed(void) {
     bool changed = (this->ui->dsb_humidity_limit_lower->value() != this->humidity_limit_lower()) ||
         (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper());
 
-    this->ui->bt_humidity_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_humidity_apply->setEnabled(changed);
-    this->ui->bt_humidity_discard->setEnabled(changed);
+    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
+    this->ui->bt_apply->setEnabled(changed);
+    this->ui->bt_discard->setEnabled(changed);
 }
 
-void QDome::humidity_limits_apply(void) {
+void QDome::apply_settings(void) {
     try {
         this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
-    } catch (const ConfigurationError& e) {
+    } catch (const ConfigurationError &e) {
         logger.error(Concern::Configuration, e.what());
     }
+    this->handle_settings_changed();
 }
 
-void QDome::humidity_limits_discard(void) {
+void QDome::discard_settings(void) {
     this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
     this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
-
 }

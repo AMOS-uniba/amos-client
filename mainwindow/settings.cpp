@@ -9,13 +9,12 @@ void MainWindow::load_settings(void) {
         logger.info(Concern::Operation, QString("Reading settings from %1").arg(settings->fileName()));
 
         QString ip = settings->value("server/ip", "127.0.0.1").toString();
-        unsigned short port = settings->value("server/port", 4805).toInt();
         QString station_id = settings->value("station/id", "none").toString();
 
         this->station = new Station(station_id);
-        this->station->set_server(new Server(QHostAddress(ip), port, station_id));
+        this->station->set_server(this->ui->server);
         this->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
-        this->station->set_dome(this->ui->dome_info);
+        this->station->set_dome(this->ui->dome);
 
         // Create the UFO manager
         this->station->set_ufo_manager(new UfoManager(
@@ -90,22 +89,6 @@ void MainWindow::load_settings_station(void) {
  * Handler of changes to the station settings in the GUI
  */
 void MainWindow::on_bt_station_apply_clicked(void) {
-    // If ID, IP or port are changed, update the server settings
-    if (
-        (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
-        (this->ui->sb_port->value() != this->station->server()->port()) ||
-        (this->ui->le_station_id->text() != this->station->get_id())
-    ) {
-        if (this->ui->le_station_id->text() != this->station->get_id()) {
-            this->station->set_id(this->ui->le_station_id->text());
-        }
-        this->station->server()->set_url(
-            QHostAddress(this->ui->le_ip->text()),
-            this->ui->sb_port->value(),
-            this->station->get_id()
-        );
-    }
-
     // Update the position, if changed
     if (
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||
@@ -126,10 +109,6 @@ void MainWindow::on_bt_station_apply_clicked(void) {
     }
 
     // Store all new values in permanent settings
-    settings->setValue("server/ip", this->station->server()->address().toString());
-    settings->setValue("server/port", this->station->server()->port());
-
-    settings->setValue("station/id", this->station->get_id());
     settings->setValue("station/latitude", this->station->latitude());
     settings->setValue("station/longitude", this->station->longitude());
     settings->setValue("station/altitude", this->station->altitude());
@@ -142,10 +121,6 @@ void MainWindow::on_bt_station_apply_clicked(void) {
 
 void MainWindow::on_bt_station_reset_clicked() {
     logger.debug(Concern::Configuration, "Discard changes to station settings");
-    this->ui->le_station_id->setText(this->station->get_id());
-    this->ui->le_ip->setText(this->station->server()->address().toString());
-    this->ui->sb_port->setValue(this->station->server()->port());
-
     this->ui->dsb_latitude->setValue(this->station->latitude());
     this->ui->dsb_longitude->setValue(this->station->longitude());
     this->ui->dsb_altitude->setValue(this->station->altitude());
@@ -155,12 +130,9 @@ void MainWindow::on_bt_station_reset_clicked() {
 
 void MainWindow::slot_station_edited(void) {
     this->button_station_toggle(
-        (this->ui->le_station_id->text() != this->station->get_id()) ||
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||
         (this->ui->dsb_longitude->value() != this->station->longitude()) ||
         (this->ui->dsb_altitude->value() != this->station->altitude()) ||
-        (this->ui->le_ip->text() != this->station->server()->address().toString()) ||
-        (this->ui->sb_port->value() != this->station->server()->port()) ||
         (this->ui->dsb_darkness_limit->value() != this->station->darkness_limit())
     );
 }

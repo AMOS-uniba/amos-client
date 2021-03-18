@@ -48,10 +48,6 @@ void MainWindow::display_cover_status(void) {
 }
 
 void MainWindow::display_station_config(void) {
-    this->ui->le_ip->setText(this->station->server()->address().toString());
-    this->ui->sb_port->setValue(this->station->server()->port());
-    this->ui->le_station_id->setText(this->station->get_id());
-
     this->ui->dsb_latitude->setValue(this->station->latitude());
     this->ui->dsb_longitude->setValue(this->station->longitude());
     this->ui->dsb_altitude->setValue(this->station->altitude());

@@ -86,7 +86,6 @@ private slots:
     void slot_station_edited(void);
 
     void heartbeat(void);
-    void on_button_send_heartbeat_pressed();
 
     void button_station_toggle(bool changed);
     void on_bt_station_reset_clicked();
@@ -102,14 +101,6 @@ private slots:
     void message_clicked();
 
     // Dome control slots
-    /*
-    void on_bt_lens_heating_clicked();
-    void on_bt_intensifier_clicked();
-    void on_bt_fan_clicked();
-
-    void on_bt_cover_open_clicked();
-    void on_bt_cover_close_clicked();
-    */
     void on_cb_safety_override_stateChanged(int arg1);
 
     void on_bt_change_ufo_clicked();

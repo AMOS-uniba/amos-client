@@ -19,7 +19,6 @@
 class Station: public QObject {
     Q_OBJECT
 private:
-    QString m_id;
     double m_latitude;
     double m_longitude;
     double m_altitude;
@@ -39,7 +38,7 @@ private:
 
     StateLogger *m_state_logger;
     QDome *m_dome;
-    Server *m_server;
+    QServer *m_server;
     UfoManager *m_ufo_manager;
 
     QNetworkAccessManager *m_network_manager;
@@ -53,32 +52,37 @@ public:
 
     StationState state(void);
 
-    void set_scanner(const QDir &directory);
-    FileSystemScanner* scanner(void) const;
 
-    QDome* dome(void) const;
 
     QJsonObject prepare_heartbeat(void) const;
 
-    // G&S for storage
+    // Scanner getter and setter
+    void set_scanner(const QDir &directory);
+    FileSystemScanner* scanner(void) const;
+
+    // Storage getters and setters
     void set_storages(QStorageBox *primary_storage, QStorageBox *permanent_storage);
     QStorageBox* primary_storage(void) const;
     QStorageBox* permanent_storage(void) const;
 
-    void set_server(Server *server);
-    Server* server(void);
+    // Server getter and setter
+    void set_server(QServer *server);
+    QServer* server(void);
 
+    // Dome getter and setter
     void set_dome(QDome *dome);
+    QDome* dome(void) const;
+
+    // UFO manager getter and setter
+    void set_ufo_manager(UfoManager *ufo_manager);
+    UfoManager* ufo_manager(void) const;
+
 
     // G&S for position
     void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
     double latitude(void) const;
     double longitude(void) const;
     double altitude(void) const;
-
-    // G&S for ID
-    const QString& get_id(void) const;
-    void set_id(const QString& new_id);
 
     // Darkness limit getters and setters
     bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
@@ -93,10 +97,6 @@ public:
     double moon_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     double moon_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
-
-    // UFo manager getters and setters
-    void set_ufo_manager(UfoManager *ufo_manager);
-    UfoManager* ufo_manager(void) const;
 
 
     // Manual control and

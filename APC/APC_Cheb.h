@@ -52,8 +52,8 @@ public:
 private:
     C3Dfunct m_f;             // Function
     int      m_n;             // Degree
-    bool     m_Valid;         // Status flag for validity of Chebyshev coefficients
     double   m_dt;            // Interval size
+    bool     m_Valid;         // Status flag for validity of Chebyshev coefficients
     double   m_ta,m_tb;       // Interval
     double   *Cx,*Cy,*Cz;     // Chebyshev coefficients
 

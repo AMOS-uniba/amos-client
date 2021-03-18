@@ -6,13 +6,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>735</height>
+    <width>448</width>
+    <height>728</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
-    <width>440</width>
+    <width>448</width>
     <height>0</height>
    </size>
   </property>
@@ -523,16 +523,16 @@
       <item row="3" column="0" colspan="2">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
-         <widget class="QPushButton" name="bt_humidity_discard">
+         <widget class="QPushButton" name="bt_apply">
           <property name="text">
-           <string>Discard</string>
+           <string>Apply</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="bt_humidity_apply">
+         <widget class="QPushButton" name="bt_discard">
           <property name="text">
-           <string>Apply</string>
+           <string>Discard</string>
           </property>
          </widget>
         </item>

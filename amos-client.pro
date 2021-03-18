@@ -1,6 +1,4 @@
-QT      += core gui
-QT      += serialport
-QT      += network widgets uiplugin
+QT      += core gui serialport network widgets uiplugin
 
 CONFIG += c++11
 CONFIG += static
@@ -33,7 +31,6 @@ SOURCES += \
     mainwindow/timers.cpp \
     mainwindow/tray.cpp \
     mainwindow.cpp \
-    server.cpp \
     station.cpp \
     utils/domestate.cpp \
     utils/exception.cpp \
@@ -51,10 +48,12 @@ SOURCES += \
     widgets/lines/qdatetimeline.cpp \
     widgets/lines/qdisplayline.cpp \
     widgets/lines/qfloatline.cpp \
+    widgets/qconfigurable.cpp \
     widgets/qdome.cpp \
     widgets/qdomewidget.cpp \
     widgets/qfilesystembox.cpp \
     widgets/qscannerbox.cpp \
+    widgets/qserver.cpp \
     widgets/qstoragebox.cpp \
     widgets/qsuninfo.cpp
 
@@ -80,7 +79,6 @@ HEADERS += \
     forward.h \
     include.h \
     mainwindow.h \
-    server.h \
     station.h \
     utils/domestate.h \
     utils/exception.h \
@@ -98,10 +96,12 @@ HEADERS += \
     widgets/lines/qdatetimeline.h \
     widgets/lines/qdisplayline.h \
     widgets/lines/qfloatline.h \
+    widgets/qconfigurable.h \
     widgets/qdome.h \
     widgets/qdomewidget.h \
     widgets/qfilesystembox.h \
     widgets/qscannerbox.h \
+    widgets/qserver.h \
     widgets/qstoragebox.h \
     widgets/qsuninfo.h
 
@@ -109,7 +109,9 @@ FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
     widgets/lines/qdisplayline.ui \
+    widgets/qconfigurable.ui \
     widgets/qdome.ui \
+    widgets/qserver.ui \
     widgets/qsuninfo.ui
 
 # Default rules for deployment.
