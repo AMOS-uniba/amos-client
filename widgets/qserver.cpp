@@ -7,7 +7,7 @@ extern QSettings *settings;
 
 
 QServer::QServer(QWidget *parent):
-    QGroupBox(parent),
+    QConfigurable(parent),
     ui(new Ui::QServer)
 {
     this->ui->setupUi(this);
@@ -39,21 +39,15 @@ void QServer::initialize(Station * const station) {
     this->load_settings(settings);
 }
 
-void QServer::load_settings(const QSettings * const settings) {
-    try {
-        this->set_station_id(
-            settings->value("station/id", "none").toString()
-        );
-        this->set_address(
-            settings->value("server/ip", "127.0.0.1").toString(),
-            settings->value("server/port", 4805).toInt()
-        );
-    } catch (ConfigurationError &e) {
-        this->set_station_id("none");
-        this->set_address("127.0.0.1", 4805);
-    }
+void QServer::load_settings_inner(const QSettings * const settings) {
+    this->set_station_id(
+        settings->value("station/id", "none").toString()
+    );
+    this->set_address(
+        settings->value("server/ip", "127.0.0.1").toString(),
+        settings->value("server/port", 4805).toInt()
+    );
     this->refresh_urls();
-    this->discard_settings();
 }
 
 void QServer::save_settings(void) {
@@ -155,33 +149,22 @@ void QServer::send_sighting(const Sighting &sighting) const {
     multipart->setParent(reply); // delete the multiPart with the reply */
 }
 
-void QServer::handle_settings_changed(void) {
-    bool changed = (
+bool QServer::is_changed(void) {
+    return (
         (this->ui->le_station_id->text() != this->station_id()) ||
         (this->ui->le_ip->text() != this->address().toString()) ||
         (this->ui->sb_port->value() != this->port())
     );
-
-    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_apply->setEnabled(changed);
-    this->ui->bt_discard->setEnabled(changed);
 }
 
-void QServer::apply_settings(void) {
-    try {
-        if (this->ui->le_station_id->text() != this->station_id()) {
-            this->set_station_id(this->ui->le_station_id->text());
-        }
-
-        if ((this->ui->le_ip->text() != this->address().toString()) || (this->ui->sb_port->value() != this->port())) {
-            this->set_address(this->ui->le_ip->text(), this->ui->sb_port->value());
-        }
-
-        emit this->settings_changed();
-    } catch (ConfigurationError &e) {
-        logger.error(Concern::Configuration, e.what());
+void QServer::apply_settings_inner(void) {
+    if (this->ui->le_station_id->text() != this->station_id()) {
+        this->set_station_id(this->ui->le_station_id->text());
     }
-    this->handle_settings_changed();
+
+    if ((this->ui->le_ip->text() != this->address().toString()) || (this->ui->sb_port->value() != this->port())) {
+        this->set_address(this->ui->le_ip->text(), this->ui->sb_port->value());
+    }
 }
 
 void QServer::discard_settings(void) {

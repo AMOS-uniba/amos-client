@@ -5,14 +5,17 @@
 extern EventLogger logger;
 
 QConfigurable::QConfigurable(QWidget * parent):
-    QGroupBox(parent)
+    QGroupBox(parent),
+    ui(new Ui::QConfigurable)
 {
 
 }
 
+QConfigurable::~QConfigurable(void) {}
+
 void QConfigurable::load_settings(const QSettings * const settings) {
     try {
-//        this->load_settings_inner(settings);
+        this->load_settings_inner(settings);
     } catch (ConfigurationError &e) {
 //        this->load_defaults();
     }
@@ -32,8 +35,8 @@ void QConfigurable::apply_settings(void) {
 
 void QConfigurable::handle_settings_changed(void) {
     bool changed = this->is_changed();
-
+/*
     this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_apply->setEnabled(changed);
+    this->ui->bt_apply->setEnabled(changed);*/
     this->ui->bt_discard->setEnabled(changed);
 }
