@@ -19,21 +19,37 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->connect(this->m_timer_long, &QTimer::timeout, this, &QSunInfo::update_long_term);
     this->m_timer_long->start();
 
+    ValueFormatter<double> angle_formatter = [=](double angle) {
+        return QString("%1°").arg(fmod(angle + 360.0, 360.0), 0, 'f', 3);
+    };
+
     this->ui->sl_altitude->set_title("Altitude θ");
     this->ui->sl_altitude->set_valid(true);
+    this->ui->sl_altitude->set_value_formatter(angle_formatter);
+
     this->ui->sl_azimuth->set_title("Azimuth a");
     this->ui->sl_azimuth->set_valid(true);
+    this->ui->sl_azimuth->set_value_formatter(angle_formatter);
+
     this->ui->sl_dec->set_title("Declination δ");
     this->ui->sl_dec->set_valid(true);
+    this->ui->sl_dec->set_value_formatter(angle_formatter);
+
     this->ui->sl_ra->set_title("Right ascension α");
     this->ui->sl_ra->set_valid(true);
+    this->ui->sl_ra->set_value_formatter(angle_formatter);
+
     this->ui->sl_ecl_lon->set_title("Ecliptical longitude λ");
     this->ui->sl_ecl_lon->set_valid(true);
+    this->ui->sl_ecl_lon->set_value_formatter(angle_formatter);
 
     this->ui->sl_moon_altitude->set_title("Moon altitude");
     this->ui->sl_moon_altitude->set_valid(true);
+    this->ui->sl_moon_altitude->set_value_formatter(angle_formatter);
+
     this->ui->sl_moon_azimuth->set_title("Moon azimuth");
     this->ui->sl_moon_azimuth->set_valid(true);
+    this->ui->sl_moon_azimuth->set_value_formatter(angle_formatter);
 
     this->ui->sl_dome_close->set_title("Dome closing");
     this->ui->sl_sunrise->set_title("Sunrise");
