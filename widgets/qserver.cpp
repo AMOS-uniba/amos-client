@@ -7,7 +7,7 @@ extern QSettings *settings;
 
 
 QServer::QServer(QWidget *parent):
-    QConfigurable(parent),
+    QGroupBox(parent),
     ui(new Ui::QServer)
 {
     this->ui->setupUi(this);
@@ -26,7 +26,6 @@ QServer::QServer(QWidget *parent):
     this->connect(this, &QServer::settings_changed, this, &QServer::refresh_urls);
     this->connect(this, &QServer::settings_changed, this, &QServer::discard_settings);
     this->connect(this, &QServer::settings_changed, this, &QServer::save_settings);
-
 }
 
 QServer::~QServer() {
@@ -36,10 +35,10 @@ QServer::~QServer() {
 
 void QServer::initialize(Station * const station) {
     this->m_station = station;
-    this->load_settings(settings);
+    this->load_settings();
 }
 
-void QServer::load_settings_inner(const QSettings * const settings) {
+void QServer::load_settings_inner(void) {
     this->set_station_id(
         settings->value("station/id", "none").toString()
     );
@@ -50,7 +49,12 @@ void QServer::load_settings_inner(const QSettings * const settings) {
     this->refresh_urls();
 }
 
-void QServer::save_settings(void) {
+void QServer::load_defaults(void) {
+    this->set_station_id("none");
+    this->set_address("127.0.0.1", 4805);
+}
+
+void QServer::save_settings(void) const {
     settings->setValue("station/id", this->station_id());
     settings->setValue("server/ip", this->address().toString());
     settings->setValue("server/port", this->port());
@@ -176,4 +180,32 @@ void QServer::discard_settings(void) {
 void QServer::button_send_heartbeat(void) {
     logger.info(Concern::Server, "Sending a heartbeat (manual)");
     this->send_heartbeat(this->m_station->prepare_heartbeat());
+}
+
+void QServer::load_settings(void) {
+    try {
+        this->load_settings_inner();
+    } catch (ConfigurationError &e) {
+        this->load_defaults();
+    }
+    this->refresh_urls();
+    this->discard_settings();
+}
+
+void QServer::apply_settings(void) {
+    try {
+        this->apply_settings_inner();
+        emit this->settings_changed();
+    } catch (ConfigurationError &e) {
+        logger.error(Concern::Configuration, e.what());
+    }
+    this->handle_settings_changed();
+}
+
+void QServer::handle_settings_changed(void) {
+    bool changed = this->is_changed();
+
+    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
+    this->ui->bt_apply->setEnabled(changed);
+    this->ui->bt_discard->setEnabled(changed);
 }

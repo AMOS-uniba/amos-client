@@ -1,4 +1,4 @@
-QT      += core gui serialport network widgets uiplugin
+QT     += core gui serialport network widgets
 
 CONFIG += c++11
 CONFIG += static
@@ -109,7 +109,6 @@ FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
     widgets/lines/qdisplayline.ui \
-    widgets/qconfigurable.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
     widgets/qsuninfo.ui

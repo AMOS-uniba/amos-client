@@ -7,15 +7,9 @@
 
 #include "utils/exception.h"
 
-namespace Ui {
-    class QConfigurable;
-}
-
 class QConfigurable: public QGroupBox {
     Q_OBJECT
 protected:
-    Ui::QConfigurable *ui;
-
     virtual bool is_changed(void) = 0;
 protected slots:
     void load_settings(const QSettings * const settings);

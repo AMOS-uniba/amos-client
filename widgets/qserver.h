@@ -15,7 +15,7 @@ namespace Ui {
     class QServer;
 }
 
-class QServer: public QConfigurable {
+class QServer: public QGroupBox {
     Q_OBJECT
 private:
     Ui::QServer *ui;
@@ -29,11 +29,13 @@ private:
     QUrl m_url_sighting;
     QNetworkAccessManager *m_network_manager;
 
-    bool is_changed(void) override;
+    bool is_changed(void);
 
 private slots:
-    void load_settings_inner(const QSettings * const settings) override;
-    void save_settings(void) override;
+    void load_settings(void);
+    void load_settings_inner(void);
+    void load_defaults(void);
+    void save_settings(void) const;
 
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_ok(QNetworkReply * reply);
@@ -53,8 +55,10 @@ public slots:
     void set_address(const QString &address, const unsigned short port);
     void set_station_id(const QString &station_id);
 
-    void apply_settings_inner(void) override;
-    void discard_settings(void) override;
+    void apply_settings(void);
+    void apply_settings_inner(void);
+    void discard_settings(void);
+    void handle_settings_changed(void);
 
     void button_send_heartbeat(void);
 

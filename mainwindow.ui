@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1473</width>
-    <height>1223</height>
+    <width>1069</width>
+    <height>896</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -70,7 +70,7 @@
        <item>
         <widget class="QDome" name="dome">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
@@ -78,7 +78,7 @@
          <property name="minimumSize">
           <size>
            <width>440</width>
-           <height>100</height>
+           <height>0</height>
           </size>
          </property>
          <property name="title">
@@ -97,7 +97,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>100</height>
+           <height>225</height>
           </size>
          </property>
          <property name="maximumSize">
@@ -383,10 +383,16 @@
        </item>
        <item>
         <widget class="QServer" name="server">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>50</height>
+           <height>150</height>
           </size>
          </property>
          <property name="title">
@@ -396,11 +402,11 @@
        </item>
        <item>
         <widget class="QGroupBox" name="group_position">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>203</height>
+          </size>
          </property>
          <property name="title">
           <string>Station information</string>
@@ -708,7 +714,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1473</width>
+     <width>1069</width>
      <height>21</height>
     </rect>
    </property>

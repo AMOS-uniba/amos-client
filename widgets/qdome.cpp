@@ -380,7 +380,7 @@ void QDome::set_serial_port(const QString &port) {
 
 void QDome::check_serial_port(void) {
     if ((this->m_serial_port == nullptr) || (!this->m_serial_port->isOpen())) {
-        logger.warning(Concern::SerialPort, "Serial port not working, resetting");
+        logger.debug(Concern::SerialPort, "Serial port not working, resetting");
         this->list_serial_ports();
         this->ui->co_serial_ports->setCurrentIndex(0);
     }
