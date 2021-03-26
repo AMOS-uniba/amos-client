@@ -2,6 +2,20 @@
 <ui version="4.0">
  <class>QDome</class>
  <widget class="QGroupBox" name="QDome">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>383</width>
+    <height>816</height>
+   </rect>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>816</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Dome</string>
   </property>
@@ -16,12 +30,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>234</height>
-      </size>
      </property>
      <property name="title">
       <string>Sensors</string>
@@ -41,7 +49,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -51,7 +65,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -61,7 +81,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -71,7 +97,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -81,7 +113,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -91,7 +129,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -101,7 +145,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -111,7 +161,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -126,12 +182,6 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>234</height>
-      </size>
      </property>
      <property name="title">
       <string>Cover</string>
@@ -177,7 +227,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -187,7 +237,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -203,7 +253,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -219,7 +269,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -235,7 +285,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -251,7 +301,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>20</height>
+          <height>16</height>
          </size>
         </property>
        </widget>
@@ -423,6 +473,18 @@
    </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="gb_serial_port">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>110</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>110</height>
+      </size>
+     </property>
      <property name="title">
       <string>Serial port</string>
      </property>
@@ -548,6 +610,18 @@
    </item>
    <item row="1" column="1">
     <widget class="QGroupBox" name="group_settings">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>110</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>110</height>
+      </size>
+     </property>
      <property name="title">
       <string>Settings</string>
      </property>

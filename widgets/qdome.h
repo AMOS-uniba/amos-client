@@ -13,6 +13,10 @@ namespace Ui {
     class QDome;
 }
 
+/**
+ * @brief The QDome class -- handles the communication and control of the AMOS dome
+ * Provides its own widget with settings, configuration and display
+ */
 class QDome : public QGroupBox {
     Q_OBJECT
 private:
@@ -32,6 +36,7 @@ private:
 
     SerialBuffer *m_buffer;
 
+    // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
     double m_humidity_limit_lower = 70;
     double m_humidity_limit_upper = 90;
 
