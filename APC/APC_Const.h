@@ -24,11 +24,11 @@
 //
 // Constants
 //
-const double pi        = 3.14159265358979324;
-const double pi2       = 2.0*pi;
-const double Rad       = pi / 180.0;
-const double Deg       = 180.0 / pi;
-const double Arcs      = 3600.0*180.0/pi;
+constexpr double pi        = 3.14159265358979324;
+constexpr double pi2       = 2.0*pi;
+constexpr double Rad       = pi / 180.0;
+constexpr double Deg       = 180.0 / pi;
+constexpr double Arcs      = 3600.0 * 180.0/pi;
 
 // Radii of Earth, Sun and Moon
 const double R_Earth   =   6378.137;     // [km]

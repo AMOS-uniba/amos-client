@@ -1,4 +1,5 @@
 #include "include.h"
+
 #include "qserver.h"
 #include "ui_qserver.h"
 
@@ -33,7 +34,7 @@ QServer::~QServer() {
     delete this->m_network_manager;
 }
 
-void QServer::initialize(Station * const station) {
+void QServer::initialize(QStation * const station) {
     this->m_station = station;
     this->load_settings();
 }

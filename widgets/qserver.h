@@ -19,7 +19,7 @@ class QServer: public QGroupBox {
     Q_OBJECT
 private:
     Ui::QServer *ui;
-    Station *m_station;
+    QStation *m_station;
 
     QHostAddress m_address;
     unsigned short m_port;
@@ -50,7 +50,7 @@ public:
     const QString &station_id(void) const;
 
 public slots:
-    void initialize(Station * const station);
+    void initialize(QStation * const station);
 
     void set_address(const QString &address, const unsigned short port);
     void set_station_id(const QString &station_id);

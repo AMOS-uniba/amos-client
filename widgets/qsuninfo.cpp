@@ -1,6 +1,8 @@
 #include "qsuninfo.h"
 #include "ui_qsuninfo.h"
 
+#include "widgets/qstation.h"
+
 QSunInfo::QSunInfo(QWidget *parent) :
     QGroupBox(parent),
     ui(new Ui::QSunInfo)
@@ -59,6 +61,8 @@ QSunInfo::QSunInfo(QWidget *parent) :
 
 QSunInfo::~QSunInfo() {
     delete this->ui;
+    delete this->m_timer_short;
+    delete this->m_timer_long;
 }
 
 void QSunInfo::update_short_term(void) {
@@ -91,7 +95,7 @@ void QSunInfo::update_short_term(void) {
 //    this->setTitle(QString("Fucking %1").arg(this->height()));
 }
 
-void QSunInfo::set_station(const Station *station) { this->m_station = station; }
+void QSunInfo::set_station(QStation * const station) { this->m_station = station; }
 
 void QSunInfo::update_long_term(void) {
     auto equ = Universe::compute_sun_equ();

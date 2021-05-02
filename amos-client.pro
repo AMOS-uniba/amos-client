@@ -31,7 +31,6 @@ SOURCES += \
     mainwindow/timers.cpp \
     mainwindow/tray.cpp \
     mainwindow.cpp \
-    station.cpp \
     utils/domestate.cpp \
     utils/exception.cpp \
     utils/request.cpp \
@@ -54,6 +53,7 @@ SOURCES += \
     widgets/qfilesystembox.cpp \
     widgets/qscannerbox.cpp \
     widgets/qserver.cpp \
+    widgets/qstation.cpp \
     widgets/qstoragebox.cpp \
     widgets/qsuninfo.cpp
 
@@ -79,7 +79,6 @@ HEADERS += \
     forward.h \
     include.h \
     mainwindow.h \
-    station.h \
     utils/domestate.h \
     utils/exception.h \
     utils/request.h \
@@ -102,6 +101,7 @@ HEADERS += \
     widgets/qfilesystembox.h \
     widgets/qscannerbox.h \
     widgets/qserver.h \
+    widgets/qstation.h \
     widgets/qstoragebox.h \
     widgets/qsuninfo.h
 
@@ -111,6 +111,7 @@ FORMS += \
     widgets/lines/qdisplayline.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
+    widgets/qstation.ui \
     widgets/qsuninfo.ui
 
 # Default rules for deployment.
@@ -122,3 +123,7 @@ RESOURCES += \
     images.qrc
 
 RC_FILE = amos-client.rc
+
+VERSION = 0.4.0.1
+QMAKE_TARGET_COMPANY = AMOS
+QMAKE_TARGET_PRODUCT = AMOS client

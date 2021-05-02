@@ -39,7 +39,7 @@ QColor Universe::altitude_colour(double altitude) {
         if (altitude < 30) {
             return QColor::fromHslF((altitude + 30) / 360.0, 0.8, 0.5);
         } else {
-            return QColor::fromHslF(1.0 / 6.0, 0.7 + 0.3 * ((altitude - 30.0) / 60.0), 0.7 + 0.3 * ((altitude - 30.0) / 60.0));
+            return QColor::fromHslF(1.0 / 6.0, 0.7 + 0.3 * ((altitude - 30.0) / 60.0), 0.4 + 0.3 * ((altitude - 30.0) / 60.0));
         }
     }
 }

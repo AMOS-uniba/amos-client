@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
     this->load_settings();
 
-    this->ui->sun_info->set_station(this->station);
+    this->ui->sun_info->set_station(this->ui->station);
 
     this->create_timers();
 
@@ -46,31 +46,27 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
         {Icon::Observing, QIcon(":/images/blue.ico")},
         {Icon::NotObserving, QIcon(":/images/grey.ico")},
     };
-    this->set_icon(Station::Manual);
+    this->set_icon(QStation::Manual);
     this->tray_icon->show();
 
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
-    this->connect(this->station, &Station::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
+    this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::show_message);
+    this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
+    this->set_icon(this->station->state());
 
-    this->display_cover_status();
-    this->display_station_config();
     this->display_ufo_state();
     this->display_window_title();
 
-    this->connect(this->station, &Station::state_changed, this, &MainWindow::set_icon);
-    this->set_icon(this->station->state());
-
-    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->station, &Station::process_sightings);
-
-    this->connect(this->station, &Station::humidity_limits_changed, this->ui->dome, &QDome::set_formatters);
+    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->ui->station, &QStation::process_sightings);
+    this->connect(this->ui->station, &QStation::humidity_limits_changed, this->ui->dome, &QDome::set_formatters);
 
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
-    this->ui->dome->initialize(this->station);
-    this->ui->server->initialize(this->station);
+    this->ui->dome->initialize(this->ui->station);
+    this->ui->server->initialize(this->ui->station);
 #ifdef OLD_PROTOCOL
     this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);
@@ -129,7 +125,6 @@ void MainWindow::on_cb_manual_stateChanged(int manual) {
     this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
 
-    this->display_cover_status();
     this->display_window_title();
 }
 
@@ -211,7 +206,7 @@ void MainWindow::on_action_open_log_triggered() {
 }
 
 void MainWindow::on_action_open_stat_triggered() {
-    QDesktopServices::openUrl(QUrl::fromLocalFile(this->station->state_logger_filename()));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(this->ui->station->state_logger_filename()));
 }
 
 void MainWindow::on_action_open_config_triggered() {

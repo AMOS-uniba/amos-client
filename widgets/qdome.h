@@ -8,6 +8,7 @@
 #include "utils/domestate.h"
 #include "mainwindow.h"
 #include "widgets/qdomewidget.h"
+#include "widgets/qstation.h"
 
 namespace Ui {
     class QDome;
@@ -24,7 +25,7 @@ private:
     const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
 
     Ui::QDome *ui;
-    Station *m_station;
+    const QStation * m_station;
 
     const unsigned char m_address = 0x99;
     QDateTime m_last_received;
@@ -76,7 +77,7 @@ public:
 
     QString status_line(void) const;
 
-    void initialize(Station * const station);
+    void initialize(QStation * const station);
 
     // Humidity getters and setters
     bool is_humid(void) const;

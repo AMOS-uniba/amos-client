@@ -108,9 +108,9 @@ QDome::QDome(QWidget *parent):
 
     this->connect(this, &QDome::cover_moved, this->ui->picture, &QDomeWidget::set_cover_position);
     this->connect(this, &QDome::cover_open, this->ui->picture, &QDomeWidget::set_cover_maximum);
-    this->connect(this, &QDome::cover_open, this->ui->pb_cover, &QProgressBar::setMaximum);
+    //this->connect(this, &QDome::cover_open, this->ui->pb_cover, &QProgressBar::setMaximum);
     this->connect(this, &QDome::cover_closed, this->ui->picture, &QDomeWidget::set_cover_minimum);
-    this->connect(this, &QDome::cover_closed, this->ui->pb_cover, &QProgressBar::setMinimum);
+    //this->connect(this, &QDome::cover_closed, this->ui->pb_cover, &QProgressBar::setMinimum);
 
 //    this->connect(this->ui->cl_camera_heating, &QControlLine::toggled, this, &QDome::toggle_camera_heating);
     this->connect(this->ui->cl_lens_heating, &QControlLine::toggled, this, &QDome::toggle_hotwire);
@@ -145,7 +145,7 @@ QDome::~QDome() {
     delete this->m_buffer;
 }
 
-void QDome::initialize(Station * const station) {
+void QDome::initialize(QStation * const station) {
     this->m_station = station;
 
     this->check_serial_port();
@@ -299,7 +299,7 @@ void QDome::display_env_data(const DomeStateT &state) {
 
 void QDome::display_shaft_data(const DomeStateZ &state) {
     this->display_serial_port_info();
-    this->ui->pb_cover->setValue(state.shaft_position());
+    //this->ui->pb_cover->setValue(state.shaft_position());
 }
 
 void QDome::display_dome_state(void) {

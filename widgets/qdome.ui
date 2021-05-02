@@ -7,14 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>383</width>
-    <height>816</height>
+    <height>701</height>
    </rect>
-  </property>
-  <property name="maximumSize">
-   <size>
-    <width>16777215</width>
-    <height>816</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>Dome</string>
@@ -23,29 +17,106 @@
    <string>Dome</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
-   <item row="7" column="1">
-    <widget class="QGroupBox" name="gb_sensors">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <item row="7" column="0">
+    <widget class="QGroupBox" name="gb_devices">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>184</height>
+      </size>
      </property>
      <property name="title">
-      <string>Sensors</string>
+      <string>Devices</string>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>3</number>
       </property>
       <item>
-       <widget class="QFloatLine" name="fl_time_alive" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QControlLine" name="cl_lens_heating" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_camera_heating" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_fan" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_ii" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QDomeWidget" name="picture" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>100</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>125</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>200</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QGroupBox" name="gb_errors">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>184</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Error bits</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="spacing">
+       <number>3</number>
+      </property>
+      <item>
+       <widget class="QBooleanLine" name="bl_error_t_lens" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -61,7 +132,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFloatLine" name="fl_t_lens" native="true">
+       <widget class="QBooleanLine" name="bl_error_t_SHT31" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -77,7 +148,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFloatLine" name="fl_t_CPU" native="true">
+       <widget class="QBooleanLine" name="bl_error_light" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -93,7 +164,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFloatLine" name="fl_t_SHT31" native="true">
+       <widget class="QBooleanLine" name="bl_error_watchdog" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -109,7 +180,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QFloatLine" name="fl_h_SHT31" native="true">
+       <widget class="QBooleanLine" name="bl_error_brownout" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -125,7 +196,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QBooleanLine" name="bl_rain_sensor" native="true">
+       <widget class="QBooleanLine" name="bl_error_master" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -141,7 +212,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QBooleanLine" name="bl_light_sensor" native="true">
+       <widget class="QBooleanLine" name="bl_error_t_CPU" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -157,7 +228,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QBooleanLine" name="bl_master_power" native="true">
+       <widget class="QBooleanLine" name="bl_error_rain" native="true">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -175,7 +246,7 @@
      </layout>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="6" column="0">
     <widget class="QGroupBox" name="gb_cover">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -327,147 +398,113 @@
      </layout>
     </widget>
    </item>
-   <item row="8" column="1">
-    <widget class="QGroupBox" name="gb_errors">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>214</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Error bits</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="spacing">
-       <number>3</number>
-      </property>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_t_lens" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_t_SHT31" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_light" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_watchdog" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_brownout" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_master" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_t_CPU" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QBooleanLine" name="bl_error_rain" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QDomeWidget" name="picture" native="true">
+   <item row="6" column="1">
+    <widget class="QGroupBox" name="gb_sensors">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-       <horstretch>0</horstretch>
-       <verstretch>100</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>125</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>200</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QWidget" name="widget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>0</number>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>234</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Sensors</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>3</number>
       </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
+      <item>
+       <widget class="QFloatLine" name="fl_time_alive" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_t_lens" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_t_CPU" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_t_SHT31" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFloatLine" name="fl_h_SHT31" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_rain_sensor" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_light_sensor" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QBooleanLine" name="bl_master_power" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -537,74 +574,27 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QProgressBar" name="pb_cover">
-     <property name="maximum">
-      <number>401</number>
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="format">
-      <string>%v/%m</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QGroupBox" name="gb_devices">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>214</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Devices</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>3</number>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
-      <item>
-       <widget class="QControlLine" name="cl_lens_heating" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_camera_heating" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_fan" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_ii" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-       </widget>
-      </item>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
      </layout>
     </widget>
    </item>

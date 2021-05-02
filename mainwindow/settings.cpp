@@ -11,13 +11,12 @@ void MainWindow::load_settings(void) {
         QString ip = settings->value("server/ip", "127.0.0.1").toString();
         QString station_id = settings->value("station/id", "none").toString();
 
-        this->station = new Station(station_id);
-        this->station->set_server(this->ui->server);
-        this->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
-        this->station->set_dome(this->ui->dome);
+        this->ui->station->set_server(this->ui->server);
+        this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
+        this->ui->station->set_dome(this->ui->dome);
 
         // Create the UFO manager
-        this->station->set_ufo_manager(new UfoManager(
+        this->ui->station->set_ufo_manager(new UfoManager(
             settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString(),
             settings->value("ufo/autostart", false).toBool()
         ));
@@ -33,7 +32,7 @@ void MainWindow::load_settings(void) {
         this->ui->cb_debug->setChecked(debug);
 
         // Load and set manual/automatic mode
-        this->station->set_manual_control(settings->value("manual", false).toBool());
+        this->ui->station->set_manual_control(settings->value("manual", false).toBool());
         this->ui->cb_manual->setChecked(this->station->is_manual());
 
         // We do not save override (must be set manually after each start)

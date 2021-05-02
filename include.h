@@ -16,6 +16,7 @@
 #include "utils/sighting.h"
 #include "utils/ufomanager.h"
 
+#include "widgets/qstation.h"
 #include "widgets/qdomewidget.h"
 #include "widgets/qdome.h"
 #include "widgets/qserver.h"
@@ -24,7 +25,6 @@
 #include "widgets/qstoragebox.h"
 
 #include "mainwindow.h"
-#include "station.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"
 

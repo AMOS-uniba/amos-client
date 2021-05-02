@@ -9,7 +9,6 @@
 #include <QMessageLogger>
 #include <QFileDialog>
 #include <QLineEdit>
-#include <QProgressBar>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
@@ -39,7 +38,7 @@ private:
     QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
     Ui::MainWindow *ui;
 
-    Station *station = nullptr;
+    QStation *station = nullptr;
     Universe *universe = nullptr;
 
     QAction *minimizeAction;
@@ -75,11 +74,7 @@ private slots:
 
     // Display
     void display_time(void);
-
     void display_window_title(void);
-
-    void display_cover_status(void);
-    void display_station_config(void);
     void display_ufo_settings(void);
     void display_ufo_state(void);
 

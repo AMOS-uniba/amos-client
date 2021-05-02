@@ -15,6 +15,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         event->accept();
     }
 }
+
 void MainWindow::create_tray_icon() {
     this->trayIconMenu = new QMenu(this);
     this->trayIconMenu->addAction(minimizeAction);

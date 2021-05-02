@@ -20,7 +20,6 @@ void MainWindow::create_timers(void) {
 
 void MainWindow::process_display_timer(void) {
     this->display_time();
-    this->display_cover_status();
 }
 
 void MainWindow::process_watchdog_timer(void) {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1069</width>
-    <height>896</height>
+    <width>1018</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,23 +130,24 @@
     <item>
      <widget class="QFrame" name="frame_log">
       <layout class="QGridLayout" name="grid_log">
-       <item row="1" column="3">
-        <widget class="QLabel" name="lb_next_heartbeat">
-         <property name="minimumSize">
-          <size>
-           <width>50</width>
-           <height>0</height>
-          </size>
-         </property>
+       <item row="2" column="3">
+        <widget class="QLabel" name="lx_uptime">
          <property name="text">
-          <string>? s</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <string>Client uptime</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1" rowspan="2">
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="cb_debug">
+         <property name="text">
+          <string>Debug output</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -159,8 +160,14 @@
          </property>
         </spacer>
        </item>
-       <item row="0" column="3">
+       <item row="2" column="4">
         <widget class="QLabel" name="lb_uptime">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>80</width>
@@ -181,17 +188,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0" rowspan="2">
-        <widget class="QCheckBox" name="cb_debug">
-         <property name="text">
-          <string>Debug output</string>
-         </property>
-         <property name="checked">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="4">
+       <item row="4" column="0" colspan="5">
         <widget class="QTableWidget" name="tb_log">
          <property name="lineWidth">
           <number>1</number>
@@ -270,20 +267,6 @@
            <string>Message</string>
           </property>
          </column>
-        </widget>
-       </item>
-       <item row="0" column="2">
-        <widget class="QLabel" name="lx_uptime">
-         <property name="text">
-          <string>Client uptime</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="2">
-        <widget class="QLabel" name="lx_next_heartbeat">
-         <property name="text">
-          <string>Next heartbeat in</string>
-         </property>
         </widget>
        </item>
       </layout>
@@ -401,7 +384,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="group_position">
+        <widget class="QStation" name="station">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -714,7 +697,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1069</width>
+     <width>1018</width>
      <height>21</height>
     </rect>
    </property>
@@ -833,6 +816,12 @@
    <class>QServer</class>
    <extends>QGroupBox</extends>
    <header>widgets/qserver.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QStation</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qstation.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
