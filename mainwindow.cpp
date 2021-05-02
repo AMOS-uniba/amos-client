@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->ui->tb_log->setColumnWidth(0, 140);
     this->ui->tb_log->setColumnWidth(1, 72);
-    this->ui->tb_log->setColumnWidth(2, 72);
+    this->ui->tb_log->setColumnWidth(2, 80);
 
     logger.set_display_widget(this->ui->tb_log);
     logger.info(Concern::Operation, "Client initialized");
@@ -30,12 +30,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->create_timers();
 
-    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    /*this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
     this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);*/
 
     // connect signals for handling of edits of safety limits
-    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
+    /*this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);*/
 
     this->create_actions();
     this->create_tray_icon();
@@ -52,10 +52,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
-    this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);
+   /* this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);*/
+    this->connect(this->ui->station, &QStation::manual_mode_changed, this, &MainWindow::display_window_title);
+    this->connect(this->ui->station, &QStation::safety_override_changed, this, &MainWindow::display_window_title);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
-    this->set_icon(this->station->state());
+    this->set_icon(this->ui->station->state());
 
     this->display_ufo_state();
     this->display_window_title();
@@ -63,12 +65,16 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->ui->station, &QStation::process_sightings);
     this->connect(this->ui->station, &QStation::humidity_limits_changed, this->ui->dome, &QDome::set_formatters);
 
+    this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
+    this->connect(this->ui->station, &QStation::darkness_limit_changed, this->ui->sun_info, &QSunInfo::update_long_term);
+
     this->ui->sun_info->update_short_term();
-    this->ui->sun_info->update_long_term();
+//    this->ui->sun_info->update_long_term();
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize(this->ui->station);
+    this->ui->station->initialize();
+
 #ifdef OLD_PROTOCOL
-    this->ui->progress_cover->setMaximum(26);
     this->ui->dome_widget->set_cover_maximum(26);
 #endif
 }
@@ -78,11 +84,9 @@ MainWindow::~MainWindow() {
 
     delete this->ui;
     delete this->timer_display;
-    delete this->timer_heartbeat;
     delete this->timer_watchdog;
 
     delete this->universe;
-    delete this->station;
     delete settings;
 }
 
@@ -115,6 +119,7 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     this->ui->action_debug->setChecked(debug);
 }
 
+/*
 void MainWindow::on_cb_manual_stateChanged(int manual) {
     logger.warning(Concern::Operation, QString("Switched to %1 mode").arg(manual ? "manual" : "automatic"));
 
@@ -127,34 +132,7 @@ void MainWindow::on_cb_manual_stateChanged(int manual) {
 
     this->display_window_title();
 }
-
-void MainWindow::on_cb_safety_override_stateChanged(int state) {
-    if (state == Qt::CheckState::Checked) {
-        QMessageBox box(
-                        QMessageBox::Icon::Warning,
-                        "Safety mechanism override",
-                        "You are about to override the safety mechanisms!",
-                        QMessageBox::Ok | QMessageBox::Cancel,
-                        this
-                    );
-        box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
-        box.setWindowIcon(QIcon(":/images/blue.ico"));
-        int choice = box.exec();
-
-        switch (choice) {
-            case QMessageBox::Ok:
-                this->station->set_safety_override(true);
-                break;
-            case QMessageBox::Cancel:
-            default:
-                this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
-                break;
-        }
-    } else {
-        this->station->set_safety_override(false);
-    }
-    this->display_window_title();
-}
+*/
 
 void MainWindow::on_bt_change_ufo_clicked(void) {
     QString filename = QFileDialog::getOpenFileName(
@@ -168,32 +146,32 @@ void MainWindow::on_bt_change_ufo_clicked(void) {
         logger.debug(Concern::UFO, "Directory selection aborted");
         return;
     } else {
-        if (filename == this->station->ufo_manager()->path()) {
+        if (filename == this->ui->station->ufo_manager()->path()) {
             logger.debug(Concern::UFO, "Path not changed");
         } else {
             logger.debug(Concern::UFO, "Path changed");
             settings->setValue("ufo/path", filename);
-            this->station->ufo_manager()->set_path(filename);
+            this->ui->station->ufo_manager()->set_path(filename);
             this->display_ufo_settings();
         }
     }
 }
 
 void MainWindow::on_cb_ufo_auto_stateChanged(int enable) {
-    this->station->ufo_manager()->set_autostart((bool) enable);
-    settings->setValue("ufo/autostart", this->station->ufo_manager()->autostart());
+    this->ui->station->ufo_manager()->set_autostart((bool) enable);
+    settings->setValue("ufo/autostart", this->ui->station->ufo_manager()->autostart());
 }
 
 void MainWindow::on_bt_ufo_clicked() {
-    if (this->station->ufo_manager()->is_running()) {
-        this->station->ufo_manager()->start_ufo();
+    if (this->ui->station->ufo_manager()->is_running()) {
+        this->ui->station->ufo_manager()->start_ufo();
     } else {
-        this->station->ufo_manager()->stop_ufo();
+        this->ui->station->ufo_manager()->stop_ufo();
     }
 }
 
 void MainWindow::on_action_manual_triggered() {
-    this->ui->cb_manual->click();
+    this->ui->station->set_manual_control(true);
 }
 
 void MainWindow::on_action_logging_options_triggered() {

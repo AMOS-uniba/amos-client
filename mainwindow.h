@@ -35,10 +35,9 @@ public:
     static QString format_duration(unsigned int seconds);
 
 private:
-    QTimer *timer_display, *timer_heartbeat, *timer_watchdog;
+    QTimer *timer_display, *timer_watchdog;
     Ui::MainWindow *ui;
 
-    QStation *station = nullptr;
     Universe *universe = nullptr;
 
     QAction *minimizeAction;
@@ -60,7 +59,6 @@ private:
 private slots:
     void load_settings(void);
     void load_settings_storage(void);
-    void load_settings_station(void);
 
     void create_timers(void);
 
@@ -78,15 +76,6 @@ private slots:
     void display_ufo_settings(void);
     void display_ufo_state(void);
 
-    void slot_station_edited(void);
-
-    void heartbeat(void);
-
-    void button_station_toggle(bool changed);
-    void on_bt_station_reset_clicked();
-    void on_bt_station_apply_clicked();
-
-    void on_cb_manual_stateChanged(int manual);
     void on_cb_debug_stateChanged(int debug);
 
     // Tray and messaging
@@ -96,8 +85,6 @@ private slots:
     void message_clicked();
 
     // Dome control slots
-    void on_cb_safety_override_stateChanged(int arg1);
-
     void on_bt_change_ufo_clicked();
     void on_cb_ufo_auto_stateChanged(int arg1);
     void on_bt_ufo_clicked();

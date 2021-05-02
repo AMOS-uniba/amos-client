@@ -4,6 +4,7 @@
 #include "ui_qstation.h"
 
 extern EventLogger logger;
+extern QSettings * settings;
 
 const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing, daylight");
 const StationState QStation::Observing          = StationState('O', "observing", Icon::Observing, "observation in progress");
@@ -53,13 +54,102 @@ QStation::QStation(QWidget * parent):
     this->m_timer_file_watchdog->setInterval(2000);
     this->connect(this->m_timer_file_watchdog, &QTimer::timeout, this, &QStation::file_check);
     this->m_timer_file_watchdog->start();
+
+    this->m_timer_heartbeat = new QTimer(this);
+    this->m_timer_heartbeat->setInterval(60 * 1000);
+    this->connect(this->m_timer_heartbeat, &QTimer::timeout, this, &QStation::heartbeat);
+    this->m_timer_heartbeat->start();
+
+    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
+    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
+    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
+    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
+
+    this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QStation::apply_settings);
+    this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QStation::discard_settings);
+
+    this->connect(this, &QStation::settings_changed, this, &QStation::discard_settings);
+    this->connect(this, &QStation::settings_changed, this, &QStation::save_settings);
 }
 
 QStation::~QStation() {
     delete ui;
 }
 
-// Set position of the station
+void QStation::initialize(void) {
+    this->load_settings();
+}
+
+void QStation::load_settings(void) {
+    try {
+        this->load_settings_inner();
+    } catch (ConfigurationError &e) {
+        this->load_defaults();
+    }
+    this->discard_settings();
+}
+
+void QStation::load_settings_inner(void) {
+    this->set_manual_control(
+        settings->value("manual", false).toBool()
+    );
+    this->set_position(
+        settings->value("station/latitude", 48.0).toDouble(),
+        settings->value("station/longitude", 17.0).toDouble(),
+        settings->value("station/altitude", 186.0).toDouble()
+    );
+    this->set_darkness_limit(
+        settings->value("limits/darkness", -12.0).toDouble()
+    );
+}
+
+void QStation::load_defaults(void) {
+    this->set_manual_control(false);
+    this->set_position(48.0, 17.0, 186.0);
+    this->set_darkness_limit(-12.0);
+}
+
+void QStation::save_settings(void) const {
+    settings->setValue("manual", this->is_manual());
+    settings->setValue("station/latitude", this->latitude());
+    settings->setValue("station/longitude", this->longitude());
+    settings->setValue("station/altitude", this->altitude());
+    settings->setValue("limits/darkness", this->darkness_limit());
+    settings->sync();
+}
+
+
+// Manual control
+void QStation::set_manual_control(bool manual) {
+    logger.info(Concern::Operation, QString("Control set to %1").arg(manual ? "manual" : "automatic"));
+    this->ui->cb_manual->setCheckState(manual ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    this->ui->cb_safety_override->setEnabled(manual);
+    this->m_manual_control = manual;
+
+    emit this->manual_mode_changed(manual);
+}
+
+bool QStation::is_manual(void) const { return this->m_manual_control; }
+
+// Safety override
+void QStation::set_safety_override(bool override) {
+    if (this->m_manual_control) {
+        logger.warning(Concern::Operation, QString("Safety override %1abled").arg(override ? "en" : "dis"));
+        this->m_safety_override = override;
+        this->ui->cb_safety_override->setCheckState(override ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    } else {
+        logger.error(Concern::Operation, "Cannot override safety when not in manual mode!");
+    }
+}
+bool QStation::is_safety_overridden(void) const { return this->m_safety_override; }
+
+/**
+ * @brief QStation::set_position
+ *  Set position of the station, with validation
+ * @param new_latitude
+ * @param new_longitude
+ * @param new_altitude
+ */
 void QStation::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
     // Check that the new values are meaningful
     if (fabs(new_latitude) > 90) {
@@ -76,7 +166,9 @@ void QStation::set_position(const double new_latitude, const double new_longitud
     this->m_longitude = new_longitude;
     this->m_altitude = new_altitude;
     logger.info(Concern::Configuration, QString("Station position set to %1°, %2°, %3 m")
-                .arg(this->m_latitude).arg(this->m_longitude).arg(this->m_altitude));
+                .arg(this->m_latitude, 0, 'f', 6)
+                .arg(this->m_longitude, 0, 'f', 6)
+                .arg(this->m_altitude, 0, 'f', 1));
 
     emit this->position_changed();
 }
@@ -306,6 +398,11 @@ QJsonObject QStation::prepare_heartbeat(void) const {
     };
 }
 
+void QStation::heartbeat(void) {
+    this->log_state();
+    this->send_heartbeat();
+}
+
 void QStation::send_heartbeat(void) {
     this->m_server->send_heartbeat(this->prepare_heartbeat());
 }
@@ -317,6 +414,8 @@ void QStation::set_state(StationState new_state) {
         emit this->state_changed(this->m_state);
     }
 }
+
+StationState QStation::state(void) const { return this->m_state; }
 
 void QStation::file_check(void) {
     this->m_ufo_manager->auto_action(this->is_dark());
@@ -332,6 +431,83 @@ void QStation::log_state(void) {
 }
 
 // Event handlers
-void QStation::on_cb_manual_stateChanged(int enable) {
-    this->set_manual_control(enable);
+void QStation::on_cb_manual_stateChanged(int state) {
+    this->set_manual_control(state);
+}
+
+void QStation::on_cb_safety_override_stateChanged(int state) {
+    if (state == Qt::CheckState::Checked) {
+        QMessageBox box(
+                        QMessageBox::Icon::Warning,
+                        "Safety mechanism override",
+                        "You are about to override the safety mechanisms!",
+                        QMessageBox::Ok | QMessageBox::Cancel,
+                        this
+                    );
+        box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
+        box.setWindowIcon(QIcon(":/images/blue.ico"));
+        int choice = box.exec();
+
+        switch (choice) {
+            case QMessageBox::Ok:
+                this->set_safety_override(true);
+                emit this->safety_override_changed(true);
+                break;
+            case QMessageBox::Cancel:
+            default:
+                this->set_safety_override(false);
+                break;
+        }
+    } else {
+        this->set_safety_override(false);
+        emit this->safety_override_changed(false);
+    }
+}
+
+bool QStation::is_changed(void) const {
+    return (
+        (this->ui->dsb_latitude->value() != this->latitude()) ||
+        (this->ui->dsb_longitude->value() != this->longitude()) ||
+        (this->ui->dsb_altitude->value() != this->altitude()) ||
+        (this->ui->dsb_darkness_limit->value() != this->darkness_limit())
+    );
+}
+
+void QStation::apply_settings_inner(void) {
+    if (
+        (this->ui->dsb_latitude->value() != this->latitude()) ||
+        (this->ui->dsb_longitude->value() != this->longitude()) ||
+        (this->ui->dsb_altitude->value() != this->altitude())
+    ) {
+        this->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
+    }
+
+    if (this->ui->dsb_darkness_limit->value() != this->darkness_limit()) {
+        this->set_darkness_limit(this->ui->dsb_darkness_limit->value());
+    }
+}
+
+void QStation::discard_settings(void) {
+    this->ui->dsb_latitude->setValue(this->latitude());
+    this->ui->dsb_longitude->setValue(this->longitude());
+    this->ui->dsb_altitude->setValue(this->altitude());
+    this->ui->dsb_darkness_limit->setValue(this->darkness_limit());
+}
+
+void QStation::apply_settings(void) {
+    try {
+        this->apply_settings_inner();
+        emit this->settings_changed();
+    } catch (ConfigurationError &e) {
+        logger.error(Concern::Configuration, e.what());
+    }
+    this->handle_settings_changed();
+}
+
+void QStation::handle_settings_changed(void) {
+    bool changed = this->is_changed();
+
+    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
+    this->ui->bt_apply->setEnabled(changed);
+    this->ui->bt_discard->setEnabled(changed);
 }

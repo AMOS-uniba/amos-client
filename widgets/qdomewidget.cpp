@@ -1,6 +1,6 @@
 #include "qdomewidget.h"
 
-QDomeWidget::QDomeWidget(QWidget *parent):
+QDomeWidget::QDomeWidget(QWidget * parent):
     QWidget(parent),
     m_cover_position(0),
     m_cover_minimum(0),
@@ -31,14 +31,14 @@ void QDomeWidget::set_cover_maximum(int new_maximum) {
     this->repaint();
 }
 
-void QDomeWidget::paintEvent(QPaintEvent *e) {
+void QDomeWidget::paintEvent(QPaintEvent * e) {
     QPainter qp(this);
     qp.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     this->drawWidget(qp);
     QWidget::paintEvent(e);
 }
 
-void QDomeWidget::drawWidget(QPainter &qp) {
+void QDomeWidget::drawWidget(QPainter & qp) {
     QColor black(0, 0, 0);
     QSize size(this->size());
 

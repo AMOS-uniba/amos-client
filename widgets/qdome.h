@@ -59,21 +59,21 @@ public:
     const static ValueFormatter<double> TemperatureValueFormatter, HumidityValueFormatter;
     const static ColourFormatter<double> TemperatureColourFormatter;
 
-    explicit QDome(QWidget *parent = nullptr);
+    explicit QDome(QWidget * parent = nullptr);
     ~QDome();
 
-    void send_command(const Command &command) const;
-    void send_request(const Request &request) const;
-    void send(const QByteArray &message) const;
+    void send_command(const Command & command) const;
+    void send_request(const Request & request) const;
+    void send(const QByteArray & message) const;
 
-    const QDateTime& last_received(void) const;
+    const QDateTime & last_received(void) const;
     SerialPortState serial_port_state(void) const;
 
     QJsonObject json(void) const;
 
-    const DomeStateS& state_S(void) const;
-    const DomeStateT& state_T(void) const;
-    const DomeStateZ& state_Z(void) const;
+    const DomeStateS & state_S(void) const;
+    const DomeStateT & state_T(void) const;
+    const DomeStateZ & state_Z(void) const;
 
     QString status_line(void) const;
 
@@ -91,9 +91,9 @@ private slots:
 
     void display_dome_state(void);
 
-    void display_basic_data(const DomeStateS &state);
-    void display_env_data(const DomeStateT &state);
-    void display_shaft_data(const DomeStateZ &state);
+    void display_basic_data(const DomeStateS & state);
+    void display_env_data(const DomeStateT & state);
+    void display_shaft_data(const DomeStateZ & state);
 
     void toggle_hotwire(void);
     void toggle_intensifier(void);
@@ -108,7 +108,7 @@ public slots:
 
     void list_serial_ports(void);
     void clear_serial_port(void);
-    void set_serial_port(const QString &port);
+    void set_serial_port(const QString & port);
     void check_serial_port(void);
 
     void display_serial_port_info(void) const;
@@ -132,15 +132,15 @@ public slots:
     void turn_off_fan(void);
 
 signals:
-    void state_updated_S(const DomeStateS &state);
-    void state_updated_T(const DomeStateT &state);
-    void state_updated_Z(const DomeStateZ &state);
+    void state_updated_S(const DomeStateS & state);
+    void state_updated_T(const DomeStateT & state);
+    void state_updated_Z(const DomeStateZ & state);
 
     void cover_closed(int position) const;
     void cover_open(int position) const;
     void cover_moved(int position) const;
 
-    void serial_port_changed(const QString &port);
+    void serial_port_changed(const QString & port);
 
     void settings_changed(double new_lower, double new_upper);
 };

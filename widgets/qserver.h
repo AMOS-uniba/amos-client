@@ -29,7 +29,7 @@ private:
     QUrl m_url_sighting;
     QNetworkAccessManager *m_network_manager;
 
-    bool is_changed(void);
+    bool is_changed(void) const;
 
 private slots:
     void load_settings(void);

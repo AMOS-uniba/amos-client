@@ -23,7 +23,6 @@ void MainWindow::load_settings(void) {
         this->display_ufo_settings();
 
         this->load_settings_storage();
-        this->load_settings_station();
         logger.load_settings();
 
         // Load and set debug levels
@@ -33,10 +32,6 @@ void MainWindow::load_settings(void) {
 
         // Load and set manual/automatic mode
         this->ui->station->set_manual_control(settings->value("manual", false).toBool());
-        this->ui->cb_manual->setChecked(this->station->is_manual());
-
-        // We do not save override (must be set manually after each start)
-        this->ui->cb_safety_override->setEnabled(this->station->is_manual());
     } catch (ConfigurationError &e) {
         QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
         QMessageBox box;
@@ -71,22 +66,9 @@ void MainWindow::load_settings_storage(void) {
 }
 
 /**
- * @brief MainWindow::load_settings_station
- * Loads and applies settings from the `station` group
- */
-void MainWindow::load_settings_station(void) {
-    this->station->set_position(
-        settings->value("station/latitude", 48).toDouble(),
-        settings->value("station/longitude", 17).toDouble(),
-        settings->value("station/altitude", 0).toDouble()
-    );
-    this->station->set_darkness_limit(settings->value("station/darkness", -12.0).toDouble());
-}
-
-/**
  * @brief MainWindow::on_bt_station_apply_clicked
  * Handler of changes to the station settings in the GUI
- */
+ *//*
 void MainWindow::on_bt_station_apply_clicked(void) {
     // Update the position, if changed
     if (
@@ -125,8 +107,8 @@ void MainWindow::on_bt_station_reset_clicked() {
     this->ui->dsb_altitude->setValue(this->station->altitude());
 
     this->ui->dsb_darkness_limit->setValue(this->station->darkness_limit());
-}
-
+}*/
+/*
 void MainWindow::slot_station_edited(void) {
     this->button_station_toggle(
         (this->ui->dsb_latitude->value() != this->station->latitude()) ||
@@ -141,3 +123,4 @@ void MainWindow::button_station_toggle(bool changed) {
     this->ui->bt_station_apply->setEnabled(changed);
     this->ui->bt_station_reset->setEnabled(changed);
 }
+*/

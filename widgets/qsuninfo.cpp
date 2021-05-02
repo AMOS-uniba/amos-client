@@ -1,7 +1,11 @@
+#include "include.h"
+
 #include "qsuninfo.h"
 #include "ui_qsuninfo.h"
 
 #include "widgets/qstation.h"
+
+extern EventLogger logger;
 
 QSunInfo::QSunInfo(QWidget *parent) :
     QGroupBox(parent),

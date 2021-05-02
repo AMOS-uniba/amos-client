@@ -2,11 +2,6 @@
 #include "ui_mainwindow.h"
 
 void MainWindow::create_timers(void) {
-    this->timer_heartbeat = new QTimer(this);
-    this->timer_heartbeat->setInterval(60 * 1000);
-    this->connect(this->timer_heartbeat, &QTimer::timeout, this, &MainWindow::heartbeat);
-    this->timer_heartbeat->start();
-
     this->timer_display = new QTimer(this);
     this->timer_display->setInterval(100);
     this->connect(this->timer_display, &QTimer::timeout, this, &MainWindow::process_display_timer);
@@ -24,9 +19,4 @@ void MainWindow::process_display_timer(void) {
 
 void MainWindow::process_watchdog_timer(void) {
     this->display_ufo_state();
-}
-
-void MainWindow::heartbeat(void) {
-    this->station->log_state();
-    this->station->send_heartbeat();
 }

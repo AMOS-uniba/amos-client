@@ -40,11 +40,20 @@ private:
 
     QTimer *m_timer_automatic;
     QTimer *m_timer_file_watchdog;
+    QTimer *m_timer_heartbeat;
 
     void set_state(StationState new_state);
 
+    bool is_changed(void) const;
+
 private slots:
-    void on_cb_manual_stateChanged(int enable);
+    void load_settings(void);
+    void load_settings_inner(void);
+    void load_defaults(void);
+    void save_settings(void) const;
+
+    void on_cb_manual_stateChanged(int state);
+    void on_cb_safety_override_stateChanged(int state);
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower;
@@ -88,14 +97,12 @@ public:
     UfoManager* ufo_manager(void) const;
 
     // Position getters and setter
-    void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
     double latitude(void) const;
     double longitude(void) const;
     double altitude(void) const;
 
     // Darkness limit getters and setters
     bool is_dark(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    void set_darkness_limit(const double new_altitude_dark);
     double darkness_limit(void) const;
 
     // Sun position functions
@@ -113,15 +120,30 @@ public:
     QJsonObject prepare_heartbeat(void) const;
 
 public slots:
+    void initialize(void);
+
+    void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
+    void set_darkness_limit(const double new_altitude_dark);
+
+    void apply_settings(void);
+    void apply_settings_inner(void);
+    void discard_settings(void);
+    void handle_settings_changed(void);
+
     void automatic_check(void);
     void file_check(void);
     void log_state(void);
 
+    void heartbeat(void);
     void send_heartbeat(void);
     void process_sightings(QVector<Sighting> sightings);
 
 signals:
+    void settings_changed(void) const;
+
     void manual_mode_changed(bool manual);
+    void safety_override_changed(bool overridden);
+
     void id_changed(void) const;
     void position_changed(void) const;
     void darkness_limit_changed(double new_limit) const;

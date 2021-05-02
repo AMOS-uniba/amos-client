@@ -4,7 +4,7 @@
 #include "ui_qserver.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 
 QServer::QServer(QWidget *parent):
@@ -19,6 +19,7 @@ QServer::QServer(QWidget *parent):
     this->connect(this->ui->le_station_id, &QLineEdit::textChanged, this, &QServer::handle_settings_changed);
     this->connect(this->ui->le_ip, &QLineEdit::textChanged, this, &QServer::handle_settings_changed);
     this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::handle_settings_changed);
+
     this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QServer::apply_settings);
     this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QServer::discard_settings);
 
@@ -37,6 +38,16 @@ QServer::~QServer() {
 void QServer::initialize(QStation * const station) {
     this->m_station = station;
     this->load_settings();
+}
+
+void QServer::load_settings(void) {
+    try {
+        this->load_settings_inner();
+    } catch (ConfigurationError &e) {
+        this->load_defaults();
+    }
+    this->refresh_urls();
+    this->discard_settings();
 }
 
 void QServer::load_settings_inner(void) {
@@ -154,7 +165,7 @@ void QServer::send_sighting(const Sighting &sighting) const {
     multipart->setParent(reply); // delete the multiPart with the reply */
 }
 
-bool QServer::is_changed(void) {
+bool QServer::is_changed(void) const {
     return (
         (this->ui->le_station_id->text() != this->station_id()) ||
         (this->ui->le_ip->text() != this->address().toString()) ||
@@ -181,16 +192,6 @@ void QServer::discard_settings(void) {
 void QServer::button_send_heartbeat(void) {
     logger.info(Concern::Server, "Sending a heartbeat (manual)");
     this->send_heartbeat(this->m_station->prepare_heartbeat());
-}
-
-void QServer::load_settings(void) {
-    try {
-        this->load_settings_inner();
-    } catch (ConfigurationError &e) {
-        this->load_defaults();
-    }
-    this->refresh_urls();
-    this->discard_settings();
 }
 
 void QServer::apply_settings(void) {

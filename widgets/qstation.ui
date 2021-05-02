@@ -177,7 +177,7 @@
    <item row="9" column="1" colspan="3">
     <layout class="QHBoxLayout" name="hl_station_info">
      <item>
-      <widget class="QPushButton" name="bt_station_apply">
+      <widget class="QPushButton" name="bt_apply">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -190,7 +190,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="bt_station_reset">
+      <widget class="QPushButton" name="bt_discard">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -219,7 +219,7 @@
       <string>°</string>
      </property>
      <property name="decimals">
-      <number>0</number>
+      <number>1</number>
      </property>
      <property name="minimum">
       <double>-18.000000000000000</double>

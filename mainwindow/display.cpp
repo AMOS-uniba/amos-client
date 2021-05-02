@@ -9,12 +9,12 @@ extern EventLogger logger;
 extern QSettings *settings;
 
 void MainWindow::display_ufo_settings(void) {
-    this->ui->cb_ufo_auto->setChecked(this->station->ufo_manager()->autostart());
-    this->ui->le_ufo_path->setText(this->station->ufo_manager()->path());
+    this->ui->cb_ufo_auto->setChecked(this->ui->station->ufo_manager()->autostart());
+    this->ui->le_ufo_path->setText(this->ui->station->ufo_manager()->path());
 }
 
 void MainWindow::display_ufo_state(void) {
-    this->ui->lb_ufo_state->setText(this->station->ufo_manager()->state_string());
+    this->ui->lb_ufo_state->setText(this->ui->station->ufo_manager()->state_string());
 }
 
 void MainWindow::display_time(void) {
