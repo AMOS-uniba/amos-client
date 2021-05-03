@@ -21,7 +21,7 @@ namespace Ui {
 class QDome : public QGroupBox {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 300;
+    constexpr static unsigned int REFRESH = 30;
     const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
 
     Ui::QDome *ui;

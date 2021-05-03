@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1018</width>
-    <height>789</height>
+    <width>1021</width>
+    <height>769</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -297,12 +297,18 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QGroupBox" name="group_ufo">
+        <widget class="QUfoManager" name="group_ufo">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>260</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="title">
           <string>UFO Capture</string>
@@ -374,7 +380,7 @@
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>260</width>
            <height>150</height>
           </size>
          </property>
@@ -387,7 +393,7 @@
         <widget class="QStation" name="station">
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>260</width>
            <height>50</height>
           </size>
          </property>
@@ -404,6 +410,12 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>260</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="title">
           <string>Data storage monitor</string>
@@ -480,7 +492,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1018</width>
+     <width>1021</width>
      <height>21</height>
     </rect>
    </property>
@@ -605,6 +617,12 @@
    <class>QStation</class>
    <extends>QGroupBox</extends>
    <header>widgets/qstation.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QUfoManager</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/qufomanager.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

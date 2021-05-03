@@ -55,7 +55,8 @@ SOURCES += \
     widgets/qserver.cpp \
     widgets/qstation.cpp \
     widgets/qstoragebox.cpp \
-    widgets/qsuninfo.cpp
+    widgets/qsuninfo.cpp \
+    widgets/qufomanager.cpp
 
 HEADERS += \
     APC/APC_Cheb.h \
@@ -103,7 +104,8 @@ HEADERS += \
     widgets/qserver.h \
     widgets/qstation.h \
     widgets/qstoragebox.h \
-    widgets/qsuninfo.h
+    widgets/qsuninfo.h \
+    widgets/qufomanager.h
 
 FORMS += \
     logging/loggingdialog.ui \
@@ -112,7 +114,8 @@ FORMS += \
     widgets/qdome.ui \
     widgets/qserver.ui \
     widgets/qstation.ui \
-    widgets/qsuninfo.ui
+    widgets/qsuninfo.ui \
+    widgets/qufomanager.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -16,7 +16,7 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_altitude->set_colour_formatter(&Universe::altitude_colour);
 
     this->m_timer_short = new QTimer(this);
-    this->m_timer_short->setInterval(20);
+    this->m_timer_short->setInterval(200);
     this->connect(this->m_timer_short, &QTimer::timeout, this, &QSunInfo::update_short_term);
     this->m_timer_short->start();
 
@@ -25,37 +25,41 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->connect(this->m_timer_long, &QTimer::timeout, this, &QSunInfo::update_long_term);
     this->m_timer_long->start();
 
-    ValueFormatter<double> angle_formatter = [=](double angle) {
-        return QString("%1°").arg(fmod(angle + 360.0, 360.0), 0, 'f', 3);
+    ValueFormatter<double> altitude_formatter = [](double altitude) {
+        return QString("%1°").arg(altitude, 0, 'f', 3);
+    };
+
+    ValueFormatter<double> azimuth_formatter = [](double azimuth) {
+        return QString("%1°").arg(fmod(azimuth + 360.0, 360.0), 0, 'f', 3);
     };
 
     this->ui->sl_altitude->set_title("Altitude θ");
     this->ui->sl_altitude->set_valid(true);
-    this->ui->sl_altitude->set_value_formatter(angle_formatter);
+    this->ui->sl_altitude->set_value_formatter(altitude_formatter);
 
     this->ui->sl_azimuth->set_title("Azimuth a");
     this->ui->sl_azimuth->set_valid(true);
-    this->ui->sl_azimuth->set_value_formatter(angle_formatter);
+    this->ui->sl_azimuth->set_value_formatter(azimuth_formatter);
 
     this->ui->sl_dec->set_title("Declination δ");
     this->ui->sl_dec->set_valid(true);
-    this->ui->sl_dec->set_value_formatter(angle_formatter);
+    this->ui->sl_dec->set_value_formatter(altitude_formatter);
 
     this->ui->sl_ra->set_title("Right ascension α");
     this->ui->sl_ra->set_valid(true);
-    this->ui->sl_ra->set_value_formatter(angle_formatter);
+    this->ui->sl_ra->set_value_formatter(azimuth_formatter);
 
     this->ui->sl_ecl_lon->set_title("Ecliptical longitude λ");
     this->ui->sl_ecl_lon->set_valid(true);
-    this->ui->sl_ecl_lon->set_value_formatter(angle_formatter);
+    this->ui->sl_ecl_lon->set_value_formatter(azimuth_formatter);
 
     this->ui->sl_moon_altitude->set_title("Moon altitude");
     this->ui->sl_moon_altitude->set_valid(true);
-    this->ui->sl_moon_altitude->set_value_formatter(angle_formatter);
+    this->ui->sl_moon_altitude->set_value_formatter(altitude_formatter);
 
     this->ui->sl_moon_azimuth->set_title("Moon azimuth");
     this->ui->sl_moon_azimuth->set_valid(true);
-    this->ui->sl_moon_azimuth->set_value_formatter(angle_formatter);
+    this->ui->sl_moon_azimuth->set_value_formatter(azimuth_formatter);
 
     this->ui->sl_dome_close->set_title("Dome closing");
     this->ui->sl_sunrise->set_title("Sunrise");
@@ -71,7 +75,8 @@ QSunInfo::~QSunInfo() {
 
 void QSunInfo::update_short_term(void) {
     auto hor = this->m_station->sun_position();
-    this->ui->sl_altitude->set_value(hor.theta * Deg);
+    double alt = hor.theta * Deg;
+    this->ui->sl_altitude->set_value(alt);
     this->ui->sl_azimuth->set_value(hor.phi * Deg);
 
     auto moon_hor = this->m_station->moon_position();
@@ -96,10 +101,9 @@ void QSunInfo::update_short_term(void) {
     }
 
     this->ui->lb_sun_status->setStyleSheet(QString("QLabel { color: %1; }").arg(colour.name()));
-//    this->setTitle(QString("Fucking %1").arg(this->height()));
 }
 
-void QSunInfo::set_station(QStation * const station) { this->m_station = station; }
+void QSunInfo::set_station(const QStation * const station) { this->m_station = station; }
 
 void QSunInfo::update_long_term(void) {
     auto equ = Universe::compute_sun_equ();

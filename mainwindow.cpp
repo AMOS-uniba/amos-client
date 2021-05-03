@@ -30,13 +30,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->create_timers();
 
-    /*this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);
-    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);*/
-
-    // connect signals for handling of edits of safety limits
-    /*this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &MainWindow::slot_station_edited);*/
-
     this->create_actions();
     this->create_tray_icon();
     this->icons = {
@@ -52,8 +45,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
-   /* this->connect(this->ui->cb_manual, QOverload<int>::of(&QCheckBox::stateChanged), this, &MainWindow::process_watchdog_timer);*/
     this->connect(this->ui->station, &QStation::manual_mode_changed, this, &MainWindow::display_window_title);
+    this->connect(this->ui->station, &QStation::manual_mode_changed, this->ui->action_manual, &QAction::setChecked);
     this->connect(this->ui->station, &QStation::safety_override_changed, this, &MainWindow::display_window_title);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
@@ -68,8 +61,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
     this->connect(this->ui->station, &QStation::darkness_limit_changed, this->ui->sun_info, &QSunInfo::update_long_term);
 
-    this->ui->sun_info->update_short_term();
-//    this->ui->sun_info->update_long_term();
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize(this->ui->station);
     this->ui->station->initialize();
@@ -171,7 +162,7 @@ void MainWindow::on_bt_ufo_clicked() {
 }
 
 void MainWindow::on_action_manual_triggered() {
-    this->ui->station->set_manual_control(true);
+    this->ui->station->set_manual_control(!this->ui->station->is_manual());
 }
 
 void MainWindow::on_action_logging_options_triggered() {

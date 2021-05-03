@@ -315,12 +315,6 @@
       </item>
       <item>
        <widget class="QBooleanLine" name="bl_open_dome_sensor" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -331,12 +325,6 @@
       </item>
       <item>
        <widget class="QBooleanLine" name="bl_closed_dome_sensor" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -347,12 +335,6 @@
       </item>
       <item>
        <widget class="QBooleanLine" name="bl_safety" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -363,12 +345,6 @@
       </item>
       <item>
        <widget class="QBooleanLine" name="bl_servo_blocked" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>

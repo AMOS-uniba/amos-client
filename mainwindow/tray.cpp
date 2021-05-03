@@ -45,7 +45,7 @@ void MainWindow::create_actions() {
 
 void MainWindow::set_icon(const StationState &state) {
     this->tray_icon->setIcon(this->icons[state.icon()]);
-    this->tray_icon->setToolTip(QString("AMOS client\n%1").arg(state.tooltip()));
+    this->tray_icon->setToolTip(QString("AMOS client\n%1\n%2").arg(state.display_string()).arg(state.tooltip()));
 }
 
 void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {

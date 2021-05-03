@@ -137,6 +137,8 @@ void QStation::set_safety_override(bool override) {
         logger.warning(Concern::Operation, QString("Safety override %1abled").arg(override ? "en" : "dis"));
         this->m_safety_override = override;
         this->ui->cb_safety_override->setCheckState(override ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+
+        emit this->safety_override_changed(override);
     } else {
         logger.error(Concern::Operation, "Cannot override safety when not in manual mode!");
     }
@@ -431,12 +433,12 @@ void QStation::log_state(void) {
 }
 
 // Event handlers
-void QStation::on_cb_manual_stateChanged(int state) {
-    this->set_manual_control(state);
+void QStation::on_cb_manual_clicked(bool checked) {
+    this->set_manual_control(checked);
 }
 
-void QStation::on_cb_safety_override_stateChanged(int state) {
-    if (state == Qt::CheckState::Checked) {
+void QStation::on_cb_safety_override_clicked(bool checked) {
+    if (checked) {
         QMessageBox box(
                         QMessageBox::Icon::Warning,
                         "Safety mechanism override",
@@ -451,16 +453,14 @@ void QStation::on_cb_safety_override_stateChanged(int state) {
         switch (choice) {
             case QMessageBox::Ok:
                 this->set_safety_override(true);
-                emit this->safety_override_changed(true);
                 break;
             case QMessageBox::Cancel:
             default:
-                this->set_safety_override(false);
+                this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
                 break;
         }
     } else {
         this->set_safety_override(false);
-        emit this->safety_override_changed(false);
     }
 }
 

@@ -52,8 +52,8 @@ private slots:
     void load_defaults(void);
     void save_settings(void) const;
 
-    void on_cb_manual_stateChanged(int state);
-    void on_cb_safety_override_stateChanged(int state);
+    void on_cb_manual_clicked(bool checked);
+    void on_cb_safety_override_clicked(bool checked);
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower;

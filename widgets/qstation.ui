@@ -198,7 +198,7 @@
         <string>reset the changes</string>
        </property>
        <property name="text">
-        <string>Discard changes</string>
+        <string>Discard</string>
        </property>
       </widget>
      </item>
