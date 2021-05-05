@@ -2,6 +2,7 @@
 #define QDOME_H
 
 #include <QGroupBox>
+#include <QSerialPort>
 
 #include "forward.h"
 #include "widgets/lines/qdisplayline.h"

@@ -1,10 +1,17 @@
-#include "include.h"
+#include <QSerialPort>
+#include <QSerialPortInfo>
+
+#include "logging/include.h"
+
+#include "utils/exception.h"
+#include "utils/request.h"
+#include "utils/telegram.h"
 
 #include "qdome.h"
 #include "ui_qdome.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 const Request QDome::RequestBasic               = Request('S', "basic data request");
 const Request QDome::RequestEnv                 = Request('T', "environment data request");

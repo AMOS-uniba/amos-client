@@ -40,7 +40,6 @@ SOURCES += \
     utils/state/state.cpp \
     utils/state/stationstate.cpp \
     utils/telegram.cpp \
-    utils/ufomanager.cpp \
     utils/universe.cpp \
     widgets/lines/qbooleanline.cpp \
     widgets/lines/qcontrolline.cpp \
@@ -75,6 +74,7 @@ HEADERS += \
     APC/APC_VecMat3D.h \
     logging/baselogger.h \
     logging/eventlogger.h \
+    logging/include.h \
     logging/loggingdialog.h \
     logging/statelogger.h \
     forward.h \
@@ -89,7 +89,6 @@ HEADERS += \
     utils/state/state.h \
     utils/state/stationstate.h \
     utils/telegram.h \
-    utils/ufomanager.h \
     utils/universe.h \
     widgets/lines/qbooleanline.h \
     widgets/lines/qcontrolline.h \
@@ -127,6 +126,6 @@ RESOURCES += \
 
 RC_FILE = amos-client.rc
 
-VERSION = 0.4.0.1
+VERSION = 0.6.0.0
 QMAKE_TARGET_COMPANY = AMOS
 QMAKE_TARGET_PRODUCT = AMOS client

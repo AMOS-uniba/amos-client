@@ -297,7 +297,7 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QUfoManager" name="group_ufo">
+        <widget class="QUfoManager" name="ufo_manager">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
            <horstretch>0</horstretch>
@@ -313,61 +313,7 @@
          <property name="title">
           <string>UFO Capture</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4">
-          <item row="1" column="0" colspan="2">
-           <widget class="QLabel" name="lb_ufo_state">
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <weight>75</weight>
-              <italic>false</italic>
-              <bold>true</bold>
-              <kerning>true</kerning>
-             </font>
-            </property>
-            <property name="text">
-             <string>undefined</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QPushButton" name="bt_change_ufo">
-            <property name="text">
-             <string>Change</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QCheckBox" name="cb_ufo_auto">
-            <property name="text">
-             <string>Auto start/stop</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLineEdit" name="le_ufo_path">
-            <property name="cursor">
-             <cursorShape>ForbiddenCursor</cursorShape>
-            </property>
-            <property name="toolTip">
-             <string>path to monitored executable</string>
-            </property>
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="bt_ufo">
-            <property name="text">
-             <string>Run UFO</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <layout class="QGridLayout" name="gridLayout_4"/>
         </widget>
        </item>
        <item>
@@ -627,10 +573,6 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>le_ufo_path</tabstop>
-  <tabstop>cb_ufo_auto</tabstop>
-  <tabstop>bt_change_ufo</tabstop>
-  <tabstop>bt_ufo</tabstop>
   <tabstop>tb_log</tabstop>
  </tabstops>
  <resources>

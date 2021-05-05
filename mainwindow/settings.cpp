@@ -14,13 +14,7 @@ void MainWindow::load_settings(void) {
         this->ui->station->set_server(this->ui->server);
         this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
         this->ui->station->set_dome(this->ui->dome);
-
-        // Create the UFO manager
-        this->ui->station->set_ufo_manager(new UfoManager(
-            settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString(),
-            settings->value("ufo/autostart", false).toBool()
-        ));
-        this->display_ufo_settings();
+        this->ui->station->set_ufo_manager(this->ui->ufo_manager);
 
         this->load_settings_storage();
         logger.load_settings();

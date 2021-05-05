@@ -118,7 +118,6 @@ void QStation::save_settings(void) const {
     settings->sync();
 }
 
-
 // Manual control
 void QStation::set_manual_control(bool manual) {
     logger.info(Concern::Operation, QString("Control set to %1").arg(manual ? "manual" : "automatic"));
@@ -215,8 +214,8 @@ QStorageBox* QStation::primary_storage(void) const { return this->m_primary_stor
 QStorageBox* QStation::permanent_storage(void) const { return this->m_permanent_storage; }
 
 // UFO manager
-void QStation::set_ufo_manager(UfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
-UfoManager* QStation::ufo_manager(void) const { return this->m_ufo_manager; }
+void QStation::set_ufo_manager(QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
+QUfoManager* QStation::ufo_manager(void) const { return this->m_ufo_manager; }
 
 // Server getters and setters
 void QStation::set_server(QServer * const server) { this->m_server = server; }
@@ -286,6 +285,8 @@ QDateTime QStation::next_sun_crossing(double altitude, bool direction_up, int re
 
 // Perform automatic state checks
 void QStation::automatic_check(void) {
+    this->ufo_manager()->auto_action(this->is_dark());
+
     const DomeStateS &stateS = this->dome()->state_S();
 
     if (!stateS.is_valid()) {

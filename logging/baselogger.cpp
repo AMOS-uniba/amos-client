@@ -1,4 +1,7 @@
-#include "include.h"
+#include <QStandardPaths>
+
+#include "baselogger.h"
+#include "utils/exception.h"
 
 BaseLogger::BaseLogger(QObject *parent, const QString &filename):
     QObject(parent),

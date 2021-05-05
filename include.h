@@ -14,7 +14,6 @@
 #include "utils/state/serialportstate.h"
 #include "utils/domestate.h"
 #include "utils/sighting.h"
-#include "utils/ufomanager.h"
 
 #include "widgets/qstation.h"
 #include "widgets/qdomewidget.h"
@@ -23,6 +22,7 @@
 #include "widgets/qfilesystembox.h"
 #include "widgets/qscannerbox.h"
 #include "widgets/qstoragebox.h"
+#include "widgets/qufomanager.h"
 
 #include "mainwindow.h"
 #include "logging/eventlogger.h"

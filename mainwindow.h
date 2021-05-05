@@ -2,22 +2,13 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMap>
-#include <QTimer>
-#include <QSerialPort>
 #include <QSettings>
 #include <QMessageLogger>
-#include <QFileDialog>
-#include <QLineEdit>
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
-#include <QSerialPortInfo>
-#include <QDesktopServices>
 
 #include "forward.h"
-
-#include "utils/ufomanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -35,7 +26,7 @@ public:
     static QString format_duration(unsigned int seconds);
 
 private:
-    QTimer *timer_display, *timer_watchdog;
+    QTimer *timer_display;
     Ui::MainWindow *ui;
 
     Universe *universe = nullptr;
@@ -54,29 +45,18 @@ private:
 
     //CommThread comm_thread;
 
-    QList<QSerialPortInfo> serial_ports;
-
 private slots:
     void load_settings(void);
     void load_settings_storage(void);
 
     void create_timers(void);
-
-    // Menu actions
-    void on_action_exit_triggered();
-    void on_action_manual_triggered();
-    void on_action_logging_options_triggered();
-
     void process_display_timer(void);
-    void process_watchdog_timer(void);
 
     // Display
+    void on_cb_debug_stateChanged(int debug);
     void display_time(void);
     void display_window_title(void);
-    void display_ufo_settings(void);
-    void display_ufo_state(void);
 
-    void on_cb_debug_stateChanged(int debug);
 
     // Tray and messaging
     void set_icon(const StationState &state);
@@ -84,10 +64,10 @@ private slots:
     void show_message();
     void message_clicked();
 
-    // Dome control slots
-    void on_bt_change_ufo_clicked();
-    void on_cb_ufo_auto_stateChanged(int arg1);
-    void on_bt_ufo_clicked();
+    // Menu actions
+    void on_action_exit_triggered();
+    void on_action_manual_triggered();
+    void on_action_logging_options_triggered();
 
     void on_action_open_log_triggered();
     void on_action_open_config_triggered();

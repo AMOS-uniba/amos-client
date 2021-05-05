@@ -29,18 +29,18 @@ private:
 
     StationState m_state;
 
-    QScannerBox *m_scanner;
-    QStorageBox *m_primary_storage;
-    QStorageBox *m_permanent_storage;
+    QScannerBox * m_scanner;
+    QStorageBox * m_primary_storage;
+    QStorageBox * m_permanent_storage;
 
-    StateLogger *m_state_logger;
-    QDome *m_dome;
-    QServer *m_server;
-    UfoManager *m_ufo_manager;
+    StateLogger * m_state_logger;
+    QDome * m_dome;
+    QServer * m_server;
+    QUfoManager * m_ufo_manager;
 
-    QTimer *m_timer_automatic;
-    QTimer *m_timer_file_watchdog;
-    QTimer *m_timer_heartbeat;
+    QTimer * m_timer_automatic;
+    QTimer * m_timer_file_watchdog;
+    QTimer * m_timer_heartbeat;
 
     void set_state(StationState new_state);
 
@@ -77,24 +77,24 @@ public:
 
     // Dome getter and setter
     void set_dome(QDome * const dome);
-    QDome* dome(void) const;
+    QDome * dome(void) const;
 
     // Scanner getter and setter
     void set_scanner(QScannerBox * const scanner);
-    QScannerBox* scanner(void) const;
+    QScannerBox * scanner(void) const;
 
     // Storage getters and setters
     void set_storages(QStorageBox * const primary_storage, QStorageBox * const permanent_storage);
-    QStorageBox* primary_storage(void) const;
-    QStorageBox* permanent_storage(void) const;
+    QStorageBox * primary_storage(void) const;
+    QStorageBox * permanent_storage(void) const;
 
     // Server getter and setter
     void set_server(QServer * const server);
-    QServer* server(void) const;
+    QServer * server(void) const;
 
     // UFO manager getter and setter
-    void set_ufo_manager(UfoManager * const ufo_manager);
-    UfoManager* ufo_manager(void) const;
+    void set_ufo_manager(QUfoManager * const ufo_manager);
+    QUfoManager * ufo_manager(void) const;
 
     // Position getters and setter
     double latitude(void) const;
@@ -106,12 +106,12 @@ public:
     double darkness_limit(void) const;
 
     // Sun position functions
-    Polar sun_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    Polar moon_position(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    double sun_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    double sun_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    double moon_altitude(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
-    double moon_azimuth(const QDateTime& time = QDateTime::currentDateTimeUtc()) const;
+    Polar sun_position(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    Polar moon_position(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    double sun_altitude(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    double sun_azimuth(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    double moon_altitude(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    double moon_azimuth(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
 
     QString state_logger_filename(void) const;

@@ -52,7 +52,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
     this->set_icon(this->ui->station->state());
 
-    this->display_ufo_state();
     this->display_window_title();
 
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->ui->station, &QStation::process_sightings);
@@ -63,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize(this->ui->station);
+    this->ui->ufo_manager->initialize(this->ui->station);
     this->ui->station->initialize();
 
 #ifdef OLD_PROTOCOL
@@ -75,8 +75,6 @@ MainWindow::~MainWindow() {
 
     delete this->ui;
     delete this->timer_display;
-    delete this->timer_watchdog;
-
     delete this->universe;
     delete settings;
 }
@@ -97,10 +95,6 @@ QString MainWindow::format_duration(unsigned int duration) {
 void MainWindow::message_clicked() {
 }
 
-void MainWindow::on_action_exit_triggered() {
-    QApplication::quit();
-}
-
 void MainWindow::on_cb_debug_stateChanged(int debug) {
     settings->setValue("debug", bool(debug));
 
@@ -110,57 +104,6 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     this->ui->action_debug->setChecked(debug);
 }
 
-/*
-void MainWindow::on_cb_manual_stateChanged(int manual) {
-    logger.warning(Concern::Operation, QString("Switched to %1 mode").arg(manual ? "manual" : "automatic"));
-
-    this->station->set_manual_control((bool) manual);
-    settings->setValue("manual", this->station->is_manual());
-
-    this->ui->action_manual->setChecked(this->station->is_manual());
-    this->ui->cb_safety_override->setEnabled(this->station->is_manual());
-    this->ui->cb_safety_override->setCheckState(Qt::CheckState::Unchecked);
-
-    this->display_window_title();
-}
-*/
-
-void MainWindow::on_bt_change_ufo_clicked(void) {
-    QString filename = QFileDialog::getOpenFileName(
-        this,
-        "Select UFO executable",
-        QString(),
-        "Executable file (*.exe)"
-    );
-
-    if (filename == "") {
-        logger.debug(Concern::UFO, "Directory selection aborted");
-        return;
-    } else {
-        if (filename == this->ui->station->ufo_manager()->path()) {
-            logger.debug(Concern::UFO, "Path not changed");
-        } else {
-            logger.debug(Concern::UFO, "Path changed");
-            settings->setValue("ufo/path", filename);
-            this->ui->station->ufo_manager()->set_path(filename);
-            this->display_ufo_settings();
-        }
-    }
-}
-
-void MainWindow::on_cb_ufo_auto_stateChanged(int enable) {
-    this->ui->station->ufo_manager()->set_autostart((bool) enable);
-    settings->setValue("ufo/autostart", this->ui->station->ufo_manager()->autostart());
-}
-
-void MainWindow::on_bt_ufo_clicked() {
-    if (this->ui->station->ufo_manager()->is_running()) {
-        this->ui->station->ufo_manager()->start_ufo();
-    } else {
-        this->ui->station->ufo_manager()->stop_ufo();
-    }
-}
-
 void MainWindow::on_action_manual_triggered() {
     this->ui->station->set_manual_control(!this->ui->station->is_manual());
 }
@@ -168,6 +111,10 @@ void MainWindow::on_action_manual_triggered() {
 void MainWindow::on_action_logging_options_triggered() {
     LoggingDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::on_action_exit_triggered() {
+    QApplication::quit();
 }
 
 void MainWindow::on_action_open_log_triggered() {
