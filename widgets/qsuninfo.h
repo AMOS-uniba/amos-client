@@ -13,7 +13,7 @@ namespace Ui {
 class QSunInfo: public QGroupBox {
     Q_OBJECT
 private:
-    Ui::QSunInfo *ui;
+    Ui::QSunInfo * ui;
     const QStation * m_station;
     QTimer * m_timer_short;
     QTimer * m_timer_long;

@@ -134,7 +134,8 @@ void QUfoManager::start_ufo(void) {
 
 void QUfoManager::stop_ufo(void) {
     HWND child;
-    while (this->is_running()) {
+    int attempt = 3;
+    while (this->is_running() && attempt-- > 0) {
         SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
         Sleep(500);
         while ((child = GetLastActivePopup(this->m_frame)) != nullptr) {
@@ -143,6 +144,7 @@ void QUfoManager::stop_ufo(void) {
         }
         emit this->stopped();
     }
+    this->m_process.kill();
 }
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {

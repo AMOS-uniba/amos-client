@@ -1,7 +1,7 @@
 #include "qstoragebox.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 QString QStorageBox::DialogTitle(void) const { return "Select storage directory"; }
 QString QStorageBox::AbortMessage(void) const { return "Storage directory selection aborted"; }

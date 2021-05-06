@@ -223,6 +223,8 @@ void QDome::display_basic_data(const DomeStateS &state) {
 
     this->display_serial_port_info();
 
+    this->ui->lb_cover_state->setEnabled(valid);
+    this->ui->lb_cover_comment->setEnabled(valid);
     this->ui->fl_time_alive->set_valid(valid);
 
     this->ui->bl_servo_moving->set_valid(valid);

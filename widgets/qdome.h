@@ -19,24 +19,24 @@ namespace Ui {
  * @brief The QDome class -- handles the communication and control of the AMOS dome
  * Provides its own widget with settings, configuration and display
  */
-class QDome : public QGroupBox {
+class QDome: public QGroupBox {
     Q_OBJECT
 private:
     constexpr static unsigned int REFRESH = 30;
     const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
 
-    Ui::QDome *ui;
+    Ui::QDome * ui;
     const QStation * m_station;
 
     const unsigned char m_address = 0x99;
     QDateTime m_last_received;
 
-    QSerialPort *m_serial_port;
+    QSerialPort * m_serial_port;
     unsigned char m_robin = 0;
-    QTimer *m_robin_timer;
-    QTimer *m_serial_watchdog;
+    QTimer * m_robin_timer;
+    QTimer * m_serial_watchdog;
 
-    SerialBuffer *m_buffer;
+    SerialBuffer * m_buffer;
 
     // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
     double m_humidity_limit_lower = 70;

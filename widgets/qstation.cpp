@@ -181,7 +181,7 @@ double QStation::longitude(void) const { return this->m_longitude; }
 double QStation::altitude(void) const { return this->m_altitude; }
 
 // Darkness limit settings
-bool QStation::is_dark(const QDateTime &time) const {
+bool QStation::is_dark(const QDateTime & time) const {
     return (this->sun_altitude(time) < this->m_darkness_limit);
 }
 
@@ -212,16 +212,16 @@ void QStation::set_storages(QStorageBox * const primary_storage, QStorageBox * c
     this->m_permanent_storage = permanent_storage;
 }
 
-QStorageBox* QStation::primary_storage(void) const { return this->m_primary_storage; }
-QStorageBox* QStation::permanent_storage(void) const { return this->m_permanent_storage; }
+QStorageBox * QStation::primary_storage(void) const { return this->m_primary_storage; }
+QStorageBox * QStation::permanent_storage(void) const { return this->m_permanent_storage; }
 
 // UFO manager
 void QStation::set_ufo_manager(QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
-QUfoManager* QStation::ufo_manager(void) const { return this->m_ufo_manager; }
+QUfoManager * QStation::ufo_manager(void) const { return this->m_ufo_manager; }
 
 // Server getters and setters
 void QStation::set_server(QServer * const server) { this->m_server = server; }
-QServer* QStation::server(void) const { return this->m_server; }
+QServer * QStation::server(void) const { return this->m_server; }
 
 /** Sun functions **/
 Polar QStation::sun_position(const QDateTime & time) const {
