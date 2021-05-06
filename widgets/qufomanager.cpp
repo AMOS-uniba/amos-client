@@ -11,18 +11,22 @@ extern QSettings * settings;
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
-    m_pid(-1),
     m_state(UfoState::NotRunning)
 {
     ui->setupUi(this);
+
+    this->m_timer_check = new QTimer(this);
+    this->m_timer_check->setInterval(1000);
+    this->connect(this->m_timer_check, &QTimer::timeout, this, &QUfoManager::update_state);
+    this->m_timer_check->start();
 }
 
 QUfoManager::~QUfoManager() {
     delete ui;
+    delete this->m_timer_check;
 }
 
-void QUfoManager::initialize(const QStation * const station) {
-    this->m_station = station;
+void QUfoManager::initialize(void) {
     this->load_settings();
 }
 
@@ -43,14 +47,7 @@ bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
 void QUfoManager::set_path(const QString & path) {
     this->ui->le_path->setText(path);
     this->m_path = path;
-
-    if (!QFile::exists(path)) {
-        this->update_state(UfoState::NotFound);
-    }
-
-    if (!path.endsWith(".exe")) {
-        this->update_state(UfoState::NotExe);
-    }
+    this->update_state();
 }
 
 const QString& QUfoManager::path(void) const { return this->m_path; }
@@ -66,40 +63,50 @@ void QUfoManager::auto_action(bool is_dark) {
     }
 }
 
-void QUfoManager::update_state(const UfoState new_state) {
+void QUfoManager::update_state(void) {
     this->disconnect(this->ui->bt_toggle, &QPushButton::clicked, nullptr, nullptr);
 
-    switch (new_state) {
-        case UfoState::NotRunning: {
-            this->ui->bt_toggle->setEnabled(true);
-            this->ui->bt_toggle->setText("Run UFO");
-            this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::start_ufo);
-            break;
-        }
-        case UfoState::NotExe: {
-            this->ui->bt_toggle->setEnabled(false);
-            this->ui->bt_toggle->setText("Not an exe file");
-            break;
-        }
-        case UfoState::NotFound: {
-            this->ui->bt_toggle->setEnabled(false);
-            this->ui->bt_toggle->setText("Not found");
-            break;
-        }
-        case UfoState::Starting: {
-            this->ui->bt_toggle->setEnabled(false);
-            this->ui->bt_toggle->setText("Starting");
-            break;
-        }
-        case UfoState::Running: {
+    switch (this->m_process.state()) {
+        case QProcess::ProcessState::Running: {
+            this->ui->lb_state->setText(QString("running (%1)").arg(this->m_process.processId()));
+            this->ui->lb_state->setStyleSheet("QLabel { color: green; }");
             this->ui->bt_toggle->setEnabled(true);
             this->ui->bt_toggle->setText("Stop UFO");
             this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::stop_ufo);
             break;
         }
+        case QProcess::ProcessState::Starting: {
+            this->ui->lb_state->setText("starting");
+            this->ui->lb_state->setStyleSheet("QLabel { color: orange; }");
+            this->ui->bt_toggle->setEnabled(false);
+            this->ui->bt_toggle->setText("Starting");
+            break;
+        }
+        case QProcess::ProcessState::NotRunning: {
+            QFileInfo info(this->path());
+            if (info.exists()) {
+                if (this->path().endsWith(".exe") && info.isFile()) {
+                    this->ui->lb_state->setText("not running");
+                    this->ui->lb_state->setStyleSheet("QLabel { color: gray; }");
+                    this->ui->bt_toggle->setEnabled(true);
+                    this->ui->bt_toggle->setText("Run UFO");
+                    this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::start_ufo);
+                } else {
+                    this->ui->lb_state->setText("not an exe file");
+                    this->ui->lb_state->setStyleSheet("QLabel { color: red; }");
+                    this->ui->bt_toggle->setEnabled(false);
+                    this->ui->bt_toggle->setText("Error");
+                    break;
+                }
+            } else {
+                this->ui->lb_state->setText("not found");
+                this->ui->lb_state->setStyleSheet("QLabel { color: red; }");
+                this->ui->bt_toggle->setEnabled(false);
+                this->ui->bt_toggle->setText("Error");
+                break;
+            }
+        }
     }
-
-    this->m_state = new_state;
 }
 
 bool QUfoManager::is_running(void) const {
@@ -117,7 +124,7 @@ void QUfoManager::start_ufo(void) {
             logger.info(Concern::UFO, "Starting");
             this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
             this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
-            //this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
+            this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
             this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
             emit this->started();
             break;
@@ -158,7 +165,7 @@ void QUfoManager::on_bt_change_clicked(void) {
         if (filename == this->path()) {
             logger.debug(Concern::UFO, "Path not changed");
         } else {
-            logger.debug(Concern::UFO, "Path changed");
+            logger.info(Concern::UFO, QString("Path changed to %1").arg(filename));
             settings->setValue("ufo/path", filename);
             this->set_path(filename);
         }

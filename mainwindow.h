@@ -11,7 +11,9 @@
 #include "forward.h"
 
 QT_BEGIN_NAMESPACE
-namespace Ui { class MainWindow; }
+namespace Ui {
+    class MainWindow;
+}
 QT_END_NAMESPACE
 
 
@@ -42,12 +44,12 @@ private:
     QMenu *trayIconMenu;
 
     QMap<Icon, QIcon> icons;
+    const QDateTime m_start_time;
 
     //CommThread comm_thread;
 
 private slots:
     void load_settings(void);
-    void load_settings_storage(void);
 
     void create_timers(void);
     void process_display_timer(void);
@@ -56,7 +58,6 @@ private slots:
     void on_cb_debug_stateChanged(int debug);
     void display_time(void);
     void display_window_title(void);
-
 
     // Tray and messaging
     void set_icon(const StationState &state);

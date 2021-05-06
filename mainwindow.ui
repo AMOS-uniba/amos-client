@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1021</width>
-    <height>769</height>
+    <width>1062</width>
+    <height>542</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -130,13 +130,6 @@
     <item>
      <widget class="QFrame" name="frame_log">
       <layout class="QGridLayout" name="grid_log">
-       <item row="2" column="3">
-        <widget class="QLabel" name="lx_uptime">
-         <property name="text">
-          <string>Client uptime</string>
-         </property>
-        </widget>
-       </item>
        <item row="2" column="1">
         <widget class="QCheckBox" name="cb_debug">
          <property name="text">
@@ -146,19 +139,6 @@
           <bool>true</bool>
          </property>
         </widget>
-       </item>
-       <item row="2" column="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
        <item row="2" column="4">
         <widget class="QLabel" name="lb_uptime">
@@ -185,6 +165,13 @@
          </property>
          <property name="alignment">
           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="lx_uptime">
+         <property name="text">
+          <string>Client uptime</string>
          </property>
         </widget>
        </item>
@@ -269,6 +256,19 @@
          </column>
         </widget>
        </item>
+       <item row="2" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
       </layout>
      </widget>
     </item>
@@ -279,6 +279,12 @@
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>260</width>
+        <height>0</height>
+       </size>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
@@ -297,56 +303,24 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QUfoManager" name="ufo_manager">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>260</width>
-           <height>0</height>
-          </size>
-         </property>
+        <widget class="QStation" name="station">
          <property name="title">
-          <string>UFO Capture</string>
+          <string>Station information</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_4"/>
         </widget>
        </item>
        <item>
         <widget class="QServer" name="server">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>260</width>
-           <height>150</height>
-          </size>
-         </property>
          <property name="title">
           <string>Server</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QStation" name="station">
-         <property name="minimumSize">
-          <size>
-           <width>260</width>
-           <height>50</height>
-          </size>
-         </property>
+        <widget class="QUfoManager" name="ufo_manager">
          <property name="title">
-          <string>Station information</string>
+          <string>UFO Capture</string>
          </property>
-         <layout class="QGridLayout" name="gridLayout_3"/>
         </widget>
        </item>
        <item>
@@ -416,7 +390,7 @@
         </widget>
        </item>
        <item>
-        <spacer name="verticalSpacer_2">
+        <spacer name="spacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
@@ -438,7 +412,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1021</width>
+     <width>1062</width>
      <height>21</height>
     </rect>
    </property>

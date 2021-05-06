@@ -120,12 +120,18 @@
     </widget>
    </item>
    <item row="6" column="4">
-    <widget class="QLabel" name="lb_next_heartbeat">
+    <widget class="QLabel" name="lb_countdown">
      <property name="minimumSize">
       <size>
        <width>20</width>
        <height>0</height>
       </size>
+     </property>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
      </property>
      <property name="text">
       <string>? s</string>
@@ -136,7 +142,7 @@
     </widget>
    </item>
    <item row="6" column="3">
-    <widget class="QLabel" name="lx_next_heartbeat">
+    <widget class="QLabel" name="lx_countdown">
      <property name="text">
       <string>Next heartbeat in</string>
      </property>

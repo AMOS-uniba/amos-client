@@ -26,7 +26,7 @@ const QDir QStorageBox::current_directory(const QDateTime &datetime) const {
 }
 
 void QStorageBox::set_enabled(bool enabled) {
-    logger.info(Concern::Storage, QString("Storage '%1' %2abled").arg(this->name(), enabled ? "en" : "dis"));
+    logger.info(Concern::Storage, QString("Storage \"%1\" %2abled").arg(this->name(), enabled ? "en" : "dis"));
     QFileSystemBox::set_enabled(enabled);
 
     settings->setValue(QString("storage/%1_enabled").arg(this->name()), enabled);
@@ -34,7 +34,7 @@ void QStorageBox::set_enabled(bool enabled) {
 
 void QStorageBox::set_directory(const QDir &new_directory) {
     QFileSystemBox::set_directory(new_directory);
-    logger.info(Concern::Storage, QString("Storage '%1': directory set to %2").arg(this->m_name, this->m_directory.path()));
+    logger.info(Concern::Storage, QString("Storage \"%1\": directory set to %2").arg(this->m_name, this->m_directory.path()));
 
     settings->setValue(QString("storage/%1_path").arg(this->name()), this->m_directory.path());
 }

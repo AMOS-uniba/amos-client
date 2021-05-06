@@ -57,6 +57,7 @@ private slots:
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower;
+    constexpr static unsigned int HeartbeatInterval = 60000;
 
     explicit QStation(QWidget *parent = nullptr);
     ~QStation();

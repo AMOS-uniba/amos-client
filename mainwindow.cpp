@@ -7,7 +7,11 @@
 extern EventLogger logger;
 extern QSettings *settings;
 
-MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent):
+    QMainWindow(parent),
+    ui(new Ui::MainWindow),
+    m_start_time(QDateTime::currentDateTimeUtc())
+{
     this->ui->setupUi(this);
     this->ui->storage_primary->set_name("primary");
     this->ui->storage_permanent->set_name("permanent");
@@ -23,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     // connect signals for handling of edits of station position
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
-    settings->setValue("run/last_run", QDateTime::currentDateTimeUtc());
+    settings->setValue("run/last_run", this->m_start_time);
     this->load_settings();
 
     this->ui->sun_info->set_station(this->ui->station);
@@ -62,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize(this->ui->station);
-    this->ui->ufo_manager->initialize(this->ui->station);
+    this->ui->ufo_manager->initialize();
     this->ui->station->initialize();
 
 #ifdef OLD_PROTOCOL

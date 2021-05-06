@@ -18,8 +18,10 @@ namespace Ui {
 class QServer: public QGroupBox {
     Q_OBJECT
 private:
-    Ui::QServer *ui;
-    QStation *m_station;
+    Ui::QServer * ui;
+    const QStation * m_station;
+    QNetworkAccessManager * m_network_manager;
+    QDateTime m_last_heartbeat;
 
     QHostAddress m_address;
     unsigned short m_port;
@@ -27,7 +29,6 @@ private:
 
     QUrl m_url_heartbeat;
     QUrl m_url_sighting;
-    QNetworkAccessManager *m_network_manager;
 
     bool is_changed(void) const;
 
@@ -42,18 +43,18 @@ private slots:
     void refresh_urls(void);
 
 public:
-    explicit QServer(QWidget *parent = nullptr);
+    explicit QServer(QWidget * parent = nullptr);
     ~QServer();
 
-    const QHostAddress &address(void) const;
-    const unsigned short &port(void) const;
-    const QString &station_id(void) const;
+    const QHostAddress & address(void) const;
+    const unsigned short & port(void) const;
+    const QString & station_id(void) const;
 
 public slots:
-    void initialize(QStation * const station);
+    void initialize(const QStation * const station);
 
-    void set_address(const QString &address, const unsigned short port);
-    void set_station_id(const QString &station_id);
+    void set_address(const QString & address, const unsigned short port);
+    void set_station_id(const QString & station_id);
 
     void apply_settings(void);
     void apply_settings_inner(void);
@@ -61,9 +62,10 @@ public slots:
     void handle_settings_changed(void);
 
     void button_send_heartbeat(void);
+    void display_countdown(void);
 
-    void send_heartbeat(const QJsonObject &heartbeat) const;
-    void send_sighting(const Sighting &sighting) const;
+    void send_heartbeat(const QJsonObject & heartbeat);
+    void send_sighting(const Sighting & sighting) const;
 
 signals:
     void settings_changed(void) const;

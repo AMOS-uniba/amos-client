@@ -56,7 +56,7 @@ QStation::QStation(QWidget * parent):
     this->m_timer_file_watchdog->start();
 
     this->m_timer_heartbeat = new QTimer(this);
-    this->m_timer_heartbeat->setInterval(60 * 1000);
+    this->m_timer_heartbeat->setInterval(QStation::HeartbeatInterval);
     this->connect(this->m_timer_heartbeat, &QTimer::timeout, this, &QStation::heartbeat);
     this->m_timer_heartbeat->start();
 
@@ -87,6 +87,8 @@ void QStation::load_settings(void) {
         this->load_defaults();
     }
     this->discard_settings();
+
+    this->send_heartbeat();
 }
 
 void QStation::load_settings_inner(void) {

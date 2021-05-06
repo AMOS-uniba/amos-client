@@ -35,7 +35,7 @@ QServer::~QServer() {
     delete this->m_network_manager;
 }
 
-void QServer::initialize(QStation * const station) {
+void QServer::initialize(const QStation * const station) {
     this->m_station = station;
     this->load_settings();
 }
@@ -113,7 +113,7 @@ void QServer::refresh_urls(void) {
     );
 }
 
-void QServer::send_heartbeat(const QJsonObject &heartbeat) const {
+void QServer::send_heartbeat(const QJsonObject &heartbeat) {
     logger.debug(Concern::Server, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
@@ -122,8 +122,9 @@ void QServer::send_heartbeat(const QJsonObject &heartbeat) const {
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
     logger.debug(Concern::Server, QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
-    QNetworkReply *reply = this->m_network_manager->post(request, message);
+    QNetworkReply * reply = this->m_network_manager->post(request, message);
     this->connect(reply, &QNetworkReply::errorOccurred, this, &QServer::heartbeat_error);
+    this->m_last_heartbeat = QDateTime::currentDateTimeUtc();
 }
 
 void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
@@ -190,8 +191,12 @@ void QServer::discard_settings(void) {
 }
 
 void QServer::button_send_heartbeat(void) {
-    logger.info(Concern::Server, "Sending a heartbeat (manual)");
+    logger.info(Concern::Server, "Sending a heartbeat manually");
     this->send_heartbeat(this->m_station->prepare_heartbeat());
+}
+
+void QServer::display_countdown(void) {
+    this->ui->lb_countdown->setText(QString("%1 s").arg(QStation::HeartbeatInterval / 1000 - this->m_last_heartbeat.secsTo(QDateTime::currentDateTimeUtc())));
 }
 
 void QServer::apply_settings(void) {
