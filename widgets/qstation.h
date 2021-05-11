@@ -28,18 +28,17 @@ private:
     bool m_safety_override;
 
     StationState m_state;
-
-    QScannerBox * m_scanner;
-    QStorageBox * m_primary_storage;
-    QStorageBox * m_permanent_storage;
-
     StateLogger * m_state_logger;
-    QDome * m_dome;
-    QServer * m_server;
-    QUfoManager * m_ufo_manager;
+
+    const QScannerBox * m_scanner;
+    const QStorageBox * m_primary_storage;
+    const QStorageBox * m_permanent_storage;
+
+    const QDome * m_dome;
+    const QServer * m_server;
+    const QUfoManager * m_ufo_manager;
 
     QTimer * m_timer_automatic;
-    QTimer * m_timer_file_watchdog;
     QTimer * m_timer_heartbeat;
 
     void set_state(StationState new_state);
@@ -76,26 +75,26 @@ public:
     void set_name(const QString & name);
     const QString& name(void) const;
 
-    // Dome getter and setter
-    void set_dome(QDome * const dome);
-    QDome * dome(void) const;
-
     // Scanner getter and setter
-    void set_scanner(QScannerBox * const scanner);
-    QScannerBox * scanner(void) const;
+    void set_scanner(const QScannerBox * const scanner);
+    const QScannerBox * scanner(void) const;
 
     // Storage getters and setters
-    void set_storages(QStorageBox * const primary_storage, QStorageBox * const permanent_storage);
-    QStorageBox * primary_storage(void) const;
-    QStorageBox * permanent_storage(void) const;
+    void set_storages(const QStorageBox * const primary_storage, const QStorageBox * const permanent_storage);
+    const QStorageBox * primary_storage(void) const;
+    const QStorageBox * permanent_storage(void) const;
+
+    // Dome getter and setter
+    void set_dome(const QDome * const dome);
+    const QDome * dome(void) const;
 
     // Server getter and setter
-    void set_server(QServer * const server);
-    QServer * server(void) const;
+    void set_server(const QServer * const server);
+    const QServer * server(void) const;
 
     // UFO manager getter and setter
-    void set_ufo_manager(QUfoManager * const ufo_manager);
-    QUfoManager * ufo_manager(void) const;
+    void set_ufo_manager(const QUfoManager * const ufo_manager);
+    const QUfoManager * ufo_manager(void) const;
 
     // Position getters and setter
     double latitude(void) const;
@@ -132,11 +131,11 @@ public slots:
     void handle_settings_changed(void);
 
     void automatic_check(void);
-    void file_check(void);
-    void log_state(void);
+    void automatic_ufo(void);
+    void log_state(void) const;
 
-    void heartbeat(void);
-    void send_heartbeat(void);
+    void heartbeat(void) const;
+    void send_heartbeat(void) const;
     void process_sightings(QVector<Sighting> sightings);
 
 signals:

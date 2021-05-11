@@ -3,9 +3,10 @@
 #include "include.h"
 
 #include "logging/loggingdialog.h"
+#include "widgets/aboutdialog.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
@@ -65,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::darkness_limit_changed, this->ui->sun_info, &QSunInfo::update_long_term);
 
     this->ui->dome->initialize(this->ui->station);
-    this->ui->server->initialize(this->ui->station);
+    this->ui->server->initialize();
     this->ui->ufo_manager->initialize();
     this->ui->station->initialize();
 
@@ -135,4 +136,9 @@ void MainWindow::on_action_open_config_triggered() {
 
 void MainWindow::on_action_debug_triggered() {
     this->ui->cb_debug->click();
+}
+
+void MainWindow::on_actionAbout_triggered() {
+    AboutDialog dialog(this);
+    dialog.exec();
 }

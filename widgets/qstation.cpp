@@ -48,12 +48,9 @@ QStation::QStation(QWidget * parent):
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
     this->connect(this->m_timer_automatic, &QTimer::timeout, this, &QStation::automatic_check);
-    this->m_timer_automatic->start();
+    this->connect(this->m_timer_automatic, &QTimer::timeout, this, &QStation::automatic_ufo);
 
-    this->m_timer_file_watchdog = new QTimer(this);
-    this->m_timer_file_watchdog->setInterval(2000);
-    this->connect(this->m_timer_file_watchdog, &QTimer::timeout, this, &QStation::file_check);
-    this->m_timer_file_watchdog->start();
+    this->m_timer_automatic->start();
 
     this->m_timer_heartbeat = new QTimer(this);
     this->m_timer_heartbeat->setInterval(QStation::HeartbeatInterval);
@@ -189,7 +186,7 @@ double QStation::darkness_limit(void) const { return this->m_darkness_limit; }
 
 void QStation::set_darkness_limit(const double new_darkness_limit) {
     if ((new_darkness_limit < -18) || (new_darkness_limit > 0)) {
-        throw ConfigurationError(QString("Darkness limit out of range: %1°").arg(new_darkness_limit));
+        throw ConfigurationError(QString("Darkness limit out of admissible range: %1°").arg(new_darkness_limit));
     }
 
     this->m_darkness_limit = new_darkness_limit;
@@ -199,29 +196,33 @@ void QStation::set_darkness_limit(const double new_darkness_limit) {
 }
 
 // Dome
-void QStation::set_dome(QDome * const dome) { this->m_dome = dome; }
-QDome* QStation::dome(void) const { return this->m_dome; }
+void QStation::set_dome(const QDome * const dome) { this->m_dome = dome; }
+const QDome * QStation::dome(void) const { return this->m_dome; }
 
 // Scanner
-void QStation::set_scanner(QScannerBox * const scanner) { this->m_scanner = scanner; }
-QScannerBox* QStation::scanner(void) const { return this->m_scanner; }
+void QStation::set_scanner(const QScannerBox * const scanner) { this->m_scanner = scanner; }
+const QScannerBox * QStation::scanner(void) const { return this->m_scanner; }
 
 // Storages
-void QStation::set_storages(QStorageBox * const primary_storage, QStorageBox * const permanent_storage) {
+void QStation::set_storages(const QStorageBox * const primary_storage, const QStorageBox * const permanent_storage) {
     this->m_primary_storage = primary_storage;
     this->m_permanent_storage = permanent_storage;
 }
 
-QStorageBox * QStation::primary_storage(void) const { return this->m_primary_storage; }
-QStorageBox * QStation::permanent_storage(void) const { return this->m_permanent_storage; }
+const QStorageBox * QStation::primary_storage(void) const { return this->m_primary_storage; }
+const QStorageBox * QStation::permanent_storage(void) const { return this->m_permanent_storage; }
 
 // UFO manager
-void QStation::set_ufo_manager(QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
-QUfoManager * QStation::ufo_manager(void) const { return this->m_ufo_manager; }
+void QStation::set_ufo_manager(const QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
+const QUfoManager * QStation::ufo_manager(void) const { return this->m_ufo_manager; }
 
 // Server getters and setters
-void QStation::set_server(QServer * const server) { this->m_server = server; }
-QServer * QStation::server(void) const { return this->m_server; }
+void QStation::set_server(const QServer * const server) {
+    this->m_server = server;
+    this->connect(this->m_server, &QServer::request_heartbeat, this, &QStation::send_heartbeat);
+}
+
+const QServer * QStation::server(void) const { return this->m_server; }
 
 /** Sun functions **/
 Polar QStation::sun_position(const QDateTime & time) const {
@@ -287,8 +288,6 @@ QDateTime QStation::next_sun_crossing(double altitude, bool direction_up, int re
 
 // Perform automatic state checks
 void QStation::automatic_check(void) {
-    this->ufo_manager()->auto_action(this->is_dark());
-
     const DomeStateS &stateS = this->dome()->state_S();
 
     if (!stateS.is_valid()) {
@@ -376,6 +375,10 @@ void QStation::automatic_check(void) {
     }
 }
 
+void QStation::automatic_ufo(void) {
+    this->ufo_manager()->auto_action(this->is_dark());
+}
+
 void QStation::process_sightings(QVector<Sighting> sightings) {
     logger.debug(Concern::Sightings, "Processing sightings...");
     for (auto &sighting: sightings) {
@@ -403,12 +406,13 @@ QJsonObject QStation::prepare_heartbeat(void) const {
     };
 }
 
-void QStation::heartbeat(void) {
+void QStation::heartbeat(void) const {
     this->log_state();
     this->send_heartbeat();
 }
 
-void QStation::send_heartbeat(void) {
+void QStation::send_heartbeat(void) const {
+    logger.debug(Concern::Heartbeat, "Sending a heartbeat...");
     this->m_server->send_heartbeat(this->prepare_heartbeat());
 }
 
@@ -422,20 +426,15 @@ void QStation::set_state(StationState new_state) {
 
 StationState QStation::state(void) const { return this->m_state; }
 
-void QStation::file_check(void) {
-    this->m_ufo_manager->auto_action(this->is_dark());
-}
-
 QString QStation::state_logger_filename(void) const { return this->m_state_logger->filename(); }
 
-void QStation::log_state(void) {
+void QStation::log_state(void) const {
     this->m_state_logger->log(QString("%1° %2 %3")
                               .arg(this->sun_altitude(), 5, 'f', 1)
-                              .arg(QString(this->state().code()))
-                              .arg(this->m_dome->status_line()));
+                              .arg(QString(this->state().code()), this->m_dome->status_line()));
 }
 
-// Event handlers
+/*********************** Event handlers ***********************************/
 void QStation::on_cb_manual_clicked(bool checked) {
     this->set_manual_control(checked);
 }

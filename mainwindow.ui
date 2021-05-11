@@ -434,8 +434,15 @@
     <addaction name="action_open_stat"/>
     <addaction name="action_open_config"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+   </widget>
    <addaction name="menuOperation"/>
    <addaction name="menu_extras"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar">
    <property name="enabled">
@@ -499,6 +506,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About AMOS client</string>
    </property>
   </action>
  </widget>

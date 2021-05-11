@@ -19,9 +19,8 @@ class QServer: public QGroupBox {
     Q_OBJECT
 private:
     Ui::QServer * ui;
-    const QStation * m_station;
     QNetworkAccessManager * m_network_manager;
-    QDateTime m_last_heartbeat;
+    mutable QDateTime m_last_heartbeat;
 
     QHostAddress m_address;
     unsigned short m_port;
@@ -51,7 +50,7 @@ public:
     const QString & station_id(void) const;
 
 public slots:
-    void initialize(const QStation * const station);
+    void initialize(void);
 
     void set_address(const QString & address, const unsigned short port);
     void set_station_id(const QString & station_id);
@@ -64,12 +63,13 @@ public slots:
     void button_send_heartbeat(void);
     void display_countdown(void);
 
-    void send_heartbeat(const QJsonObject & heartbeat);
+    void send_heartbeat(const QJsonObject & heartbeat) const;
     void send_sighting(const Sighting & sighting) const;
 
 signals:
     void settings_changed(void) const;
 
+    void request_heartbeat(void) const;
     void heartbeat_sent(void) const;
 };
 

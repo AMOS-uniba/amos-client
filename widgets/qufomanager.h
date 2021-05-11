@@ -32,7 +32,7 @@ private:
 
     HWND m_frame;
     bool m_autostart;
-    QProcess m_process;
+    mutable QProcess m_process;
     QString m_path;
 
     UfoState m_state;
@@ -54,8 +54,8 @@ public:
 
     bool is_running(void) const;
 
-    void start_ufo(void);
-    void stop_ufo(void);
+    void start_ufo(void) const;
+    void stop_ufo(void) const;
 
     UfoState state(void) const;
 
@@ -63,7 +63,7 @@ public slots:
     void initialize(void);
     void load_settings(void);
     void save_settings(void) const;
-    void auto_action(bool is_dark);
+    void auto_action(bool is_dark) const;
 
 signals:
     void started(void) const;

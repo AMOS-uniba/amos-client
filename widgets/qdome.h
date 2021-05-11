@@ -78,7 +78,7 @@ public:
 
     QString status_line(void) const;
 
-    void initialize(QStation * const station);
+    void initialize(const QStation * const station);
 
     // Humidity getters and setters
     bool is_humid(void) const;
@@ -96,9 +96,9 @@ private slots:
     void display_env_data(const DomeStateT & state);
     void display_shaft_data(const DomeStateZ & state);
 
-    void toggle_hotwire(void);
-    void toggle_intensifier(void);
-    void toggle_fan(void);
+    void toggle_hotwire(void) const;
+    void toggle_intensifier(void) const;
+    void toggle_fan(void) const;
 
     void handle_settings_changed(void);
     void apply_settings(void);
@@ -120,17 +120,17 @@ public slots:
     void request_status(void);
 
     // Command wrappers
-    void open_cover(void);
-    void close_cover(void);
+    void open_cover(void) const;
+    void close_cover(void) const;
 
-    void turn_on_intensifier(void);
-    void turn_off_intensifier(void);
+    void turn_on_intensifier(void) const;
+    void turn_off_intensifier(void) const;
 
-    void turn_on_hotwire(void);
-    void turn_off_hotwire(void);
+    void turn_on_hotwire(void) const;
+    void turn_off_hotwire(void) const;
 
-    void turn_on_fan(void);
-    void turn_off_fan(void);
+    void turn_on_fan(void) const;
+    void turn_off_fan(void) const;
 
 signals:
     void state_updated_S(const DomeStateS & state);

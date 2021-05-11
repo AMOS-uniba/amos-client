@@ -31,9 +31,6 @@ void MainWindow::load_settings(void) {
         bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
         this->ui->cb_debug->setChecked(debug);
-
-        // Load and set manual/automatic mode
-        this->ui->station->set_manual_control(settings->value("manual", false).toBool());
     } catch (ConfigurationError &e) {
         QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
         QMessageBox box;

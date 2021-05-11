@@ -52,7 +52,7 @@ void QUfoManager::set_path(const QString & path) {
 
 const QString& QUfoManager::path(void) const { return this->m_path; }
 
-void QUfoManager::auto_action(bool is_dark) {
+void QUfoManager::auto_action(bool is_dark) const {
     logger.debug(Concern::UFO, "Automatic action");
     if (this->m_autostart) {
         if (is_dark) {
@@ -113,7 +113,11 @@ bool QUfoManager::is_running(void) const {
     return (this->m_process.state() == QProcess::ProcessState::Running);
 }
 
-void QUfoManager::start_ufo(void) {
+/**
+ * @brief QUfoManager::start_ufo
+ * Conditionally start UFO Capture v2 as a child process
+ */
+void QUfoManager::start_ufo(void) const {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
@@ -132,7 +136,11 @@ void QUfoManager::start_ufo(void) {
     }
 }
 
-void QUfoManager::stop_ufo(void) {
+/**
+ * @brief QUfoManager::stop_ufo
+ * Stops UFO Capture v2 (three polite attempts by Jozef's method, then kill)
+ */
+void QUfoManager::stop_ufo(void) const {
     HWND child;
     int attempt = 3;
     while (this->is_running() && attempt-- > 0) {

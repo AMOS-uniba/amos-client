@@ -35,8 +35,7 @@ QServer::~QServer() {
     delete this->m_network_manager;
 }
 
-void QServer::initialize(const QStation * const station) {
-    this->m_station = station;
+void QServer::initialize(void) {
     this->load_settings();
 }
 
@@ -113,7 +112,7 @@ void QServer::refresh_urls(void) {
     );
 }
 
-void QServer::send_heartbeat(const QJsonObject &heartbeat) {
+void QServer::send_heartbeat(const QJsonObject &heartbeat) const {
     logger.debug(Concern::Server, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
@@ -139,7 +138,7 @@ void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
     );
 }
 
-void QServer::heartbeat_ok(QNetworkReply* reply) {
+void QServer::heartbeat_ok(QNetworkReply * reply) {
     logger.debug(
         Concern::Server,
         QString("Heartbeat received (HTTP code %1), response \"%2\"").arg(
@@ -152,18 +151,18 @@ void QServer::heartbeat_ok(QNetworkReply* reply) {
     emit this->heartbeat_sent();
 }
 
-void QServer::send_sighting(const Sighting &sighting) const {
+void QServer::send_sighting(const Sighting & sighting) const {
     logger.debug(Concern::Server, QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
 
-    QHttpMultiPart *multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+    QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
     multipart->append(sighting.jpg_part());
     multipart->append(sighting.xml_part());
     multipart->append(sighting.json_metadata());
 
     QNetworkRequest request(this->m_url_sighting);
-    QNetworkReply *reply = this->m_network_manager->post(request, multipart);
-    multipart->setParent(reply); // delete the multiPart with the reply */
+    QNetworkReply * reply = this->m_network_manager->post(request, multipart);
+    multipart->setParent(reply); // delete the multiPart with the reply
 }
 
 bool QServer::is_changed(void) const {
@@ -191,8 +190,8 @@ void QServer::discard_settings(void) {
 }
 
 void QServer::button_send_heartbeat(void) {
-    logger.info(Concern::Server, "Sending a heartbeat manually");
-    this->send_heartbeat(this->m_station->prepare_heartbeat());
+    logger.info(Concern::Server, "Requesting a manual heartbeat");
+    emit this->request_heartbeat();
 }
 
 void QServer::display_countdown(void) {

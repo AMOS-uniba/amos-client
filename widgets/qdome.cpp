@@ -153,7 +153,7 @@ QDome::~QDome() {
     delete this->m_buffer;
 }
 
-void QDome::initialize(QStation * const station) {
+void QDome::initialize(const QStation * const station) {
     this->m_station = station;
 
     this->check_serial_port();
@@ -307,13 +307,13 @@ void QDome::display_env_data(const DomeStateT &state) {
     this->ui->fl_h_SHT31->set_value(state.humidity_sht());
 }
 
-void QDome::display_shaft_data(const DomeStateZ &state) {
+void QDome::display_shaft_data(const DomeStateZ & state) {
     this->display_serial_port_info();
     //this->ui->pb_cover->setValue(state.shaft_position());
 }
 
 void QDome::display_dome_state(void) {
-    const DomeStateS &stateS = this->state_S();
+    const DomeStateS & stateS = this->state_S();
     QString text;
     QString colour;
 
@@ -532,7 +532,7 @@ void QDome::request_status(void) {
     this->m_robin = (this->m_robin + 1) % 3;
 }
 
-void QDome::toggle_hotwire(void) {
+void QDome::toggle_hotwire(void) const {
     if (this->state_S().lens_heating_active()) {
         logger.info(Concern::Operation, "Manual command: turn off the hotwire");
         this->turn_off_hotwire();
@@ -542,18 +542,18 @@ void QDome::toggle_hotwire(void) {
     }
 }
 
-void QDome::turn_on_hotwire(void) { this->send_command(QDome::CommandHotwireOn); }
-void QDome::turn_off_hotwire(void) { this->send_command(QDome::CommandHotwireOff); }
+void QDome::turn_on_hotwire(void) const { this->send_command(QDome::CommandHotwireOn); }
+void QDome::turn_off_hotwire(void) const { this->send_command(QDome::CommandHotwireOff); }
 
 // High level command to open the cover. Opens only if it is dark, or if in override mode.
-void QDome::open_cover(void) {
+void QDome::open_cover(void) const {
     if (this->m_station->is_dark() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
         this->send_command(QDome::CommandOpenCover);
     }
 }
-void QDome::close_cover(void) { this->send_command(QDome::CommandCloseCover); }
+void QDome::close_cover(void) const { this->send_command(QDome::CommandCloseCover); }
 
-void QDome::toggle_fan(void) {
+void QDome::toggle_fan(void) const {
     if (this->state_S().fan_active()) {
         logger.info(Concern::Operation, "Manual command: turn off the fan");
         this->turn_off_fan();
@@ -562,11 +562,11 @@ void QDome::toggle_fan(void) {
         this->turn_on_fan();
     }
 }
-void QDome::turn_on_fan(void) { this->send_command(QDome::CommandFanOn); }
-void QDome::turn_off_fan(void) { this->send_command(QDome::CommandFanOff); }
+void QDome::turn_on_fan(void) const { this->send_command(QDome::CommandFanOn); }
+void QDome::turn_off_fan(void) const { this->send_command(QDome::CommandFanOff); }
 
 // High level command to turn on the intensifier. Turns on only if it is dark, or if in override mode.
-void QDome::toggle_intensifier(void) {
+void QDome::toggle_intensifier(void) const {
     if (this->state_S().intensifier_active()) {
         logger.info(Concern::Operation, "Manual command: turn off the image intensifier");
         this->turn_off_intensifier();
@@ -576,14 +576,14 @@ void QDome::toggle_intensifier(void) {
     }
 }
 
-void QDome::turn_on_intensifier(void) {
+void QDome::turn_on_intensifier(void) const {
     if (this->m_station->is_dark() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
         this->send_command(QDome::CommandIIOn);
     } else {
         logger.warning(Concern::SerialPort, "Command ignored, sun is too high and override is not active");
     }
 }
-void QDome::turn_off_intensifier(void) { this->send_command(QDome::CommandIIOff); }
+void QDome::turn_off_intensifier(void) const { this->send_command(QDome::CommandIIOff); }
 
 // Humidity limit settings
 bool QDome::is_humid(void) const {

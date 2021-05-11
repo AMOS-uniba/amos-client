@@ -21,7 +21,7 @@ void QScannerBox::set_enabled(bool enabled) {
 
 void QScannerBox::set_directory(const QDir &new_directory) {
     QFileSystemBox::set_directory(new_directory);
-    logger.info(Concern::Storage, QString("Scanner directory set to %1").arg(this->m_directory.path()));
+    logger.info(Concern::Storage, QString("Scanner directory set to \"%1\"").arg(this->m_directory.path()));
     settings->setValue("storage/scanner_path", this->m_directory.path());
 }
 

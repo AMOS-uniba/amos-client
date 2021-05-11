@@ -41,6 +41,7 @@ SOURCES += \
     utils/state/stationstate.cpp \
     utils/telegram.cpp \
     utils/universe.cpp \
+    widgets/aboutdialog.cpp \
     widgets/lines/qbooleanline.cpp \
     widgets/lines/qcontrolline.cpp \
     widgets/lines/qdatetimeline.cpp \
@@ -90,6 +91,7 @@ HEADERS += \
     utils/state/stationstate.h \
     utils/telegram.h \
     utils/universe.h \
+    widgets/aboutdialog.h \
     widgets/lines/qbooleanline.h \
     widgets/lines/qcontrolline.h \
     widgets/lines/qdatetimeline.h \
@@ -109,6 +111,7 @@ HEADERS += \
 FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
+    widgets/aboutdialog.ui \
     widgets/lines/qdisplayline.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
@@ -125,6 +128,8 @@ RESOURCES += \
     images.qrc
 
 RC_FILE = amos-client.rc
+
+QT_FATAL_WARNINGS = 1
 
 VERSION = 0.6.0.0
 QMAKE_TARGET_COMPANY = AMOS
