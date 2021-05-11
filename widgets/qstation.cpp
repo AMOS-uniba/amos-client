@@ -38,6 +38,8 @@ QString QStation::temperature_colour(float temperature) {
 QStation::QStation(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QStation),
+    m_manual_control(false),
+    m_safety_override(false),
     m_state(QStation::NotObserving)
 {
     ui->setupUi(this);
