@@ -11,6 +11,7 @@ extern QSettings * settings;
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
+    m_autostart(false),
     m_state(UfoState::NotRunning)
 {
     ui->setupUi(this);
@@ -53,8 +54,8 @@ void QUfoManager::set_path(const QString & path) {
 const QString& QUfoManager::path(void) const { return this->m_path; }
 
 void QUfoManager::auto_action(bool is_dark) const {
-    logger.debug(Concern::UFO, "Automatic action");
     if (this->m_autostart) {
+        logger.debug(Concern::UFO, "Automatic action");
         if (is_dark) {
             this->start_ufo();
         } else {
@@ -141,18 +142,26 @@ void QUfoManager::start_ufo(void) const {
  * Stops UFO Capture v2 (three polite attempts by Jozef's method, then kill)
  */
 void QUfoManager::stop_ufo(void) const {
-    HWND child;
-    int attempt = 3;
-    while (this->is_running() && attempt-- > 0) {
-        SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
-        Sleep(500);
-        while ((child = GetLastActivePopup(this->m_frame)) != nullptr) {
-            SetActiveWindow(child);
-            SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+    if (this->m_process.state() == QProcess::ProcessState::NotRunning) {
+        logger.debug(Concern::UFO, "Not running");
+    } else {
+        HWND child;
+        int attempt = 3;
+        while (this->is_running() && attempt-- > 0) {
+            logger.info(Concern::UFO, QString("Trying to stop UFO politely (attempt %1)").arg(3 - attempt));
+            SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
+            Sleep(200);
+            while ((child = GetLastActivePopup(this->m_frame)) != nullptr) {
+                SetActiveWindow(child);
+                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+            }
+            emit this->stopped();
+            return;
         }
-        emit this->stopped();
+
+        logger.warning(Concern::UFO, "Killing the child process");
+        this->m_process.kill();
     }
-    this->m_process.kill();
 }
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {
