@@ -152,21 +152,25 @@ void QUfoManager::stop_ufo(void) const {
         logger.debug(Concern::UFO, "Not running");
     } else {
         HWND child;
-        int attempt = 3;
-        while (this->is_running() && attempt-- > 0) {
-            logger.info(Concern::UFO, QString("Trying to stop UFO politely (attempt %1)").arg(3 - attempt));
+
+        if (this->is_running()) {
+            logger.info(Concern::UFO, QString("Trying to stop UFO politely"));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
             Sleep(200);
-            while ((child = GetLastActivePopup(this->m_frame)) != nullptr) {
-                SetActiveWindow(child);
-                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-            }
-            emit this->stopped();
-            return;
-        }
 
-        logger.warning(Concern::UFO, "Killing the child process");
-        this->m_process.kill();
+            child = GetLastActivePopup(this->m_frame);
+            SetActiveWindow(child);
+            SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+
+            if (!this->is_running()) {
+                emit this->stopped();
+                return;
+            }
+
+            logger.warning(Concern::UFO, "UFO did not stop, killing the child process");
+            this->m_process.kill();
+            emit this->stopped();
+        }
     }
 }
 

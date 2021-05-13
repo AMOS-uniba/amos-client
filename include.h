@@ -1,5 +1,5 @@
 // enable this to conform to the Senec station protocol
-// #define OLD_PROTOCOL 1
+#define OLD_PROTOCOL 1
 
 #ifndef INCLUDE_H
 #define INCLUDE_H
