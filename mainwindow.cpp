@@ -71,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->station->initialize();
 
 #ifdef OLD_PROTOCOL
-    this->ui->dome_widget->set_cover_maximum(26);
+//    this->ui->dome->set_cover_maximum(26);
 #endif
 }
 

@@ -42,7 +42,13 @@ void QUfoManager::save_settings(void) const {
 }
 
 // Autostart getter and setter
-void QUfoManager::set_autostart(bool enable) { this->m_autostart = enable; }
+void QUfoManager::set_autostart(bool enable) {
+    logger.info(Concern::UFO, QString("Autostart %1abled").arg(enable ? "en" : "dis"));
+    this->m_autostart = enable;
+
+    this->ui->cb_auto->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+}
+
 bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
 
 void QUfoManager::set_path(const QString & path) {

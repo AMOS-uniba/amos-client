@@ -5,7 +5,7 @@
 
 class SerialPortState: public State {
 public:
-    SerialPortState(unsigned char code, const QString &display_name);
+    SerialPortState(unsigned char code, const QString & display_name);
 };
 
 #endif // SERIALPORTSTATE_H

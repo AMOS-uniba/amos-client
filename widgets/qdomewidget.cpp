@@ -44,8 +44,10 @@ void QDomeWidget::drawWidget(QPainter & qp) {
 
     double CameraWidth = 0.2;
     double CameraHeight = 0.55;
-    double CoverWidth = 0.4;
-    double CoverHeight = 0.7;
+    double BoxWidth = 0.36;
+    double BoxHeight = 0.25;
+    double CoverWidth = 0.36;
+    double CoverHeight = 0.65;
     double TopLidThickness = 0.02;
 
     float angle = ((float) (this->m_cover_position - this->m_cover_minimum) / (float) (this->m_cover_maximum - this->m_cover_minimum)) * M_PI_2 * 0.9;
@@ -73,7 +75,7 @@ void QDomeWidget::drawWidget(QPainter & qp) {
     qp.drawRect(QRectF(-CameraWidth / 2, -CameraHeight, CameraWidth, CameraHeight));
 
     qp.setBrush(QColor(195, 195, 195));
-    qp.drawRect(QRectF(-0.2, 0, 0.4, 0.25));
+    qp.drawRect(QRectF(-BoxWidth / 2.0, 0, BoxWidth, BoxHeight));
 
     QPixmap logo(":/images/blue.ico");
     qp.drawPixmap(QRectF(-0.075, 0.05, 0.15, 0.15), logo.scaled(25, 25, Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF(0, 0, 25, 25));

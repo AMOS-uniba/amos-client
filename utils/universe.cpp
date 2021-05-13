@@ -32,14 +32,31 @@ Vec3D Universe::compute_moon_equ(const QDateTime &time) {
     return Vec3D(Polar(ra, dec));
 }
 
+QColor linear_interpolate(QColor first, double stop1, QColor second, double stop2, double value) {
+    double x = (value - stop1) / (stop2 - stop1);
+    return QColor::fromRgbF(
+        first.redF() * x + second.redF() * (1 - x),
+        first.greenF() * x + second.greenF() * (1 - x),
+        first.blueF() * x + second.blueF() * (1 - x)
+    );
+}
+
 QColor Universe::altitude_colour(double altitude) {
-    if (altitude < 0) {
-        return QColor::fromHslF(2.0 / 3.0, 0.5, 0.5 + altitude / 90.0 * 0.5);
-    } else {
-        if (altitude < 30) {
-            return QColor::fromHslF((altitude + 30) / 360.0, 0.8, 0.5);
-        } else {
-            return QColor::fromHslF(1.0 / 6.0, 0.7 + 0.3 * ((altitude - 30.0) / 60.0), 0.4 + 0.3 * ((altitude - 30.0) / 60.0));
-        }
+    if (altitude < -18) {
+        return linear_interpolate(QColor::fromHslF(0, 0, 0), -90, QColor::fromRgbF(0, 0, 0.25), -18, altitude);
     }
+
+    if (altitude < 0) {
+        return linear_interpolate(QColor::fromHslF(0, 0, 0.25), -18, QColor::fromRgbF(0, 0, 1), 0, altitude);
+    }
+
+    if (altitude < 6) {
+        return linear_interpolate(QColor::fromHslF(1, 0.25, 0), 0, QColor::fromRgbF(1, 0.75, 0), 6, altitude);
+    }
+
+    if (altitude < 18) {
+        return linear_interpolate(QColor::fromHslF(1, 0.75, 0), 6, QColor::fromRgbF(0, 0.625, 0.875), 18, altitude);
+    }
+
+    return linear_interpolate(QColor::fromHslF(0, 0.625, 0.875), 18, QColor::fromRgbF(0, 0.875, 1), 90, altitude);
 }

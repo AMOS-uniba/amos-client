@@ -7,6 +7,7 @@ AboutDialog::AboutDialog(QWidget * parent) :
 {
     ui->setupUi(this);
     this->ui->lb_datetime->setText(QString("Built on %1 %2").arg(__DATE__, __TIME__));
+    this->ui->lb_version->setText(QString("Version %1").arg(VERSION_STRING));
 }
 
 AboutDialog::~AboutDialog() {

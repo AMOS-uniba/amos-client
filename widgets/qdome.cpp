@@ -358,8 +358,16 @@ void QDome::list_serial_ports(void) {
     this->ui->co_serial_ports->clear();
     auto serial_ports = QSerialPortInfo::availablePorts();
 
-    for (QSerialPortInfo &sp: serial_ports) {
+    for (QSerialPortInfo & sp: serial_ports) {
         this->ui->co_serial_ports->addItem(sp.portName());
+    }
+
+    if (serial_ports.length() == 0) {
+        this->ui->co_serial_ports->setPlaceholderText("no ports available");
+        this->ui->co_serial_ports->setEnabled(false);
+    } else {
+        this->ui->co_serial_ports->setPlaceholderText("not selected");
+        this->ui->co_serial_ports->setEnabled(true);
     }
 }
 
@@ -410,19 +418,25 @@ SerialPortState QDome::serial_port_state(void) const {
 
 void QDome::display_serial_port_info(void) const {
     QString info;
-    if (this->m_serial_port == nullptr) {
-        info = "no port selected";
+
+    if (QSerialPortInfo::availablePorts().length() == 0) {
+        info = "no ports available";
     } else {
-        if (this->m_serial_port->isOpen()) {
-            if (this->state_S().is_valid()) {
-                info = "valid data";
-            } else {
-                info = "no data";
-            }
+        if (this->m_serial_port == nullptr) {
+            info = "no port selected";
         } else {
-            info = QString("error %1: %2").arg(this->m_serial_port->error()).arg(this->m_serial_port->errorString());
+            if (this->m_serial_port->isOpen()) {
+                if (this->state_S().is_valid()) {
+                    info = "valid data";
+                } else {
+                    info = "no data";
+                }
+            } else {
+                info = QString("error %1: %2").arg(this->m_serial_port->error()).arg(this->m_serial_port->errorString());
+            }
         }
     }
+
     this->ui->lb_serial_port_state->setText(this->serial_port_state().display_string());
     this->ui->lb_serial_data_state->setText(info);
 }
