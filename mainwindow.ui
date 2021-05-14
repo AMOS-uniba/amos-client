@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1062</width>
-    <height>542</height>
+    <width>1060</width>
+    <height>789</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -298,6 +298,12 @@
        </property>
        <item>
         <widget class="QStation" name="station">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="title">
           <string>Station information</string>
          </property>
@@ -305,6 +311,12 @@
        </item>
        <item>
         <widget class="QServer" name="server">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="title">
           <string>Server</string>
          </property>
@@ -312,6 +324,12 @@
        </item>
        <item>
         <widget class="QUfoManager" name="ufo_manager">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
          <property name="title">
           <string>UFO Capture</string>
          </property>
@@ -406,7 +424,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1062</width>
+     <width>1060</width>
      <height>21</height>
     </rect>
    </property>
