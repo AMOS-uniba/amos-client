@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>383</width>
+    <width>386</width>
     <height>672</height>
    </rect>
   </property>
@@ -22,9 +22,15 @@
    </property>
    <item row="7" column="0">
     <widget class="QGroupBox" name="gb_devices">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>180</width>
        <height>184</height>
       </size>
      </property>
@@ -102,6 +108,12 @@
    </item>
    <item row="7" column="1">
     <widget class="QGroupBox" name="gb_errors">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -250,9 +262,15 @@
     <widget class="QGroupBox" name="gb_cover">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
+       <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>180</width>
+       <height>0</height>
+      </size>
      </property>
      <property name="title">
       <string>Cover</string>
@@ -378,7 +396,7 @@
     <widget class="QGroupBox" name="gb_sensors">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>0</horstretch>
+       <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
@@ -486,9 +504,15 @@
    </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="gb_serial_port">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>180</width>
        <height>110</height>
       </size>
      </property>
@@ -595,9 +619,15 @@
    </item>
    <item row="1" column="1">
     <widget class="QGroupBox" name="group_settings">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
-       <width>0</width>
+       <width>180</width>
        <height>110</height>
       </size>
      </property>

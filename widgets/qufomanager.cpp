@@ -7,10 +7,10 @@
 extern EventLogger logger;
 extern QSettings * settings;
 
-
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
+    m_frame(nullptr),
     m_autostart(false),
     m_state(UfoState::NotRunning)
 {
@@ -137,6 +137,11 @@ void QUfoManager::start_ufo(void) const {
             this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
             this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
             this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
+
+            Sleep(1000);
+            this->m_frame = FindWindowA(nullptr, "UFOCapture");
+            logger.debug(Concern::UFO, QString("HWND is %1").arg((long long) this->m_frame));
+            SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_MINIMIZE, 0);
             emit this->started();
             break;
         }
@@ -156,11 +161,13 @@ void QUfoManager::stop_ufo(void) const {
         if (this->is_running()) {
             logger.info(Concern::UFO, QString("Trying to stop UFO politely"));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
-            Sleep(200);
+            Sleep(1000);
 
             child = GetLastActivePopup(this->m_frame);
             SetActiveWindow(child);
             SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+
+            Sleep(1000);
 
             if (!this->is_running()) {
                 emit this->stopped();

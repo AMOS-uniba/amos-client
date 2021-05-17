@@ -30,7 +30,7 @@ private:
 
     QTimer * m_timer_check;
 
-    HWND m_frame;
+    mutable HWND m_frame;
     bool m_autostart;
     mutable QProcess m_process;
     QString m_path;
