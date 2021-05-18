@@ -18,11 +18,11 @@ private:
     Icon m_icon;
     QString m_tooltip;
 public:
-    StationState(unsigned char code, const QString &display_name, Icon icon, const QString &tooltip);
+    StationState(unsigned char code, const QString & display_name, Icon icon, const QString & tooltip);
     Icon icon(void) const;
-    const QString& tooltip(void) const;
-    bool operator==(const StationState &other);
-    bool operator!=(const StationState &other);
+    const QString & tooltip(void) const;
+    bool operator==(const StationState & other);
+    bool operator!=(const StationState & other);
 };
 
 #endif // STATIONSTATE_H

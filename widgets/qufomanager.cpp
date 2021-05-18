@@ -7,12 +7,19 @@
 extern EventLogger logger;
 extern QSettings * settings;
 
+const UfoState QUfoManager::Unknown      = UfoState('U', "unknown", Qt::black, false, "Error");
+const UfoState QUfoManager::NotAnExe     = UfoState('E', "not an EXE file", Qt::red, false, "Error");
+const UfoState QUfoManager::NotFound     = UfoState('F', "not found", Qt::red, false, "Error");
+const UfoState QUfoManager::NotRunning   = UfoState('N', "not running", Qt::gray, true, "Start UFO");
+const UfoState QUfoManager::Starting     = UfoState('S', "starting", QColor::fromHsl(60, 255, 255), false, "Starting...");
+const UfoState QUfoManager::Running      = UfoState('R', "running", Qt::darkGreen, true, "Stop UFO");
+
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
     m_frame(nullptr),
     m_autostart(false),
-    m_state(UfoState::NotRunning)
+    m_state(QUfoManager::NotRunning)
 {
     ui->setupUi(this);
 
@@ -20,6 +27,8 @@ QUfoManager::QUfoManager(QWidget * parent):
     this->m_timer_check->setInterval(1000);
     this->connect(this->m_timer_check, &QTimer::timeout, this, &QUfoManager::update_state);
     this->m_timer_check->start();
+
+    this->connect(this, &QUfoManager::state_changed, this, &QUfoManager::log_state_change);
 }
 
 QUfoManager::~QUfoManager() {
@@ -73,46 +82,44 @@ void QUfoManager::auto_action(bool is_dark) const {
 void QUfoManager::update_state(void) {
     this->disconnect(this->ui->bt_toggle, &QPushButton::clicked, nullptr, nullptr);
 
+    UfoState old_state = this->m_state;
+    UfoState new_state = QUfoManager::Unknown;
+
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running: {
-            this->ui->lb_state->setText(QString("running (%1)").arg(this->m_process.processId()));
-            this->ui->lb_state->setStyleSheet("QLabel { color: green; }");
-            this->ui->bt_toggle->setEnabled(true);
-            this->ui->bt_toggle->setText("Stop UFO");
             this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::stop_ufo);
+            new_state = QUfoManager::Running;
             break;
         }
         case QProcess::ProcessState::Starting: {
-            this->ui->lb_state->setText("starting");
-            this->ui->lb_state->setStyleSheet("QLabel { color: orange; }");
-            this->ui->bt_toggle->setEnabled(false);
-            this->ui->bt_toggle->setText("Starting");
+            new_state = QUfoManager::Starting;
             break;
         }
         case QProcess::ProcessState::NotRunning: {
             QFileInfo info(this->path());
             if (info.exists()) {
                 if (this->path().endsWith(".exe") && info.isFile()) {
-                    this->ui->lb_state->setText("not running");
-                    this->ui->lb_state->setStyleSheet("QLabel { color: gray; }");
-                    this->ui->bt_toggle->setEnabled(true);
-                    this->ui->bt_toggle->setText("Run UFO");
                     this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::start_ufo);
+                    new_state = QUfoManager::NotRunning;
                 } else {
-                    this->ui->lb_state->setText("not an exe file");
-                    this->ui->lb_state->setStyleSheet("QLabel { color: red; }");
-                    this->ui->bt_toggle->setEnabled(false);
-                    this->ui->bt_toggle->setText("Error");
+                    new_state = QUfoManager::NotAnExe;
                     break;
                 }
             } else {
-                this->ui->lb_state->setText("not found");
-                this->ui->lb_state->setStyleSheet("QLabel { color: red; }");
-                this->ui->bt_toggle->setEnabled(false);
-                this->ui->bt_toggle->setText("Error");
+                new_state = QUfoManager::NotFound;
                 break;
             }
         }
+    }
+
+    this->ui->lb_state->setText(new_state.display_string());
+    this->ui->lb_state->setStyleSheet(QString("QLabel { color: %1; }").arg(new_state.colour().name()));
+    this->ui->bt_toggle->setEnabled(new_state.button_enabled());
+    this->ui->bt_toggle->setText(new_state.button_text());
+
+    if (old_state != new_state) {
+        this->m_state = new_state;
+        emit this->state_changed(new_state);
     }
 }
 
@@ -141,7 +148,8 @@ void QUfoManager::start_ufo(void) const {
             Sleep(1000);
             this->m_frame = FindWindowA(nullptr, "UFOCapture");
             logger.debug(Concern::UFO, QString("HWND is %1").arg((long long) this->m_frame));
-            SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+            Sleep(1000);
+            ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
             emit this->started();
             break;
         }
@@ -159,26 +167,49 @@ void QUfoManager::stop_ufo(void) const {
         HWND child;
 
         if (this->is_running()) {
-            logger.info(Concern::UFO, QString("Trying to stop UFO politely"));
+            logger.debug(Concern::UFO, QString("Trying to stop UFO politely"));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
             Sleep(1000);
 
+            logger.debug(Concern::UFO, "Clicking the dialog button");
             child = GetLastActivePopup(this->m_frame);
+
+            logger.debug(Concern::UFO, QString("Child dialog's HWND is %1").arg((long long) child));
+
+            if (child == nullptr) {
+                logger.error(Concern::UFO, "Child is null");
+            }
+
             SetActiveWindow(child);
             SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
 
             Sleep(1000);
 
-            if (!this->is_running()) {
-                emit this->stopped();
-                return;
+            if (this->is_running()) {
+                logger.warning(Concern::UFO, "UFO did not stop, killing the child process");
+                // this->m_process.kill();
             }
 
-            logger.warning(Concern::UFO, "UFO did not stop, killing the child process");
-            this->m_process.kill();
             emit this->stopped();
+        } else {
+            logger.debug(Concern::UFO, "UFO is not running, not doing anything");
         }
     }
+}
+
+void QUfoManager::log_state_change(const UfoState & state) const {
+    QString message = QString("State changed to \"%1\"").arg(state.display_string());
+
+    if (state == QUfoManager::Starting) {
+        logger.debug(Concern::UFO, message);
+    } else {
+        if ((state == QUfoManager::NotRunning) || (state == QUfoManager::Running)) {
+            logger.info(Concern::UFO, message);
+        } else {
+            logger.error(Concern::UFO, message);
+        }
+    }
+
 }
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {

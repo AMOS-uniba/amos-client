@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>288</width>
+    <width>235</width>
     <height>203</height>
    </rect>
   </property>
@@ -27,6 +27,12 @@
     <widget class="QCheckBox" name="cb_safety_override">
      <property name="enabled">
       <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
      </property>
      <property name="text">
       <string>Safety override</string>
@@ -126,16 +132,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QCheckBox" name="cb_manual">
-     <property name="text">
-      <string>Enable manual control</string>
-     </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
    <item row="5" column="1">
     <widget class="QLabel" name="lx_alt">
      <property name="text">
@@ -146,53 +142,25 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2" colspan="2">
-    <widget class="QDoubleSpinBox" name="dsb_latitude">
-     <property name="toolTip">
-      <string>geographic latitude of the station</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-     <property name="showGroupSeparator" stdset="0">
-      <bool>true</bool>
-     </property>
-     <property name="suffix">
-      <string>°</string>
-     </property>
-     <property name="decimals">
-      <number>6</number>
-     </property>
-     <property name="minimum">
-      <double>-90.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>90.000000000000000</double>
-     </property>
-     <property name="singleStep">
-      <double>0.000001000000000</double>
-     </property>
-    </widget>
-   </item>
    <item row="9" column="1" colspan="3">
     <layout class="QHBoxLayout" name="hl_station_info">
      <item>
       <widget class="QPushButton" name="bt_apply">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>save the changes</string>
        </property>
        <property name="text">
-        <string>No changes</string>
+        <string>Apply</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="bt_discard">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="toolTip">
         <string>reset the changes</string>
@@ -236,6 +204,50 @@
     <widget class="Line" name="line_up">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QCheckBox" name="cb_manual">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="text">
+      <string>Manual control</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2" colspan="2">
+    <widget class="QDoubleSpinBox" name="dsb_latitude">
+     <property name="toolTip">
+      <string>geographic latitude of the station</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+     <property name="showGroupSeparator" stdset="0">
+      <bool>true</bool>
+     </property>
+     <property name="suffix">
+      <string>°</string>
+     </property>
+     <property name="decimals">
+      <number>6</number>
+     </property>
+     <property name="minimum">
+      <double>-90.000000000000000</double>
+     </property>
+     <property name="maximum">
+      <double>90.000000000000000</double>
+     </property>
+     <property name="singleStep">
+      <double>0.000001000000000</double>
      </property>
     </widget>
    </item>

@@ -23,8 +23,7 @@ void MainWindow::display_window_title(void) {
 #else
     QString protocol = "";
 #endif
-    this->setWindowTitle(QString("AMOS client %1%2 [%3 mode]%4").arg(
-                             VERSION_STRING,
+    this->setWindowTitle(QString("AMOS client%1 [%2 mode]%3").arg(
                              protocol,
                              this->ui->station->is_manual() ? "manual" : "automatic",
                              this->ui->station->is_safety_overridden() ? " [safety override]" : ""

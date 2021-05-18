@@ -39,6 +39,7 @@ SOURCES += \
     utils/state/serialportstate.cpp \
     utils/state/state.cpp \
     utils/state/stationstate.cpp \
+    utils/state/ufostate.cpp \
     utils/telegram.cpp \
     utils/universe.cpp \
     widgets/aboutdialog.cpp \
@@ -89,6 +90,7 @@ HEADERS += \
     utils/state/serialportstate.h \
     utils/state/state.h \
     utils/state/stationstate.h \
+    utils/state/ufostate.h \
     utils/telegram.h \
     utils/universe.h \
     widgets/aboutdialog.h \
@@ -131,8 +133,10 @@ RC_FILE = amos-client.rc
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.6.0.2
+VERSION = 0.6.0.4
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+
+TARGET = "AMOS client"
 
 QMAKE_TARGET_COMPANY = AMOS
 QMAKE_TARGET_PRODUCT = AMOS client

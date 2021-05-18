@@ -8,19 +8,11 @@
 #include "winuser.h"
 #include "process.h"
 #include "widgets/qstation.h"
+#include "utils/state/ufostate.h"
 
 namespace Ui {
     class QUfoManager;
 }
-
-
-enum class UfoState {
-    NotFound,
-    NotExe,
-    NotRunning,
-    Starting,
-    Running,
-};
 
 
 class QUfoManager: public QGroupBox {
@@ -31,10 +23,10 @@ private:
     QTimer * m_timer_check;
 
     mutable HWND m_frame;
-    bool m_autostart;
     mutable QProcess m_process;
     QString m_path;
 
+    bool m_autostart;
     UfoState m_state;
     void update_state(void);
 
@@ -43,6 +35,8 @@ private slots:
     void on_bt_change_clicked();
 
 public:
+    const static UfoState Unknown, NotAnExe, NotFound, NotRunning, Starting, Running;
+
     explicit QUfoManager(QWidget * parent = nullptr);
     ~QUfoManager();
 
@@ -65,9 +59,13 @@ public slots:
     void save_settings(void) const;
     void auto_action(bool is_dark) const;
 
+    void log_state_change(const UfoState & state) const;
+
 signals:
     void started(void) const;
     void stopped(void) const;
+
+    void state_changed(UfoState state) const;
 };
 
 #endif // QUFOMANAGER_H
