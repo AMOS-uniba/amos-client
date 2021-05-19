@@ -391,11 +391,12 @@ void QStation::process_sightings(QVector<Sighting> sightings) {
 }
 
 QJsonObject QStation::prepare_heartbeat(void) const {
-     return QJsonObject {
+    return QJsonObject {
         {"auto", !this->is_manual()},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->dome()->json()},
         {"st", QString(this->state().code())},
+        {"ufo", this->ufo_manager()->json()},
         {"disk", QJsonObject {
             {"prim", this->primary_storage()->json()},
             {"perm", this->permanent_storage()->json()},

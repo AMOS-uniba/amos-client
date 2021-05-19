@@ -44,20 +44,22 @@ public:
     bool is_autostart(void) const;
 
     void set_path(const QString &path);
-    const QString& path(void) const;
+    const QString & path(void) const;
 
     bool is_running(void) const;
 
-    void start_ufo(void) const;
-    void stop_ufo(void) const;
-
     UfoState state(void) const;
+
+    QJsonObject json(void) const;
 
 public slots:
     void initialize(void);
     void load_settings(void);
     void save_settings(void) const;
     void auto_action(bool is_dark) const;
+
+    void start_ufo(void) const;
+    void stop_ufo(void) const;
 
     void log_state_change(const UfoState & state) const;
 

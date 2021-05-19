@@ -450,7 +450,6 @@ QJsonObject QDome::json(void) const {
     };
 }
 
-
 void QDome::send_command(const Command &command) const {
     logger.debug(Concern::SerialPort, QString("Sending a command '%1'").arg(command.display_name()));
     this->send(command.for_telegram());

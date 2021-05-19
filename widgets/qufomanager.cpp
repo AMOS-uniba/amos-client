@@ -123,6 +123,8 @@ void QUfoManager::update_state(void) {
     }
 }
 
+UfoState QUfoManager::state(void) const { return this->m_state; }
+
 bool QUfoManager::is_running(void) const {
     return (this->m_process.state() == QProcess::ProcessState::Running);
 }
@@ -135,7 +137,7 @@ void QUfoManager::start_ufo(void) const {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
-            logger.debug(Concern::UFO, "Already running");
+            logger.debug(Concern::UFO, "UFO Capture is already running, not doing anything");
             break;
         }
         case QProcess::ProcessState::NotRunning: {
@@ -147,7 +149,7 @@ void QUfoManager::start_ufo(void) const {
 
             Sleep(1000);
             this->m_frame = FindWindowA(nullptr, "UFOCapture");
-            logger.debug(Concern::UFO, QString("HWND is %1").arg((long long) this->m_frame));
+            logger.debug(Concern::UFO, QString("UFO Capture's HWND is %1").arg((long long) this->m_frame));
             Sleep(1000);
             ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
             emit this->started();
@@ -167,7 +169,7 @@ void QUfoManager::stop_ufo(void) const {
         HWND child;
 
         if (this->is_running()) {
-            logger.debug(Concern::UFO, QString("Trying to stop UFO politely"));
+            logger.debug(Concern::UFO, QString("Trying to stop UFO Capture politely"));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
             Sleep(1000);
 
@@ -186,13 +188,13 @@ void QUfoManager::stop_ufo(void) const {
             Sleep(1000);
 
             if (this->is_running()) {
-                logger.warning(Concern::UFO, "UFO did not stop, killing the child process");
-                // this->m_process.kill();
+                logger.warning(Concern::UFO, "UFO Capture did not stop, killing the child process");
+                this->m_process.kill();
             }
 
             emit this->stopped();
         } else {
-            logger.debug(Concern::UFO, "UFO is not running, not doing anything");
+            logger.debug(Concern::UFO, "UFO Capture is not running, not doing anything");
         }
     }
 }
@@ -209,8 +211,14 @@ void QUfoManager::log_state_change(const UfoState & state) const {
             logger.error(Concern::UFO, message);
         }
     }
-
 }
+
+QJsonObject QUfoManager::json(void) const {
+    return QJsonObject {
+        {"st", QString(QChar(this->state().code()))},
+    };
+}
+
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {
     this->set_autostart(checked);
