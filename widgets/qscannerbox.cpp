@@ -2,12 +2,12 @@
 #include "utils/exception.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 QString QScannerBox::DialogTitle(void) const { return "Select UFO output directory to watch"; }
 QString QScannerBox::AbortMessage(void) const { return "Watch directory selection aborted"; }
 
-QScannerBox::QScannerBox(QWidget *parent):
+QScannerBox::QScannerBox(QWidget * parent):
     QFileSystemBox(parent)
 {
     this->connect(this->m_timer, &QTimer::timeout, this, &QScannerBox::scan_sightings);
@@ -19,7 +19,7 @@ void QScannerBox::set_enabled(bool enabled) {
     settings->setValue(QString("storage/scanner_enabled"), enabled);
 }
 
-void QScannerBox::set_directory(const QDir &new_directory) {
+void QScannerBox::set_directory(const QDir & new_directory) {
     QFileSystemBox::set_directory(new_directory);
     logger.info(Concern::Storage, QString("Scanner directory set to \"%1\"").arg(this->m_directory.path()));
     settings->setValue("storage/scanner_path", this->m_directory.path());
@@ -34,7 +34,7 @@ void QScannerBox::scan_sightings(void) const {
 
         QStringList xmls = this->m_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
-        for (QString &xml: xmls) {
+        for (QString & xml: xmls) {
             try {
                 QFileInfo xml_info(QString("%1/%2").arg(dir, xml));
                 QString prefix = QString("%1/%2").arg(xml_info.absolutePath(), xml_info.completeBaseName());

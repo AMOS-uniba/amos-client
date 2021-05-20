@@ -1,9 +1,9 @@
 #include "qstoragebox.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
-QFileSystemBox::QFileSystemBox(QWidget *parent):
+QFileSystemBox::QFileSystemBox(QWidget * parent):
     QGroupBox(parent),
     m_enabled(true)
 {
@@ -74,7 +74,7 @@ void QFileSystemBox::scan_info(void) {
     );
 }
 
-void QFileSystemBox::set_directory(const QDir &new_directory) {
+void QFileSystemBox::set_directory(const QDir & new_directory) {
     this->m_directory = new_directory;
     this->m_le_path->setText(this->m_directory.path());
     emit this->directory_changed(this->m_directory.path());

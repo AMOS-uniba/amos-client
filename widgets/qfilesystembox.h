@@ -36,21 +36,21 @@ protected:
     void select_directory(void);
 
 public:
-    explicit QFileSystemBox(QWidget *parent = nullptr);
+    explicit QFileSystemBox(QWidget * parent = nullptr);
 
     bool is_enabled(void) const;
     QStorageInfo info(void) const;
 
 public slots:
     void scan_info(void);
-    virtual void set_directory(const QDir &new_directory);
+    virtual void set_directory(const QDir & new_directory);
     virtual void set_enabled(bool enabled);
 
     void open_in_explorer(void) const;
 
 signals:
     void toggled(bool enabled);
-    void directory_changed(const QDir &directory);
+    void directory_changed(const QDir & directory);
     void low_disk_space(void);
 };
 

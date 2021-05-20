@@ -209,7 +209,10 @@
  <tabstops>
   <tabstop>le_station_id</tabstop>
   <tabstop>le_ip</tabstop>
+  <tabstop>sb_port</tabstop>
+  <tabstop>bt_apply</tabstop>
   <tabstop>bt_discard</tabstop>
+  <tabstop>bt_send_heartbeat</tabstop>
  </tabstops>
  <resources/>
  <connections/>

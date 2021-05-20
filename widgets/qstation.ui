@@ -253,6 +253,16 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>cb_manual</tabstop>
+  <tabstop>cb_safety_override</tabstop>
+  <tabstop>dsb_latitude</tabstop>
+  <tabstop>dsb_longitude</tabstop>
+  <tabstop>dsb_altitude</tabstop>
+  <tabstop>dsb_darkness_limit</tabstop>
+  <tabstop>bt_apply</tabstop>
+  <tabstop>bt_discard</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

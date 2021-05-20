@@ -772,6 +772,15 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>co_serial_ports</tabstop>
+  <tabstop>dsb_humidity_limit_upper</tabstop>
+  <tabstop>dsb_humidity_limit_lower</tabstop>
+  <tabstop>bt_apply</tabstop>
+  <tabstop>bt_discard</tabstop>
+  <tabstop>bt_cover_open</tabstop>
+  <tabstop>bt_cover_close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

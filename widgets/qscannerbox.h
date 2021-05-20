@@ -11,12 +11,12 @@ protected:
     virtual QString AbortMessage(void) const override;
 
 public:
-    explicit QScannerBox(QWidget *parent = nullptr);
+    explicit QScannerBox(QWidget * parent = nullptr);
     void scan_sightings(void) const;
 
 public slots:
     void set_enabled(bool enabled) override;
-    void set_directory(const QDir &new_directory) override;
+    void set_directory(const QDir & new_directory) override;
 
 signals:
     void sightings_found(QVector<Sighting> sightings) const;
