@@ -130,6 +130,7 @@ RESOURCES += \
     images.qrc
 
 RC_FILE = amos-client.rc
+RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 

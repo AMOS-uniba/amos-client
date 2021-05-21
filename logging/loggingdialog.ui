@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>243</width>
-    <height>334</height>
+    <width>174</width>
+    <height>283</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Logging settings</string>
+   <string>Debug logging settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
