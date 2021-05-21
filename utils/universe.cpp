@@ -14,13 +14,9 @@ QColor linear_interpolate(QColor first, double stop1, QColor second, double stop
     );
 }
 
-QColor linear_interpolator(const QVector<Node> nodes, double position) {
+QColor piecewise_linear_interpolator(const QVector<Node> & nodes, double position) {
     if (position < nodes.first().position) {
         return nodes.first().colour;
-    }
-
-    if (position > nodes.last().position) {
-        return nodes.last().colour;
     }
 
     for (QVector<Node>::const_iterator node = nodes.cbegin(); node + 1 != nodes.cend(); ++node) {
@@ -63,7 +59,7 @@ Vec3D Universe::compute_moon_equ(const QDateTime & time) {
 }
 
 QColor Universe::altitude_colour(double altitude) {
-    return linear_interpolator({
+    return piecewise_linear_interpolator({
         {-90.0, QColor::fromRgbF(0.0, 0.0, 0.0)},
         {-18.0, QColor::fromRgbF(0.0, 0.0, 0.25)},
         {  0.0, QColor::fromRgbF(0.0, 0.0, 1.0)},
