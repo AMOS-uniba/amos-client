@@ -17,8 +17,6 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->storage_primary->set_name("primary");
     this->ui->storage_permanent->set_name("permanent");
 
-    this->universe = new Universe();
-
     this->ui->tb_log->setColumnWidth(0, 140);
     this->ui->tb_log->setColumnWidth(1, 72);
     this->ui->tb_log->setColumnWidth(2, 80);
@@ -80,7 +78,6 @@ MainWindow::~MainWindow() {
 
     delete this->ui;
     delete this->timer_display;
-    delete this->universe;
     delete settings;
 }
 

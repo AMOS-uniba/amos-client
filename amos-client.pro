@@ -133,7 +133,7 @@ RC_FILE = amos-client.rc
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.6.0.4
+VERSION = 0.6.1.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 TARGET = "AMOS client"

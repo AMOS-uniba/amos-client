@@ -20,7 +20,6 @@ private:
 public:
     explicit QSunInfo(QWidget * parent = nullptr);
     ~QSunInfo();
-    void set_universe(Universe * const universe);
     void set_station(const QStation * const station);
 
 public slots:

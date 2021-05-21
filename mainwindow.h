@@ -31,8 +31,6 @@ private:
     QTimer * timer_display;
     Ui::MainWindow * ui;
 
-    Universe * universe = nullptr;
-
     QAction * minimizeAction;
     QAction * maximizeAction;
     QAction * restoreAction;
