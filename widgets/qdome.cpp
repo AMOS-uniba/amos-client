@@ -1,6 +1,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
+#include "settings.h"
 #include "logging/include.h"
 
 #include "utils/exception.h"
@@ -115,10 +116,11 @@ QDome::QDome(QWidget *parent):
     this->connect(this, &QDome::state_updated_Z, this, &QDome::display_shaft_data);
 
     this->connect(this, &QDome::cover_moved, this->ui->picture, &QDomeWidget::set_cover_position);
+    this->connect(this, &QDome::cover_moved, this->ui->pb_cover, &QProgressBar::setValue);
     this->connect(this, &QDome::cover_open, this->ui->picture, &QDomeWidget::set_cover_maximum);
-    //this->connect(this, &QDome::cover_open, this->ui->pb_cover, &QProgressBar::setMaximum);
+    this->connect(this, &QDome::cover_open, this->ui->pb_cover, &QProgressBar::setMaximum);
     this->connect(this, &QDome::cover_closed, this->ui->picture, &QDomeWidget::set_cover_minimum);
-    //this->connect(this, &QDome::cover_closed, this->ui->pb_cover, &QProgressBar::setMinimum);
+    this->connect(this, &QDome::cover_closed, this->ui->pb_cover, &QProgressBar::setMinimum);
 
 //    this->connect(this->ui->cl_camera_heating, &QControlLine::toggled, this, &QDome::toggle_camera_heating);
     this->connect(this->ui->cl_lens_heating, &QControlLine::toggled, this, &QDome::toggle_hotwire);
@@ -144,6 +146,10 @@ QDome::QDome(QWidget *parent):
     this->m_serial_watchdog->setInterval(2000);
     this->connect(this->m_serial_watchdog, &QTimer::timeout, this, &QDome::check_serial_port);
     this->m_serial_watchdog->start();
+
+    emit this->cover_open(400);
+    emit this->cover_closed(0);
+    emit this->cover_moved(0);
 }
 
 QDome::~QDome() {
@@ -217,7 +223,7 @@ void QDome::set_formatters(void) {
     this->ui->bl_error_rain->set_formatters(Qt::red, Qt::black, "closed", "ok");
 }
 
-void QDome::display_basic_data(const DomeStateS &state) {
+void QDome::display_basic_data(const DomeStateS & state) {
     logger.debug(Concern::SerialPort, "Displaying basic data");
     bool valid = state.is_valid();
 
@@ -225,6 +231,7 @@ void QDome::display_basic_data(const DomeStateS &state) {
 
     this->ui->lb_cover_state->setEnabled(valid);
     this->ui->lb_cover_comment->setEnabled(valid);
+    this->ui->pb_cover->setEnabled(valid);
     this->ui->fl_time_alive->set_valid(valid);
 
     this->ui->bl_servo_moving->set_valid(valid);
@@ -289,7 +296,7 @@ void QDome::display_basic_data(const DomeStateS &state) {
     this->ui->cl_ii->set_enabled(state.is_valid() && this->m_station->is_manual());
 }
 
-void QDome::display_env_data(const DomeStateT &state) {
+void QDome::display_env_data(const DomeStateT & state) {
     logger.debug(Concern::SerialPort, "Displaying env data");
 
     bool valid = state.is_valid();
@@ -309,7 +316,10 @@ void QDome::display_env_data(const DomeStateT &state) {
 
 void QDome::display_shaft_data(const DomeStateZ & state) {
     this->display_serial_port_info();
-    //this->ui->pb_cover->setValue(state.shaft_position());
+
+    if (state.is_valid()) {
+        emit this->cover_moved(state.shaft_position());
+    }
 }
 
 void QDome::display_dome_state(void) {
@@ -514,7 +524,6 @@ void QDome::process_message(const QByteArray &message) {
 #endif
                 this->m_state_Z = DomeStateZ(decoded);
                 emit this->state_updated_Z(this->m_state_Z);
-                emit this->cover_moved(this->m_state_Z.shaft_position());
                 break;
             default:
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));

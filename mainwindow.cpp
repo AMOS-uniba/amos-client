@@ -1,5 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "settings.h"
 #include "include.h"
 
 #include "logging/loggingdialog.h"
@@ -69,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->station->initialize();
 
 #ifdef OLD_PROTOCOL
+//    this->ui->dome->set_cover_minimum(-26);
 //    this->ui->dome->set_cover_maximum(26);
 #endif
 }

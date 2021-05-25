@@ -14,6 +14,8 @@
 #include <QStorageInfo>
 
 #include "logging/eventlogger.h"
+#include "utils/exception.h"
+#include "utils/sighting.h"
 
 
 class QFileSystemBox: public QGroupBox {

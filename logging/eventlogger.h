@@ -1,14 +1,15 @@
 #include <QObject>
-#include <QListWidget>
+#include <QDateTime>
 #include <QTableWidget>
 #include <QFile>
+#include <QDir>
 #include <QTextStream>
+#include <QSettings>
 
-#include "forward.h"
 #include "logging/baselogger.h"
 
-#ifndef LOG_H
-#define LOG_H
+#ifndef EVENTLOGGER_H
+#define EVENTLOGGER_H
 
 enum class Level {
     DebugDetail = 10,
@@ -48,30 +49,30 @@ struct ConcernInfo {
 class EventLogger: public BaseLogger {
     Q_OBJECT
 private:
-    QTableWidget *m_display = nullptr;
+    QTableWidget * m_display = nullptr;
     Level logging_level;
 
     const static QMap<Level, LevelInfo> Levels;
 
     QMap<Concern, bool> debug_visible;
 
-    QString format(const QDateTime &timestamp, Level level, const QString &concern, const QString& message) const;
-    void write(Level level, Concern concern, const QString &message) const;
+    QString format(const QDateTime & timestamp, Level level, const QString & concern, const QString & message) const;
+    void write(Level level, Concern concern, const QString & message) const;
 public:
     const static QMap<Concern, ConcernInfo> Concerns;
 
-    explicit EventLogger(QObject *parent, const QString &filename);
+    explicit EventLogger(QObject * parent, const QString & filename);
 
-    void set_display_widget(QTableWidget *widget);
+    void set_display_widget(QTableWidget * widget);
     void set_level(Level new_level);
 
-    void detail(Concern concern, const QString &message) const;
-    void debug(Concern concern, const QString &message) const;
-    void debug_error(Concern concern, const QString &message) const;
-    void info(Concern concern, const QString &message) const;
-    void warning(Concern concern, const QString &message) const;
-    void error(Concern concern, const QString &message) const;
-    void fatal(Concern concern, const QString &message) const;
+    void detail(Concern concern, const QString & message) const;
+    void debug(Concern concern, const QString & message) const;
+    void debug_error(Concern concern, const QString & message) const;
+    void info(Concern concern, const QString & message) const;
+    void warning(Concern concern, const QString & message) const;
+    void error(Concern concern, const QString & message) const;
+    void fatal(Concern concern, const QString & message) const;
 
     void set_debug_visible(Concern concern, bool visible);
     bool is_debug_visible(Concern concern) const;

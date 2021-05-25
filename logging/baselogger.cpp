@@ -1,12 +1,18 @@
 #include <QStandardPaths>
 
-#include "baselogger.h"
+#include "logging/baselogger.h"
 #include "utils/exception.h"
 
-BaseLogger::BaseLogger(QObject *parent, const QString &filename):
+BaseLogger::BaseLogger(QObject * parent, const QString & filename):
     QObject(parent),
     m_filename(filename)
-{
+{}
+
+BaseLogger::~BaseLogger(void) {
+    if (this->m_file != nullptr) {
+        this->m_file->close();
+        delete this->m_file;
+    }
 }
 
 void BaseLogger::initialize(void) {
@@ -24,10 +30,4 @@ void BaseLogger::initialize(void) {
 
 QString BaseLogger::filename(void) const {
     return this->m_file->fileName();
-}
-
-BaseLogger::~BaseLogger(void) {
-    if (this->m_file != nullptr) {
-        this->m_file->close();
-    }
 }

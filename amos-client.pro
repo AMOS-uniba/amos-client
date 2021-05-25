@@ -82,6 +82,7 @@ HEADERS += \
     forward.h \
     include.h \
     mainwindow.h \
+    settings.h \
     utils/domestate.h \
     utils/exception.h \
     utils/request.h \
@@ -134,7 +135,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.6.1.0
+VERSION = 0.6.2.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 
 TARGET = "AMOS client"

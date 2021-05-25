@@ -1,6 +1,3 @@
-// enable this to conform to the old protocol (currently only Senec)
-//#define OLD_PROTOCOL 1
-
 #ifndef INCLUDE_H
 #define INCLUDE_H
 

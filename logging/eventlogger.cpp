@@ -1,6 +1,6 @@
-#include "include.h"
+#include "logging/eventlogger.h"
 
-extern QSettings *settings;
+extern QSettings * settings;
 
 EventLogger::EventLogger(QObject *parent, const QString &filename):
     BaseLogger(parent, filename),
@@ -40,16 +40,13 @@ const QMap<Concern, ConcernInfo> EventLogger::Concerns = {
     {Concern::Storage,          {"STO", "storage",      "storage",          "Storage management"}}
 };
 
-void EventLogger::set_display_widget(QTableWidget *widget) {
+void EventLogger::set_display_widget(QTableWidget * widget) {
     this->m_display = widget;
 }
 
-QString EventLogger::format(const QDateTime &timestamp, Level level, const QString &concern, const QString &message) const {
+QString EventLogger::format(const QDateTime & timestamp, Level level, const QString & concern, const QString & message) const {
     return QString("%1 %2|%3: %4")
-            .arg(timestamp.toString(Qt::ISODate))
-            .arg(EventLogger::Levels[level].code)
-            .arg(concern)
-            .arg(message);
+            .arg(timestamp.toString(Qt::ISODate), EventLogger::Levels[level].code, concern, message);
 }
 
 void EventLogger::write(Level level, Concern concern, const QString &message) const {
@@ -97,24 +94,24 @@ void EventLogger::set_level(Level new_level) {
     this->logging_level = new_level;
 }
 
-void EventLogger::fatal(Concern concern, const QString &message) const { this->write(Level::Fatal, concern, message); }
-void EventLogger::error(Concern concern, const QString &message) const { this->write(Level::Error, concern, message); }
-void EventLogger::warning(Concern concern, const QString &message) const { this->write(Level::Warning, concern, message); }
-void EventLogger::info(Concern concern, const QString &message) const { this->write(Level::Info, concern, message); }
+void EventLogger::fatal(Concern concern, const QString & message) const { this->write(Level::Fatal, concern, message); }
+void EventLogger::error(Concern concern, const QString & message) const { this->write(Level::Error, concern, message); }
+void EventLogger::warning(Concern concern, const QString & message) const { this->write(Level::Warning, concern, message); }
+void EventLogger::info(Concern concern, const QString & message) const { this->write(Level::Info, concern, message); }
 
-void EventLogger::debug(Concern concern, const QString &message) const {
+void EventLogger::debug(Concern concern, const QString & message) const {
     if (this->debug_visible[concern]) {
         this->write(Level::Debug, concern, message);
     }
 }
 
-void EventLogger::debug_error(Concern concern, const QString &message) const {
+void EventLogger::debug_error(Concern concern, const QString & message) const {
     if (this->debug_visible[concern]) {
         this->write(Level::DebugError, concern, message);
     }
 }
 
-void EventLogger::detail(Concern concern, const QString &message) const {
+void EventLogger::detail(Concern concern, const QString & message) const {
     if (this->debug_visible[concern]) {
         this->write(Level::DebugDetail, concern, message);
     }

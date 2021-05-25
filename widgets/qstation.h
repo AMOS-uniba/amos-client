@@ -22,8 +22,6 @@ private:
     double m_altitude;
 
     double m_darkness_limit;
-    double m_humidity_limit_lower;
-    double m_humidity_limit_upper;
     bool m_manual_control;
     bool m_safety_override;
 

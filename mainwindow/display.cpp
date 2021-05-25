@@ -1,6 +1,8 @@
-#include "include.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include "settings.h"
+#include "include.h"
 
 #include <QLabel>
 #include <QPushButton>

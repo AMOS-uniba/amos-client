@@ -5,18 +5,22 @@
 #include <QSerialPort>
 
 #include "forward.h"
+#include "settings.h"
 
+#include "utils/exception.h"
+
+#include "logging/eventlogger.h"
 
 
 class DomeState {
 private:
     QDateTime m_timestamp;
 protected:
-    static float deciint(const QByteArray &chunk);
+    static float deciint(const QByteArray & chunk);
     bool m_valid;
     DomeState(void);
 public:
-    const QDateTime& timestamp(void) const;
+    const QDateTime & timestamp(void) const;
     float age(void) const;
     void set_valid(void);
     bool is_valid(void) const;
@@ -32,7 +36,7 @@ private:
     unsigned int m_time_alive;
 public:
     DomeStateS(void);
-    DomeStateS(const QByteArray &response);
+    DomeStateS(const QByteArray & response);
 
     bool servo_moving(void) const;
     bool servo_direction(void) const;
@@ -71,7 +75,7 @@ private:
     float m_temp_lens, m_temp_CPU, m_temp_SHT31, m_humi_SHT31;
 public:
     DomeStateT(void);
-    DomeStateT(const QByteArray &response);
+    DomeStateT(const QByteArray & response);
 
     float temperature_lens(void) const;
     float temperature_CPU(void) const;
@@ -88,7 +92,7 @@ private:
     short int m_shaft_position;
 public:
     DomeStateZ(void);
-    DomeStateZ(const QByteArray &response);
+    DomeStateZ(const QByteArray & response);
 
     short int shaft_position(void) const;
 

@@ -13,6 +13,7 @@
 
 #include "widgets/qfilesystembox.h"
 #include "logging/eventlogger.h"
+#include "utils/sighting.h"
 
 
 class QStorageBox: public QFileSystemBox {

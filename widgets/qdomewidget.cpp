@@ -1,5 +1,8 @@
 #include "qdomewidget.h"
 
+extern EventLogger logger;
+
+
 QDomeWidget::QDomeWidget(QWidget * parent):
     QWidget(parent),
     m_cover_position(0),
@@ -11,11 +14,13 @@ QDomeWidget::QDomeWidget(QWidget * parent):
 }
 
 void QDomeWidget::set_cover_position(int new_position) {
+    logger.debug(Concern::Operation, QString("Cover position set to %1").arg(new_position));
     this->m_cover_position = new_position;
     this->repaint();
 }
 
 void QDomeWidget::set_cover_minimum(int new_minimum) {
+    logger.debug(Concern::Operation, QString("Cover minimum set to %1").arg(new_minimum));
     this->m_cover_minimum = new_minimum;
     if (this->m_cover_position < this->m_cover_minimum) {
         this->m_cover_position = this->m_cover_minimum;
@@ -24,6 +29,7 @@ void QDomeWidget::set_cover_minimum(int new_minimum) {
 }
 
 void QDomeWidget::set_cover_maximum(int new_maximum) {
+    logger.debug(Concern::Operation, QString("Cover maximum set to %1").arg(new_maximum));
     this->m_cover_maximum = new_maximum;
     if (this->m_cover_position > this->m_cover_maximum) {
         this->m_cover_position = this->m_cover_maximum;

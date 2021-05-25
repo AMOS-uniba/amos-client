@@ -1,5 +1,4 @@
 #include "qscannerbox.h"
-#include "utils/exception.h"
 
 extern EventLogger logger;
 extern QSettings * settings;

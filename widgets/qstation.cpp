@@ -38,6 +38,10 @@ QString QStation::temperature_colour(float temperature) {
 QStation::QStation(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QStation),
+    m_latitude(48.0),
+    m_longitude(17.0),
+    m_altitude(0.0),
+    m_darkness_limit(-12.0),
     m_manual_control(false),
     m_safety_override(false),
     m_state(QStation::NotObserving)
@@ -111,7 +115,6 @@ void QStation::load_defaults(void) {
 }
 
 void QStation::save_settings(void) const {
-    settings->setValue("manual", this->is_manual());
     settings->setValue("station/latitude", this->latitude());
     settings->setValue("station/longitude", this->longitude());
     settings->setValue("station/altitude", this->altitude());
@@ -122,9 +125,13 @@ void QStation::save_settings(void) const {
 // Manual control
 void QStation::set_manual_control(bool manual) {
     logger.info(Concern::Operation, QString("Control set to %1").arg(manual ? "manual" : "automatic"));
+
     this->ui->cb_manual->setCheckState(manual ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     this->ui->cb_safety_override->setEnabled(manual);
     this->m_manual_control = manual;
+
+    settings->setValue("manual", manual);
+    settings->sync();
 
     emit this->manual_mode_changed(manual);
 }
@@ -167,6 +174,7 @@ void QStation::set_position(const double new_latitude, const double new_longitud
     this->m_latitude = new_latitude;
     this->m_longitude = new_longitude;
     this->m_altitude = new_altitude;
+
     logger.info(Concern::Configuration, QString("Station position set to %1°, %2°, %3 m")
                 .arg(this->m_latitude, 0, 'f', 6)
                 .arg(this->m_longitude, 0, 'f', 6)
@@ -421,7 +429,8 @@ void QStation::send_heartbeat(void) const {
 
 void QStation::set_state(StationState new_state) {
     if (new_state != this->m_state) {
-        logger.debug(Concern::Operation, QString("State changed from %1 to %2").arg(this->state().display_string(), new_state.display_string()));
+        logger.debug(Concern::Operation, QString("State changed from \"%1\" to \"%2\"")
+                     .arg(this->state().display_string(), new_state.display_string()));
         this->m_state = new_state;
         emit this->state_changed(this->m_state);
     }

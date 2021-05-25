@@ -5,8 +5,10 @@
 #include <QSerialPort>
 
 #include "forward.h"
-#include "widgets/lines/qdisplayline.h"
 #include "utils/domestate.h"
+#include "utils/serialbuffer.h"
+
+#include "widgets/lines/qdisplayline.h"
 #include "mainwindow.h"
 #include "widgets/qdomewidget.h"
 #include "widgets/qstation.h"
@@ -16,7 +18,7 @@ namespace Ui {
 }
 
 /**
- * @brief The QDome class -- handles the communication and control of the AMOS dome
+ * @brief The QDome class handles the communication and control of the AMOS dome
  * Provides its own widget with settings, configuration and display
  */
 class QDome: public QGroupBox {

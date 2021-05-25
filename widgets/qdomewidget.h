@@ -5,6 +5,8 @@
 #include <QWidget>
 #include <QtGui>
 
+#include "logging/eventlogger.h"
+
 class QDomeWidget: public QWidget {
     Q_OBJECT
 private:

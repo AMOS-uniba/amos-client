@@ -1,7 +1,6 @@
-#include "include.h"
+#include "domestate.h"
 
 extern EventLogger logger;
-
 
 
 DomeState::DomeState(void):
