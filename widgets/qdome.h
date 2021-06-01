@@ -24,31 +24,32 @@ namespace Ui {
 class QDome: public QGroupBox {
     Q_OBJECT
 private:
-    constexpr static unsigned int REFRESH = 200;
+    constexpr static unsigned int Refresh = 200;                                // Robin time in ms
+    unsigned char m_robin = 0;
+
     const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
 
     Ui::QDome * ui;
     const QStation * m_station;
 
-    const unsigned char m_address = 0x99;
+    constexpr static unsigned char Address = 0x99;                              // address
     QDateTime m_last_received;
 
     QSerialPort * m_serial_port;
-    unsigned char m_robin = 0;
     QTimer * m_robin_timer;
     QTimer * m_serial_watchdog;
 
     SerialBuffer * m_buffer;
 
     // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
-    double m_humidity_limit_lower = 70;
-    double m_humidity_limit_upper = 90;
+    double m_humidity_limit_lower = 70.0;
+    double m_humidity_limit_upper = 90.0;
 
     DomeStateS m_state_S;
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
 
-    void process_message(const QByteArray &message);
+    void process_message(const QByteArray & message);
 public:
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;

@@ -138,7 +138,7 @@ QDome::QDome(QWidget *parent):
     this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &QDome::process_message);
 
     this->m_robin_timer = new QTimer(this);
-    this->m_robin_timer->setInterval(QDome::REFRESH);
+    this->m_robin_timer->setInterval(QDome::Refresh);
     this->connect(this->m_robin_timer, &QTimer::timeout, this, &QDome::request_status);
     this->m_robin_timer->start();
 
@@ -478,7 +478,7 @@ void QDome::send(const QByteArray &message) const {
         if (!this->m_serial_port->isOpen()) {
             logger.debug_error(Concern::SerialPort, QString("Cannot send, serial port %1 is not open").arg(this->m_serial_port->portName()));
         } else {
-            Telegram telegram(this->m_address, message);
+            Telegram telegram(this->Address, message);
             this->m_serial_port->write(telegram.compose());
         }
     }
@@ -609,11 +609,11 @@ void QDome::turn_off_intensifier(void) const { this->send_command(QDome::Command
 
 // Humidity limit settings
 bool QDome::is_humid(void) const {
-    return (this->state_T().humidity_sht() >= this->m_humidity_limit_lower);
+    return (this->state_T().humidity_sht() >= this->humidity_limit_lower());
 }
 
 bool QDome::is_very_humid(void) const {
-    return (this->state_T().humidity_sht() >= this->m_humidity_limit_upper);
+    return (this->state_T().humidity_sht() >= this->humidity_limit_upper());
 }
 
 double QDome::humidity_limit_lower(void) const { return this->m_humidity_limit_lower; }
@@ -621,15 +621,15 @@ double QDome::humidity_limit_upper(void) const { return this->m_humidity_limit_u
 
 void QDome::set_humidity_limits(const double new_lower, const double new_upper) {
     if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper)) {
-        throw ConfigurationError(QString("Invalid humidity limits: %1% - %2%").arg(new_lower).arg(new_upper));
+        throw ConfigurationError(QString("Invalid humidity limits: %1% and %2%").arg(new_lower).arg(new_upper));
     }
 
     this->m_humidity_limit_lower = new_lower;
     this->m_humidity_limit_upper = new_upper;
     logger.info(Concern::Configuration,
-                QString("Station's humidity limits set to %1% - %2%")
-                .arg(this->m_humidity_limit_lower)
-                .arg(this->m_humidity_limit_upper)
+                QString("Station's humidity limits set to %1%, %2%")
+                    .arg(this->m_humidity_limit_lower)
+                    .arg(this->m_humidity_limit_upper)
     );
 
     settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
@@ -650,7 +650,7 @@ void QDome::handle_settings_changed(void) {
 void QDome::apply_settings(void) {
     try {
         this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
-    } catch (const ConfigurationError &e) {
+    } catch (const ConfigurationError & e) {
         logger.error(Concern::Configuration, e.what());
     }
     this->handle_settings_changed();
