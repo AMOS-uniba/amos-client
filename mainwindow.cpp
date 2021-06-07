@@ -13,7 +13,8 @@ extern QSettings * settings;
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_start_time(QDateTime::currentDateTimeUtc())
+    m_start_time(QDateTime::currentDateTimeUtc()),
+    m_terminate(false)
 {
     this->ui->setupUi(this);
     this->ui->storage_primary->set_name("primary");
@@ -47,7 +48,6 @@ MainWindow::MainWindow(QWidget *parent):
     this->set_icon(QStation::Manual);
     this->tray_icon->show();
 
-    this->connect(this->tray_icon, &QSystemTrayIcon::messageClicked, this, &MainWindow::message_clicked);
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
 
     this->connect(this->ui->station, &QStation::manual_mode_changed, this, &MainWindow::display_window_title);
@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
     this->connect(this->ui->station, &QStation::darkness_limit_changed, this->ui->sun_info, &QSunInfo::update_long_term);
+    this->connect(qApp, &QApplication::commitDataRequest, this, &MainWindow::set_terminate);
 
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize();
@@ -97,9 +98,6 @@ QString MainWindow::format_duration(unsigned int duration) {
         .arg(seconds, 2, 10, QChar('0'));
 }
 
-void MainWindow::message_clicked() {
-}
-
 void MainWindow::on_cb_debug_stateChanged(int debug) {
     settings->setValue("debug", bool(debug));
 
@@ -107,6 +105,10 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     logger.warning(Concern::Operation, QString("Logging of debug information %1").arg(debug ? "ON" : "OFF"));
 
     this->ui->action_debug->setChecked(debug);
+}
+
+void MainWindow::set_terminate(void) {
+    this->m_terminate = true;
 }
 
 void MainWindow::on_action_manual_triggered() {

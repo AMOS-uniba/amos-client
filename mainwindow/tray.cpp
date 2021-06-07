@@ -11,9 +11,21 @@ void MainWindow::closeEvent(QCloseEvent *event) {
        // event->ignore();
     }*/
 
-    event->ignore();
-    if (QMessageBox::question(this, "Confirm exit", "Are you sure you want to turn off the client?", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
+    if (this->m_terminate) {
         event->accept();
+    } else {
+        event->ignore();
+
+        QMessageBox * box = new QMessageBox(QMessageBox::Question,
+                                            "Confirm exit",
+                                            "Are you sure you want to turn off the client?",
+                                            QMessageBox::Yes | QMessageBox::No,
+                                            this);
+
+        box->connect(box->button(QMessageBox::Yes), &QAbstractButton::clicked, qApp, &QApplication::quit);
+        box->connect(box->button(QMessageBox::No), &QAbstractButton::clicked, box, &QObject::deleteLater);
+        box->connect(qApp, &QApplication::aboutToQuit, box, &QObject::deleteLater);
+        box->exec();
     }
 }
 
@@ -30,17 +42,17 @@ void MainWindow::create_tray_icon() {
 }
 
 void MainWindow::create_actions() {
-    minimizeAction = new QAction("Mi&nimize", this);
-    connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
+    this->minimizeAction = new QAction("Mi&nimize", this);
+    this->connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
 
-    maximizeAction = new QAction("Ma&ximize", this);
-    connect(maximizeAction, &QAction::triggered, this, &QWidget::showMaximized);
+    this->maximizeAction = new QAction("Ma&ximize", this);
+    this->connect(maximizeAction, &QAction::triggered, this, &QWidget::showMaximized);
 
-    restoreAction = new QAction("&Restore", this);
-    connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
+    this->restoreAction = new QAction("&Restore", this);
+    this->connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
 
-    quitAction = new QAction("&Quit", this);
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    this->quitAction = new QAction("&Quit", this);
+    this->connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 
 void MainWindow::set_icon(const StationState &state) {

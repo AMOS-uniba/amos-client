@@ -43,6 +43,7 @@ private:
 
     QMap<Icon, QIcon> icons;
     const QDateTime m_start_time;
+    bool m_terminate;
 
     //CommThread comm_thread;
 
@@ -60,8 +61,8 @@ private slots:
     // Tray and messaging
     void set_icon(const StationState & state);
     void icon_activated(QSystemTrayIcon::ActivationReason reason);
-    void show_message();
-    void message_clicked();
+    void show_message(void);
+    void set_terminate(void);
 
     // Menu actions
     void on_action_exit_triggered();
