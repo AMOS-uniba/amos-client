@@ -660,3 +660,13 @@ void QDome::discard_settings(void) {
     this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
     this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
 }
+
+void QDome::on_bt_cover_open_clicked() {
+    logger.info(Concern::Operation, "Manual command to open the over");
+    this->open_cover();
+}
+
+void QDome::on_bt_cover_close_clicked() {
+    logger.info(Concern::Operation, "Manual command to close the over");
+    this->close_cover();
+}

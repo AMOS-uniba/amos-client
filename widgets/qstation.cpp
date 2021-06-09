@@ -6,7 +6,7 @@
 extern EventLogger logger;
 extern QSettings * settings;
 
-const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing, daylight");
+const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing daylight");
 const StationState QStation::Observing          = StationState('O', "observing", Icon::Observing, "observation in progress");
 const StationState QStation::NotObserving       = StationState('N', "not observing", Icon::NotObserving, "observation stopped");
 const StationState QStation::Manual             = StationState('M', "manual", Icon::Manual, "manual control enabled");
@@ -128,6 +128,7 @@ void QStation::set_manual_control(bool manual) {
 
     this->ui->cb_manual->setCheckState(manual ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     this->ui->cb_safety_override->setEnabled(manual);
+    this->ui->cb_safety_override->setCheckState(manual ? this->ui->cb_safety_override->checkState() : Qt::CheckState::Unchecked);
     this->m_manual_control = manual;
 
     settings->setValue("manual", manual);

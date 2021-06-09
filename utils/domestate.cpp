@@ -139,7 +139,11 @@ DomeStateT::DomeStateT(const QByteArray &response) {
     this->m_humi_SHT31 = DomeStateT::deciint(response.mid(7, 2));
 
     this->m_valid      = true;
-    logger.debug(Concern::SerialPort, QString("T state received: %1 %2 %3 %4").arg(this->m_temp_lens).arg(this->m_temp_CPU).arg(this->m_temp_SHT31).arg(this->m_humi_SHT31));
+    logger.debug(Concern::SerialPort, QString("T state received: %1 %2 %3 %4")
+                 .arg(this->m_temp_lens, 4, 'f', 1)
+                 .arg(this->m_temp_CPU, 4, 'f', 1)
+                 .arg(this->m_temp_SHT31, 4, 'f', 1)
+                 .arg(this->m_humi_SHT31, 4, 'f', 1));
 }
 
 float DomeStateT::temperature_lens(void) const { return this->m_temp_lens; }

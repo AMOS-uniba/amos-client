@@ -5,7 +5,7 @@
 
 extern EventLogger logger;
 
-void MainWindow::closeEvent(QCloseEvent *event) {
+void MainWindow::closeEvent(QCloseEvent * event) {
    /* if (this->tray_icon->isVisible()) {
         this->hide();
        // event->ignore();
@@ -55,9 +55,9 @@ void MainWindow::create_actions() {
     this->connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
 }
 
-void MainWindow::set_icon(const StationState &state) {
+void MainWindow::set_icon(const StationState & state) {
     this->tray_icon->setIcon(this->icons[state.icon()]);
-    this->tray_icon->setToolTip(QString("AMOS client\n%1\n%2").arg(state.display_string()).arg(state.tooltip()));
+    this->tray_icon->setToolTip(QString("AMOS client\n%1\n%2").arg(state.display_string()));
 }
 
 void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {

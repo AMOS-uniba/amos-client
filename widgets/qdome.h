@@ -107,6 +107,9 @@ private slots:
     void apply_settings(void);
     void discard_settings(void);
 
+    void on_bt_cover_open_clicked();
+    void on_bt_cover_close_clicked();
+
 public slots:
     void set_formatters(void);
 
