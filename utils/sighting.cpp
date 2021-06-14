@@ -2,7 +2,7 @@
 
 extern EventLogger logger;
 
-Sighting::Sighting(const QString& prefix):
+Sighting::Sighting(const QString & prefix):
     m_prefix(prefix)
 {
     this->m_jpg = this->try_open(QString("%1P.jpg").arg(prefix), false);
@@ -22,14 +22,14 @@ Sighting::Sighting(const QString& prefix):
                 }).join("+"))
     );
     this->m_timestamp = QFileInfo(this->m_xml).birthTime();
-    this->hack_Y16();
+//    this->hack_Y16();
 }
 
 Sighting::~Sighting(void) {
     this->m_files.clear();
 }
 
-QString Sighting::try_open(const QString &path, bool require) {
+QString Sighting::try_open(const QString & path, bool require) {
     if (QFileInfo(path).exists()) {
         return path;
     } else {
@@ -67,11 +67,11 @@ void Sighting::move(const QString &prefix) {
     }
 }
 
-void Sighting::copy(const QString &prefix) const {
+void Sighting::copy(const QString & prefix) const {
     logger.debug(Concern::Sightings, QString("Copying to %1").arg(prefix));
     QDir().mkpath(prefix);
 
-    for (auto &file: this->m_files) {
+    for (auto & file: this->m_files) {
         QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
         QFile::copy(file, new_path);
     }

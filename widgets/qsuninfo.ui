@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>272</width>
-    <height>213</height>
+    <width>302</width>
+    <height>204</height>
    </rect>
   </property>
   <property name="title">
    <string>Sun info</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
    <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="gb_sun">
      <property name="title">

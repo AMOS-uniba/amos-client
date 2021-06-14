@@ -10,6 +10,18 @@
     <height>680</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>680</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Dome</string>
   </property>
@@ -20,7 +32,7 @@
    <property name="topMargin">
     <number>0</number>
    </property>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <widget class="QGroupBox" name="gb_cover">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -31,7 +43,7 @@
      <property name="minimumSize">
       <size>
        <width>180</width>
-       <height>0</height>
+       <height>184</height>
       </size>
      </property>
      <property name="title">
@@ -154,8 +166,21 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="group_settings">
+   <item row="6" column="0" colspan="2">
+    <widget class="QProgressBar" name="pb_cover">
+     <property name="maximum">
+      <number>400</number>
+     </property>
+     <property name="value">
+      <number>0</number>
+     </property>
+     <property name="format">
+      <string>%v/%m</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="1">
+    <widget class="QGroupBox" name="gb_devices">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
@@ -165,153 +190,60 @@
      <property name="minimumSize">
       <size>
        <width>180</width>
-       <height>100</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>110</height>
+       <height>184</height>
       </size>
      </property>
      <property name="title">
-      <string>Settings</string>
+      <string>Devices</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <property name="topMargin">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="spacing">
        <number>3</number>
       </property>
-      <property name="verticalSpacing">
-       <number>3</number>
-      </property>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lx_humidity_upper">
-        <property name="text">
-         <string>Humidity upper limit</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
-        <property name="maximumSize">
+      <item>
+       <widget class="QControlLine" name="cl_lens_heating" native="true">
+        <property name="minimumSize">
          <size>
-          <width>80</width>
-          <height>16777215</height>
+          <width>0</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="toolTip">
-         <string>close if humidity exceeds this level</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>true</bool>
-        </property>
-        <property name="suffix">
-         <string>%</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>1.000000000000000</double>
-        </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="bt_apply">
-          <property name="text">
-           <string>Apply</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="bt_discard">
-          <property name="text">
-           <string>Discard</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
-        <property name="maximumSize">
+      <item>
+       <widget class="QControlLine" name="cl_camera_heating" native="true">
+        <property name="minimumSize">
          <size>
-          <width>80</width>
-          <height>16777215</height>
+          <width>0</width>
+          <height>20</height>
          </size>
         </property>
-        <property name="toolTip">
-         <string>open only if humidity is below this level</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>true</bool>
-        </property>
-        <property name="suffix">
-         <string>%</string>
-        </property>
-        <property name="decimals">
-         <number>1</number>
-        </property>
-        <property name="minimum">
-         <double>0.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>100.000000000000000</double>
-        </property>
-        <property name="singleStep">
-         <double>1.000000000000000</double>
+       </widget>
+      </item>
+      <item>
+       <widget class="QControlLine" name="cl_fan" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lx_humidity_lower">
-        <property name="text">
-         <string>Humidity lower limit</string>
+      <item>
+       <widget class="QControlLine" name="cl_ii" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>20</height>
+         </size>
         </property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="0" column="0">
-    <widget class="QWidget" name="widget" native="true">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
-     </layout>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
+   <item row="5" column="0" colspan="2">
     <widget class="QDomeWidget" name="picture" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -333,13 +265,19 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <widget class="QGroupBox" name="gb_sensors">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>175</height>
+      </size>
      </property>
      <property name="title">
       <string>Sensors</string>
@@ -437,8 +375,32 @@
      </layout>
     </widget>
    </item>
-   <item row="6" column="1">
-    <widget class="QGroupBox" name="gb_devices">
+   <item row="1" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+     </layout>
+    </widget>
+   </item>
+   <item row="8" column="1">
+    <widget class="QGroupBox" name="gb_errors">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
@@ -447,67 +409,9 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>180</width>
-       <height>184</height>
+       <width>0</width>
+       <height>175</height>
       </size>
-     </property>
-     <property name="title">
-      <string>Devices</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3">
-      <property name="spacing">
-       <number>3</number>
-      </property>
-      <item>
-       <widget class="QControlLine" name="cl_lens_heating" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_camera_heating" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_fan" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QControlLine" name="cl_ii" native="true">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QGroupBox" name="gb_errors">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
      </property>
      <property name="title">
       <string>Error bits</string>
@@ -647,32 +551,13 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QProgressBar" name="pb_cover">
-     <property name="maximum">
-      <number>400</number>
-     </property>
-     <property name="value">
-      <number>0</number>
-     </property>
-     <property name="format">
-      <string>%v/%m</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" rowspan="2">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="gb_serial_port">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>180</width>
-       <height>100</height>
-      </size>
      </property>
      <property name="maximumSize">
       <size>
@@ -748,6 +633,133 @@
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="group_settings">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>110</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Settings</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="verticalSpacing">
+       <number>3</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="lx_humidity_upper">
+        <property name="text">
+         <string>Humidity upper limit</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_upper">
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>close if humidity exceeds this level</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QPushButton" name="bt_apply">
+          <property name="text">
+           <string>Apply</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="bt_discard">
+          <property name="text">
+           <string>Discard</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
+        <property name="maximumSize">
+         <size>
+          <width>80</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="toolTip">
+         <string>open only if humidity is below this level</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string>%</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="lx_humidity_lower">
+        <property name="text">
+         <string>Humidity lower limit</string>
         </property>
        </widget>
       </item>
