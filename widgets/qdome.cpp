@@ -428,6 +428,7 @@ SerialPortState QDome::serial_port_state(void) const {
 
 void QDome::display_serial_port_info(void) const {
     QString info;
+    bool reachable = false;
 
     if (QSerialPortInfo::availablePorts().length() == 0) {
         info = "no ports available";
@@ -438,6 +439,7 @@ void QDome::display_serial_port_info(void) const {
             if (this->m_serial_port->isOpen()) {
                 if (this->state_S().is_valid()) {
                     info = "valid data";
+                    reachable = true;
                 } else {
                     info = "no data";
                 }
@@ -449,6 +451,7 @@ void QDome::display_serial_port_info(void) const {
 
     this->ui->lb_serial_port_state->setText(this->serial_port_state().display_string());
     this->ui->lb_serial_data_state->setText(info);
+    this->ui->picture->set_reachable(reachable);
 }
 
 QJsonObject QDome::json(void) const {

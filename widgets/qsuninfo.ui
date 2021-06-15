@@ -11,11 +11,11 @@
    </rect>
   </property>
   <property name="title">
-   <string>Sun info</string>
+   <string>Universe</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="topMargin">
-    <number>0</number>
+    <number>3</number>
    </property>
    <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="gb_sun">
