@@ -1,7 +1,7 @@
 #include "ufostate.h"
 
 UfoState::UfoState(unsigned char code, const QString & display_string, QColor colour, bool enable_button, QString button_text):
-    MeteoroidState(code, display_string),
+    State(code, display_string),
     m_colour(colour),
     m_button_enabled(enable_button),
     m_button_text(button_text)

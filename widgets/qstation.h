@@ -35,6 +35,7 @@ private:
     const QDome * m_dome;
     const QServer * m_server;
     const QUfoManager * m_ufo_manager;
+    const QUfoManager * m_ufo_hd_manager;
 
     QTimer * m_timer_automatic;
     QTimer * m_timer_heartbeat;
@@ -93,6 +94,9 @@ public:
     // UFO manager getter and setter
     void set_ufo_manager(const QUfoManager * const ufo_manager);
     const QUfoManager * ufo_manager(void) const;
+
+    void set_ufo_hd_manager(const QUfoManager * const ufo_hd_manager);
+    const QUfoManager * ufo_hd_manager(void) const;
 
     // Position getters and setter
     double latitude(void) const;

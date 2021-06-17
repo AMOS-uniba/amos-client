@@ -12,6 +12,9 @@ void MainWindow::load_settings(void) {
         this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
         this->ui->station->set_dome(this->ui->dome);
         this->ui->station->set_ufo_manager(this->ui->ufo_manager);
+        this->ui->ufo_manager->set_id("sd");
+        this->ui->station->set_ufo_hd_manager(this->ui->ufo_hd_manager);
+        this->ui->ufo_hd_manager->set_id("hd");
 
         this->ui->scanner->set_directory(QDir(settings->value("storage/scanner_path", "C:\\Data").toString()));
         this->ui->scanner->set_enabled(settings->value("storage/scanner_enabled", true).toBool());
@@ -31,7 +34,7 @@ void MainWindow::load_settings(void) {
         bool debug = settings->value("debug", false).toBool();
         logger.set_level(debug ? Level::Debug : Level::Info);
         this->ui->cb_debug->setChecked(debug);
-    } catch (ConfigurationError &e) {
+    } catch (ConfigurationError & e) {
         QString postmortem = QString("Fatal configuration error: %1").arg(e.what());
         QMessageBox box;
         box.setText(postmortem);

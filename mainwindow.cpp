@@ -70,8 +70,12 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize();
     this->ui->ufo_manager->initialize();
+    this->ui->ufo_hd_manager->initialize();
     this->ui->station->initialize();
 
+    this->ui->scanner->initialize();
+    this->ui->storage_primary->initialize();
+    this->ui->storage_permanent->initialize();
 #ifdef OLD_PROTOCOL
 //    this->ui->dome->set_cover_minimum(-26);
 //    this->ui->dome->set_cover_maximum(26);

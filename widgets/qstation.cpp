@@ -227,6 +227,9 @@ const QStorageBox * QStation::permanent_storage(void) const { return this->m_per
 void QStation::set_ufo_manager(const QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
 const QUfoManager * QStation::ufo_manager(void) const { return this->m_ufo_manager; }
 
+void QStation::set_ufo_hd_manager(const QUfoManager * const ufo_hd_manager) { this->m_ufo_hd_manager = ufo_hd_manager; }
+const QUfoManager * QStation::ufo_hd_manager(void) const { return this->m_ufo_hd_manager; }
+
 // Server getters and setters
 void QStation::set_server(const QServer * const server) {
     this->m_server = server;
@@ -388,6 +391,7 @@ void QStation::automatic_check(void) {
 
 void QStation::automatic_ufo(void) {
     this->ufo_manager()->auto_action(this->is_dark());
+    this->ufo_hd_manager()->auto_action(this->is_dark());
 }
 
 void QStation::process_sightings(QVector<Sighting> sightings) {

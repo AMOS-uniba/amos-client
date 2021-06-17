@@ -18,6 +18,8 @@ QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
     m_frame(nullptr),
+    m_path(""),
+    m_id(""),
     m_autostart(false),
     m_state(QUfoManager::NotRunning)
 {
@@ -41,13 +43,13 @@ void QUfoManager::initialize(void) {
 }
 
 void QUfoManager::load_settings(void) {
-    this->set_path(settings->value("ufo/path", "C:\\Program Files\\UFO\\UFO.exe").toString());
-    this->set_autostart(settings->value("ufo/autostart", false).toBool());
+    this->set_path(settings->value(QString("ufo/%1-path").arg(this->m_id), "C:\\AMOS\\UFO\\UFO.exe").toString());
+    this->set_autostart(settings->value(QString("ufo/%1-autostart").arg(this->m_id), false).toBool());
 }
 
 void QUfoManager::save_settings(void) const {
-    settings->setValue("ufo/path", this->path());
-    settings->setValue("ufo/autostart", this->is_autostart());
+    settings->setValue(QString("ufo/%1-path").arg(this->m_id), this->path());
+    settings->setValue(QString("ufo/%1-autostart").arg(this->m_id), this->is_autostart());
 }
 
 // Autostart getter and setter
@@ -56,6 +58,7 @@ void QUfoManager::set_autostart(bool enable) {
     this->m_autostart = enable;
 
     this->ui->cb_auto->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+    this->save_settings();
 }
 
 bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
@@ -63,10 +66,13 @@ bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
 void QUfoManager::set_path(const QString & path) {
     this->ui->le_path->setText(path);
     this->m_path = path;
+    this->save_settings();
     this->update_state();
 }
 
 const QString& QUfoManager::path(void) const { return this->m_path; }
+
+void QUfoManager::set_id(const QString & id) { this->m_id = id; }
 
 void QUfoManager::auto_action(bool is_dark) const {
     if (this->m_autostart) {
@@ -116,6 +122,7 @@ void QUfoManager::update_state(void) {
     this->ui->lb_state->setStyleSheet(QString("QLabel { color: %1; }").arg(new_state.colour().name()));
     this->ui->bt_toggle->setEnabled(new_state.button_enabled());
     this->ui->bt_toggle->setText(new_state.button_text());
+    this->ui->cb_auto->setEnabled(new_state.button_enabled());
 
     if (old_state != new_state) {
         this->m_state = new_state;
@@ -222,7 +229,6 @@ QJsonObject QUfoManager::json(void) const {
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {
     this->set_autostart(checked);
-    settings->setValue("ufo/autostart", this->is_autostart());
 }
 
 void QUfoManager::on_bt_change_clicked(void) {
@@ -241,7 +247,6 @@ void QUfoManager::on_bt_change_clicked(void) {
             logger.debug(Concern::UFO, "Path not changed");
         } else {
             logger.info(Concern::UFO, QString("Path changed to %1").arg(filename));
-            settings->setValue("ufo/path", filename);
             this->set_path(filename);
         }
     }

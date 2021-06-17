@@ -25,6 +25,7 @@ private:
     mutable HWND m_frame;
     mutable QProcess m_process;
     QString m_path;
+    QString m_id;
 
     bool m_autostart;
     UfoState m_state;
@@ -43,8 +44,10 @@ public:
     void set_autostart(bool enable);
     bool is_autostart(void) const;
 
-    void set_path(const QString &path);
+    void set_path(const QString & path);
     const QString & path(void) const;
+
+    void set_id(const QString & name);
 
     bool is_running(void) const;
 
