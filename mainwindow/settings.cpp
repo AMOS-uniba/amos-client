@@ -11,22 +11,9 @@ void MainWindow::load_settings(void) {
         this->ui->station->set_server(this->ui->server);
         this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
         this->ui->station->set_dome(this->ui->dome);
-        this->ui->station->set_ufo_manager(this->ui->ufo_manager);
-        this->ui->ufo_manager->set_id("sd");
-        this->ui->station->set_ufo_hd_manager(this->ui->ufo_hd_manager);
-        this->ui->ufo_hd_manager->set_id("hd");
 
-        this->ui->scanner->set_directory(QDir(settings->value("storage/scanner_path", "C:\\Data").toString()));
-        this->ui->scanner->set_enabled(settings->value("storage/scanner_enabled", true).toBool());
-        this->ui->scanner->scan_info();
-
-        this->ui->storage_primary->set_directory(QDir(settings->value("storage/primary_path", "C:\\Data").toString()));
-        this->ui->storage_primary->set_enabled(settings->value("storage/primary_enabled", true).toBool());
-        this->ui->storage_primary->scan_info();
-
-        this->ui->storage_permanent->set_directory(QDir(settings->value("storage/permanent_path", "D:\\Data").toString()));
-        this->ui->storage_permanent->set_enabled(settings->value("storage/permanent_enabled", true).toBool());
-        this->ui->storage_permanent->scan_info();
+        this->ui->station->set_ufo_manager(this->ui->ufo_allsky);
+        this->ui->station->set_ufo_hd_manager(this->ui->ufo_spectral);
 
         logger.load_settings();
 

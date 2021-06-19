@@ -1,4 +1,5 @@
 #include "include.h"
+#include "widgets/qstation.h"
 
 #include "qserver.h"
 #include "ui_qserver.h"

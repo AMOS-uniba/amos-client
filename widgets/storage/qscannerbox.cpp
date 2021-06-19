@@ -5,23 +5,13 @@ extern QSettings * settings;
 
 QString QScannerBox::DialogTitle(void) const { return "Select UFO output directory to watch"; }
 QString QScannerBox::AbortMessage(void) const { return "Watch directory selection aborted"; }
+QString QScannerBox::MessageEnabled(void) const { return "Directory %1 %2abled"; }
+QString QScannerBox::MessageDirectoryChanged(void) const { return "Directory %1 set to \"%2\""; }
 
 QScannerBox::QScannerBox(QWidget * parent):
     QFileSystemBox(parent)
 {
     this->connect(this->m_timer, &QTimer::timeout, this, &QScannerBox::scan_sightings);
-}
-
-void QScannerBox::set_enabled(bool enabled) {
-    logger.info(Concern::Storage, QString("Scanner %1abled").arg(enabled ? "en" : "dis"));
-    QFileSystemBox::set_enabled(enabled);
-    settings->setValue(QString("storage/scanner_enabled"), enabled);
-}
-
-void QScannerBox::set_directory(const QDir & new_directory) {
-    QFileSystemBox::set_directory(new_directory);
-    logger.info(Concern::Storage, QString("Scanner directory set to \"%1\"").arg(this->m_directory.path()));
-    settings->setValue("storage/scanner_path", this->m_directory.path());
 }
 
 void QScannerBox::scan_sightings(void) const {
@@ -39,7 +29,7 @@ void QScannerBox::scan_sightings(void) const {
                 QString prefix = QString("%1/%2").arg(xml_info.absolutePath(), xml_info.completeBaseName());
 
                 sightings.append(Sighting(prefix));
-            } catch (RuntimeException &e) {
+            } catch (RuntimeException & e) {
                 logger.error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
             }
         }

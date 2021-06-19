@@ -5,6 +5,11 @@
 
 #include "forward.h"
 #include "APC/APC_include.h"
+#include "utils/universe.h"
+#include "widgets/qdome.h"
+#include "widgets/qufomanager.h"
+#include "widgets/qserver.h"
+#include "widgets/storage/qstoragebox.h"
 
 #include "logging/statelogger.h"
 

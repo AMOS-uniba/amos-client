@@ -133,9 +133,13 @@ bool Sighting::hack_Y16(void) const {
         if (header == "Y800") {
             logger.debug(Concern::Sightings, "Video format header is correct (Y800)");
         } else {
-            logger.warning(Concern::Sightings, QString("Video format header is faulty (%1), changing to 'Y800'").arg(QString(header)));
-            avi.seek(0xBC);
-            avi.write("Y800", 4);
+            if (header == "Y16 ") {
+                logger.warning(Concern::Sightings, QString("Video format header is faulty (%1), changing to 'Y800'").arg(QString(header)));
+                avi.seek(0xBC);
+                avi.write("Y800", 4);
+            } else {
+                logger.warning(Concern::Sightings, QString("Video format header is unknown (%1), not doing anything").arg(QString(header)));
+            }
         }
         avi.close();
         return true;

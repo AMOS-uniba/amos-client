@@ -44,7 +44,7 @@ QStation::QStation(QWidget * parent):
     m_darkness_limit(-12.0),
     m_manual_control(false),
     m_safety_override(false),
-    m_state(QStation::NotObserving)
+    m_state(QStation::DomeUnreachable)
 {
     ui->setupUi(this);
 
@@ -315,7 +315,7 @@ void QStation::automatic_check(void) {
         if (this->is_safety_overridden()) {
             logger.debug(Concern::Automatic, "Emergency override active, not closing");
         } else {
-            logger.warning(Concern::Automatic, "Closed the cover (not dark enough)");
+            logger.info(Concern::Automatic, "Closed the cover (not dark enough)");
             this->dome()->close_cover();
         }
     }
@@ -325,7 +325,7 @@ void QStation::automatic_check(void) {
         if (this->is_safety_overridden()) {
             logger.debug(Concern::Automatic, "Emergency override active, not turning off the intensifier");
         } else {
-            logger.warning(Concern::Automatic, "Turned off the image intensifier (not dark enough)");
+            logger.info(Concern::Automatic, "Turned off the image intensifier (not dark enough)");
             this->dome()->turn_off_intensifier();
         }
     }

@@ -34,49 +34,54 @@ QUfoManager::QUfoManager(QWidget * parent):
 }
 
 QUfoManager::~QUfoManager() {
-    delete ui;
     delete this->m_timer_check;
+    delete this->ui;
 }
 
-void QUfoManager::initialize(void) {
+void QUfoManager::initialize(const QString & id) {
+    if (!this->m_id.isEmpty()) {
+        throw ConfigurationError("UFO manager id already set");
+    }
+
+    this->m_id = id;
     this->load_settings();
 }
 
+const QString & QUfoManager::id(void) const { return this->m_id; }
+
 void QUfoManager::load_settings(void) {
-    this->set_path(settings->value(QString("ufo/%1-path").arg(this->m_id), "C:\\AMOS\\UFO\\UFO.exe").toString());
-    this->set_autostart(settings->value(QString("ufo/%1-autostart").arg(this->m_id), false).toBool());
+    this->set_path(settings->value(QString("ufo/%1_path").arg(this->id()), "C:\\AMOS\\UFO\\UFO.exe").toString());
+    this->set_autostart(settings->value(QString("ufo/%1_autostart").arg(this->id()), true).toBool());
 }
 
 void QUfoManager::save_settings(void) const {
-    settings->setValue(QString("ufo/%1-path").arg(this->m_id), this->path());
-    settings->setValue(QString("ufo/%1-autostart").arg(this->m_id), this->is_autostart());
+    settings->setValue(QString("ufo/%1_path").arg(this->id()), this->path());
+    settings->setValue(QString("ufo/%1_autostart").arg(this->id()), this->is_autostart());
 }
 
 // Autostart getter and setter
 void QUfoManager::set_autostart(bool enable) {
-    logger.info(Concern::UFO, QString("Autostart %1abled").arg(enable ? "en" : "dis"));
+    logger.info(Concern::UFO, QString("UFO-%1: autostart %2abled").arg(this->id(), enable ? "en" : "dis"));
     this->m_autostart = enable;
 
     this->ui->cb_auto->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
-    this->save_settings();
 }
 
 bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
 
+// Path getter and setter
 void QUfoManager::set_path(const QString & path) {
+    logger.info(Concern::UFO, QString("UFO-%1: path set to \"%2\"").arg(this->id(), path));
     this->ui->le_path->setText(path);
     this->m_path = path;
-    this->save_settings();
-    this->update_state();
 }
 
 const QString& QUfoManager::path(void) const { return this->m_path; }
 
-void QUfoManager::set_id(const QString & id) { this->m_id = id; }
-
+// Automatic action: start UFO after sunset, stop before sunrise
 void QUfoManager::auto_action(bool is_dark) const {
     if (this->m_autostart) {
-        logger.debug(Concern::UFO, "Automatic action");
+        logger.debug(Concern::UFO, QString("UFO-%1: Automatic action").arg(this->id()));
         if (is_dark) {
             this->start_ufo();
         } else {
@@ -86,6 +91,8 @@ void QUfoManager::auto_action(bool is_dark) const {
 }
 
 void QUfoManager::update_state(void) {
+    logger.debug(Concern::UFO, "Updating state...");
+
     this->disconnect(this->ui->bt_toggle, &QPushButton::clicked, nullptr, nullptr);
 
     UfoState old_state = this->m_state;
@@ -144,7 +151,7 @@ void QUfoManager::start_ufo(void) const {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
-            logger.debug(Concern::UFO, "UFO Capture is already running, not doing anything");
+            logger.debug(Concern::UFO, QString("UFO-%1: Application already running, not doing anything").arg(this->id()));
             break;
         }
         case QProcess::ProcessState::NotRunning: {
@@ -156,7 +163,7 @@ void QUfoManager::start_ufo(void) const {
 
             Sleep(1000);
             this->m_frame = FindWindowA(nullptr, "UFOCapture");
-            logger.debug(Concern::UFO, QString("UFO Capture's HWND is %1").arg((long long) this->m_frame));
+            logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2").arg(this->id()).arg((long long) this->m_frame));
             Sleep(1000);
             ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
             emit this->started();
@@ -171,12 +178,12 @@ void QUfoManager::start_ufo(void) const {
  */
 void QUfoManager::stop_ufo(void) const {
     if (this->m_process.state() == QProcess::ProcessState::NotRunning) {
-        logger.debug(Concern::UFO, "Not running");
+        logger.debug(Concern::UFO, QString("UFO-%1: Not running").arg(this->id()));
     } else {
         HWND child;
 
         if (this->is_running()) {
-            logger.debug(Concern::UFO, QString("Trying to stop UFO Capture politely"));
+            logger.debug(Concern::UFO, QString("UFO-%1: Trying to stop politely").arg(this->id()));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
             Sleep(1000);
 
@@ -195,19 +202,19 @@ void QUfoManager::stop_ufo(void) const {
             Sleep(1000);
 
             if (this->is_running()) {
-                logger.warning(Concern::UFO, "UFO Capture did not stop, killing the child process");
+                logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
                 this->m_process.kill();
             }
 
             emit this->stopped();
         } else {
-            logger.debug(Concern::UFO, "UFO Capture is not running, not doing anything");
+            logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
         }
     }
 }
 
 void QUfoManager::log_state_change(const UfoState & state) const {
-    QString message = QString("State changed to \"%1\"").arg(state.display_string());
+    QString message = QString("UFO-%1: State changed to \"%2\"").arg(this->id(), state.display_string());
 
     if (state == QUfoManager::Starting) {
         logger.debug(Concern::UFO, message);
@@ -226,9 +233,9 @@ QJsonObject QUfoManager::json(void) const {
     };
 }
 
-
 void QUfoManager::on_cb_auto_clicked(bool checked) {
     this->set_autostart(checked);
+    this->save_settings();
 }
 
 void QUfoManager::on_bt_change_clicked(void) {
@@ -248,6 +255,8 @@ void QUfoManager::on_bt_change_clicked(void) {
         } else {
             logger.info(Concern::UFO, QString("Path changed to %1").arg(filename));
             this->set_path(filename);
+            this->update_state();
+            this->save_settings();
         }
     }
 }

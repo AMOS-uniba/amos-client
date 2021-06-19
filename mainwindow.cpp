@@ -17,15 +17,13 @@ MainWindow::MainWindow(QWidget *parent):
     m_terminate(false)
 {
     this->ui->setupUi(this);
-    this->ui->storage_primary->set_name("primary");
-    this->ui->storage_permanent->set_name("permanent");
 
     this->ui->tb_log->setColumnWidth(0, 140);
     this->ui->tb_log->setColumnWidth(1, 72);
     this->ui->tb_log->setColumnWidth(2, 80);
 
     logger.set_display_widget(this->ui->tb_log);
-    logger.info(Concern::Operation, "Client initialized");
+    logger.info(Concern::Operation, "------------ Initializing AMOS client ------------");
 
     // connect signals for handling of edits of station position
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
@@ -69,17 +67,23 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->ui->dome->initialize(this->ui->station);
     this->ui->server->initialize();
-    this->ui->ufo_manager->initialize();
-    this->ui->ufo_hd_manager->initialize();
     this->ui->station->initialize();
+    this->ui->ufo_allsky->initialize("allsky");
+    this->ui->ufo_spectral->initialize("spectral");
 
-    this->ui->scanner->initialize();
-    this->ui->storage_primary->initialize();
-    this->ui->storage_permanent->initialize();
+    this->ui->scanner->initialize("scanner", "C:/Data/");
+    this->ui->storage_primary->initialize("primary", "C:/Data/");
+    this->ui->storage_permanent->initialize("permanent", "D:/Data/");
+
+    this->ui->scanner->scan_info();
+    this->ui->storage_primary->scan_info();
+    this->ui->storage_permanent->scan_info();
+
 #ifdef OLD_PROTOCOL
 //    this->ui->dome->set_cover_minimum(-26);
 //    this->ui->dome->set_cover_maximum(26);
 #endif
+    logger.info(Concern::Operation, "Initialization complete");
 }
 
 MainWindow::~MainWindow() {
@@ -112,6 +116,11 @@ void MainWindow::on_cb_debug_stateChanged(int debug) {
     this->ui->action_debug->setChecked(debug);
 }
 
+/**
+ * @brief MainWindow::set_terminate
+ * Once called, the application is scheduled for termination and will not ask for exit confirmation
+ * Primarily used to prevent blocking system shutdown
+ */
 void MainWindow::set_terminate(void) {
     this->m_terminate = true;
 }

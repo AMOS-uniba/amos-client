@@ -317,7 +317,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QUfoManager" name="ufo_manager">
+        <widget class="QUfoManager" name="ufo_allsky">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -330,7 +330,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QUfoManager" name="ufo_hd_manager">
+        <widget class="QUfoManager" name="ufo_spectral">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -534,13 +534,13 @@
   <customwidget>
    <class>QStorageBox</class>
    <extends>QGroupBox</extends>
-   <header>widgets/qstoragebox.h</header>
+   <header>widgets/storage/qstoragebox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QScannerBox</class>
    <extends>QGroupBox</extends>
-   <header>widgets/qscannerbox.h</header>
+   <header>widgets/storage/qscannerbox.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

@@ -51,13 +51,13 @@ SOURCES += \
     widgets/qconfigurable.cpp \
     widgets/qdome.cpp \
     widgets/qdomewidget.cpp \
-    widgets/qfilesystembox.cpp \
-    widgets/qscannerbox.cpp \
     widgets/qserver.cpp \
     widgets/qstation.cpp \
-    widgets/qstoragebox.cpp \
     widgets/qsuninfo.cpp \
-    widgets/qufomanager.cpp
+    widgets/qufomanager.cpp \
+    widgets/storage/qfilesystembox.cpp \
+    widgets/storage/qscannerbox.cpp \
+    widgets/storage/qstoragebox.cpp
 
 HEADERS += \
     APC/APC_Cheb.h \
@@ -103,13 +103,13 @@ HEADERS += \
     widgets/qconfigurable.h \
     widgets/qdome.h \
     widgets/qdomewidget.h \
-    widgets/qfilesystembox.h \
-    widgets/qscannerbox.h \
     widgets/qserver.h \
     widgets/qstation.h \
-    widgets/qstoragebox.h \
     widgets/qsuninfo.h \
-    widgets/qufomanager.h
+    widgets/qufomanager.h \
+    widgets/storage/qfilesystembox.h \
+    widgets/storage/qscannerbox.h \
+    widgets/storage/qstoragebox.h
 
 FORMS += \
     logging/loggingdialog.ui \
@@ -135,9 +135,8 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.6.4.1
+VERSION = 0.6.5.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
-
 TARGET = "AMOS client"
 
 QMAKE_TARGET_COMPANY = AMOS

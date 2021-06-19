@@ -5,7 +5,8 @@ extern QSettings * settings;
 
 QFileSystemBox::QFileSystemBox(QWidget * parent):
     QGroupBox(parent),
-    m_enabled(true)
+    m_enabled(true),
+    m_id("")
 {
     this->m_timer = new QTimer(this);
     this->m_timer->setInterval(2000);
@@ -43,6 +44,36 @@ QFileSystemBox::QFileSystemBox(QWidget * parent):
     this->scan_info();
 }
 
+void QFileSystemBox::initialize(const QString & id, const QString & default_path) {
+    if (!this->m_id.isEmpty()) {
+        throw ConfigurationError("QFileSystemBox id already set");
+    }
+
+    this->m_id = id;
+    this->m_default_path = default_path;
+    this->load_settings();
+}
+
+const QString & QFileSystemBox::id(void) const { return this->m_id; }
+
+QString QFileSystemBox::path_key(void) const {
+    return QString("storage/%1_path").arg(this->id());
+}
+
+QString QFileSystemBox::enabled_key(void) const {
+    return QString("storage/%1_enabled").arg(this->id());
+}
+
+void QFileSystemBox::load_settings(void) {
+    this->set_directory(QDir(settings->value(this->path_key(), this->m_default_path).toString()));
+    this->set_enabled(settings->value(this->enabled_key(), true).toBool());
+}
+
+void QFileSystemBox::save_settings(void) const {
+    settings->setValue(this->path_key(), this->m_directory.path());
+    settings->setValue(this->enabled_key(), this->is_enabled());
+}
+
 QStorageInfo QFileSystemBox::info(void) const {
     return QStorageInfo(this->m_directory);
 }
@@ -52,6 +83,8 @@ bool QFileSystemBox::is_enabled(void) const {
 }
 
 void QFileSystemBox::set_enabled(bool enabled) {
+    logger.info(Concern::Storage, this->MessageEnabled().arg(this->id(), enabled ? "en" : "dis"));
+
     this->m_enabled = enabled;
     this->m_le_path->setEnabled(enabled);
     this->m_cb_enabled->setCheckState(enabled ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -59,25 +92,17 @@ void QFileSystemBox::set_enabled(bool enabled) {
     if (enabled != this->m_enabled) {
         emit this->toggled(this->m_enabled);
     }
-}
-
-void QFileSystemBox::scan_info(void) {
-    auto info = this->info();
-    double total = (double) info.bytesTotal() / (1 << 30);
-    double used = (double) info.bytesAvailable() / (1 << 30);
-
-    this->m_pb_capacity->setRange(0, (unsigned int) total);
-    this->m_pb_capacity->setValue((unsigned int) (total - used));
-    this->m_pb_capacity->setStyleSheet(
-        QString("QProgressBar { border: 1px solid black; border-radius: 0px; text-align: center; } \
-            QProgressBar::chunk {background-color: hsv(%1, 100%, 100%); width: 1px; }").arg((unsigned int) ((1 - ((total - used) / total)) * 120))
-    );
+    settings->setValue(this->enabled_key(), enabled);
 }
 
 void QFileSystemBox::set_directory(const QDir & new_directory) {
+    logger.info(Concern::Storage, this->MessageDirectoryChanged().arg(this->id(), new_directory.path()));
+
     this->m_directory = new_directory;
     this->m_le_path->setText(this->m_directory.path());
     emit this->directory_changed(this->m_directory.path());
+
+    settings->setValue(this->path_key(), this->m_directory.path());
 }
 
 void QFileSystemBox::select_directory(void) {
@@ -99,4 +124,17 @@ void QFileSystemBox::select_directory(void) {
 
 void QFileSystemBox::open_in_explorer(void) const {
     QDesktopServices::openUrl(QUrl::fromLocalFile(this->m_directory.path()));
+}
+
+void QFileSystemBox::scan_info(void) {
+    auto info = this->info();
+    double total = (double) info.bytesTotal() / (1 << 30);
+    double used = (double) info.bytesAvailable() / (1 << 30);
+
+    this->m_pb_capacity->setRange(0, (unsigned int) total);
+    this->m_pb_capacity->setValue((unsigned int) (total - used));
+    this->m_pb_capacity->setStyleSheet(
+        QString("QProgressBar { border: 1px solid black; border-radius: 0px; text-align: center; } \
+            QProgressBar::chunk {background-color: hsv(%1, 100%, 100%); width: 1px; }").arg((unsigned int) ((1 - ((total - used) / total)) * 120))
+    );
 }

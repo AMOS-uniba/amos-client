@@ -20,8 +20,8 @@ private:
 
     static unsigned char decode_byte(unsigned char first, unsigned char second);
 public:
-    Telegram(const unsigned char address, const QByteArray& message);
-    Telegram(const QByteArray& message);
+    Telegram(const unsigned char address, const QByteArray & message);
+    Telegram(const QByteArray & message);
 
     QByteArray compose(void) const;
     QByteArray get_message(void) const;

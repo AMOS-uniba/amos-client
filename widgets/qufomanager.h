@@ -40,6 +40,7 @@ public:
 
     explicit QUfoManager(QWidget * parent = nullptr);
     ~QUfoManager();
+    const QString & id(void) const;
 
     void set_autostart(bool enable);
     bool is_autostart(void) const;
@@ -47,16 +48,12 @@ public:
     void set_path(const QString & path);
     const QString & path(void) const;
 
-    void set_id(const QString & name);
-
     bool is_running(void) const;
-
     UfoState state(void) const;
-
     QJsonObject json(void) const;
 
 public slots:
-    void initialize(void);
+    void initialize(const QString & id);
     void load_settings(void);
     void save_settings(void) const;
     void auto_action(bool is_dark) const;

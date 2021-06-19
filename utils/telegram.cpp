@@ -1,12 +1,12 @@
-#include "include.h"
+#include "telegram.h"
 
 extern EventLogger logger;
 
 // Construct a new telegram from
-Telegram::Telegram(const unsigned char address, const QByteArray& message): m_address(address), m_message(message) {}
+Telegram::Telegram(const unsigned char address, const QByteArray & message): m_address(address), m_message(message) {}
 
 // RAII: construct a new telegram from the received message, includes validation
-Telegram::Telegram(const QByteArray& received) {
+Telegram::Telegram(const QByteArray & received) {
     logger.debug(Concern::SerialPort, QString("New telegram: '%1'").arg(QString(received)));
 
     // Check length of the message
