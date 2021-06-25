@@ -39,15 +39,16 @@ private:
 
     const QDome * m_dome;
     const QServer * m_server;
-    const QUfoManager * m_ufo_manager;
-    const QUfoManager * m_ufo_hd_manager;
+    const QUfoManager * m_ufo_allsky;
+    const QUfoManager * m_ufo_spectral;
 
     QTimer * m_timer_automatic;
     QTimer * m_timer_heartbeat;
 
     void set_state(StationState new_state);
 
-    bool is_changed(void) const;
+    bool is_position_changed(void) const;
+    bool is_altitude_changed(void) const;
 
 private slots:
     void load_settings(void);
@@ -75,10 +76,6 @@ public:
     void set_safety_override(bool override);
     bool is_safety_overridden(void) const;
 
-    // Station name
-    void set_name(const QString & name);
-    const QString& name(void) const;
-
     // Scanner getter and setter
     void set_scanner(const QScannerBox * const scanner);
     const QScannerBox * scanner(void) const;
@@ -97,11 +94,11 @@ public:
     const QServer * server(void) const;
 
     // UFO manager getter and setter
-    void set_ufo_manager(const QUfoManager * const ufo_manager);
-    const QUfoManager * ufo_manager(void) const;
+    void set_ufo_allsky(const QUfoManager * const ufo_allsky);
+    const QUfoManager * ufo_allsky(void) const;
 
-    void set_ufo_hd_manager(const QUfoManager * const ufo_hd_manager);
-    const QUfoManager * ufo_hd_manager(void) const;
+    void set_ufo_spectral(const QUfoManager * const ufo_spectral);
+    const QUfoManager * ufo_spectral(void) const;
 
     // Position getters and setter
     double latitude(void) const;

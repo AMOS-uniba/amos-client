@@ -63,11 +63,10 @@ QStation::QStation(QWidget * parent):
     this->connect(this->m_timer_heartbeat, &QTimer::timeout, this, &QStation::heartbeat);
     this->m_timer_heartbeat->start();
 
-    this->connect(this->ui->dsb_latitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
-    this->connect(this->ui->dsb_longitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
-    this->connect(this->ui->dsb_altitude, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
-    this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
-
+    // Connect change handler to all QDoubleSpinBoxes
+    for (auto && widget: { this->ui->dsb_latitude, this->ui->dsb_longitude, this->ui->dsb_altitude, this->ui->dsb_darkness_limit }) {
+        this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_settings_changed);
+    }
     this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QStation::apply_settings);
     this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QStation::discard_settings);
 
@@ -224,11 +223,11 @@ const QStorageBox * QStation::primary_storage(void) const { return this->m_prima
 const QStorageBox * QStation::permanent_storage(void) const { return this->m_permanent_storage; }
 
 // UFO manager
-void QStation::set_ufo_manager(const QUfoManager * const ufo_manager) { this->m_ufo_manager = ufo_manager; }
-const QUfoManager * QStation::ufo_manager(void) const { return this->m_ufo_manager; }
+void QStation::set_ufo_allsky(const QUfoManager * const ufo_allsky) { this->m_ufo_allsky = ufo_allsky; }
+const QUfoManager * QStation::ufo_allsky(void) const { return this->m_ufo_allsky; }
 
-void QStation::set_ufo_hd_manager(const QUfoManager * const ufo_hd_manager) { this->m_ufo_hd_manager = ufo_hd_manager; }
-const QUfoManager * QStation::ufo_hd_manager(void) const { return this->m_ufo_hd_manager; }
+void QStation::set_ufo_spectral(const QUfoManager * const ufo_spectral) { this->m_ufo_spectral = ufo_spectral; }
+const QUfoManager * QStation::ufo_spectral(void) const { return this->m_ufo_spectral; }
 
 // Server getters and setters
 void QStation::set_server(const QServer * const server) {
@@ -390,8 +389,8 @@ void QStation::automatic_check(void) {
 }
 
 void QStation::automatic_ufo(void) {
-    this->ufo_manager()->auto_action(this->is_dark());
-    this->ufo_hd_manager()->auto_action(this->is_dark());
+    this->ufo_allsky()->auto_action(this->is_dark());
+    this->ufo_spectral()->auto_action(this->is_dark());
 }
 
 void QStation::process_sightings(QVector<Sighting> sightings) {
@@ -409,7 +408,7 @@ QJsonObject QStation::prepare_heartbeat(void) const {
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"dome", this->dome()->json()},
         {"st", QString(this->state().code())},
-        {"ufo", this->ufo_manager()->json()},
+        {"ufo", this->ufo_allsky()->json()},
         {"disk", QJsonObject {
             {"prim", this->primary_storage()->json()},
             {"perm", this->permanent_storage()->json()},
@@ -483,25 +482,23 @@ void QStation::on_cb_safety_override_clicked(bool checked) {
     }
 }
 
-bool QStation::is_changed(void) const {
+bool QStation::is_position_changed(void) const {
     return (
-        (this->ui->dsb_latitude->value() != this->latitude()) ||
-        (this->ui->dsb_longitude->value() != this->longitude()) ||
-        (this->ui->dsb_altitude->value() != this->altitude()) ||
-        (this->ui->dsb_darkness_limit->value() != this->darkness_limit())
+        (abs(this->ui->dsb_latitude->value() - this->latitude()) > 1e-9) ||
+        (abs(this->ui->dsb_longitude->value() - this->longitude()) > 1e-9) ||
+        (abs(this->ui->dsb_altitude->value() - this->altitude()) > 1e-3)
     );
 }
 
+bool QStation::is_altitude_changed(void) const {
+    return (abs(this->ui->dsb_darkness_limit->value() - this->darkness_limit()) > 1e-3);
+}
+
 void QStation::apply_settings_inner(void) {
-    if (
-        (this->ui->dsb_latitude->value() != this->latitude()) ||
-        (this->ui->dsb_longitude->value() != this->longitude()) ||
-        (this->ui->dsb_altitude->value() != this->altitude())
-    ) {
+    if (this->is_position_changed()) {
         this->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
     }
-
-    if (this->ui->dsb_darkness_limit->value() != this->darkness_limit()) {
+    if (this->is_altitude_changed()) {
         this->set_darkness_limit(this->ui->dsb_darkness_limit->value());
     }
 }
@@ -517,14 +514,14 @@ void QStation::apply_settings(void) {
     try {
         this->apply_settings_inner();
         emit this->settings_changed();
-    } catch (ConfigurationError &e) {
+    } catch (ConfigurationError & e) {
         logger.error(Concern::Configuration, e.what());
     }
     this->handle_settings_changed();
 }
 
 void QStation::handle_settings_changed(void) {
-    bool changed = this->is_changed();
+    bool changed = (this->is_position_changed() || this->is_altitude_changed());
 
     this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
     this->ui->bt_apply->setEnabled(changed);

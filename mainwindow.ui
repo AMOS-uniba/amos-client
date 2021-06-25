@@ -124,13 +124,23 @@
     <item>
      <widget class="QFrame" name="frame_log">
       <layout class="QGridLayout" name="grid_log">
-       <item row="2" column="1">
-        <widget class="QCheckBox" name="cb_debug">
-         <property name="text">
-          <string>Debug output</string>
+       <item row="2" column="2">
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
          </property>
-         <property name="checked">
-          <bool>true</bool>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="lx_uptime">
+         <property name="text">
+          <string>Client uptime</string>
          </property>
         </widget>
        </item>
@@ -156,20 +166,26 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="3">
-        <widget class="QLabel" name="lx_uptime">
+       <item row="2" column="1">
+        <widget class="QCheckBox" name="cb_debug">
          <property name="text">
-          <string>Client uptime</string>
+          <string>Debug output</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="4" column="0" colspan="5">
+       <item row="3" column="0" rowspan="3" colspan="5">
         <widget class="QTableWidget" name="tb_log">
          <property name="lineWidth">
           <number>1</number>
          </property>
          <property name="horizontalScrollBarPolicy">
           <enum>Qt::ScrollBarAlwaysOn</enum>
+         </property>
+         <property name="sizeAdjustPolicy">
+          <enum>QAbstractScrollArea::AdjustToContents</enum>
          </property>
          <property name="editTriggers">
           <set>QAbstractItemView::NoEditTriggers</set>
@@ -179,6 +195,9 @@
          </property>
          <property name="selectionMode">
           <enum>QAbstractItemView::NoSelection</enum>
+         </property>
+         <property name="textElideMode">
+          <enum>Qt::ElideNone</enum>
          </property>
          <property name="horizontalScrollMode">
           <enum>QAbstractItemView::ScrollPerPixel</enum>
@@ -244,19 +263,6 @@
          </column>
         </widget>
        </item>
-       <item row="2" column="2">
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
       </layout>
      </widget>
     </item>
@@ -274,23 +280,21 @@
         <height>0</height>
        </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <property name="spacing">
-        <number>3</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="4" column="0" colspan="2">
+        <widget class="QUfoManager" name="ufo_spectral">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>50</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Spectral camera</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
         <widget class="QStation" name="station">
          <property name="minimumSize">
           <size>
@@ -303,20 +307,20 @@
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QServer" name="server">
-         <property name="minimumSize">
+       <item row="9" column="0" colspan="2">
+        <spacer name="spacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
-           <height>50</height>
+           <width>50</width>
+           <height>40</height>
           </size>
          </property>
-         <property name="title">
-          <string>Server</string>
-         </property>
-        </widget>
+        </spacer>
        </item>
-       <item>
+       <item row="3" column="0" colspan="2">
         <widget class="QUfoManager" name="ufo_allsky">
          <property name="minimumSize">
           <size>
@@ -325,24 +329,11 @@
           </size>
          </property>
          <property name="title">
-          <string>UFO</string>
+          <string>All-sky camera</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QUfoManager" name="ufo_spectral">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>UFO HD</string>
-         </property>
-        </widget>
-       </item>
-       <item>
+       <item row="5" column="0" colspan="2">
         <widget class="QGroupBox" name="group_storage">
          <property name="minimumSize">
           <size>
@@ -351,7 +342,7 @@
           </size>
          </property>
          <property name="title">
-          <string>Data storage monitor</string>
+          <string>Data storage</string>
          </property>
          <property name="flat">
           <bool>false</bool>
@@ -402,18 +393,18 @@
          </layout>
         </widget>
        </item>
-       <item>
-        <spacer name="spacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
+       <item row="2" column="0" colspan="2">
+        <widget class="QServer" name="server">
+         <property name="minimumSize">
           <size>
-           <width>50</width>
-           <height>40</height>
+           <width>0</width>
+           <height>50</height>
           </size>
          </property>
-        </spacer>
+         <property name="title">
+          <string>Server</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -532,18 +523,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QStorageBox</class>
-   <extends>QGroupBox</extends>
-   <header>widgets/storage/qstoragebox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QScannerBox</class>
-   <extends>QGroupBox</extends>
-   <header>widgets/storage/qscannerbox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QSunInfo</class>
    <extends>QGroupBox</extends>
    <header>widgets/qsuninfo.h</header>
@@ -571,6 +550,18 @@
    <class>QUfoManager</class>
    <extends>QGroupBox</extends>
    <header>widgets/qufomanager.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QStorageBox</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/storage/qstoragebox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QScannerBox</class>
+   <extends>QGroupBox</extends>
+   <header>widgets/storage/qscannerbox.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -665,11 +665,11 @@ void QDome::discard_settings(void) {
 }
 
 void QDome::on_bt_cover_open_clicked() {
-    logger.info(Concern::Operation, "Manual command to open the over");
+    logger.info(Concern::Operation, "Manual command to open the cover");
     this->open_cover();
 }
 
 void QDome::on_bt_cover_close_clicked() {
-    logger.info(Concern::Operation, "Manual command to close the over");
+    logger.info(Concern::Operation, "Manual command to close the cover");
     this->close_cover();
 }

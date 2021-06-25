@@ -23,10 +23,14 @@ const QDir QStorageBox::current_directory(const QDateTime & datetime) const {
 void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
     if (this->m_enabled) {
         logger.debug(Concern::Storage, QString("Storage \"%1\" storing a sighting").arg(this->id()));
+
+        //This is a better solution: every sighting has its own directory. Currently not implemented.
+        //QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
+        QString path = this->current_directory().path();
         if (del) {
-            sighting.move(this->current_directory().path());
+            sighting.move(path);
         } else {
-            sighting.copy(this->current_directory().path());
+            sighting.copy(path);
         }
     } else {
         logger.debug(Concern::Storage, QString("Storage \"%1\" disabled, not %2ing").arg(this->id(), del ? "mov" : "copy"));

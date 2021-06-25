@@ -48,6 +48,7 @@ SOURCES += \
     widgets/lines/qdatetimeline.cpp \
     widgets/lines/qdisplayline.cpp \
     widgets/lines/qfloatline.cpp \
+    widgets/qcamera.cpp \
     widgets/qconfigurable.cpp \
     widgets/qdome.cpp \
     widgets/qdomewidget.cpp \
@@ -100,6 +101,7 @@ HEADERS += \
     widgets/lines/qdatetimeline.h \
     widgets/lines/qdisplayline.h \
     widgets/lines/qfloatline.h \
+    widgets/qcamera.h \
     widgets/qconfigurable.h \
     widgets/qdome.h \
     widgets/qdomewidget.h \
@@ -116,6 +118,7 @@ FORMS += \
     mainwindow.ui \
     widgets/aboutdialog.ui \
     widgets/lines/qdisplayline.ui \
+    widgets/qcamera.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
     widgets/qstation.ui \
@@ -135,7 +138,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.6.5.0
+VERSION = 0.6.7.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 TARGET = "AMOS client"
 

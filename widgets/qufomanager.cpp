@@ -34,6 +34,7 @@ QUfoManager::QUfoManager(QWidget * parent):
 }
 
 QUfoManager::~QUfoManager() {
+    this->disconnect(&this->m_process, &QProcess::stateChanged, nullptr, nullptr);
     delete this->m_timer_check;
     delete this->ui;
 }
@@ -91,7 +92,7 @@ void QUfoManager::auto_action(bool is_dark) const {
 }
 
 void QUfoManager::update_state(void) {
-    logger.debug(Concern::UFO, "Updating state...");
+    logger.debug(Concern::UFO, QString("UFO-%1: Updating state...").arg(this->id()));
 
     this->disconnect(this->ui->bt_toggle, &QPushButton::clicked, nullptr, nullptr);
 
@@ -151,11 +152,11 @@ void QUfoManager::start_ufo(void) const {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
-            logger.debug(Concern::UFO, QString("UFO-%1: Application already running, not doing anything").arg(this->id()));
+            logger.debug(Concern::UFO, QString("UFO-%1 already running, not doing anything").arg(this->id()));
             break;
         }
         case QProcess::ProcessState::NotRunning: {
-            logger.info(Concern::UFO, "Starting");
+            logger.info(Concern::UFO, QString("UFO-%1 starting").arg(this->id()));
             this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
             this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
             this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
@@ -214,24 +215,17 @@ void QUfoManager::stop_ufo(void) const {
 }
 
 void QUfoManager::log_state_change(const UfoState & state) const {
-    QString message = QString("UFO-%1: State changed to \"%2\"").arg(this->id(), state.display_string());
-
-    if (state == QUfoManager::Starting) {
-        logger.debug(Concern::UFO, message);
-    } else {
-        if ((state == QUfoManager::NotRunning) || (state == QUfoManager::Running)) {
-            logger.info(Concern::UFO, message);
-        } else {
-            logger.error(Concern::UFO, message);
-        }
-    }
+    logger.debug(Concern::UFO, QString("UFO-%1: State changed to \"%2\"").arg(this->id(), state.display_string()));
 }
 
 QJsonObject QUfoManager::json(void) const {
     return QJsonObject {
+        {"auto", this->is_autostart()},
         {"st", QString(QChar(this->state().code()))},
     };
 }
+
+/** Event handlers **/
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {
     this->set_autostart(checked);

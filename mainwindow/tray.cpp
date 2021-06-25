@@ -15,7 +15,6 @@ void MainWindow::closeEvent(QCloseEvent * event) {
         event->accept();
     } else {
         event->ignore();
-
         QMessageBox * box = new QMessageBox(QMessageBox::Question,
                                             "Confirm exit",
                                             "Are you sure you want to turn off the client?",
@@ -57,9 +56,10 @@ void MainWindow::create_actions() {
 
 void MainWindow::set_icon(const StationState & state) {
     this->tray_icon->setIcon(this->icons[state.icon()]);
-    this->tray_icon->setToolTip(QString("AMOS client\n%1\n%2")
-                                .arg(state.display_string())
-                                .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate)));
+    this->tray_icon->setToolTip(QString("AMOS client\n%1\nsince %2").arg(
+        state.display_string(),
+        QDateTime::currentDateTimeUtc().toString(Qt::ISODate)
+    ));
 }
 
 void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
@@ -72,9 +72,8 @@ void MainWindow::icon_activated(QSystemTrayIcon::ActivationReason reason) {
                 this->activateWindow();
             }
             break;
-        case QSystemTrayIcon::MiddleClick:
-            break;
         default:
+        case QSystemTrayIcon::MiddleClick:
             break;
     }
 }
@@ -84,6 +83,6 @@ void MainWindow::show_message(void) {
         "AMOS client",
         this->ui->station->state().tooltip(),
         this->icons[this->ui->station->state().icon()],
-        5000
+        3000
     );
 }

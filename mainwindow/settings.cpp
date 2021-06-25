@@ -12,8 +12,8 @@ void MainWindow::load_settings(void) {
         this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
         this->ui->station->set_dome(this->ui->dome);
 
-        this->ui->station->set_ufo_manager(this->ui->ufo_allsky);
-        this->ui->station->set_ufo_hd_manager(this->ui->ufo_spectral);
+        this->ui->station->set_ufo_allsky(this->ui->ufo_allsky);
+        this->ui->station->set_ufo_spectral(this->ui->ufo_spectral);
 
         logger.load_settings();
 

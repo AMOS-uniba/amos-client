@@ -2,23 +2,27 @@
 
 extern EventLogger logger;
 
-Sighting::Sighting(const QString & prefix):
+Sighting::Sighting(const QString & dir, const QString & prefix):
+    m_dir(dir),
     m_prefix(prefix)
 {
-    this->m_jpg = this->try_open(QString("%1P.jpg").arg(prefix), false);
-    this->m_xml = this->try_open(QString("%1.xml").arg(prefix), true);
-    this->m_bmp = this->try_open(QString("%1M.bmp").arg(prefix), false);
-    this->m_avi = this->try_open(QString("%1.avi").arg(prefix), false);
-    this->m_files = {this->m_jpg, this->m_xml, this->m_bmp, this->m_avi};
+    QString full = QString("%1/%2").arg(this->m_dir, this->m_prefix);
+    this->m_jpg = this->try_open(QString("%1P.jpg").arg(full), false);
+    this->m_jpt = this->try_open(QString("%1T.jpg").arg(full), false);
+    this->m_xml = this->try_open(QString("%1.xml").arg(full), true);
+    this->m_bmp = this->try_open(QString("%1M.bmp").arg(full), false);
+    this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
+    this->m_files = {this->m_jpg, this->m_jpt, this->m_xml, this->m_bmp, this->m_avi};
 
     logger.info(Concern::Sightings, QString("Created a new sighting '%1*' (%2 MB) (%3)")
                 .arg(prefix)
                 .arg(this->avi_size() / (1 << 20))
                 .arg(QStringList({
-                    (this->m_xml == "") ? "XML" : "---",
-                    (this->m_jpg == "") ? "JPG" : "---",
-                    (this->m_bmp == "") ? "BMP" : "---",
-                    (this->m_avi == "") ? "AVI" : "---"
+                    (this->m_xml != "") ? "XML" : "---",
+                    (this->m_jpg != "") ? "JPG" : "---",
+                    (this->m_jpt != "") ? "JPT" : "---",
+                    (this->m_bmp != "") ? "BMP" : "---",
+                    (this->m_avi != "") ? "AVI" : "---"
                 }).join("+"))
     );
     this->m_timestamp = QFileInfo(this->m_xml).birthTime();
@@ -30,7 +34,7 @@ Sighting::~Sighting(void) {
 }
 
 QString Sighting::try_open(const QString & path, bool require) {
-    if (QFileInfo(path).exists()) {
+    if (QFileInfo::exists(path)) {
         return path;
     } else {
         if (require) {
@@ -46,11 +50,11 @@ qint64 Sighting::avi_size(void) const {
     return info.exists() ? info.size() : -1;
 }
 
-void Sighting::move(const QString &prefix) {
-    QDir().mkpath(prefix);
+void Sighting::move(const QString & dir) {
+    QDir().mkpath(dir);
 
-    for (auto &file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
+    for (auto & file: this->m_files) {
+        QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
 
         if (QFile::exists(new_path)) {
             logger.warning(Concern::Sightings, QString("Could not move the sighting, have to delete file '%1' first...").arg(new_path));
@@ -67,13 +71,17 @@ void Sighting::move(const QString &prefix) {
     }
 }
 
-void Sighting::copy(const QString & prefix) const {
-    logger.debug(Concern::Sightings, QString("Copying to %1").arg(prefix));
-    QDir().mkpath(prefix);
+void Sighting::copy(const QString & dir) const {
+    logger.debug(Concern::Sightings, QString("Copying to %1").arg(dir));
+    QDir().mkpath(dir);
 
     for (auto & file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(prefix).arg(QFileInfo(file).fileName());
-        QFile::copy(file, new_path);
+        QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
+        if (QFile::copy(file, new_path)) {
+            logger.debug(Concern::Sightings, QString("Moved %1 to %2").arg(file, new_path));
+        } else {
+            logger.error(Concern::Sightings, QString("Could not copy file %1 to %2").arg(file, new_path));
+        }
     }
 }
 
