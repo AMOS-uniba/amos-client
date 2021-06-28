@@ -8,39 +8,30 @@
 #include "utils/exception.h"
 
 /*
-class QAmosWidget: public QGroupBox {
+class QAmosWidgetMixin {
     Q_OBJECT
 protected:
-    virtual void load_settings(const QSettings * const settings);
+    void load_settings(const QSettings * const settings);
+
+    virtual bool is_changed(void) const = 0;
+
     virtual void load_settings_inner(const QSettings * const settings) = 0;
-    virtual void load_defaults(void) = 0;
-    virtual void save_settings(void) const = 0;
+    virtual void apply_changes_inner(void) = 0;
 
-public:
-    explicit QAmosWidget(QWidget * parent = nullptr);
-    ~QAmosWidget(void);
-
-    virtual void initialize(void) = 0;
-};
-
-
-class QConfigurable: public QAmosWidget {
-    Q_OBJECT
-protected:
-    virtual bool is_config_changed(void) = 0;
-    virtual void load_settings(const QSettings * const settings) override;
 protected slots:
-    void handle_config_changed(void);
+    void apply_changes(void);
+
+    virtual void load_defaults(void) = 0;
+    virtual void save_settings(QSettings * const settings) const = 0;
+    virtual void discard_changes(void) = 0;
+    virtual void handle_config_changed(void) = 0;
 
 public:
-    explicit QConfigurable(QWidget * parent = nullptr);
-    ~QConfigurable(void);
+    explicit QAmosWidgetMixin(void);
+    ~QAmosWidgetMixin(void);
 
 public slots:
-
-    void apply_changes(void);
-    virtual void apply_changes_inner(void) = 0;
-    virtual void discard_changes(void) = 0;
+    virtual void initialize(void) = 0;
 
 signals:
     void settings_changed(void) const;

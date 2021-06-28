@@ -43,21 +43,20 @@ void QUfoManager::initialize(const QString & id) {
     if (!this->m_id.isEmpty()) {
         throw ConfigurationError("UFO manager id already set");
     }
-
     this->m_id = id;
+
     this->load_settings();
+    this->update_state();
 }
 
-const QString & QUfoManager::id(void) const { return this->m_id; }
-
 void QUfoManager::load_settings(void) {
-    this->set_path(settings->value(QString("ufo/%1_path").arg(this->id()), "C:\\AMOS\\UFO\\UFO.exe").toString());
-    this->set_autostart(settings->value(QString("ufo/%1_autostart").arg(this->id()), true).toBool());
+    this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), "C:/AMOS/UFO2/UFO2.exe").toString());
+    this->set_autostart(settings->value(QString("camera_%1/ufo_autostart").arg(this->id()), true).toBool());
 }
 
 void QUfoManager::save_settings(void) const {
-    settings->setValue(QString("ufo/%1_path").arg(this->id()), this->path());
-    settings->setValue(QString("ufo/%1_autostart").arg(this->id()), this->is_autostart());
+    settings->setValue(QString("camera_%1/ufo_path").arg(this->id()), this->path());
+    settings->setValue(QString("camera_%1/ufo_autostart").arg(this->id()), this->is_autostart());
 }
 
 // Autostart getter and setter

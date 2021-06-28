@@ -40,7 +40,8 @@ public:
 
     explicit QUfoManager(QWidget * parent = nullptr);
     ~QUfoManager();
-    const QString & id(void) const;
+
+    inline const QString & id(void) const { return this->m_id; }
 
     void set_autostart(bool enable);
     bool is_autostart(void) const;

@@ -43,7 +43,7 @@ void QServer::initialize(void) {
 void QServer::load_settings(void) {
     try {
         this->load_settings_inner();
-    } catch (ConfigurationError &e) {
+    } catch (ConfigurationError & e) {
         this->load_defaults();
     }
     this->refresh_urls();
@@ -73,14 +73,10 @@ void QServer::save_settings(void) const {
     settings->sync();
 }
 
-const QHostAddress& QServer::address(void) const { return this->m_address; }
-const unsigned short& QServer::port(void) const { return this->m_port; }
-const QString& QServer::station_id(void) const { return this->m_station_id; }
-
-void QServer::set_address(const QString &address, const unsigned short port) {
+void QServer::set_address(const QString & address, const unsigned short port) {
     QHostAddress addr;
     if (!addr.setAddress(address)) {
-        throw ConfigurationError(QString("Invalid IP address %1").arg(address));
+        throw ConfigurationError(QString("Invalid address \"%1\"").arg(address));
     }
 
     this->m_address = addr;
@@ -90,7 +86,7 @@ void QServer::set_address(const QString &address, const unsigned short port) {
 }
 
 void QServer::set_station_id(const QString &id) {
-    if (id.length() > 4) {
+    if ((id.length() < 2) || (id.length() > 4)) {
         throw ConfigurationError(QString("Cannot set station id to '%1'").arg(id));
     }
 
@@ -128,7 +124,7 @@ void QServer::send_heartbeat(const QJsonObject &heartbeat) const {
 }
 
 void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
-    auto reply = static_cast<QNetworkReply*>(sender());
+    auto reply = static_cast<QNetworkReply *>(sender());
     logger.error(
         Concern::Server,
         QString("Heartbeat could not be sent: %1 (error %2: %3)")
@@ -152,6 +148,12 @@ void QServer::heartbeat_ok(QNetworkReply * reply) {
     emit this->heartbeat_sent();
 }
 
+void QServer::send_sightings(QVector<Sighting> sightings) const {
+    for (auto && sighting: sightings) {
+        this->send_sighting(sighting);
+    }
+}
+
 void QServer::send_sighting(const Sighting & sighting) const {
     logger.debug(Concern::Server, QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
 
@@ -164,6 +166,16 @@ void QServer::send_sighting(const Sighting & sighting) const {
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply * reply = this->m_network_manager->post(request, multipart);
     multipart->setParent(reply); // delete the multiPart with the reply
+}
+
+void QServer::button_send_heartbeat(void) {
+    logger.info(Concern::Server, "Requesting a manual heartbeat");
+    emit this->request_heartbeat();
+}
+
+void QServer::display_countdown(void) {
+    this->ui->lb_countdown->setText(QString("%1 s")
+        .arg(QStation::HeartbeatInterval / 1000 - this->m_last_heartbeat.secsTo(QDateTime::currentDateTimeUtc())));
 }
 
 bool QServer::is_changed(void) const {
@@ -190,20 +202,11 @@ void QServer::discard_settings(void) {
     this->ui->le_station_id->setText(this->station_id());
 }
 
-void QServer::button_send_heartbeat(void) {
-    logger.info(Concern::Server, "Requesting a manual heartbeat");
-    emit this->request_heartbeat();
-}
-
-void QServer::display_countdown(void) {
-    this->ui->lb_countdown->setText(QString("%1 s").arg(QStation::HeartbeatInterval / 1000 - this->m_last_heartbeat.secsTo(QDateTime::currentDateTimeUtc())));
-}
-
 void QServer::apply_settings(void) {
     try {
         this->apply_settings_inner();
         emit this->settings_changed();
-    } catch (ConfigurationError &e) {
+    } catch (ConfigurationError & e) {
         logger.error(Concern::Configuration, e.what());
     }
     this->handle_settings_changed();

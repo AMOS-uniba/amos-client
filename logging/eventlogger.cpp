@@ -46,7 +46,7 @@ void EventLogger::set_display_widget(QTableWidget * widget) {
 
 QString EventLogger::format(const QDateTime & timestamp, Level level, const QString & concern, const QString & message) const {
     return QString("%1 %2|%3: %4")
-            .arg(timestamp.toString(Qt::ISODate), EventLogger::Levels[level].code, concern, message);
+        .arg(timestamp.toString(Qt::ISODate), EventLogger::Levels[level].code, concern, message);
 }
 
 void EventLogger::write(Level level, Concern concern, const QString &message) const {

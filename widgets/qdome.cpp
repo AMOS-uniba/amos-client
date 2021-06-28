@@ -16,7 +16,7 @@ extern QSettings * settings;
 
 const Request QDome::RequestBasic               = Request('S', "basic data request");
 const Request QDome::RequestEnv                 = Request('T', "environment data request");
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
 const Request QDome::RequestShaft               = Request('W', "shaft position request (old protocol)");
 #else
 const Request QDome::RequestShaft               = Request('Z', "shaft position request");
@@ -520,7 +520,7 @@ void QDome::process_message(const QByteArray &message) {
                 this->m_state_T = DomeStateT(decoded);
                 emit this->state_updated_T(this->m_state_T);
                 break;
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
             case 'W':
 #else
             case 'Z':

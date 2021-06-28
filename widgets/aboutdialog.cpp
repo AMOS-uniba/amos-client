@@ -12,7 +12,7 @@ AboutDialog::AboutDialog(QWidget * parent) :
     ui->setupUi(this);
     this->ui->lb_datetime->setText(QString("Built on %1 %2").arg(__DATE__, __TIME__));
     this->ui->lb_protocol->setText(
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
     "Compiled for old protocol (Senec)"
 #else
     "Compiled for new protocol"

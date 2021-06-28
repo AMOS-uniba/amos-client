@@ -1,5 +1,7 @@
 #include "qstoragebox.h"
 
+#include "widgets/qcamera.h"
+
 extern EventLogger logger;
 extern QSettings * settings;
 
@@ -40,8 +42,6 @@ QFileSystemBox::QFileSystemBox(QWidget * parent):
     this->connect(this->m_bt_change, &QPushButton::clicked, this, &QFileSystemBox::select_directory);
     this->connect(this->m_bt_open, &QPushButton::clicked, this, &QFileSystemBox::open_in_explorer);
     this->connect(this->m_cb_enabled, &QCheckBox::clicked, this, &QFileSystemBox::set_enabled);
-
-    this->scan_info();
 }
 
 void QFileSystemBox::initialize(const QString & id, const QString & default_path) {
@@ -51,17 +51,19 @@ void QFileSystemBox::initialize(const QString & id, const QString & default_path
 
     this->m_id = id;
     this->m_default_path = default_path;
+
     this->load_settings();
+    this->scan_info();
 }
 
 const QString & QFileSystemBox::id(void) const { return this->m_id; }
 
 QString QFileSystemBox::path_key(void) const {
-    return QString("storage/%1_path").arg(this->id());
+    return QString("camera_%1/%2_path").arg(((QCamera *) this->parentWidget())->id(), this->id());
 }
 
 QString QFileSystemBox::enabled_key(void) const {
-    return QString("storage/%1_enabled").arg(this->id());
+    return QString("camera_%1/%2_enabled").arg(((QCamera *) this->parentWidget())->id(), this->id());
 }
 
 void QFileSystemBox::load_settings(void) {

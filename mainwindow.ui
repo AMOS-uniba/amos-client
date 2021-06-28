@@ -20,33 +20,6 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QFrame" name="frame_dome_old">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout_2">
-       <property name="spacing">
-        <number>3</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-      </layout>
-     </widget>
-    </item>
-    <item>
      <widget class="QFrame" name="frame_dome">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
@@ -206,7 +179,7 @@
           <enum>Qt::NoPen</enum>
          </property>
          <property name="wordWrap">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="rowCount">
           <number>0</number>
@@ -234,6 +207,9 @@
          </attribute>
          <attribute name="verticalHeaderDefaultSectionSize">
           <number>18</number>
+         </attribute>
+         <attribute name="verticalHeaderStretchLastSection">
+          <bool>false</bool>
          </attribute>
          <column>
           <property name="text">
@@ -276,25 +252,25 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>260</width>
+        <width>500</width>
         <height>0</height>
        </size>
       </property>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="4" column="0" colspan="2">
-        <widget class="QUfoManager" name="ufo_spectral">
+       <item row="1" column="0">
+        <widget class="QCamera" name="camera_allsky">
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>50</height>
+           <height>100</height>
           </size>
          </property>
          <property name="title">
-          <string>Spectral camera</string>
+          <string>All-sky camera</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="0" colspan="2">
+       <item row="0" column="0">
         <widget class="QStation" name="station">
          <property name="minimumSize">
           <size>
@@ -307,93 +283,7 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="2">
-        <spacer name="spacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>50</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <widget class="QUfoManager" name="ufo_allsky">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>50</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>All-sky camera</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0" colspan="2">
-        <widget class="QGroupBox" name="group_storage">
-         <property name="minimumSize">
-          <size>
-           <width>260</width>
-           <height>255</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Data storage</string>
-         </property>
-         <property name="flat">
-          <bool>false</bool>
-         </property>
-         <property name="checkable">
-          <bool>false</bool>
-         </property>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <item>
-           <widget class="QScannerBox" name="scanner">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>70</height>
-             </size>
-            </property>
-            <property name="title">
-             <string>Watch directory</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QStorageBox" name="storage_primary">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>70</height>
-             </size>
-            </property>
-            <property name="title">
-             <string>Primary storage</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QStorageBox" name="storage_permanent">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>70</height>
-             </size>
-            </property>
-            <property name="title">
-             <string>Permanent storage</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item row="2" column="0" colspan="2">
+       <item row="0" column="1">
         <widget class="QServer" name="server">
          <property name="minimumSize">
           <size>
@@ -405,6 +295,32 @@
           <string>Server</string>
          </property>
         </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCamera" name="camera_spectral">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Spectral camera</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0" colspan="2">
+        <spacer name="spacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>50</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -547,21 +463,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QUfoManager</class>
+   <class>QCamera</class>
    <extends>QGroupBox</extends>
-   <header>widgets/qufomanager.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QStorageBox</class>
-   <extends>QGroupBox</extends>
-   <header>widgets/storage/qstoragebox.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QScannerBox</class>
-   <extends>QGroupBox</extends>
-   <header>widgets/storage/qscannerbox.h</header>
+   <header>widgets/qcamera.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

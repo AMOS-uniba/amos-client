@@ -20,7 +20,7 @@ void MainWindow::display_time(void) {
 }
 
 void MainWindow::display_window_title(void) {
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
     QString protocol = " <Senec>";
 #else
     QString protocol = "";

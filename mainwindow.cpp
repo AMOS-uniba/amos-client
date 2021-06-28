@@ -30,10 +30,16 @@ MainWindow::MainWindow(QWidget *parent):
     settings->setValue("run/last_run", this->m_start_time);
     this->load_settings();
 
+    this->ui->dome->initialize(this->ui->station);
+    this->ui->server->initialize();
+    this->ui->station->initialize();
+    this->ui->camera_allsky->initialize("allsky");
+    this->ui->camera_spectral->initialize("spectral");
+
     this->ui->sun_info->set_station(this->ui->station);
+    this->ui->sun_info->set_allsky_camera(this->ui->camera_allsky);
 
     this->create_timers();
-
     this->create_actions();
     this->create_tray_icon();
     this->icons = {
@@ -54,32 +60,20 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::show_message);
     this->connect(this->ui->station, &QStation::state_changed, this->ui->dome, &QDome::display_serial_port_info);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
-    this->set_icon(this->ui->station->state());
-
-    this->display_window_title();
-
-    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this->ui->station, &QStation::process_sightings);
-    this->connect(this->ui->station, &QStation::humidity_limits_changed, this->ui->dome, &QDome::set_formatters);
 
     this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
-    this->connect(this->ui->station, &QStation::darkness_limit_changed, this->ui->sun_info, &QSunInfo::update_long_term);
+
+    this->connect(this->ui->camera_allsky, &QCamera::sightings_found, this->ui->server, &QServer::send_sightings);
+
     this->connect(qApp, &QApplication::commitDataRequest, this, &MainWindow::set_terminate);
 
-    this->ui->dome->initialize(this->ui->station);
-    this->ui->server->initialize();
-    this->ui->station->initialize();
-    this->ui->ufo_allsky->initialize("allsky");
-    this->ui->ufo_spectral->initialize("spectral");
+    this->ui->station->send_heartbeat();
 
-    this->ui->scanner->initialize("scanner", "C:/Data/");
-    this->ui->storage_primary->initialize("primary", "C:/Data/");
-    this->ui->storage_permanent->initialize("permanent", "D:/Data/");
-
-    this->ui->scanner->scan_info();
-    this->ui->storage_primary->scan_info();
-    this->ui->storage_permanent->scan_info();
-
-#ifdef OLD_PROTOCOL
+    this->set_icon(this->ui->station->state());
+    this->display_window_title();
+    this->ui->sun_info->update_short_term();
+    this->ui->sun_info->update_long_term();
+#if OLD_PROTOCOL
 //    this->ui->dome->set_cover_minimum(-26);
 //    this->ui->dome->set_cover_maximum(26);
 #endif

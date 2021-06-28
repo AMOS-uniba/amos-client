@@ -9,11 +9,8 @@ void MainWindow::load_settings(void) {
         logger.info(Concern::Operation, QString("Reading settings from \"%1\"").arg(settings->fileName()));
 
         this->ui->station->set_server(this->ui->server);
-        this->ui->station->set_storages(this->ui->storage_primary, this->ui->storage_permanent);
+        this->ui->station->set_cameras(this->ui->camera_allsky, this->ui->camera_spectral);
         this->ui->station->set_dome(this->ui->dome);
-
-        this->ui->station->set_ufo_allsky(this->ui->ufo_allsky);
-        this->ui->station->set_ufo_spectral(this->ui->ufo_spectral);
 
         logger.load_settings();
 

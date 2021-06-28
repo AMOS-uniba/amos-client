@@ -104,6 +104,7 @@ void QSunInfo::update_short_term(void) {
 }
 
 void QSunInfo::set_station(const QStation * const station) { this->m_station = station; }
+void QSunInfo::set_allsky_camera(const QCamera * const camera) { this->m_allsky_camera = camera; }
 
 void QSunInfo::update_long_term(void) {
     auto equ = Universe::compute_sun_equ();
@@ -113,8 +114,8 @@ void QSunInfo::update_long_term(void) {
     auto ecl = Universe::compute_sun_ecl();
     this->ui->sl_ecl_lon->set_value(ecl[phi] * Deg);
 
-    this->ui->sl_dome_close->set_value(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), true));
+    this->ui->sl_dome_close->set_value(this->m_station->next_sun_crossing(this->m_allsky_camera->darkness_limit(), true));
     this->ui->sl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
     this->ui->sl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
-    this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->m_station->darkness_limit(), false));
+    this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->m_allsky_camera->darkness_limit(), false));
 }

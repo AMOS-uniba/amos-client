@@ -61,7 +61,7 @@ bool DomeStateS::fan_active(void) const                     { return this->m_bas
 
 bool DomeStateS::rain_sensor_active(void) const             { return this->m_env & 0x01; }
 bool DomeStateS::light_sensor_active(void) const            { return this->m_env & 0x02; }
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
 bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x08; }
 #else
 bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x04; }
@@ -171,7 +171,7 @@ DomeStateZ::DomeStateZ(void):
     m_shaft_position(0) {}
 
 DomeStateZ::DomeStateZ(const QByteArray &response) {
-#ifdef OLD_PROTOCOL
+#if OLD_PROTOCOL
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }
