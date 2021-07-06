@@ -17,7 +17,7 @@ namespace Ui {
     class QStation;
 }
 
-class QStation: public QGroupBox {
+class QStation: public QAmosWidget {
     Q_OBJECT
 private:
     Ui::QStation * ui;
@@ -44,11 +44,20 @@ private:
 
     void set_state(StationState new_state);
 
-    void load_settings(const QSettings * const settings);
-    void load_settings_inner(const QSettings * const settings);
-    void apply_changes_inner(void);
+    void connect_slots(void) override;
+    void load_defaults(void) override;
+    void load_settings_inner(const QSettings * const settings) override;
+    void save_settings_inner(QSettings * settings) const override;
+    void apply_changes_inner(void) override;
+    void discard_changes_inner(void) override;
 
-    bool is_changed(void) const;
+private slots:
+    void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
+
+    void automatic_timer(void);
+
+    void on_cb_manual_clicked(bool checked);
+    void on_cb_safety_override_clicked(bool checked);
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower;
@@ -56,6 +65,8 @@ public:
 
     explicit QStation(QWidget * parent = nullptr);
     ~QStation();
+
+    bool is_changed(void) const override;
 
     static QString temperature_colour(float temperature);
 
@@ -85,7 +96,8 @@ public:
     inline double altitude(void) const { return this->m_altitude; }
 
     // Darkness limit getters and setters
-    bool is_dark(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    bool is_dark_allsky(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
+    bool is_dark_spectral(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
 
     // Sun position functions
     Polar sun_position(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
@@ -101,42 +113,24 @@ public:
     StationState state(void) const;
     QJsonObject json(void) const;
 
-private slots:
-    void load_defaults(void);
-    void save_settings(void) const;
+public slots:
+    void initialize(void) override;
 
-    void apply_changes(void);
-    void discard_changes(void);
-    void handle_config_changed(void);
-
-    void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
-
-    void automatic_timer(void);
     void automatic_cover(void);
 
-    void on_cb_manual_clicked(bool checked);
-    void on_cb_safety_override_clicked(bool checked);
-
-public slots:
-    void initialize(void);
-
     void log_state(void) const;
-
     void heartbeat(void) const;
     void send_heartbeat(void) const;
 
 signals:
-    void settings_changed(void) const;
-    void settings_discarded(void) const;
-
     void manual_mode_changed(bool manual);
     void safety_override_changed(bool overridden);
 
-    void id_changed(void) const;
     void position_changed(void) const;
-
     void state_changed(StationState state) const;
-    void automatic_action(bool is_dark) const;
+
+    void automatic_action_allsky(bool is_dark) const;
+    void automatic_action_spectral(bool is_dark) const;
 };
 
 #endif // QSTATION_H

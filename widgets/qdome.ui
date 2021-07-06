@@ -704,24 +704,6 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0" colspan="2">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QPushButton" name="bt_apply">
-          <property name="text">
-           <string>Apply</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="bt_discard">
-          <property name="text">
-           <string>Discard</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
       <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="dsb_humidity_limit_lower">
         <property name="maximumSize">
@@ -798,8 +780,6 @@
   <tabstop>co_serial_ports</tabstop>
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>dsb_humidity_limit_lower</tabstop>
-  <tabstop>bt_apply</tabstop>
-  <tabstop>bt_discard</tabstop>
   <tabstop>bt_cover_open</tabstop>
   <tabstop>bt_cover_close</tabstop>
  </tabstops>

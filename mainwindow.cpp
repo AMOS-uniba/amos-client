@@ -30,14 +30,16 @@ MainWindow::MainWindow(QWidget *parent):
     settings->setValue("run/last_run", this->m_start_time);
     this->load_settings();
 
-    this->ui->dome->initialize(this->ui->station);
+    this->amos_widgets = {this->ui->dome, this->ui->server, this->ui->station, this->ui->camera_allsky, this->ui->camera_spectral};
+
+    this->ui->dome->initialize();
     this->ui->server->initialize();
     this->ui->station->initialize();
-    this->ui->camera_allsky->initialize("allsky");
-    this->ui->camera_spectral->initialize("spectral");
+    this->ui->camera_allsky->initialize("allsky", this->ui->station);
+    this->ui->camera_spectral->initialize("spectral", this->ui->station);
 
+    this->ui->dome->set_station(this->ui->station);
     this->ui->sun_info->set_station(this->ui->station);
-    this->ui->sun_info->set_allsky_camera(this->ui->camera_allsky);
 
     this->create_timers();
     this->create_actions();
@@ -61,11 +63,25 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::state_changed, this->ui->dome, &QDome::display_serial_port_info);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
 
+    this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->station, &QStation::automatic_cover);
+    this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->camera_allsky->ufo_manager(), &QUfoManager::auto_action);
+    this->connect(this->ui->station, &QStation::automatic_action_spectral, this->ui->camera_spectral->ufo_manager(), &QUfoManager::auto_action);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
+    this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_allsky, &QCamera::update_clocks);
+    this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);
 
     this->connect(this->ui->camera_allsky, &QCamera::sightings_found, this->ui->server, &QServer::send_sightings);
 
+    this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+    this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+    this->connect(this->ui->server, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+    this->connect(this->ui->camera_allsky, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+    this->connect(this->ui->camera_spectral, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+
     this->connect(qApp, &QApplication::commitDataRequest, this, &MainWindow::set_terminate);
+
+    this->on_bt_discard_clicked();
+    this->slot_settings_changed();
 
     this->ui->station->send_heartbeat();
 
@@ -73,6 +89,8 @@ MainWindow::MainWindow(QWidget *parent):
     this->display_window_title();
     this->ui->sun_info->update_short_term();
     this->ui->sun_info->update_long_term();
+    this->ui->camera_allsky->update_clocks();
+    this->ui->camera_spectral->update_clocks();
 #if OLD_PROTOCOL
 //    this->ui->dome->set_cover_minimum(-26);
 //    this->ui->dome->set_cover_maximum(26);
@@ -84,7 +102,7 @@ MainWindow::~MainWindow() {
     logger.info(Concern::Operation, "Terminating normally");
 
     delete this->ui;
-    delete this->timer_display;
+    delete this->m_timer_display;
     delete settings;
 }
 
@@ -148,7 +166,7 @@ void MainWindow::on_action_debug_triggered() {
     this->ui->cb_debug->click();
 }
 
-void MainWindow::on_actionAbout_triggered() {
+void MainWindow::on_action_about_triggered() {
     AboutDialog dialog(this);
     dialog.exec();
 }

@@ -193,7 +193,7 @@ void QUfoManager::stop_ufo(void) const {
             logger.debug(Concern::UFO, QString("Child dialog's HWND is %1").arg((long long) child));
 
             if (child == nullptr) {
-                logger.error(Concern::UFO, "Child is null");
+                logger.debug_error(Concern::UFO, "Child is null");
             }
 
             SetActiveWindow(child);

@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 extern EventLogger logger;
-extern QSettings *settings;
+extern QSettings * settings;
 
 void MainWindow::load_settings(void) {
     try {
@@ -30,5 +30,49 @@ void MainWindow::load_settings(void) {
 
         logger.fatal(Concern::Configuration, postmortem);
         exit(-4);
+    }
+}
+
+void MainWindow::slot_settings_changed() {
+    bool changed =
+        this->ui->dome->is_changed() ||
+        this->ui->station->is_changed() ||
+        this->ui->server->is_changed() ||
+        this->ui->camera_allsky->is_changed() ||
+        this->ui->camera_spectral->is_changed();
+
+    if (changed) {
+        this->ui->bt_apply->setEnabled(true);
+        this->ui->bt_apply->setText("Apply changes");
+        this->ui->bt_discard->setEnabled(true);
+    } else {
+        this->ui->bt_apply->setEnabled(false);
+        this->ui->bt_apply->setText("No changes");
+        this->ui->bt_discard->setEnabled(false);
+    }
+}
+
+void MainWindow::on_bt_apply_clicked() {
+    foreach (QAmosWidget * widget, this->amos_widgets) {
+        widget->apply_changes();
+        widget->save_settings(settings);
+    }
+/*
+    this->ui->dome->apply_changes();
+    this->ui->station->apply_changes();
+    this->ui->server->apply_changes();
+    this->ui->camera_allsky->apply_changes();
+    this->ui->camera_spectral->apply_changes();
+
+    this->ui->dome->save_settings(settings);
+    this->ui->station->save_settings(settings);
+    this->ui->server->save_settings(settings);
+    this->ui->camera_allsky->save_settings(settings);
+    this->ui->camera_spectral->save_settings(settings);*/
+}
+
+void MainWindow::on_bt_discard_clicked() {
+    foreach (QAmosWidget * widget, this->amos_widgets) {
+        widget->discard_changes();
     }
 }

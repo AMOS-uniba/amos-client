@@ -9,6 +9,7 @@
 #include <QCloseEvent>
 
 #include "forward.h"
+#include "widgets/qconfigurable.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -28,7 +29,8 @@ public:
     static QString format_duration(unsigned int seconds);
 
 private:
-    QTimer * timer_display;
+    QTimer * m_timer_display;
+    QTimer * m_timer_long;
     Ui::MainWindow * ui;
 
     QAction * minimizeAction;
@@ -45,6 +47,8 @@ private:
     const QDateTime m_start_time;
     bool m_terminate;
 
+    QVector<QAmosWidget *> amos_widgets;
+
     //CommThread comm_thread;
 
 private slots:
@@ -52,6 +56,9 @@ private slots:
 
     void create_timers(void);
     void process_display_timer(void);
+
+    // Settings
+    void slot_settings_changed(void);
 
     // Display
     void on_cb_debug_stateChanged(int debug);
@@ -73,6 +80,8 @@ private slots:
     void on_action_open_config_triggered();
     void on_action_open_stat_triggered();
     void on_action_debug_triggered();
-    void on_actionAbout_triggered();
-    };
+    void on_action_about_triggered();
+    void on_bt_apply_clicked();
+    void on_bt_discard_clicked();
+};
 #endif // MAINWINDOW_H

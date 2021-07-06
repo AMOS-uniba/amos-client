@@ -8,8 +8,8 @@ extern EventLogger logger;
 extern QSettings * settings;
 
 
-QServer::QServer(QWidget *parent):
-    QGroupBox(parent),
+QServer::QServer(QWidget * parent):
+    QAmosWidget(parent),
     ui(new Ui::QServer)
 {
     this->ui->setupUi(this);
@@ -17,18 +17,10 @@ QServer::QServer(QWidget *parent):
     this->m_network_manager = new QNetworkAccessManager(this);
     this->connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_ok);
 
-    this->connect(this->ui->le_station_id, &QLineEdit::textChanged, this, &QServer::handle_settings_changed);
-    this->connect(this->ui->le_ip, &QLineEdit::textChanged, this, &QServer::handle_settings_changed);
-    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::handle_settings_changed);
-
-    this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QServer::apply_settings);
-    this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QServer::discard_settings);
 
     this->connect(this->ui->bt_send_heartbeat, &QPushButton::clicked, this, &QServer::button_send_heartbeat);
 
-    this->connect(this, &QServer::settings_changed, this, &QServer::refresh_urls);
-    this->connect(this, &QServer::settings_changed, this, &QServer::discard_settings);
-    this->connect(this, &QServer::settings_changed, this, &QServer::save_settings);
+    this->connect(this, &QServer::settings_saved, this, &QServer::refresh_urls);
 }
 
 QServer::~QServer() {
@@ -37,20 +29,17 @@ QServer::~QServer() {
 }
 
 void QServer::initialize(void) {
-    this->load_settings();
-}
-
-void QServer::load_settings(void) {
-    try {
-        this->load_settings_inner();
-    } catch (ConfigurationError & e) {
-        this->load_defaults();
-    }
+    QAmosWidget::initialize();
     this->refresh_urls();
-    this->discard_settings();
 }
 
-void QServer::load_settings_inner(void) {
+void QServer::connect_slots(void) {
+    this->connect(this->ui->le_station_id, &QLineEdit::textChanged, this, &QServer::settings_changed);
+    this->connect(this->ui->le_ip, &QLineEdit::textChanged, this, &QServer::settings_changed);
+    this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
+}
+
+void QServer::load_settings_inner(const QSettings * const settings) {
     this->set_station_id(
         settings->value("station/id", "none").toString()
     );
@@ -66,7 +55,7 @@ void QServer::load_defaults(void) {
     this->set_address("127.0.0.1", 4805);
 }
 
-void QServer::save_settings(void) const {
+void QServer::save_settings_inner(QSettings * settings) const {
     settings->setValue("station/id", this->station_id());
     settings->setValue("server/ip", this->address().toString());
     settings->setValue("server/port", this->port());
@@ -85,7 +74,7 @@ void QServer::set_address(const QString & address, const unsigned short port) {
     logger.info(Concern::Server, QString("Address set to %1").arg(full_address));
 }
 
-void QServer::set_station_id(const QString &id) {
+void QServer::set_station_id(const QString & id) {
     if ((id.length() < 2) || (id.length() > 4)) {
         throw ConfigurationError(QString("Cannot set station id to '%1'").arg(id));
     }
@@ -109,7 +98,7 @@ void QServer::refresh_urls(void) {
     );
 }
 
-void QServer::send_heartbeat(const QJsonObject &heartbeat) const {
+void QServer::send_heartbeat(const QJsonObject & heartbeat) const {
     logger.debug(Concern::Server, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
@@ -179,14 +168,21 @@ void QServer::display_countdown(void) {
 }
 
 bool QServer::is_changed(void) const {
+    return (this->is_id_changed() || this->is_address_changed());
+}
+
+bool QServer::is_id_changed(void) const {
+    return (this->ui->le_station_id->text() != this->station_id());
+}
+
+bool QServer::is_address_changed(void) const {
     return (
-        (this->ui->le_station_id->text() != this->station_id()) ||
         (this->ui->le_ip->text() != this->address().toString()) ||
         (this->ui->sb_port->value() != this->port())
     );
 }
 
-void QServer::apply_settings_inner(void) {
+void QServer::apply_changes_inner(void) {
     if (this->ui->le_station_id->text() != this->station_id()) {
         this->set_station_id(this->ui->le_station_id->text());
     }
@@ -196,26 +192,8 @@ void QServer::apply_settings_inner(void) {
     }
 }
 
-void QServer::discard_settings(void) {
+void QServer::discard_changes_inner(void) {
     this->ui->le_ip->setText(this->address().toString());
     this->ui->sb_port->setValue(this->port());
     this->ui->le_station_id->setText(this->station_id());
-}
-
-void QServer::apply_settings(void) {
-    try {
-        this->apply_settings_inner();
-        emit this->settings_changed();
-    } catch (ConfigurationError & e) {
-        logger.error(Concern::Configuration, e.what());
-    }
-    this->handle_settings_changed();
-}
-
-void QServer::handle_settings_changed(void) {
-    bool changed = this->is_changed();
-
-    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_apply->setEnabled(changed);
-    this->ui->bt_discard->setEnabled(changed);
 }

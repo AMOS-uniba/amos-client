@@ -8,6 +8,7 @@
 #include "utils/domestate.h"
 #include "utils/serialbuffer.h"
 
+#include "widgets/qconfigurable.h"
 #include "widgets/lines/qdisplayline.h"
 #include "mainwindow.h"
 #include "widgets/qdomewidget.h"
@@ -21,7 +22,7 @@ namespace Ui {
  * @brief The QDome class handles the communication and control of the AMOS dome
  * Provides its own widget with settings, configuration and display
  */
-class QDome: public QGroupBox {
+class QDome: public QAmosWidget {
     Q_OBJECT
 private:
     constexpr static unsigned int Refresh = 200;                                // Robin time in ms
@@ -50,6 +51,27 @@ private:
     DomeStateZ m_state_Z;
 
     void process_message(const QByteArray & message);
+
+    void connect_slots(void) override;
+    void load_defaults(void) override;
+    void load_settings_inner(const QSettings * const settings) override;
+    void save_settings_inner(QSettings * settings) const override;
+    void apply_changes_inner(void) override;
+    void discard_changes_inner(void) override;
+
+private slots:
+    void display_dome_state(void);
+    void display_basic_data(const DomeStateS & state);
+    void display_env_data(const DomeStateT & state);
+    void display_shaft_data(const DomeStateZ & state);
+
+    void toggle_hotwire(void) const;
+    void toggle_intensifier(void) const;
+    void toggle_fan(void) const;
+
+    void on_bt_cover_open_clicked();
+    void on_bt_cover_close_clicked();
+
 public:
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -66,6 +88,9 @@ public:
     explicit QDome(QWidget * parent = nullptr);
     ~QDome();
 
+    virtual void initialize() override;
+    bool is_changed(void) const override;
+
     void send_command(const Command & command) const;
     void send_request(const Request & request) const;
     void send(const QByteArray & message) const;
@@ -81,7 +106,7 @@ public:
 
     QString status_line(void) const;
 
-    void initialize(const QStation * const station);
+    void set_station(const QStation * const station);
 
     // Humidity getters and setters
     bool is_humid(void) const;
@@ -89,26 +114,6 @@ public:
     double humidity_limit_lower(void) const;
     double humidity_limit_upper(void) const;
     void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
-
-private slots:
-    void load_settings(void);
-
-    void display_dome_state(void);
-
-    void display_basic_data(const DomeStateS & state);
-    void display_env_data(const DomeStateT & state);
-    void display_shaft_data(const DomeStateZ & state);
-
-    void toggle_hotwire(void) const;
-    void toggle_intensifier(void) const;
-    void toggle_fan(void) const;
-
-    void handle_settings_changed(void);
-    void apply_settings(void);
-    void discard_settings(void);
-
-    void on_bt_cover_open_clicked();
-    void on_bt_cover_close_clicked();
 
 public slots:
     void set_formatters(void);
@@ -149,7 +154,7 @@ signals:
 
     void serial_port_changed(const QString & port);
 
-    void settings_changed(double new_lower, double new_upper);
+    void humidity_limits_changed(double new_lower, double new_upper);
 };
 
 #endif // QDOME_H

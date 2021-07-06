@@ -67,7 +67,7 @@ const ColourFormatter<double> QDome::TemperatureColourFormatter = [](double temp
 };
 
 QDome::QDome(QWidget *parent):
-    QGroupBox(parent),
+    QAmosWidget(parent),
     ui(new Ui::QDome),
     m_station(nullptr),
     m_serial_port(nullptr),
@@ -128,13 +128,6 @@ QDome::QDome(QWidget *parent):
     this->connect(this->ui->cl_ii, &QControlLine::toggled, this, &QDome::toggle_intensifier);
 
     this->connect(this->ui->co_serial_ports, &QComboBox::currentTextChanged, this, &QDome::set_serial_port);
-
-    this->connect(this->ui->dsb_humidity_limit_lower, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_settings_changed);
-    this->connect(this->ui->dsb_humidity_limit_upper, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::handle_settings_changed);
-    this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QDome::apply_settings);
-    this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QDome::discard_settings);
-    this->connect(this, &QDome::settings_changed, this, &QDome::discard_settings);
-
     this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &QDome::process_message);
 
     this->m_robin_timer = new QTimer(this);
@@ -159,24 +152,58 @@ QDome::~QDome() {
     delete this->m_buffer;
 }
 
-void QDome::initialize(const QStation * const station) {
-    this->m_station = station;
+void QDome::initialize(void) {
+    QAmosWidget::initialize();
 
     this->check_serial_port();
     this->set_formatters();
-    this->load_settings();
 
     this->display_basic_data(this->m_state_S);
     this->display_env_data(this->m_state_T);
     this->display_shaft_data(this->m_state_Z);
 }
 
-void QDome::load_settings(void) {
+void QDome::connect_slots(void) {
+    for (auto && widget: {this->ui->dsb_humidity_limit_lower, this->ui->dsb_humidity_limit_upper}) {
+        this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::settings_changed);
+    }
+}
+
+void QDome::load_defaults(void) {
+    this->set_humidity_limits(75.0, 90.0);
+}
+
+void QDome::load_settings_inner(const QSettings * const settings) {
     this->set_humidity_limits(
         settings->value("dome/humidity_lower", 75.0).toDouble(),
-        settings->value("dome/humidity_upper", 80.0).toDouble()
+        settings->value("dome/humidity_upper", 90.0).toDouble()
     );
 }
+
+bool QDome::is_changed(void) const {
+    return (
+        (this->ui->dsb_humidity_limit_lower->value() != this->humidity_limit_lower()) ||
+        (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper())
+    );
+}
+
+void QDome::apply_changes_inner(void) {
+    if (this->is_changed()) {
+        this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
+    }
+}
+
+void QDome::discard_changes_inner(void) {
+    this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
+    this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
+}
+
+void QDome::save_settings_inner(QSettings * settings) const {
+    settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
+    settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
+}
+
+void QDome::set_station(const QStation * const station) { this->m_station = station; }
 
 /**
  * @brief QDome::set_formatters
@@ -572,7 +599,7 @@ void QDome::turn_off_hotwire(void) const { this->send_command(QDome::CommandHotw
 
 // High level command to open the cover. Opens only if it is dark, or if in override mode.
 void QDome::open_cover(void) const {
-    if (this->m_station->is_dark() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
+    if (this->m_station->is_dark_allsky() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
         this->send_command(QDome::CommandOpenCover);
     }
 }
@@ -602,7 +629,7 @@ void QDome::toggle_intensifier(void) const {
 }
 
 void QDome::turn_on_intensifier(void) const {
-    if (this->m_station->is_dark() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
+    if (this->m_station->is_dark_allsky() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
         this->send_command(QDome::CommandIIOn);
     } else {
         logger.warning(Concern::SerialPort, "Command ignored, sun is too high and override is not active");
@@ -635,33 +662,7 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
                     .arg(this->m_humidity_limit_upper)
     );
 
-    settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
-    settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
-
-    emit this->settings_changed(new_lower, new_upper);
-}
-
-void QDome::handle_settings_changed(void) {
-    bool changed = (this->ui->dsb_humidity_limit_lower->value() != this->humidity_limit_lower()) ||
-        (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper());
-
-    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_apply->setEnabled(changed);
-    this->ui->bt_discard->setEnabled(changed);
-}
-
-void QDome::apply_settings(void) {
-    try {
-        this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
-    } catch (const ConfigurationError & e) {
-        logger.error(Concern::Configuration, e.what());
-    }
-    this->handle_settings_changed();
-}
-
-void QDome::discard_settings(void) {
-    this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
-    this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
+    emit this->humidity_limits_changed(new_lower, new_upper);
 }
 
 void QDome::on_bt_cover_open_clicked() {

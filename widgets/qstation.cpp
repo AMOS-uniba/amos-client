@@ -33,11 +33,11 @@ QString QStation::temperature_colour(float temperature) {
         s = 255;
         v = 160;
     }
-    return QString("hsv(%1, %2, %3)").arg(h).arg(s).arg(v);
+    return QString("hsv(%1, %2, %3)").arg(h, s, v);
 }
 
 QStation::QStation(QWidget * parent):
-    QGroupBox(parent),
+    QAmosWidget(parent),
     ui(new Ui::QStation),
     m_latitude(49.0),
     m_longitude(18.0),
@@ -54,23 +54,12 @@ QStation::QStation(QWidget * parent):
     this->m_timer_automatic = new QTimer(this);
     this->m_timer_automatic->setInterval(1000);
     this->connect(this->m_timer_automatic, &QTimer::timeout, this, &QStation::automatic_timer);
-    this->connect(this, &QStation::automatic_action, this, &QStation::automatic_cover);
     this->m_timer_automatic->start();
 
     this->m_timer_heartbeat = new QTimer(this);
     this->m_timer_heartbeat->setInterval(QStation::HeartbeatInterval);
     this->connect(this->m_timer_heartbeat, &QTimer::timeout, this, &QStation::heartbeat);
     this->m_timer_heartbeat->start();
-
-    // Connect change handler to all QDoubleSpinBoxes
-    for (auto && widget: {this->ui->dsb_latitude, this->ui->dsb_longitude, this->ui->dsb_altitude}) {
-        this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::handle_config_changed);
-    }
-    this->connect(this->ui->bt_apply, &QPushButton::clicked, this, &QStation::apply_changes);
-    this->connect(this->ui->bt_discard, &QPushButton::clicked, this, &QStation::discard_changes);
-
-    this->connect(this, &QStation::settings_changed, this, &QStation::discard_changes);
-    this->connect(this, &QStation::settings_changed, this, &QStation::save_settings);
 }
 
 QStation::~QStation() {
@@ -79,18 +68,13 @@ QStation::~QStation() {
 }
 
 void QStation::initialize(void) {
-    this->load_settings(settings);
+    QAmosWidget::initialize();
 }
 
-void QStation::load_settings(const QSettings * const settings) {
-    try {
-        this->load_settings_inner(settings);
-    } catch (ConfigurationError & e) {
-        logger.error(Concern::Configuration, e.what());
-        this->load_defaults();
+void QStation::connect_slots(void) {
+    for (auto && widget: {this->ui->dsb_latitude, this->ui->dsb_longitude, this->ui->dsb_altitude}) {
+        this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QStation::settings_changed);
     }
-
-    this->discard_changes();
 }
 
 void QStation::load_settings_inner(const QSettings * const settings) {
@@ -109,12 +93,11 @@ void QStation::load_defaults(void) {
     this->set_position(48.0, 17.0, 186.0);
 }
 
-void QStation::save_settings(void) const {
+void QStation::save_settings_inner(QSettings * settings) const {
     settings->setValue("manual", this->is_manual());
     settings->setValue("station/latitude", this->latitude());
     settings->setValue("station/longitude", this->longitude());
     settings->setValue("station/altitude", this->altitude());
-    settings->sync();
 }
 
 // Manual control
@@ -142,13 +125,6 @@ void QStation::set_safety_override(bool override) {
     }
 }
 
-/**
- * @brief QStation::set_position
- *  Set position of the station, with validation
- * @param new_latitude
- * @param new_longitude
- * @param new_altitude
- */
 void QStation::set_position(const double new_latitude, const double new_longitude, const double new_altitude) {
     // Check that the new values are meaningful
     if (fabs(new_latitude) > 90) {
@@ -173,17 +149,24 @@ void QStation::set_position(const double new_latitude, const double new_longitud
     emit this->position_changed();
 }
 
-// Darkness limit settings
-bool QStation::is_dark(const QDateTime & time) const {
-    return true; //(this->sun_altitude(time) < this->m_darkness_limit);
+/** Darkness limit settings **/
+bool QStation::is_dark_allsky(const QDateTime & time) const {
+    return (this->sun_altitude(time) < this->camera_allsky()->darkness_limit());
 }
 
+bool QStation::is_dark_spectral(const QDateTime & time) const {
+    return (this->sun_altitude(time) < this->camera_spectral()->darkness_limit());
+}
+
+/** Pointers to other relevant widgets **/
 void QStation::set_cameras(const QCamera * const allsky, const QCamera * const spectral) {
     this->m_camera_allsky = allsky;
     this->m_camera_spectral = spectral;
 }
 
-void QStation::set_dome(const QDome * const dome) { this->m_dome = dome; }
+void QStation::set_dome(const QDome * const dome) {
+    this->m_dome = dome;
+}
 
 void QStation::set_server(const QServer * const server) {
     this->m_server = server;
@@ -192,72 +175,43 @@ void QStation::set_server(const QServer * const server) {
 
 /** Sun functions **/
 Polar QStation::sun_position(const QDateTime & time) const {
-    double alt, az;
-    double mjd = Universe::mjd(time);
-    double lmst = GMST(mjd) + this->m_longitude * Rad;
-
-    Vec3D equatorial = Universe::compute_sun_equ(time);
-    Equ2Hor(equatorial[theta], lmst - equatorial[phi], this->m_latitude * Rad, alt, az);
-
-    return Polar(az + pi, alt);
+    return Universe::sun_position(this->latitude(), this->longitude(), time);
 }
 
 Polar QStation::moon_position(const QDateTime & time) const {
-    double alt, az;
-    double mjd = Universe::mjd(time);
-    double lmst = GMST(mjd) + this->m_longitude * Rad;
-
-    Vec3D equatorial = Universe::compute_moon_equ(time);
-    Equ2Hor(equatorial[theta], lmst - equatorial[phi], this->m_latitude * Rad, alt, az);
-
-    return Polar(fmod(az + pi, 2 * pi), alt);
+    return Universe::moon_position(this->latitude(), this->longitude(), time);
 }
 
 double QStation::sun_altitude(const QDateTime & time) const {
-    return this->sun_position(time).theta * Deg;
+    return Universe::sun_altitude(this->latitude(), this->longitude(), time);
 }
 
 double QStation::sun_azimuth(const QDateTime & time) const {
-    return fmod(this->sun_position(time).phi * Deg + 360.0, 360.0);
+    return Universe::sun_azimuth(this->latitude(), this->longitude(), time);
 }
 
 double QStation::moon_altitude(const QDateTime & time) const {
-    return this->moon_position(time).theta * Deg;
+    return Universe::moon_altitude(this->latitude(), this->longitude(), time);
 }
 
 double QStation::moon_azimuth(const QDateTime & time) const {
-    return fmod(this->moon_position(time).phi * Deg + 360.0, 360.0);
+    return Universe::moon_azimuth(this->latitude(), this->longitude(), time);
 }
 
 /* Compute next crossing of the Sun through the almucantar `altitude` in the specified direction (up/down)
  * with resolution of `resolution` seconds (optional, default = 60) */
 QDateTime QStation::next_sun_crossing(double altitude, bool direction_up, int resolution) const {
-    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / 60) * 60);
-    double oldalt = this->sun_altitude(now);
-
-    for (int i = 1; i <= 86400 / resolution; ++i) {
-        QDateTime moment = now.addSecs(resolution * i);
-        double newalt = this->sun_altitude(moment);
-        if (direction_up) {
-            if ((oldalt < altitude) && (newalt > altitude)) {
-                return moment;
-            }
-        } else {
-            if ((oldalt > altitude) && (newalt < altitude)) {
-                return moment;
-            }
-        }
-        oldalt = newalt;
-    }
-    return QDateTime();
+    return Universe::next_sun_crossing(this->latitude(), this->longitude(), altitude, direction_up, resolution);
 }
 
 void QStation::automatic_timer(void) {
-    emit this->automatic_action(this->is_dark());
+    emit this->automatic_action_allsky(this->is_dark_allsky());
+    emit this->automatic_action_spectral(this->is_dark_spectral());
 }
 
 // Perform automatic state checks
 void QStation::automatic_cover(void) {
+    logger.debug(Concern::Automatic, "Automatic cover action");
     const DomeStateS & stateS = this->dome()->state_S();
 
     if (!stateS.is_valid()) {
@@ -267,7 +221,7 @@ void QStation::automatic_cover(void) {
     }
 
     // Emergency: close the cover, unless safety overridden
-    if (stateS.dome_open_sensor_active() && !this->is_dark()) {
+    if (stateS.dome_open_sensor_active() && !this->is_dark_allsky()) {
         if (this->is_safety_overridden()) {
             logger.debug(Concern::Automatic, "Emergency override active, not closing");
         } else {
@@ -277,7 +231,7 @@ void QStation::automatic_cover(void) {
     }
 
     // Emergency: turn off the image intensifier, unless safety overridden
-    if (stateS.intensifier_active() && !this->is_dark()) {
+    if (stateS.intensifier_active() && !this->is_dark_allsky()) {
         if (this->is_safety_overridden()) {
             logger.debug(Concern::Automatic, "Emergency override active, not turning off the intensifier");
         } else {
@@ -291,7 +245,7 @@ void QStation::automatic_cover(void) {
         logger.debug(Concern::Automatic, "Manual control mode, passing");
         this->set_state(QStation::Manual);
     } else {
-        if (this->is_dark()) {
+        if (this->is_dark_allsky()) {
             if (stateS.dome_closed_sensor_active()) {
                 if (stateS.rain_sensor_active()) {
                     logger.debug(Concern::Automatic, "Will not open: raining");
@@ -429,32 +383,14 @@ bool QStation::is_changed(void) const {
     );
 }
 
-void QStation::apply_changes(void) {
-    try {
-        this->apply_changes_inner();
-        emit this->settings_changed();
-    } catch (ConfigurationError & e) {
-        logger.error(Concern::Configuration, e.what());
-    }
-    this->handle_config_changed();
-}
-
 void QStation::apply_changes_inner(void) {
     if (this->is_changed()) {
         this->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
     }
 }
 
-void QStation::discard_changes(void) {
+void QStation::discard_changes_inner(void) {
     this->ui->dsb_latitude->setValue(this->latitude());
     this->ui->dsb_longitude->setValue(this->longitude());
     this->ui->dsb_altitude->setValue(this->altitude());
-}
-
-void QStation::handle_config_changed(void) {
-    bool changed = this->is_changed();
-
-    this->ui->bt_apply->setText(QString("%1 changes").arg(changed ? "Apply" : "No"));
-    this->ui->bt_apply->setEnabled(changed);
-    this->ui->bt_discard->setEnabled(changed);
 }

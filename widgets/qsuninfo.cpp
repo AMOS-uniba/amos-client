@@ -49,10 +49,6 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_ra->set_valid(true);
     this->ui->sl_ra->set_value_formatter(azimuth_formatter);
 
-    this->ui->sl_ecl_lon->set_title("Ecliptical longitude λ");
-    this->ui->sl_ecl_lon->set_valid(true);
-    this->ui->sl_ecl_lon->set_value_formatter(azimuth_formatter);
-
     this->ui->sl_moon_altitude->set_title("Moon altitude");
     this->ui->sl_moon_altitude->set_valid(true);
     this->ui->sl_moon_altitude->set_value_formatter(altitude_formatter);
@@ -61,10 +57,8 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_moon_azimuth->set_valid(true);
     this->ui->sl_moon_azimuth->set_value_formatter(azimuth_formatter);
 
-    this->ui->sl_dome_close->set_title("Dome closing");
     this->ui->sl_sunrise->set_title("Sunrise");
     this->ui->sl_sunset->set_title("Sunset");
-    this->ui->sl_dome_open->set_title("Dome opening");
 }
 
 QSunInfo::~QSunInfo() {
@@ -89,7 +83,7 @@ void QSunInfo::update_short_term(void) {
         this->ui->lb_sun_status->setToolTip("Sun is above the horizon");
         colour = Universe::altitude_colour(hor.theta * Deg);
     } else {
-        if (this->m_station->is_dark()) {
+        if (this->m_station->is_dark_allsky()) {
             this->ui->lb_sun_status->setText("dark");
             this->ui->lb_sun_status->setToolTip("Sun is below the horizon and below the darkness limit");
             colour = Qt::black;
@@ -104,18 +98,12 @@ void QSunInfo::update_short_term(void) {
 }
 
 void QSunInfo::set_station(const QStation * const station) { this->m_station = station; }
-void QSunInfo::set_allsky_camera(const QCamera * const camera) { this->m_allsky_camera = camera; }
 
 void QSunInfo::update_long_term(void) {
     auto equ = Universe::compute_sun_equ();
     this->ui->sl_dec->set_value(equ[theta] * Deg);
     this->ui->sl_ra->set_value(equ[phi] * Deg);
 
-    auto ecl = Universe::compute_sun_ecl();
-    this->ui->sl_ecl_lon->set_value(ecl[phi] * Deg);
-
-    this->ui->sl_dome_close->set_value(this->m_station->next_sun_crossing(this->m_allsky_camera->darkness_limit(), true));
     this->ui->sl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
     this->ui->sl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
-    this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->m_allsky_camera->darkness_limit(), false));
 }

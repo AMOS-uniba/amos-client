@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>261</width>
-    <height>162</height>
+    <height>137</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -24,7 +24,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="topMargin">
-    <number>3</number>
+    <number>9</number>
    </property>
    <item row="4" column="1">
     <widget class="QDoubleSpinBox" name="dsb_altitude">
@@ -102,36 +102,6 @@
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="hl_station_info">
-     <item>
-      <widget class="QPushButton" name="bt_apply">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>save the changes</string>
-       </property>
-       <property name="text">
-        <string>Apply</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="bt_discard">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="toolTip">
-        <string>reset the changes</string>
-       </property>
-       <property name="text">
-        <string>Discard</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
    </item>
    <item row="4" column="0">
     <widget class="QLabel" name="lx_alt">
@@ -217,8 +187,6 @@
   <tabstop>dsb_latitude</tabstop>
   <tabstop>dsb_longitude</tabstop>
   <tabstop>dsb_altitude</tabstop>
-  <tabstop>bt_apply</tabstop>
-  <tabstop>bt_discard</tabstop>
  </tabstops>
  <resources/>
  <connections/>

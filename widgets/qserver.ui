@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>240</width>
-    <height>172</height>
+    <width>289</width>
+    <height>137</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,6 +23,9 @@
    <string>Server</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="topMargin">
+    <number>3</number>
+   </property>
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="lo_countdown">
      <item>
@@ -66,20 +69,6 @@
     <widget class="Line" name="line">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <widget class="QPushButton" name="bt_discard">
-     <property name="text">
-      <string>Discard</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0">
-    <widget class="QPushButton" name="bt_apply">
-     <property name="text">
-      <string>Apply</string>
      </property>
     </widget>
    </item>

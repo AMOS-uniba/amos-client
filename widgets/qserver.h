@@ -15,7 +15,7 @@ namespace Ui {
     class QServer;
 }
 
-class QServer: public QGroupBox {
+class QServer: public QAmosWidget {
     Q_OBJECT
 private:
     Ui::QServer * ui;
@@ -29,13 +29,19 @@ private:
     QUrl m_url_heartbeat;
     QUrl m_url_sighting;
 
-    bool is_changed(void) const;
+    void connect_slots(void) override;
+    void load_defaults(void) override;
+    void load_settings_inner(const QSettings * const settings) override;
+    void save_settings_inner(QSettings * settings) const override;
+    void apply_changes_inner(void) override;
+    void discard_changes_inner(void) override;
+
+    bool is_id_changed(void) const;
+    bool is_address_changed(void) const;
 
 private slots:
-    void load_settings(void);
-    void load_settings_inner(void);
-    void load_defaults(void);
-    void save_settings(void) const;
+    void set_address(const QString & address, const unsigned short port);
+    void set_station_id(const QString & station_id);
 
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_ok(QNetworkReply * reply);
@@ -47,20 +53,14 @@ public:
     explicit QServer(QWidget * parent = nullptr);
     ~QServer();
 
+    bool is_changed(void) const override;
+
     inline const QHostAddress & address(void) const { return this->m_address; }
     inline const unsigned short & port(void) const { return this->m_port; }
     inline const QString & station_id(void) const { return this->m_station_id; }
 
 public slots:
-    void initialize(void);
-
-    void set_address(const QString & address, const unsigned short port);
-    void set_station_id(const QString & station_id);
-
-    void apply_settings(void);
-    void apply_settings_inner(void);
-    void discard_settings(void);
-    void handle_settings_changed(void);
+    void initialize(void) override;
 
     void button_send_heartbeat(void);
     void display_countdown(void);
@@ -69,8 +69,6 @@ public slots:
     void send_sightings(QVector<Sighting> sightings) const;
 
 signals:
-    void settings_changed(void) const;
-
     void request_heartbeat(void) const;
     void heartbeat_sent(void) const;
 };
