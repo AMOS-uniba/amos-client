@@ -17,7 +17,6 @@ QServer::QServer(QWidget * parent):
     this->m_network_manager = new QNetworkAccessManager(this);
     this->connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_ok);
 
-
     this->connect(this->ui->bt_send_heartbeat, &QPushButton::clicked, this, &QServer::button_send_heartbeat);
 
     this->connect(this, &QServer::settings_saved, this, &QServer::refresh_urls);
@@ -70,6 +69,8 @@ void QServer::set_address(const QString & address, const unsigned short port) {
 
     this->m_address = addr;
     this->m_port = port;
+    this->refresh_urls();
+
     QString full_address = QString("%1:%2").arg(this->m_address.toString()).arg(this->m_port);
     logger.info(Concern::Server, QString("Address set to %1").arg(full_address));
 }
@@ -80,6 +81,8 @@ void QServer::set_station_id(const QString & id) {
     }
 
     this->m_station_id = id;
+    this->refresh_urls();
+
     logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_station_id));
 }
 
@@ -186,7 +189,6 @@ void QServer::apply_changes_inner(void) {
     if (this->ui->le_station_id->text() != this->station_id()) {
         this->set_station_id(this->ui->le_station_id->text());
     }
-
     if ((this->ui->le_ip->text() != this->address().toString()) || (this->ui->sb_port->value() != this->port())) {
         this->set_address(this->ui->le_ip->text(), this->ui->sb_port->value());
     }

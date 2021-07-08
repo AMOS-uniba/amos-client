@@ -41,6 +41,7 @@ void QCamera::initialize(const QString & id, const QStation * const station) {
 
 void QCamera::connect_slots(void) {
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
+    this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
 }
 
 bool QCamera::is_changed(void) const {
