@@ -62,9 +62,9 @@ void Sighting::move(const QString & dir) {
         }
 
         if (QFile::rename(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Moved %1 to %2").arg(file, new_path));
+            logger.debug(Concern::Sightings, QString("Moved '%1' to '%2'").arg(file, new_path));
         } else {
-            logger.error(Concern::Sightings, QString("Could not move file %1 to %2").arg(file, new_path));
+            logger.error(Concern::Sightings, QString("Could not move file '%1' to '%2'").arg(file, new_path));
         }
 
         file = new_path;
@@ -78,9 +78,9 @@ void Sighting::copy(const QString & dir) const {
     for (auto & file: this->m_files) {
         QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
         if (QFile::copy(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Copied %1 to %2").arg(file, new_path));
+            logger.debug(Concern::Sightings, QString("Copied '%1' to '%2'").arg(file, new_path));
         } else {
-            logger.error(Concern::Sightings, QString("Could not copy file %1 to %2").arg(file, new_path));
+            logger.error(Concern::Sightings, QString("Could not copy file '%1' to '%2'").arg(file, new_path));
         }
     }
 }
