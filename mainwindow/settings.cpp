@@ -57,18 +57,6 @@ void MainWindow::on_bt_apply_clicked() {
         widget->apply_changes();
         widget->save_settings(settings);
     }
-/*
-    this->ui->dome->apply_changes();
-    this->ui->station->apply_changes();
-    this->ui->server->apply_changes();
-    this->ui->camera_allsky->apply_changes();
-    this->ui->camera_spectral->apply_changes();
-
-    this->ui->dome->save_settings(settings);
-    this->ui->station->save_settings(settings);
-    this->ui->server->save_settings(settings);
-    this->ui->camera_allsky->save_settings(settings);
-    this->ui->camera_spectral->save_settings(settings);*/
 }
 
 void MainWindow::on_bt_discard_clicked() {

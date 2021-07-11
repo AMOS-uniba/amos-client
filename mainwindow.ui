@@ -18,54 +18,30 @@
     <normaloff>:/images/blue.ico</normaloff>:/images/blue.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QFrame" name="frame_dome">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="2">
+     <widget class="QFrame" name="frame_station">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <layout class="QVBoxLayout" name="layout">
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QDome" name="dome">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="minimumSize">
-          <size>
-           <width>440</width>
-           <height>680</height>
-          </size>
-         </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="2" rowspan="5">
+        <widget class="QCamera" name="camera_allsky">
          <property name="title">
-          <string>Dome info</string>
+          <string>All-sky camera</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="0" column="0">
         <widget class="QSunInfo" name="sun_info">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>170</height>
-          </size>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>1</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
          <property name="maximumSize">
           <size>
@@ -78,15 +54,66 @@
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="vs_dome">
+       <item row="0" column="3" rowspan="5">
+        <widget class="QCamera" name="camera_spectral">
+         <property name="title">
+          <string>Spectral camera</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QServer" name="server">
+         <property name="title">
+          <string>Server</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <layout class="QHBoxLayout" name="hl_station_info">
+         <item>
+          <widget class="QPushButton" name="bt_apply">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>save the changes</string>
+           </property>
+           <property name="text">
+            <string>Apply</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="bt_discard">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="toolTip">
+            <string>reset the changes</string>
+           </property>
+           <property name="text">
+            <string>Discard</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="QStation" name="station">
+         <property name="title">
+          <string>Station information</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1" rowspan="5">
+        <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Vertical</enum>
+          <enum>Qt::Horizontal</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>0</width>
-           <height>10000</height>
+           <width>5000</width>
+           <height>20</height>
           </size>
          </property>
         </spacer>
@@ -94,8 +121,14 @@
       </layout>
      </widget>
     </item>
-    <item>
+    <item row="1" column="2">
      <widget class="QFrame" name="frame_log">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>10</horstretch>
+        <verstretch>10</verstretch>
+       </sizepolicy>
+      </property>
       <layout class="QGridLayout" name="grid_log">
        <item row="2" column="2">
         <spacer name="horizontalSpacer">
@@ -242,115 +275,45 @@
       </layout>
      </widget>
     </item>
-    <item>
-     <widget class="QFrame" name="frame_station">
+    <item row="0" column="0" rowspan="2">
+     <widget class="QFrame" name="frame_dome">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
-      <property name="minimumSize">
-       <size>
-        <width>500</width>
-        <height>0</height>
-       </size>
-      </property>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="1">
-        <widget class="QCamera" name="camera_spectral">
+      <layout class="QVBoxLayout" name="layout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QDome" name="dome">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
-           <height>100</height>
+           <width>440</width>
+           <height>680</height>
           </size>
          </property>
          <property name="title">
-          <string>Spectral camera</string>
+          <string>Dome info</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QServer" name="server">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>137</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Server</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0" colspan="2">
-        <spacer name="spacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>50</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="0">
-        <widget class="QCamera" name="camera_allsky">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>100</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>All-sky camera</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QStation" name="station">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>137</height>
-          </size>
-         </property>
-         <property name="title">
-          <string>Station information</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <layout class="QHBoxLayout" name="hl_station_info">
-         <item>
-          <widget class="QPushButton" name="bt_apply">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="toolTip">
-            <string>save the changes</string>
-           </property>
-           <property name="text">
-            <string>Apply</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="bt_discard">
-           <property name="enabled">
-            <bool>true</bool>
-           </property>
-           <property name="toolTip">
-            <string>reset the changes</string>
-           </property>
-           <property name="text">
-            <string>Discard</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
       </layout>
      </widget>

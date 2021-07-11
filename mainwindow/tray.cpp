@@ -12,6 +12,7 @@ void MainWindow::closeEvent(QCloseEvent * event) {
     }*/
 
     if (this->m_terminate) {
+        this->on_bt_apply_clicked();
         event->accept();
     } else {
         event->ignore();
@@ -30,14 +31,14 @@ void MainWindow::closeEvent(QCloseEvent * event) {
 
 void MainWindow::create_tray_icon() {
     this->trayIconMenu = new QMenu(this);
-    this->trayIconMenu->addAction(minimizeAction);
-    this->trayIconMenu->addAction(maximizeAction);
-    this->trayIconMenu->addAction(restoreAction);
+    this->trayIconMenu->addAction(this->minimizeAction);
+    this->trayIconMenu->addAction(this->maximizeAction);
+    this->trayIconMenu->addAction(this->restoreAction);
     this->trayIconMenu->addSeparator();
-    this->trayIconMenu->addAction(quitAction);
+    this->trayIconMenu->addAction(this->quitAction);
 
     this->tray_icon = new QSystemTrayIcon(this);
-    this->tray_icon->setContextMenu(trayIconMenu);
+    this->tray_icon->setContextMenu(this->trayIconMenu);
 }
 
 void MainWindow::create_actions() {

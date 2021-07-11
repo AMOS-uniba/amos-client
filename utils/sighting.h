@@ -20,11 +20,14 @@ public:
     ~Sighting(void);
 
     qint64 avi_size(void) const;
+    inline QString dir(void) const { return this->m_dir; }
     inline QString prefix(void) const { return this->m_prefix; }
 
     QHttpPart jpg_part(void) const;
     QHttpPart xml_part(void) const;
-    QHttpPart json_metadata(void) const;
+    QHttpPart json(void) const;
+
+    void debug(void) const;
 
     void move(const QString & dir);
     void copy(const QString & dir) const;

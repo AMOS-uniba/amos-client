@@ -21,7 +21,7 @@ const QDir QStorageBox::current_directory(const QDateTime & datetime) const {
 }
 
 void QStorageBox::store_sightings(QVector<Sighting> sightings, bool del) const {
-    for (auto && sighting: sightings) {
+    for (auto & sighting: sightings) {
         this->store_sighting(sighting, del);
     }
 }

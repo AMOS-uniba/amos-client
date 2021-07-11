@@ -87,6 +87,7 @@ void EventLogger::write(Level level, Concern concern, const QString &message) co
         if (this->m_display->rowCount() > 256) {
             this->m_display->removeRow(0);
         }
+        this->m_display->scrollToBottom();
     }
 }
 

@@ -141,8 +141,9 @@ void QServer::heartbeat_ok(QNetworkReply * reply) {
 }
 
 void QServer::send_sightings(QVector<Sighting> sightings) const {
-    for (auto && sighting: sightings) {
+    for (auto & sighting: sightings) {
         this->send_sighting(sighting);
+        sighting.debug();
     }
 }
 
@@ -151,9 +152,10 @@ void QServer::send_sighting(const Sighting & sighting) const {
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
+    sighting.debug();
     multipart->append(sighting.jpg_part());
     multipart->append(sighting.xml_part());
-    multipart->append(sighting.json_metadata());
+    multipart->append(sighting.json());
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply * reply = this->m_network_manager->post(request, multipart);

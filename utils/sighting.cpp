@@ -57,7 +57,7 @@ void Sighting::move(const QString & dir) {
         QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
 
         if (QFile::exists(new_path)) {
-            logger.warning(Concern::Sightings, QString("Could not move the sighting, have to delete file '%1' first...").arg(new_path));
+            logger.warning(Concern::Sightings, QString("Could not move the sighting, deleting file '%1' first...").arg(new_path));
             QFile::remove(new_path);
         }
 
@@ -69,6 +69,12 @@ void Sighting::move(const QString & dir) {
 
         file = new_path;
     }
+
+    this->m_jpg = this->m_files[0];
+    this->m_jpt = this->m_files[1];
+    this->m_xml = this->m_files[2];
+    this->m_bmp = this->m_files[3];
+    this->m_avi = this->m_files[4];
 }
 
 void Sighting::copy(const QString & dir) const {
@@ -115,7 +121,7 @@ QHttpPart Sighting::xml_part(void) const {
     return xml_part;
 }
 
-QHttpPart Sighting::json_metadata(void) const {
+QHttpPart Sighting::json(void) const {
     QHttpPart text_part;
     text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
     text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
@@ -125,8 +131,16 @@ QHttpPart Sighting::json_metadata(void) const {
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
     };
 
-    text_part.setBody(QJsonDocument(content).toJson(QJsonDocument::Compact));
+    auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);
+    text_part.setBody(text);
+    logger.debug(Concern::Sightings, text);
     return text_part;
+}
+
+void Sighting::debug(void) const {
+    for (auto & file: this->m_files) {
+        qDebug() << file;
+    }
 }
 
 bool Sighting::hack_Y16(void) const {

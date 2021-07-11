@@ -16,6 +16,7 @@ private:
     Ui::QCamera * ui;
     const QStation * m_station;
     QString m_id;
+    bool m_enabled;
 
     double m_darkness_limit;
 
@@ -27,6 +28,9 @@ private:
     void discard_changes_inner(void) override;
     using QAmosWidget::initialize;
 
+    inline QString enabled_key(void) const { return QString("camera_%1/enabled").arg(this->id()); }
+    inline QString darkness_key(void) const { return QString("camera_%1/darkness_limit").arg(this->id()); }
+
 public:
     explicit QCamera(QWidget * parent = nullptr);
     ~QCamera();
@@ -34,6 +38,7 @@ public:
     bool is_changed(void) const override;
 
     inline const QString & id(void) const { return this->m_id; }
+    inline bool is_enabled(void) const { return this->m_enabled; }
     inline double darkness_limit(void) const { return this->m_darkness_limit; }
 
     QJsonObject json(void) const;
@@ -41,6 +46,7 @@ public:
     const QUfoManager * ufo_manager(void) const;
 
 private slots:
+    void set_enabled(int enable);
     void set_darkness_limit(double new_limit);
 
     void store_sightings(QVector<Sighting> sightings);
@@ -53,6 +59,7 @@ signals:
     void darkness_limit_changed(double new_limit) const;
 
     void sightings_found(QVector<Sighting> sightings) const;
+    void sightings_stored(QVector<Sighting> sightings) const;
 };
 
 #endif // QCAMERA_H

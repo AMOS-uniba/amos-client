@@ -70,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_allsky, &QCamera::update_clocks);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);
 
-    this->connect(this->ui->camera_allsky, &QCamera::sightings_found, this->ui->server, &QServer::send_sightings);
+    this->connect(this->ui->camera_allsky, &QCamera::sightings_stored, this->ui->server, &QServer::send_sightings);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);

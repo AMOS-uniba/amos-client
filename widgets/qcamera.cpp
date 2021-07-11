@@ -40,6 +40,8 @@ void QCamera::initialize(const QString & id, const QStation * const station) {
 }
 
 void QCamera::connect_slots(void) {
+    this->connect(this->ui->cb_enabled, &QCheckBox::stateChanged, this, &QCamera::set_enabled);
+    this->connect(this->ui->cb_enabled, &QCheckBox::stateChanged, this, &QCamera::update_clocks);
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
     this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
 }
@@ -66,9 +68,12 @@ const QUfoManager * QCamera::ufo_manager(void) const {
 void QCamera::store_sightings(QVector<Sighting> sightings) {
     logger.debug(Concern::Sightings, "Storing sightings...");
 
-    for (auto && sighting: sightings) {
+    for (auto & sighting: sightings) {
         this->ui->storage_primary->store_sighting(sighting, true);
+        sighting.debug();
     }
+
+    emit this->sightings_stored(sightings);
 }
 
 void QCamera::set_darkness_limit(double new_darkness_limit) {
@@ -92,9 +97,8 @@ void QCamera::update_clocks(void) {
 }
 
 void QCamera::load_settings_inner(const QSettings * const settings) {
-    this->set_darkness_limit(
-        settings->value(QString("camera_%1/darkness").arg(this->id()), -12.0).toDouble()
-    );
+    this->set_enabled(settings->value(this->enabled_key(), true).toBool());
+    this->set_darkness_limit(settings->value(this->darkness_key(), -12.0).toDouble());
 }
 
 void QCamera::load_defaults(void) {
@@ -102,7 +106,8 @@ void QCamera::load_defaults(void) {
 }
 
 void QCamera::save_settings_inner(QSettings * settings) const {
-    settings->setValue(QString("camera_%1/darkness").arg(this->id()), this->darkness_limit());
+    settings->setValue(this->enabled_key(), this->is_enabled());
+    settings->setValue(this->darkness_key(), this->darkness_limit());
 }
 
 void QCamera::apply_changes_inner(void) {
@@ -113,4 +118,21 @@ void QCamera::apply_changes_inner(void) {
 
 void QCamera::discard_changes_inner(void) {
     this->ui->dsb_darkness_limit->setValue(this->darkness_limit());
+}
+
+void QCamera::set_enabled(int enable) {
+    this->m_enabled = (bool) enable;
+    logger.info(Concern::Operation, QString("Camera %1: %2abled").arg(this->id(), enable ? "en" : "dis"));
+
+    this->ui->lx_darkness_limit->setEnabled(enable);
+    this->ui->dsb_darkness_limit->setEnabled(enable);
+    this->ui->sl_dome_open->set_valid(enable);
+    this->ui->sl_dome_close->set_valid(enable);
+    this->ui->ufo_manager->setEnabled(enable);
+    this->ui->scanner->setEnabled(enable);
+    this->ui->storage_primary->setEnabled(enable);
+    this->ui->storage_permanent->setEnabled(enable);
+
+    this->save_settings(settings);
+    this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
