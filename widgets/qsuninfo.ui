@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>302</width>
-    <height>169</height>
+    <width>320</width>
+    <height>170</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>320</width>
+    <height>170</height>
+   </size>
   </property>
   <property name="title">
    <string>Universe</string>
@@ -275,15 +281,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFloatLine</class>
-   <extends>QWidget</extends>
-   <header>widgets/lines/qfloatline.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QDateTimeLine</class>
    <extends>QWidget</extends>
    <header>widgets/lines/qdatetimeline.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFloatLine</class>
+   <extends>QWidget</extends>
+   <header>widgets/lines/qfloatline.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

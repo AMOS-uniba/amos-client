@@ -7,7 +7,7 @@ extern EventLogger logger;
 extern QSettings * settings;
 
 
-const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing daylight");
+const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing during the day");
 const StationState QStation::Observing          = StationState('O', "observing", Icon::Observing, "observation in progress");
 const StationState QStation::NotObserving       = StationState('N', "not observing", Icon::NotObserving, "observation stopped");
 const StationState QStation::Manual             = StationState('M', "manual", Icon::Manual, "manual control enabled");

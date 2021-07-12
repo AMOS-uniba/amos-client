@@ -65,13 +65,15 @@ void QDomeWidget::drawWidget(QPainter & qp) {
     float angle = ((float) (this->m_cover_position - this->m_cover_minimum) / (float) (this->m_cover_maximum - this->m_cover_minimum)) * M_PI_2 * 0.9;
     float w = size.width() - 1;
     float h = size.height() - 1;
-    float scale = ((w * 2) < h ? (w * 2) : h);
+    float scale = (w / 2 < h ? w / 2 : h);
 
     qp.setPen(QPen(Qt::black, 0));
 
     QTransform centered;
-    centered.translate(w / 2, h * 0.75 - 1);
-    QTransform scaled(centered);
+    centered.translate(w / 2, h * 0.5);
+    QTransform centershift;
+    centershift.translate(w / 2, h * 0.75);
+    QTransform scaled(centershift);
     scaled.scale(scale, scale);
     qp.setTransform(scaled);
 
@@ -93,7 +95,7 @@ void QDomeWidget::drawWidget(QPainter & qp) {
         qp.drawRect(QRectF(-BoxWidth / 2.0, 0, BoxWidth, BoxHeight));
 
         QPixmap logo(":/images/blue.ico");
-        qp.drawPixmap(QRectF(-0.075, 0.05, 0.15, 0.15), logo.scaled(25, 25, Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF(0, 0, 25, 25));
+        qp.drawPixmap(QRectF(-0.075, 0.05, 0.15, 0.15), logo.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation), QRectF(0, 0, 64, 64));
 
         // Cover
         QLinearGradient cover(0, 0, 0.4, 0);
@@ -126,6 +128,6 @@ void QDomeWidget::drawWidget(QPainter & qp) {
         qp.setTransform(centered);
         qp.setPen(Qt::GlobalColor::gray);
         qp.setFont(QFont("MS Shell Dlg 2", 16, QFont::Bold, false));
-        qp.drawText(QRectF(-100, -80, 200, 100), Qt::AlignCenter, "dome unreachable");
+        qp.drawText(QRectF(-w * 0.4, -h * 0.2, w * 0.8, h * 0.4), Qt::AlignCenter, "dome unreachable");
     }
 }
