@@ -54,20 +54,24 @@ void Sighting::move(const QString & dir) {
     QDir().mkpath(dir);
 
     for (auto & file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
-
-        if (QFile::exists(new_path)) {
-            logger.warning(Concern::Sightings, QString("Could not move the sighting, deleting file '%1' first...").arg(new_path));
-            QFile::remove(new_path);
-        }
-
-        if (QFile::rename(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Moved '%1' to '%2'").arg(file, new_path));
+        if (file.isEmpty()) {
+            logger.debug(Concern::Sightings, QString("File not present in the sighting, skipping"));
         } else {
-            logger.error(Concern::Sightings, QString("Could not move file '%1' to '%2'").arg(file, new_path));
-        }
+            QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
 
-        file = new_path;
+            if (QFile::exists(new_path)) {
+                logger.warning(Concern::Sightings, QString("Could not move the sighting, deleting file '%1' first...").arg(new_path));
+                QFile::remove(new_path);
+            }
+
+            if (QFile::rename(file, new_path)) {
+                logger.debug(Concern::Sightings, QString("Moved '%1' to '%2'").arg(file, new_path));
+            } else {
+                logger.error(Concern::Sightings, QString("Could not move file '%1' to '%2'").arg(file, new_path));
+            }
+
+            file = new_path;
+        }
     }
 
     this->m_jpg = this->m_files[0];

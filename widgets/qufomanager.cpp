@@ -82,10 +82,19 @@ const QString& QUfoManager::path(void) const { return this->m_path; }
 void QUfoManager::auto_action(bool is_dark) const {
     if (this->m_autostart) {
         logger.debug(Concern::UFO, QString("UFO-%1: Automatic action").arg(this->id()));
-        if (is_dark) {
-            this->start_ufo();
+
+        if (this->state() == QUfoManager::NotAnExe) {
+            logger.debug_error(Concern::UFO, QString("UFO-%1: Selected file is not a valid EXE file").arg(this->id()));
         } else {
-            this->stop_ufo();
+            if (this->state() == QUfoManager::NotFound) {
+                logger.debug_error(Concern::UFO, QString("UFO-%1: File not found").arg(this->id()));
+            } else {
+                if (is_dark) {
+                    this->start_ufo();
+                } else {
+                    this->stop_ufo();
+                }
+            }
         }
     }
 }

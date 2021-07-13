@@ -11,7 +11,7 @@ extern EventLogger logger;
 extern QSettings *settings;
 
 void MainWindow::display_time(void) {
-    statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+    this->statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
     this->ui->lb_uptime->setText(
         this->format_duration(this->m_start_time.secsTo(QDateTime::currentDateTimeUtc()))

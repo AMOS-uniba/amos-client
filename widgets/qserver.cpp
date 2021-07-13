@@ -148,11 +148,10 @@ void QServer::send_sightings(QVector<Sighting> sightings) const {
 }
 
 void QServer::send_sighting(const Sighting & sighting) const {
-    logger.debug(Concern::Server, QString("Sending a sighting to %1").arg(this->m_url_sighting.toString()));
+    logger.debug(Concern::Server, QString("Sending sighting %1 to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
 
-    sighting.debug();
     multipart->append(sighting.jpg_part());
     multipart->append(sighting.xml_part());
     multipart->append(sighting.json());

@@ -102,6 +102,7 @@ void QCamera::load_settings_inner(const QSettings * const settings) {
 }
 
 void QCamera::load_defaults(void) {
+    this->set_enabled(true);
     this->set_darkness_limit(-12.0);
 }
 
@@ -133,6 +134,6 @@ void QCamera::set_enabled(int enable) {
     this->ui->storage_primary->setEnabled(enable);
     this->ui->storage_permanent->setEnabled(enable);
 
-    this->save_settings(settings);
+    settings->setValue(this->enabled_key(), this->is_enabled());
     this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
