@@ -36,7 +36,7 @@ private slots:
     void on_bt_change_clicked();
 
 public:
-    const static UfoState Unknown, NotAnExe, NotFound, NotRunning, Starting, Running;
+    const static UfoState Disabled, Unknown, NotAnExe, NotFound, NotRunning, Starting, Running;
 
     explicit QUfoManager(QWidget * parent = nullptr);
     ~QUfoManager();

@@ -24,7 +24,7 @@ QCamera::~QCamera() {
     delete this->ui;
 }
 
-void QCamera::initialize(const QString & id, const QStation * const station) {
+void QCamera::initialize(const QString & id, const QStation * const station, bool spectral) {
     if (!this->m_id.isEmpty()) {
         throw ConfigurationError("QCamera id already set");
     }
@@ -52,6 +52,7 @@ bool QCamera::is_changed(void) const {
 
 QJsonObject QCamera::json(void) const {
     return QJsonObject {
+        {"on", this->is_enabled()},
         {"ufo", this->ui->ufo_manager->json()},
         {"dark", this->darkness_limit()},
         {"disk", QJsonObject {
@@ -61,8 +62,10 @@ QJsonObject QCamera::json(void) const {
     };
 }
 
-const QUfoManager * QCamera::ufo_manager(void) const {
-    return this->ui->ufo_manager;
+void QCamera::auto_action(bool is_dark) {
+    if (this->is_enabled()) {
+        this->ui->ufo_manager->auto_action(is_dark);
+    }
 }
 
 void QCamera::store_sightings(QVector<Sighting> sightings) {

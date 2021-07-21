@@ -35,8 +35,8 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->dome->initialize();
     this->ui->server->initialize();
     this->ui->station->initialize();
-    this->ui->camera_allsky->initialize("allsky", this->ui->station);
-    this->ui->camera_spectral->initialize("spectral", this->ui->station);
+    this->ui->camera_allsky->initialize("allsky", this->ui->station, false);
+    this->ui->camera_spectral->initialize("spectral", this->ui->station, true);
 
     this->ui->dome->set_station(this->ui->station);
     this->ui->sun_info->set_station(this->ui->station);
@@ -64,8 +64,8 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
 
     this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->station, &QStation::automatic_cover);
-    this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->camera_allsky->ufo_manager(), &QUfoManager::auto_action);
-    this->connect(this->ui->station, &QStation::automatic_action_spectral, this->ui->camera_spectral->ufo_manager(), &QUfoManager::auto_action);
+    this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->camera_allsky, &QCamera::auto_action);
+    this->connect(this->ui->station, &QStation::automatic_action_spectral, this->ui->camera_spectral, &QCamera::auto_action);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->sun_info, &QSunInfo::update_long_term);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_allsky, &QCamera::update_clocks);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);

@@ -178,6 +178,9 @@ void QDome::load_settings_inner(const QSettings * const settings) {
         settings->value("dome/humidity_lower", 75.0).toDouble(),
         settings->value("dome/humidity_upper", 90.0).toDouble()
     );
+    this->set_serial_port(
+        settings->value("dome/port", "COM1").toString()
+    );
 }
 
 bool QDome::is_changed(void) const {
@@ -201,6 +204,7 @@ void QDome::discard_changes_inner(void) {
 void QDome::save_settings_inner(QSettings * settings) const {
     settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
+    settings->setValue("dome/port", this->m_serial_port->portName());
 }
 
 void QDome::set_station(const QStation * const station) { this->m_station = station; }
@@ -324,12 +328,9 @@ void QDome::display_basic_data(const DomeStateS & state) {
 }
 
 void QDome::display_env_data(const DomeStateT & state) {
-    logger.debug(Concern::SerialPort, "Displaying env data");
-
-    bool valid = state.is_valid();
-
     this->display_serial_port_info();
 
+    bool valid = state.is_valid();
     this->ui->fl_t_lens->set_valid(valid);
     this->ui->fl_t_CPU->set_valid(valid);
     this->ui->fl_t_SHT31->set_valid(valid);
@@ -413,7 +414,7 @@ void QDome::clear_serial_port(void) {
     this->m_serial_port = nullptr;
 }
 
-void QDome::set_serial_port(const QString &port) {
+void QDome::set_serial_port(const QString & port) {
     this->clear_serial_port();
 
     this->m_serial_port = new QSerialPort(this);

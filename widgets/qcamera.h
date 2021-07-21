@@ -17,6 +17,7 @@ private:
     const QStation * m_station;
     QString m_id;
     bool m_enabled;
+    bool m_spectral;
 
     double m_darkness_limit;
 
@@ -39,11 +40,10 @@ public:
 
     inline const QString & id(void) const { return this->m_id; }
     inline bool is_enabled(void) const { return this->m_enabled; }
+    inline bool is_spectral(void) const { return this->m_spectral; }
     inline double darkness_limit(void) const { return this->m_darkness_limit; }
 
     QJsonObject json(void) const;
-
-    const QUfoManager * ufo_manager(void) const;
 
 private slots:
     void set_enabled(int enable);
@@ -52,7 +52,8 @@ private slots:
     void store_sightings(QVector<Sighting> sightings);
 
 public slots:
-    void initialize(const QString & id, const QStation * const station);
+    void initialize(const QString & id, const QStation * const station, bool spectral);
+    void auto_action(bool is_dark);
     void update_clocks(void);
 
 signals:

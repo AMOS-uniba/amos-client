@@ -2,6 +2,7 @@
 #define QSCANNERBOX_H
 
 #include "widgets/storage/qfilesystembox.h"
+#include "widgets/qcamera.h"
 
 class QScannerBox: public QFileSystemBox {
     Q_OBJECT

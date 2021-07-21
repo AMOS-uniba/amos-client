@@ -2,7 +2,8 @@
 
 extern EventLogger logger;
 
-Sighting::Sighting(const QString & dir, const QString & prefix):
+Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
+    m_spectral(spectral),
     m_dir(dir),
     m_prefix(prefix)
 {
@@ -131,6 +132,7 @@ QHttpPart Sighting::json(void) const {
     text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
 
     QJsonObject content {
+        {"spectral", this->is_spectral()},
         {"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")},
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
     };

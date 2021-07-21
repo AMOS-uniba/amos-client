@@ -26,7 +26,7 @@ void QScannerBox::scan_sightings(void) const {
         for (QString & xml: xmls) {
             try {
                 QFileInfo xml_info(QString("%1/%2").arg(dir, xml));
-                sightings.append(Sighting(xml_info.absolutePath(), xml_info.completeBaseName()));
+                sightings.append(Sighting(xml_info.absolutePath(), xml_info.completeBaseName(), ((QCamera *) this->parentWidget())->is_spectral()));
             } catch (RuntimeException & e) {
                 logger.error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
             }
