@@ -30,6 +30,7 @@ void QCamera::initialize(const QString & id, const QStation * const station, boo
     }
     this->m_id = id;
     this->m_station = station;
+    this->m_spectral = spectral;
 
     QAmosWidget::initialize();
 

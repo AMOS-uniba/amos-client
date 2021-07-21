@@ -15,8 +15,8 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
     this->m_files = {this->m_jpg, this->m_jpt, this->m_xml, this->m_bmp, this->m_avi};
 
-    logger.info(Concern::Sightings, QString("Created a new sighting '%1*' (%2 MB) (%3)")
-                .arg(prefix)
+    logger.info(Concern::Sightings, QString("New %1 sighting '%2*' (%3 MB) (%4)")
+                .arg(this->is_spectral() ? "spectral" : "allsky", prefix)
                 .arg(this->avi_size() / (1 << 20))
                 .arg(QStringList({
                     (this->m_xml != "") ? "XML" : "---",
@@ -34,11 +34,11 @@ Sighting::~Sighting(void) {
     this->m_files.clear();
 }
 
-QString Sighting::try_open(const QString & path, bool require) {
+QString Sighting::try_open(const QString & path, bool required) {
     if (QFileInfo::exists(path)) {
         return path;
     } else {
-        if (require) {
+        if (required) {
             throw RuntimeException(QString("Could not open sighting file %1").arg(path));
         } else {
             return "";
