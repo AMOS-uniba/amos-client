@@ -41,11 +41,13 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_azimuth->set_valid(true);
     this->ui->sl_azimuth->set_value_formatter(azimuth_formatter);
 
-    this->ui->sl_dec->set_title("Declination");
+    this->ui->sl_dec->set_title("δ");
+    this->ui->sl_dec->set_tooltip("Declination");
     this->ui->sl_dec->set_valid(true);
     this->ui->sl_dec->set_value_formatter(altitude_formatter);
 
-    this->ui->sl_ra->set_title("Right ascension");
+    this->ui->sl_ra->set_title("α");
+    this->ui->sl_ra->set_tooltip("Right ascension");
     this->ui->sl_ra->set_valid(true);
     this->ui->sl_ra->set_value_formatter(azimuth_formatter);
 

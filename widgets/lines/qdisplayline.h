@@ -18,16 +18,17 @@ using ValueFormatter = std::function<QString(T value)>;
 class QDisplayLine: public QWidget {
     Q_OBJECT
 protected:
-    Ui::QDisplayLine *ui;
+    Ui::QDisplayLine * ui;
     bool m_valid;
 public:
-    explicit QDisplayLine(QWidget *parent = nullptr);
+    explicit QDisplayLine(QWidget * parent = nullptr);
     ~QDisplayLine();
 
     QString title(void) const;
 
 public slots:
-    void set_title(const QString &new_title);
+    void set_title(const QString & new_title);
+    void set_tooltip(const QString & new_tooltip);
     void set_valid(bool valid);
 };
 

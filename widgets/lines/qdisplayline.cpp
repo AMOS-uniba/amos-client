@@ -14,8 +14,12 @@ QDisplayLine::~QDisplayLine() {
     delete ui;
 }
 
-void QDisplayLine::set_title(const QString &new_title) {
+void QDisplayLine::set_title(const QString & new_title) {
     this->ui->lb_title->setText(new_title);
+}
+
+void QDisplayLine::set_tooltip(const QString & new_tooltip) {
+    this->setToolTip(new_tooltip);
 }
 
 QString QDisplayLine::title(void) const {

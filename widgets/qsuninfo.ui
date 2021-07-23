@@ -7,14 +7,8 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>170</height>
+    <height>169</height>
    </rect>
-  </property>
-  <property name="minimumSize">
-   <size>
-    <width>320</width>
-    <height>170</height>
-   </size>
   </property>
   <property name="title">
    <string>Universe</string>

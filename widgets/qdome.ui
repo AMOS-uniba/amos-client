@@ -586,6 +586,9 @@
           <kerning>true</kerning>
          </font>
         </property>
+        <property name="toolTip">
+         <string>state of serial port</string>
+        </property>
         <property name="text">
          <string>undefined</string>
         </property>
@@ -596,6 +599,9 @@
       </item>
       <item row="3" column="0" colspan="2">
        <widget class="QLabel" name="lb_serial_data_state">
+        <property name="toolTip">
+         <string>state of the data</string>
+        </property>
         <property name="text">
          <string>undefined</string>
         </property>
