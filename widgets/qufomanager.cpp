@@ -17,6 +17,7 @@ const UfoState QUfoManager::Running      = UfoState('R', "running", Qt::darkGree
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
+    m_start_scheduled(false),
     m_frame(nullptr),
     m_path(""),
     m_id(""),
@@ -30,12 +31,15 @@ QUfoManager::QUfoManager(QWidget * parent):
     this->connect(this->m_timer_check, &QTimer::timeout, this, &QUfoManager::update_state);
     this->m_timer_check->start();
 
+    this->m_timer_delay = new QTimer(this);
+
     this->connect(this, &QUfoManager::state_changed, this, &QUfoManager::log_state_change);
 }
 
 QUfoManager::~QUfoManager() {
     this->disconnect(&this->m_process, &QProcess::stateChanged, nullptr, nullptr);
     delete this->m_timer_check;
+    delete this->m_timer_delay;
     delete this->ui;
 }
 
@@ -63,6 +67,7 @@ void QUfoManager::save_settings(void) const {
 void QUfoManager::set_autostart(bool enable) {
     logger.info(Concern::UFO, QString("UFO-%1: autostart %2abled").arg(this->id(), enable ? "en" : "dis"));
     this->m_autostart = enable;
+    this->m_start_scheduled &= enable;
 
     this->ui->cb_auto->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
@@ -90,7 +95,7 @@ void QUfoManager::auto_action(bool is_dark) const {
                 logger.debug_error(Concern::UFO, QString("UFO-%1: File not found").arg(this->id()));
             } else {
                 if (is_dark) {
-                    this->start_ufo();
+                    this->start_ufo(30);
                 } else {
                     this->stop_ufo();
                 }
@@ -156,7 +161,7 @@ bool QUfoManager::is_running(void) const {
  * @brief QUfoManager::start_ufo
  * Conditionally start UFO Capture v2 as a child process
  */
-void QUfoManager::start_ufo(void) const {
+void QUfoManager::start_ufo(unsigned int delay) const {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running:
         case QProcess::ProcessState::Starting: {
@@ -164,21 +169,41 @@ void QUfoManager::start_ufo(void) const {
             break;
         }
         case QProcess::ProcessState::NotRunning: {
-            logger.info(Concern::UFO, QString("UFO-%1 starting").arg(this->id()));
-            this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
-            this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
-            this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
-            this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
+            if (this->m_start_scheduled) {
+                logger.debug(Concern::UFO, QString("UFO-%1 already scheduled to start").arg(this->id()));
+            } else {
+                logger.info(Concern::UFO, QString("UFO-%1 starting with delay %2 s").arg(this->id()).arg(delay));
 
-            Sleep(1000);
-            this->m_frame = FindWindowA(nullptr, "UFOCapture");
-            logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2").arg(this->id()).arg((long long) this->m_frame));
-            Sleep(1000);
-            ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
-            emit this->started();
-            break;
+                this->m_start_scheduled = true;
+                this->m_timer_delay->setInterval(delay * 1000);
+                this->connect(this->m_timer_delay, &QTimer::timeout, this, &QUfoManager::start_ufo_inner);
+                this->m_timer_delay->setSingleShot(true);
+                this->m_timer_delay->start();
+                break;
+            }
         }
     }
+}
+
+/**
+ * @brief QUfoManager::start_ufo_inner
+ * Actually starts UFO, private function
+ */
+void QUfoManager::start_ufo_inner(void) const {
+    logger.debug(Concern::UFO, QString("UFO-%1 starting").arg(this->id()));
+    this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
+    this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
+    this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
+    this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
+
+    Sleep(1000);
+    this->m_frame = FindWindowA(nullptr, "UFOCapture");
+    logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2").arg(this->id()).arg((long long) this->m_frame));
+    Sleep(1000);
+    ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
+    this->m_start_scheduled = false;
+
+    emit this->started();
 }
 
 /**

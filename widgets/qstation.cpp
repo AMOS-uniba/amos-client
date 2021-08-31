@@ -151,6 +151,7 @@ void QStation::set_position(const double new_latitude, const double new_longitud
 
 /** Darkness limit settings **/
 bool QStation::is_dark_allsky(const QDateTime & time) const {
+    return true;
     return (this->sun_altitude(time) < this->camera_allsky()->darkness_limit());
 }
 
@@ -256,37 +257,37 @@ void QStation::automatic_cover(void) {
                         this->set_state(QStation::RainOrHumid);
                     } else {
                         logger.info(Concern::Automatic, "Opening the cover");
-                        this->m_dome->open_cover();
+                        this->dome()->open_cover();
                     }
                 }
 
                 // If the dome is closed, also turn off the intensifier
                 if (stateS.intensifier_active()) {
                     logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
-                    this->m_dome->turn_off_intensifier();
+                    this->dome()->turn_off_intensifier();
                     this->set_state(QStation::NotObserving);
                 }
             } else {
                 if (stateS.dome_open_sensor_active()) {
                     // If the dome is open, turn on the image intensifier and the fan
                     if (stateS.intensifier_active()) {
-                        logger.detail(Concern::Automatic, "Intensifier active");
+                        logger.detail(Concern::Automatic, "Intensifier is active");
                         this->set_state(QStation::Observing);
                     } else {
                         logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
-                        this->m_dome->turn_on_intensifier();
+                        this->dome()->turn_on_intensifier();
                     }
 
                     if (!stateS.fan_active()) {
                         logger.info(Concern::Automatic, "Turned on the fan");
-                        this->m_dome->turn_on_fan();
+                        this->dome()->turn_on_fan();
                     }
 
                     // But if humidity is very high, close the cover
                     if (this->dome()->is_very_humid()) {
                         logger.info(Concern::Automatic, "Closed the cover (high humidity)");
                         this->set_state(QStation::RainOrHumid);
-                        this->m_dome->close_cover();
+                        this->dome()->close_cover();
                     }
                 } else {
                     this->set_state(QStation::NotObserving);
@@ -340,7 +341,7 @@ QString QStation::state_logger_filename(void) const { return this->m_state_logge
 void QStation::log_state(void) const {
     this->m_state_logger->log(QString("%1° %2 %3")
                               .arg(this->sun_altitude(), 5, 'f', 1)
-                              .arg(QString(this->state().code()), this->m_dome->status_line()));
+                              .arg(QString(this->state().code()), this->dome()->status_line()));
 }
 
 /*********************** Event handlers ***********************************/

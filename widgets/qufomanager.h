@@ -21,6 +21,8 @@ private:
     Ui::QUfoManager * ui;
 
     QTimer * m_timer_check;
+    QTimer * m_timer_delay;
+    mutable bool m_start_scheduled;
 
     mutable HWND m_frame;
     mutable QProcess m_process;
@@ -30,6 +32,8 @@ private:
     bool m_autostart;
     UfoState m_state;
     void update_state(void);
+
+    void start_ufo_inner(void) const;
 
 private slots:
     void on_cb_auto_clicked(bool checked);
@@ -59,7 +63,7 @@ public slots:
     void save_settings(void) const;
     void auto_action(bool is_dark) const;
 
-    void start_ufo(void) const;
+    void start_ufo(unsigned int delay = 0) const;
     void stop_ufo(void) const;
 
     void log_state_change(const UfoState & state) const;
