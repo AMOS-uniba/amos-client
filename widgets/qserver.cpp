@@ -121,8 +121,8 @@ void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
         Concern::Server,
         QString("Heartbeat could not be sent: (error %1: %2) %3")
                 .arg(error)
-                .arg(reply->errorString()
-                .arg(QString(reply->readAll()))
+                .arg(reply->errorString())
+                .arg(QString(reply->readAll())
         )
     );
 }

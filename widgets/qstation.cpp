@@ -151,7 +151,6 @@ void QStation::set_position(const double new_latitude, const double new_longitud
 
 /** Darkness limit settings **/
 bool QStation::is_dark_allsky(const QDateTime & time) const {
-    return true;
     return (this->sun_altitude(time) < this->camera_allsky()->darkness_limit());
 }
 
@@ -347,6 +346,7 @@ void QStation::log_state(void) const {
 /*********************** Event handlers ***********************************/
 void QStation::on_cb_manual_clicked(bool checked) {
     this->set_manual_control(checked);
+    this->save_settings(settings);
 }
 
 void QStation::on_cb_safety_override_clicked(bool checked) {
