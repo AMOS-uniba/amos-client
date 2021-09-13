@@ -15,7 +15,6 @@ char source[MAXCHARS], dest[MAXCHARS];
 int older_than = 7;
 
 bool fileExists(const char* filePath) {
-
 	DWORD dwAttrib = GetFileAttributes(filePath);
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES && !(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
@@ -26,9 +25,9 @@ bool fileTime(const char* filePath, LPFILETIME last_mod) {
 	if (hFile != NULL) {
 		bool success = GetFileTime(hFile, NULL, NULL, last_mod);
 		CloseHandle(hFile);
-		return(success);
+		return success;
 	}
-	return(false);
+	return false;
 }
 
 bool fileSize(const char* filePath, PLARGE_INTEGER size) {
@@ -37,9 +36,9 @@ bool fileSize(const char* filePath, PLARGE_INTEGER size) {
 	if (hFile != NULL) {
 		bool success = GetFileSizeEx(hFile, size);
 		CloseHandle(hFile);
-		return(success);
+		return success;
 	}
-	return(false);
+	return false;
 }
 
 void readCfg(char * filename) {//station initialization
@@ -116,7 +115,7 @@ int main() {
 		if (diff < older_than)
 			continue;
 
-		//do not delete if file is not on destination and same size 
+		//do not delete if file is not on destination and same size
 		memcpy(dst_path, dest, dlength);
 		if (!fileExists(dst_path) || !fileSize(dst_path, &dst_size) || src_size.QuadPart != dst_size.QuadPart)
 			continue;

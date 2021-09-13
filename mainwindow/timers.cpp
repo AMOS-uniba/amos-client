@@ -16,4 +16,5 @@ void MainWindow::create_timers(void) {
 
 void MainWindow::process_display_timer(void) {
     this->display_time();
+    this->ui->dome->display_serial_port_info();
 }

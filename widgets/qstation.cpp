@@ -311,6 +311,7 @@ QJsonObject QStation::json(void) const {
             {"hll", this->dome()->humidity_limit_lower()},
             {"hlu", this->dome()->humidity_limit_upper()},
         }},
+        {"cv", VERSION_STRING},
     };
 }
 

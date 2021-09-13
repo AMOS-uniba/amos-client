@@ -70,6 +70,7 @@ QDome::QDome(QWidget *parent):
     QAmosWidget(parent),
     ui(new Ui::QDome),
     m_station(nullptr),
+    m_last_received(QDateTime::currentDateTimeUtc()),
     m_serial_port(nullptr),
     m_state_S(),
     m_state_T(),
@@ -257,6 +258,8 @@ void QDome::set_formatters(void) {
 void QDome::display_basic_data(const DomeStateS & state) {
     logger.debug(Concern::SerialPort, "Displaying basic data");
     bool valid = state.is_valid();
+
+    this->m_last_received = QDateTime::currentDateTimeUtc();
 
     this->display_serial_port_info();
 
@@ -478,7 +481,11 @@ void QDome::display_serial_port_info(void) const {
     }
 
     this->ui->lb_serial_port_state->setText(this->serial_port_state().display_string());
-    this->ui->lb_serial_data_state->setText(info);
+    this->ui->lb_serial_data_state->setText(
+        QString("%1 (%2 s)")
+            .arg(info)
+            .arg(this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 0, 'f', 1)
+    );
     this->ui->picture->set_reachable(reachable);
 }
 
@@ -491,17 +498,17 @@ QJsonObject QDome::json(void) const {
     };
 }
 
-void QDome::send_command(const Command &command) const {
+void QDome::send_command(const Command & command) const {
     logger.debug(Concern::SerialPort, QString("Sending a command '%1'").arg(command.display_name()));
     this->send(command.for_telegram());
 }
 
-void QDome::send_request(const Request &request) const {
+void QDome::send_request(const Request & request) const {
     logger.debug(Concern::SerialPort, QString("Sending a request '%1'").arg(request.display_name()));
     this->send(request.for_telegram());
 }
 
-void QDome::send(const QByteArray &message) const {
+void QDome::send(const QByteArray & message) const {
     if (this->m_serial_port == nullptr) {
         logger.debug_error(Concern::SerialPort, "Cannot send, no serial port set");
         return;
@@ -523,7 +530,7 @@ void QDome::process_response(void) {
     this->m_buffer->insert(response);
 }
 
-void QDome::process_message(const QByteArray &message) {
+void QDome::process_message(const QByteArray & message) {
     try {
         Telegram telegram(message);
         QByteArray decoded = telegram.get_message();
