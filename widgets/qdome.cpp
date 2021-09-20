@@ -141,6 +141,11 @@ QDome::QDome(QWidget *parent):
     this->connect(this->m_serial_watchdog, &QTimer::timeout, this, &QDome::check_serial_port);
     this->m_serial_watchdog->start();
 
+    this->m_open_timer = new QTimer(this);
+    this->m_open_timer->setInterval(1000);
+    this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::set_open_since);
+    this->m_open_timer->start();
+
     emit this->cover_open(400);
     emit this->cover_closed(0);
     emit this->cover_moved(0);
@@ -445,8 +450,15 @@ void QDome::check_serial_port(void) {
     }
 }
 
-const QDateTime& QDome::last_received(void) const {
-    return this->m_last_received;
+void QDome::set_open_since(void) {
+    const DomeStateS & state = this->state_S();
+    if (state.is_valid() && state.dome_open_sensor_active()) {
+        if (!this->m_open_since.isValid()) {
+            this->m_open_since = QDateTime::currentDateTimeUtc();
+        }
+    } else {
+        this->m_open_since = QDateTime();
+    }
 }
 
 SerialPortState QDome::serial_port_state(void) const {

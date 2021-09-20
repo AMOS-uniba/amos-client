@@ -129,8 +129,8 @@ signals:
     void position_changed(void) const;
     void state_changed(StationState state) const;
 
-    void automatic_action_allsky(bool is_dark) const;
-    void automatic_action_spectral(bool is_dark) const;
+    void automatic_action_allsky(bool is_dark, const QDateTime & open_since) const;
+    void automatic_action_spectral(bool is_dark, const QDateTime & open_since) const;
 };
 
 #endif // QSTATION_H

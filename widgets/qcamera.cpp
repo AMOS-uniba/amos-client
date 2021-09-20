@@ -63,8 +63,22 @@ QJsonObject QCamera::json(void) const {
     };
 }
 
-void QCamera::auto_action(bool is_dark) {
-    if (this->is_enabled()) {
+void QCamera::auto_action(bool is_dark, const QDateTime & open_since) {
+    /* if ((this->is_enabled()) && (open_since.isValid()) && (open_since.secsTo(QDateTime::currentDateTimeUtc()) > 10)) {
+        this->ui->ufo_manager->auto_action(is_dark);
+    } */
+    if (!this->is_enabled()) {
+        logger.debug(Concern::UFO, QString("Camera %1 is not enabled").arg(this->id()));
+        return;
+    }
+    if (!open_since.isValid()) {
+        logger.debug(Concern::UFO, QString("Dome's open-since is not valid"));
+        return;
+    }
+    logger.debug(Concern::UFO, QString("%1").arg(open_since.secsTo(QDateTime::currentDateTimeUtc())));
+
+    if ((this->is_enabled()) && (open_since.isValid()) && (open_since.secsTo(QDateTime::currentDateTimeUtc()) > 10)) {
+        logger.debug(Concern::UFO, "Auto action going through...");
         this->ui->ufo_manager->auto_action(is_dark);
     }
 }

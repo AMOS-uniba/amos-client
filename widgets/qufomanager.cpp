@@ -95,7 +95,7 @@ void QUfoManager::auto_action(bool is_dark) const {
                 logger.debug_error(Concern::UFO, QString("UFO-%1: File not found").arg(this->id()));
             } else {
                 if (is_dark) {
-                    this->start_ufo(30);
+                    this->start_ufo(10);
                 } else {
                     this->stop_ufo();
                 }

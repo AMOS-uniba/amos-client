@@ -53,7 +53,7 @@ private slots:
 
 public slots:
     void initialize(const QString & id, const QStation * const station, bool spectral);
-    void auto_action(bool is_dark);
+    void auto_action(bool is_dark, const QDateTime & open_since = QDateTime());
     void update_clocks(void);
 
 signals:

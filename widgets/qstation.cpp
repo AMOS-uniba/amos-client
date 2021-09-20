@@ -205,8 +205,8 @@ QDateTime QStation::next_sun_crossing(double altitude, bool direction_up, int re
 }
 
 void QStation::automatic_timer(void) {
-    emit this->automatic_action_allsky(this->is_dark_allsky());
-    emit this->automatic_action_spectral(this->is_dark_spectral());
+    emit this->automatic_action_allsky(this->is_dark_allsky(), this->dome()->open_since());
+    emit this->automatic_action_spectral(this->is_dark_spectral(), QDateTime());
 }
 
 // Perform automatic state checks

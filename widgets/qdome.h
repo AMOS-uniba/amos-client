@@ -35,10 +35,12 @@ private:
 
     constexpr static unsigned char Address = 0x99;                              // address
     QDateTime m_last_received;
+    QDateTime m_open_since;
 
     QSerialPort * m_serial_port;
     QTimer * m_robin_timer;
     QTimer * m_serial_watchdog;
+    QTimer * m_open_timer;
 
     SerialBuffer * m_buffer;
 
@@ -72,6 +74,8 @@ private slots:
     void on_bt_cover_open_clicked();
     void on_bt_cover_close_clicked();
 
+    void set_open_since(void);
+
 public:
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
@@ -95,7 +99,9 @@ public:
     void send_request(const Request & request) const;
     void send(const QByteArray & message) const;
 
-    const QDateTime & last_received(void) const;
+    inline const QDateTime & last_received(void) const { return this->m_last_received; };
+    inline const QDateTime & open_since(void) const { return this->m_open_since; };
+
     SerialPortState serial_port_state(void) const;
 
     QJsonObject json(void) const;
