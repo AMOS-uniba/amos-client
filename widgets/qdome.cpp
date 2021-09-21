@@ -496,7 +496,7 @@ void QDome::display_serial_port_info(void) const {
     this->ui->lb_serial_data_state->setText(
         QString("%1 (%2 s)")
             .arg(info)
-            .arg(this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 0, 'f', 1)
+            .arg(MainWindow::format_duration_double(this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 1))
     );
     this->ui->picture->set_reachable(reachable);
 }

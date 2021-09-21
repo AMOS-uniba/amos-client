@@ -61,7 +61,7 @@ public slots:
     void initialize(const QString & id);
     void load_settings(void);
     void save_settings(void) const;
-    void auto_action(bool is_dark) const;
+    void auto_action(bool is_dark, const QDateTime & open_since) const;
 
     void start_ufo(unsigned int delay = 0) const;
     void stop_ufo(void) const;

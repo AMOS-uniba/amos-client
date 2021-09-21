@@ -84,7 +84,7 @@ void QUfoManager::set_path(const QString & path) {
 const QString& QUfoManager::path(void) const { return this->m_path; }
 
 // Automatic action: start UFO after sunset, stop before sunrise
-void QUfoManager::auto_action(bool is_dark) const {
+void QUfoManager::auto_action(bool is_dark, const QDateTime & open_since) const {
     if (this->m_autostart) {
         logger.debug(Concern::UFO, QString("UFO-%1: Automatic action").arg(this->id()));
 
@@ -94,8 +94,17 @@ void QUfoManager::auto_action(bool is_dark) const {
             if (this->state() == QUfoManager::NotFound) {
                 logger.debug_error(Concern::UFO, QString("UFO-%1: File not found").arg(this->id()));
             } else {
+                logger.debug(Concern::UFO, QString("Cover has been open for %1 s").arg(open_since.secsTo(QDateTime::currentDateTimeUtc())));
+
+                if (open_since.secsTo(QDateTime::currentDateTimeUtc()) > 10) {
+                    logger.debug(Concern::UFO, "Auto action going through...");
+                }
+
                 if (is_dark) {
-                    this->start_ufo(10);
+                    if (open_since.isValid()) {
+                        this->start_ufo();
+                        logger.debug(Concern::UFO, QString("Camera %1: Dome's open-since is not valid").arg(this->id()));
+                    }
                 } else {
                     this->stop_ufo();
                 }
