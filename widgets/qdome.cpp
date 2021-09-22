@@ -452,7 +452,7 @@ void QDome::check_serial_port(void) {
 
 void QDome::set_open_since(void) {
     const DomeStateS & state = this->state_S();
-    if (state.is_valid() && state.dome_open_sensor_active()) {
+    if (state.is_valid() && state.dome_open_sensor_active() && state.intensifier_active()) {
         if (!this->m_open_since.isValid()) {
             this->m_open_since = QDateTime::currentDateTimeUtc();
         }
@@ -494,9 +494,9 @@ void QDome::display_serial_port_info(void) const {
 
     this->ui->lb_serial_port_state->setText(this->serial_port_state().display_string());
     this->ui->lb_serial_data_state->setText(
-        QString("%1 (%2 s)")
-            .arg(info)
-            .arg(MainWindow::format_duration_double(this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 1))
+        QString("%1 (%2)").arg(info, MainWindow::format_duration_double(
+             this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 1
+        ))
     );
     this->ui->picture->set_reachable(reachable);
 }
