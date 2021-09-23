@@ -192,3 +192,8 @@ void MainWindow::on_action_about_triggered() {
     AboutDialog dialog(this);
     dialog.exec();
 }
+
+void MainWindow::on_pb_logging_options_clicked() {
+    this->on_action_logging_options_triggered();
+}
+
