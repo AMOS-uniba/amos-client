@@ -161,6 +161,7 @@ QDome::~QDome() {
 void QDome::initialize(void) {
     QAmosWidget::initialize();
 
+    this->list_serial_ports();
     this->check_serial_port();
     this->set_formatters();
 
@@ -433,6 +434,8 @@ void QDome::set_serial_port(const QString & port) {
     if (this->m_serial_port->open(QSerialPort::ReadWrite)) {
         this->connect(this->m_serial_port, &QSerialPort::readyRead, this, &QDome::process_response);
         this->connect(this->m_serial_port, &QSerialPort::errorOccurred, this, &QDome::handle_error);
+
+        this->ui->co_serial_ports->setCurrentText(port);
         logger.info(Concern::SerialPort, QString("Opened %1").arg(this->m_serial_port->portName()));
 
         emit this->serial_port_changed(port);
@@ -447,6 +450,9 @@ void QDome::check_serial_port(void) {
         logger.debug(Concern::SerialPort, "Serial port not working, resetting");
         this->list_serial_ports();
         this->ui->co_serial_ports->setCurrentIndex(0);
+    } else {
+        QSignalBlocker(this->ui->co_serial_ports);
+        this->ui->co_serial_ports->setCurrentText(this->m_serial_port->portName());
     }
 }
 
