@@ -15,18 +15,24 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
     this->m_files = {this->m_jpg, this->m_jpt, this->m_xml, this->m_bmp, this->m_avi};
 
-    logger.info(Concern::Sightings, QString("New %1 sighting '%2*' (%3 MB) (%4)")
-                .arg(this->is_spectral() ? "spectral" : "allsky", prefix)
-                .arg(this->avi_size() / (1 << 20))
-                .arg(QStringList({
-                    (this->m_xml != "") ? "XML" : "---",
-                    (this->m_jpg != "") ? "JPG" : "---",
-                    (this->m_jpt != "") ? "JPT" : "---",
-                    (this->m_bmp != "") ? "BMP" : "---",
-                    (this->m_avi != "") ? "AVI" : "---"
-                }).join("+"))
-    );
-    this->m_timestamp = QFileInfo(this->m_xml).birthTime();
+    this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
+
+    if (!this->m_timestamp.isValid()) {
+        throw RuntimeException("Invalid sighting file name");
+    } else {
+        logger.info(Concern::Sightings, QString("New %1 sighting '%2*' from %3 (%4, %5 MB)")
+            .arg(this->is_spectral() ? "spectral" : "allsky", prefix)
+            .arg(this->timestamp().toString("yyyy-MM-dd hh:mm:ss"))
+            .arg(QStringList({
+                (this->m_xml != "") ? "XML" : "---",
+                (this->m_jpg != "") ? "JPG" : "---",
+                (this->m_jpt != "") ? "JPT" : "---",
+                (this->m_bmp != "") ? "BMP" : "---",
+                (this->m_avi != "") ? "AVI" : "---"
+            }).join("+"))
+            .arg(this->avi_size() / (1 << 20))
+        );
+    }
 //    this->hack_Y16();
 }
 
@@ -133,7 +139,7 @@ QHttpPart Sighting::json(void) const {
 
     QJsonObject content {
         {"spectral", this->is_spectral()},
-        {"timestamp", QDateTime::currentDateTimeUtc().toString("yyyy-MM-dd hh:mm:ss.zzz")},
+        {"timestamp", this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")},
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
     };
 

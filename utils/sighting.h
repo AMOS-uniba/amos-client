@@ -24,6 +24,7 @@ public:
     inline QString dir(void) const { return this->m_dir; }
     inline QString prefix(void) const { return this->m_prefix; }
     inline bool is_spectral(void) const { return this->m_spectral; }
+    inline QDateTime timestamp(void) const { return this->m_timestamp; }
 
     QHttpPart jpg_part(void) const;
     QHttpPart xml_part(void) const;

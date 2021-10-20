@@ -32,6 +32,8 @@ private:
     inline QString enabled_key(void) const { return QString("camera_%1/enabled").arg(this->id()); }
     inline QString darkness_key(void) const { return QString("camera_%1/darkness_limit").arg(this->id()); }
 
+    constexpr static double DefaultDarknessLimit = -12.0;
+
 public:
     explicit QCamera(QWidget * parent = nullptr);
     ~QCamera();

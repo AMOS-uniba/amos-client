@@ -15,7 +15,7 @@ protected:
 public:
     explicit QStorageBox(QWidget * parent = nullptr);
     QJsonObject json(void) const;
-    const QDir current_directory(const QDateTime & datetime = QDateTime::currentDateTimeUtc()) const;
+    const QDir directory_for_sighting(const QDateTime & datetime = QDateTime::currentDateTimeUtc()) const;
 
 public slots:
     void store_sightings(QVector<Sighting> sightings, bool del = false) const;

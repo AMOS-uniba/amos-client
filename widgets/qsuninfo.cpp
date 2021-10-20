@@ -2,6 +2,7 @@
 
 #include "qsuninfo.h"
 #include "ui_qsuninfo.h"
+#include "APC/APC_VecMat3D.h"
 
 #include "widgets/qstation.h"
 
@@ -59,8 +60,12 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_moon_azimuth->set_valid(true);
     this->ui->sl_moon_azimuth->set_value_formatter(azimuth_formatter);
 
-    this->ui->sl_sunrise->set_title("Sunrise");
-    this->ui->sl_sunset->set_title("Sunset");
+    this->ui->sl_moon_elongation->set_title("Solar elongation");
+    this->ui->sl_moon_elongation->set_valid(true);
+    this->ui->sl_moon_elongation->set_value_formatter(azimuth_formatter);
+
+    this->ui->dtl_sunrise->set_title("Sunrise");
+    this->ui->dtl_sunset->set_title("Sunset");
 }
 
 QSunInfo::~QSunInfo() {
@@ -70,20 +75,25 @@ QSunInfo::~QSunInfo() {
 }
 
 void QSunInfo::update_short_term(void) {
-    auto hor = this->m_station->sun_position();
-    double alt = hor.theta * Deg;
+    auto sun_hor = this->m_station->sun_position();
+    double alt = sun_hor.theta * Deg;
     this->ui->sl_altitude->set_value(alt);
-    this->ui->sl_azimuth->set_value(hor.phi * Deg);
+    this->ui->sl_azimuth->set_value(sun_hor.phi * Deg);
 
     auto moon_hor = this->m_station->moon_position();
     this->ui->sl_moon_altitude->set_value(moon_hor.theta * Deg);
     this->ui->sl_moon_azimuth->set_value(moon_hor.phi * Deg);
+    auto sun_xyz = Vec3D(sun_hor);
+    auto moon_xyz = Vec3D(moon_hor);
+    double elongation = acos((sun_xyz * moon_xyz) / (sun_hor.r * moon_hor.r)) * Deg;
+
+    this->ui->sl_moon_elongation->set_value(elongation);
 
     QColor colour = QColor();
-    if (hor.theta > 0) {
+    if (sun_hor.theta > 0) {
         this->ui->lb_sun_status->setText("day");
         this->ui->lb_sun_status->setToolTip("Sun is above the horizon");
-        colour = Universe::altitude_colour(hor.theta * Deg);
+        colour = Universe::altitude_colour(sun_hor.theta * Deg);
     } else {
         if (this->m_station->is_dark_allsky()) {
             this->ui->lb_sun_status->setText("dark");
@@ -106,6 +116,6 @@ void QSunInfo::update_long_term(void) {
     this->ui->sl_dec->set_value(equ[theta] * Deg);
     this->ui->sl_ra->set_value(equ[phi] * Deg);
 
-    this->ui->sl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
-    this->ui->sl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
+    this->ui->dtl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
+    this->ui->dtl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
 }

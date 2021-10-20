@@ -51,6 +51,10 @@ private:
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
 
+    constexpr static double DefaultLatitude = 48.0;
+    constexpr static double DefaultLongitude = 17.0;
+    constexpr static double DefaultAltitude = 186.0;
+
 private slots:
     void set_position(const double new_latitude, const double new_longitude, const double new_altitude);
 
@@ -60,7 +64,7 @@ private slots:
     void on_cb_safety_override_clicked(bool checked);
 
 public:
-    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower;
+    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower, Inconsistent;
     constexpr static unsigned int HeartbeatInterval = 60000;
 
     explicit QStation(QWidget * parent = nullptr);

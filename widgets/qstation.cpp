@@ -14,6 +14,7 @@ const StationState QStation::Manual             = StationState('M', "manual", Ic
 const StationState QStation::DomeUnreachable    = StationState('U', "dome unreachable", Icon::Failure, "serial port has no connection");
 const StationState QStation::RainOrHumid        = StationState('R', "rain or high humidity", Icon::NotObserving, "rain sensor active or humidity too high");
 const StationState QStation::NoMasterPower      = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
+const StationState QStation::Inconsistent       = StationState('I', "inconsistent", Icon::Failure, "inconsistent state");
 
 QString QStation::temperature_colour(float temperature) {
     float h = 0, s = 0, v = 0;
@@ -82,15 +83,15 @@ void QStation::load_settings_inner(const QSettings * const settings) {
         settings->value("manual", false).toBool()
     );
     this->set_position(
-        settings->value("station/latitude", 48.0).toDouble(),
-        settings->value("station/longitude", 17.0).toDouble(),
-        settings->value("station/altitude", 186.0).toDouble()
+        settings->value("station/latitude", QStation::DefaultLatitude).toDouble(),
+        settings->value("station/longitude", QStation::DefaultLongitude).toDouble(),
+        settings->value("station/altitude", QStation::DefaultAltitude).toDouble()
     );
 }
 
 void QStation::load_defaults(void) {
     this->set_manual_control(false);
-    this->set_position(48.0, 17.0, 186.0);
+    this->set_position(QStation::DefaultLatitude, QStation::DefaultLongitude, QStation::DefaultAltitude);
 }
 
 void QStation::save_settings_inner(QSettings * settings) const {
@@ -240,61 +241,69 @@ void QStation::automatic_cover(void) {
         }
     }
 
-    if (this->m_manual_control) {
-        // If we are in manual mode, pass other automatic checks
-        logger.debug(Concern::Automatic, "Manual control mode, passing");
-        this->set_state(QStation::Manual);
+    // Inconsistent state: both dome sensors active
+    if (stateS.dome_closed_sensor_active() && stateS.dome_open_sensor_active()) {
+        logger.debug_error(Concern::Operation, "Both open-dome and closed-dome sensors active, emergency closing");
+        this->set_state(QStation::Inconsistent);
+        this->dome()->close_cover();
+        this->dome()->turn_off_intensifier();
     } else {
-        if (this->is_dark_allsky()) {
-            if (stateS.dome_closed_sensor_active()) {
-                if (stateS.rain_sensor_active()) {
-                    logger.debug(Concern::Automatic, "Will not open: raining");
-                    this->set_state(QStation::RainOrHumid);
-                } else {
-                    if (this->dome()->is_humid()) {
-                        logger.debug(Concern::Automatic, "Will not open: humidity is too high");
+        if (this->m_manual_control) {
+            // If we are in manual mode, pass other automatic checks
+            logger.debug(Concern::Automatic, "Manual control mode, passing");
+            this->set_state(QStation::Manual);
+        } else {
+            if (this->is_dark_allsky()) {
+                if (stateS.dome_closed_sensor_active()) {
+                    if (stateS.rain_sensor_active()) {
+                        logger.debug(Concern::Automatic, "Will not open: raining");
                         this->set_state(QStation::RainOrHumid);
                     } else {
-                        logger.info(Concern::Automatic, "Opening the cover");
-                        this->dome()->open_cover();
+                        if (this->dome()->is_humid()) {
+                            logger.debug(Concern::Automatic, "Will not open: humidity is too high");
+                            this->set_state(QStation::RainOrHumid);
+                        } else {
+                            logger.info(Concern::Automatic, "Opening the cover");
+                            this->dome()->open_cover();
+                        }
                     }
-                }
 
-                // If the dome is closed, also turn off the intensifier
-                if (stateS.intensifier_active()) {
-                    logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
-                    this->dome()->turn_off_intensifier();
-                    this->set_state(QStation::NotObserving);
+                    // If the dome is closed, also turn off the intensifier
+                    if (stateS.intensifier_active()) {
+                        logger.info(Concern::Automatic, "Cover is closed, turned off the intensifier");
+                        this->dome()->turn_off_intensifier();
+                        this->set_state(QStation::NotObserving);
+                    }
+                } else {
+                    if (stateS.dome_open_sensor_active()) {
+                        // If the dome is open, turn on the image intensifier and the fan
+                        if (stateS.intensifier_active()) {
+                            logger.detail(Concern::Automatic, "Intensifier is active");
+                            this->set_state(QStation::Observing);
+                        } else {
+                            logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
+                            this->dome()->turn_on_intensifier();
+                        }
+
+                        if (!stateS.fan_active()) {
+                            logger.info(Concern::Automatic, "Turned on the fan");
+                            this->dome()->turn_on_fan();
+                        }
+
+                        // But if humidity is very high, close the cover
+                        if (this->dome()->is_very_humid()) {
+                            logger.info(Concern::Automatic, "Closed the cover (high humidity)");
+                            this->set_state(QStation::RainOrHumid);
+                            this->dome()->close_cover();
+                        }
+                    } else {
+                        this->set_state(QStation::NotObserving);
+                    }
                 }
             } else {
-                if (stateS.dome_open_sensor_active()) {
-                    // If the dome is open, turn on the image intensifier and the fan
-                    if (stateS.intensifier_active()) {
-                        logger.detail(Concern::Automatic, "Intensifier is active");
-                        this->set_state(QStation::Observing);
-                    } else {
-                        logger.info(Concern::Automatic, "Cover open, turned on the image intensifier");
-                        this->dome()->turn_on_intensifier();
-                    }
-
-                    if (!stateS.fan_active()) {
-                        logger.info(Concern::Automatic, "Turned on the fan");
-                        this->dome()->turn_on_fan();
-                    }
-
-                    // But if humidity is very high, close the cover
-                    if (this->dome()->is_very_humid()) {
-                        logger.info(Concern::Automatic, "Closed the cover (high humidity)");
-                        this->set_state(QStation::RainOrHumid);
-                        this->dome()->close_cover();
-                    }
-                } else {
-                    this->set_state(QStation::NotObserving);
-                }
+                logger.debug(Concern::Automatic, "Will not open: daylight");
+                this->set_state(QStation::Daylight);
             }
-        } else {
-            logger.debug(Concern::Automatic, "Will not open: daylight");
-            this->set_state(QStation::Daylight);
         }
     }
 }
@@ -361,7 +370,7 @@ void QStation::on_cb_safety_override_clicked(bool checked) {
                     );
         box.setInformativeText("Turning on the image intensifier during the day with open cover may result in permanent damage.");
         box.setWindowIcon(QIcon(":/images/blue.ico"));
-        int choice = box.exec();
+        QMessageBox::StandardButton choice = (QMessageBox::StandardButton) box.exec();
 
         switch (choice) {
             case QMessageBox::Ok:

@@ -16,7 +16,7 @@ QStorageBox::QStorageBox(QWidget * parent):
     QFileSystemBox(parent)
 {}
 
-const QDir QStorageBox::current_directory(const QDateTime & datetime) const {
+const QDir QStorageBox::directory_for_sighting(const QDateTime & datetime) const {
     return QDir(QString("%1/%2/").arg(this->m_directory.path(), datetime.toString("yyyy/MM/dd")));
 }
 
@@ -33,7 +33,7 @@ void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
 #if SEPARATE_SIGHTINGS
         QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
 #else
-        QString path = this->current_directory().path();
+        QString path = this->directory_for_sighting(sighting.timestamp()).path();
 #endif
         del ? sighting.move(path) : sighting.copy(path);
     } else {

@@ -23,8 +23,8 @@ const QMap<Level, LevelInfo> EventLogger::Levels = {
     {Level::Debug,          {"DBG", "debug",        Qt::darkGray}},
     {Level::DebugError,     {"DBE", "debug error",  Qt::red}},
     {Level::Info,           {"INF", "info",         Qt::black}},
-    {Level::Warning,        {"WAR", "warning",      Qt::blue}},
-    {Level::Error,          {"ERR", "error",        Qt::red}},
+    {Level::Warning,        {"WAR", "warning",      QColor(255, 96, 0)}},
+    {Level::Error,          {"ERR", "error",        QColor(224, 0, 0)}},
     {Level::Fatal,          {"FTL", "fatal",        Qt::darkRed}},
 };
 

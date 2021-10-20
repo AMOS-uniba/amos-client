@@ -65,7 +65,7 @@ QJsonObject QCamera::json(void) const {
 
 void QCamera::auto_action(bool is_dark, const QDateTime & open_since) {
     if (!this->is_enabled()) {
-        logger.debug(Concern::UFO, QString("Camera %1 is disabled").arg(this->id()));
+        logger.debug(Concern::UFO, QString("Camera %1: automatic action skipped, camera is disabled").arg(this->id()));
     } else {
         this->ui->ufo_manager->auto_action(is_dark, open_since);
     }
@@ -104,12 +104,12 @@ void QCamera::update_clocks(void) {
 
 void QCamera::load_settings_inner(const QSettings * const settings) {
     this->set_enabled(settings->value(this->enabled_key(), true).toBool());
-    this->set_darkness_limit(settings->value(this->darkness_key(), -12.0).toDouble());
+    this->set_darkness_limit(settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble());
 }
 
 void QCamera::load_defaults(void) {
     this->set_enabled(true);
-    this->set_darkness_limit(-12.0);
+    this->set_darkness_limit(QCamera::DefaultDarknessLimit);
 }
 
 void QCamera::save_settings_inner(QSettings * settings) const {
@@ -141,5 +141,7 @@ void QCamera::set_enabled(int enable) {
     this->ui->storage_permanent->setEnabled(enable);
 
     settings->setValue(this->enabled_key(), this->is_enabled());
+
+    const QSignalBlocker blocker(this->ui->cb_enabled);
     this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }

@@ -451,7 +451,7 @@ void QDome::check_serial_port(void) {
         this->list_serial_ports();
         this->ui->co_serial_ports->setCurrentIndex(0);
     } else {
-        QSignalBlocker(this->ui->co_serial_ports);
+        const QSignalBlocker blocker(this->ui->co_serial_ports);
         this->ui->co_serial_ports->setCurrentText(this->m_serial_port->portName());
     }
 }
@@ -620,16 +620,29 @@ void QDome::toggle_hotwire(void) const {
     }
 }
 
-void QDome::turn_on_hotwire(void) const { this->send_command(QDome::CommandHotwireOn); }
-void QDome::turn_off_hotwire(void) const { this->send_command(QDome::CommandHotwireOff); }
+void QDome::turn_on_hotwire(void) const {
+    logger.info(Concern::Operation, "Turning on the hotwire");
+    this->send_command(QDome::CommandHotwireOn);
+}
+
+void QDome::turn_off_hotwire(void) const {
+    logger.info(Concern::Operation, "Turning off the hotwire");
+    this->send_command(QDome::CommandHotwireOff);
+}
 
 // High level command to open the cover. Opens only if it is dark, or if in override mode.
 void QDome::open_cover(void) const {
     if (this->m_station->is_dark_allsky() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
+        logger.info(Concern::Operation, "Opening the cover");
         this->send_command(QDome::CommandOpenCover);
+    } else {
+        logger.warning(Concern::Operation, "Refusing to open the cover: it must be dark, or in manual mode with safety overridden");
     }
 }
-void QDome::close_cover(void) const { this->send_command(QDome::CommandCloseCover); }
+void QDome::close_cover(void) const {
+    logger.info(Concern::Operation, "Closing the cover");
+    this->send_command(QDome::CommandCloseCover);
+}
 
 void QDome::toggle_fan(void) const {
     if (this->state_S().fan_active()) {
@@ -640,8 +653,15 @@ void QDome::toggle_fan(void) const {
         this->turn_on_fan();
     }
 }
-void QDome::turn_on_fan(void) const { this->send_command(QDome::CommandFanOn); }
-void QDome::turn_off_fan(void) const { this->send_command(QDome::CommandFanOff); }
+void QDome::turn_on_fan(void) const {
+    logger.info(Concern::Operation, "Turning on the fan");
+    this->send_command(QDome::CommandFanOn);
+}
+
+void QDome::turn_off_fan(void) const {
+    logger.info(Concern::Operation, "Turning off the fan");
+    this->send_command(QDome::CommandFanOff);
+}
 
 // High level command to turn on the intensifier. Turns on only if it is dark, or if in override mode.
 void QDome::toggle_intensifier(void) const {
@@ -658,7 +678,7 @@ void QDome::turn_on_intensifier(void) const {
     if (this->m_station->is_dark_allsky() || (this->m_station->is_manual() && this->m_station->is_safety_overridden())) {
         this->send_command(QDome::CommandIIOn);
     } else {
-        logger.warning(Concern::SerialPort, "Command ignored, sun is too high and override is not active");
+        logger.warning(Concern::Operation, "Refusing to turn on II: it must be dark, or in manual mode with safety overridden");
     }
 }
 void QDome::turn_off_intensifier(void) const { this->send_command(QDome::CommandIIOff); }
@@ -692,11 +712,11 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
 }
 
 void QDome::on_bt_cover_open_clicked() {
-    logger.info(Concern::Operation, "Manual command to open the cover");
+    logger.info(Concern::Operation, "Manual command: open the cover");
     this->open_cover();
 }
 
 void QDome::on_bt_cover_close_clicked() {
-    logger.info(Concern::Operation, "Manual command to close the cover");
+    logger.info(Concern::Operation, "Manual command: close the cover");
     this->close_cover();
 }

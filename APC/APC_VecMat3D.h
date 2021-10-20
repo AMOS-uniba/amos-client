@@ -97,6 +97,8 @@ public:
     friend Vec3D operator * (double fScalar, const Vec3D& Vec);
     friend Vec3D operator * (const Vec3D& Vec, double fScalar);
 
+    friend double operator * (const Vec3D& left, const Vec3D& right);
+
     // scalar division
     friend Vec3D operator / (const Vec3D& Vec, double fScalar);
 

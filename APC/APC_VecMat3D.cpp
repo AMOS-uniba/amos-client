@@ -196,6 +196,11 @@ return fScalar * Vec;
 }
 
 
+double operator * (const Vec3D& left, const Vec3D& right) {
+    return Dot(left, right);
+}
+
+
 //
 // Scalar division
 //

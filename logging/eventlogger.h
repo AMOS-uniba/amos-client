@@ -24,7 +24,7 @@ enum class Level {
 struct LevelInfo {
     QString code;
     QString name;
-    Qt::GlobalColor colour;
+    QColor colour;
 };
 
 enum class Concern {
