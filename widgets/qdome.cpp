@@ -33,9 +33,9 @@ const Command QDome::CommandHotwireOn           = Command('\x09', "turn on hotwi
 const Command QDome::CommandHotwireOff          = Command('\x0A', "turn off hotwire");
 const Command QDome::CommandResetSlave          = Command('\x0B', "reset slave");
 
-const SerialPortState QDome::SerialPortNotSet   = SerialPortState('N', "not set");
-const SerialPortState QDome::SerialPortOpen     = SerialPortState('O', "open");
-const SerialPortState QDome::SerialPortError    = SerialPortState('E', "error");
+const SerialPortState QDome::SerialPortNotSet   = SerialPortState('N', "not set", QColor(96, 96, 96));
+const SerialPortState QDome::SerialPortOpen     = SerialPortState('O', "open", QColor(0, 192, 0));
+const SerialPortState QDome::SerialPortError    = SerialPortState('E', "error", QColor(240, 0, 0));
 
 const ValueFormatter<double> QDome::TemperatureValueFormatter = [](double value) {
     return QString("%1 °C").arg(value, 3, 'f', 1);
@@ -65,6 +65,8 @@ const ColourFormatter<double> QDome::TemperatureColourFormatter = [](double temp
     }
     return QColor::fromHsv(h, s, v);
 };
+
+const QString QDome::DefaultPort = QString("COM1");
 
 QDome::QDome(QWidget *parent):
     QAmosWidget(parent),
@@ -146,8 +148,8 @@ QDome::QDome(QWidget *parent):
     this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::set_open_since);
     this->m_open_timer->start();
 
-    emit this->cover_open(400);
     emit this->cover_closed(0);
+    emit this->cover_open(400);
     emit this->cover_moved(0);
 }
 
@@ -177,16 +179,17 @@ void QDome::connect_slots(void) {
 }
 
 void QDome::load_defaults(void) {
-    this->set_humidity_limits(75.0, 90.0);
+    this->set_humidity_limits(QDome::DefaultHumidityLower, QDome::DefaultHumidityUpper);
+    this->set_serial_port(QDome::DefaultPort);
 }
 
 void QDome::load_settings_inner(const QSettings * const settings) {
     this->set_humidity_limits(
-        settings->value("dome/humidity_lower", 75.0).toDouble(),
-        settings->value("dome/humidity_upper", 90.0).toDouble()
+        settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
+        settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
     );
     this->set_serial_port(
-        settings->value("dome/port", "COM1").toString()
+        settings->value("dome/port", QDome::DefaultPort).toString()
     );
 }
 
@@ -498,7 +501,9 @@ void QDome::display_serial_port_info(void) const {
         }
     }
 
-    this->ui->lb_serial_port_state->setText(this->serial_port_state().display_string());
+    const SerialPortState & state = this->serial_port_state();
+    this->ui->lb_serial_port_state->setText(state.display_string());
+    this->ui->lb_serial_port_state->setStyleSheet(QString("QLabel { color: %1; }").arg(state.colour().name()));
     this->ui->lb_serial_data_state->setText(
         QString("%1 (%2)").arg(info, MainWindow::format_duration_double(
              this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 1

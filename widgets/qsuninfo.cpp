@@ -34,6 +34,10 @@ QSunInfo::QSunInfo(QWidget *parent) :
         return QString("%1°").arg(fmod(azimuth + 360.0, 360.0), 0, 'f', 3);
     };
 
+    ValueFormatter<double> illumination_formatter = [](double illumination) {
+        return QString("%1").arg(illumination, 3, 'f', 3);
+    };
+
     this->ui->sl_altitude->set_title("Altitude");
     this->ui->sl_altitude->set_valid(true);
     this->ui->sl_altitude->set_value_formatter(altitude_formatter);
@@ -52,6 +56,9 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_ra->set_valid(true);
     this->ui->sl_ra->set_value_formatter(azimuth_formatter);
 
+    this->ui->dtl_sunrise->set_title("Sunrise");
+    this->ui->dtl_sunset->set_title("Sunset");
+
     this->ui->sl_moon_altitude->set_title("Altitude");
     this->ui->sl_moon_altitude->set_valid(true);
     this->ui->sl_moon_altitude->set_value_formatter(altitude_formatter);
@@ -60,12 +67,16 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_moon_azimuth->set_valid(true);
     this->ui->sl_moon_azimuth->set_value_formatter(azimuth_formatter);
 
-    this->ui->sl_moon_elongation->set_title("Solar elongation");
+    this->ui->sl_moon_elongation->set_title("Elongation");
     this->ui->sl_moon_elongation->set_valid(true);
     this->ui->sl_moon_elongation->set_value_formatter(azimuth_formatter);
 
-    this->ui->dtl_sunrise->set_title("Sunrise");
-    this->ui->dtl_sunset->set_title("Sunset");
+    this->ui->sl_moon_illumination->set_title("Illumination");
+    this->ui->sl_moon_illumination->set_valid(true);
+    this->ui->sl_moon_illumination->set_value_formatter(illumination_formatter);
+
+    this->ui->dtl_moonrise->set_title("Moonrise");
+    this->ui->dtl_moonset->set_title("Moonset");
 }
 
 QSunInfo::~QSunInfo() {
@@ -85,9 +96,12 @@ void QSunInfo::update_short_term(void) {
     this->ui->sl_moon_azimuth->set_value(moon_hor.phi * Deg);
     auto sun_xyz = Vec3D(sun_hor);
     auto moon_xyz = Vec3D(moon_hor);
-    double elongation = acos((sun_xyz * moon_xyz) / (sun_hor.r * moon_hor.r)) * Deg;
+    double dot = (sun_xyz * moon_xyz) / (sun_hor.r * moon_hor.r);
+    double elongation = acos(dot) * Deg;
+    double illumination = (1.0 - dot) / 2.0;
 
     this->ui->sl_moon_elongation->set_value(elongation);
+    this->ui->sl_moon_illumination->set_value(illumination);
 
     QColor colour = QColor();
     if (sun_hor.theta > 0) {
@@ -118,4 +132,7 @@ void QSunInfo::update_long_term(void) {
 
     this->ui->dtl_sunrise->set_value(this->m_station->next_sun_crossing(-0.5, true));
     this->ui->dtl_sunset->set_value(this->m_station->next_sun_crossing(-0.5, false));
+
+    this->ui->dtl_moonrise->set_value(this->m_station->next_moon_crossing(-0.5, true));
+    this->ui->dtl_moonset->set_value(this->m_station->next_moon_crossing(-0.5, false));
 }

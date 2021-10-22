@@ -25,7 +25,9 @@ namespace Universe {
     double moon_altitude(const double latitude, const double longitude, const QDateTime & time = QDateTime::currentDateTimeUtc());
     double moon_azimuth(const double latitude, const double longitude, const QDateTime & time = QDateTime::currentDateTimeUtc());
 
-    QDateTime next_sun_crossing(double latitude, double longitude, double altitude, bool direction_up, int resolution = 60);
+    QDateTime next_crossing(std::function<double(double, double, QDateTime)> fun,
+                            double latitude, double longitude, double altitude, bool direction_up, int resolution = 60);
+
 };
 
 #endif // UNIVERSE_H

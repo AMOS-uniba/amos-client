@@ -94,12 +94,8 @@ void QCamera::set_darkness_limit(double new_darkness_limit) {
 }
 
 void QCamera::update_clocks(void) {
-    this->ui->sl_dome_close->set_value(
-        Universe::next_sun_crossing(this->m_station->latitude(), this->m_station->longitude(), this->darkness_limit(), true)
-    );
-    this->ui->sl_dome_open->set_value(
-        Universe::next_sun_crossing(this->m_station->latitude(), this->m_station->longitude(), this->darkness_limit(), false)
-    );
+    this->ui->sl_dome_close->set_value(this->m_station->next_sun_crossing(this->darkness_limit(), true));
+    this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->darkness_limit(), false));
 }
 
 void QCamera::load_settings_inner(const QSettings * const settings) {

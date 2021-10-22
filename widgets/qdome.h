@@ -61,6 +61,10 @@ private:
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
 
+    constexpr static double DefaultHumidityLower = 75.0;
+    constexpr static double DefaultHumidityUpper = 90.0;
+    const static QString DefaultPort;
+
 private slots:
     void display_dome_state(void);
     void display_basic_data(const DomeStateS & state);

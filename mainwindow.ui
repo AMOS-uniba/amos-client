@@ -14,7 +14,7 @@
    <string>AMOS client [automatic mode]</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="images.qrc">
     <normaloff>:/images/blue.ico</normaloff>:/images/blue.ico</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string notr="true">Sun info</string>
+          <string notr="true">Astronomy</string>
          </property>
         </widget>
        </item>
@@ -471,6 +471,8 @@
  <tabstops>
   <tabstop>tb_log</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="images.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -111,6 +111,7 @@ public:
     double moon_altitude(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
     double moon_azimuth(const QDateTime & time = QDateTime::currentDateTimeUtc()) const;
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
+    QDateTime next_moon_crossing(double altitude, bool direction_up, int resolution = 60) const;
 
     QString state_logger_filename(void) const;
 

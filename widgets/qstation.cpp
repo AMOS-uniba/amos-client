@@ -202,7 +202,12 @@ double QStation::moon_azimuth(const QDateTime & time) const {
 /* Compute next crossing of the Sun through the almucantar `altitude` in the specified direction (up/down)
  * with resolution of `resolution` seconds (optional, default = 60) */
 QDateTime QStation::next_sun_crossing(double altitude, bool direction_up, int resolution) const {
-    return Universe::next_sun_crossing(this->latitude(), this->longitude(), altitude, direction_up, resolution);
+    return Universe::next_crossing(Universe::sun_altitude, this->latitude(), this->longitude(), altitude, direction_up, resolution);
+}
+
+/* The same with the Moon */
+QDateTime QStation::next_moon_crossing(double altitude, bool direction_up, int resolution) const {
+    return Universe::next_crossing(Universe::moon_altitude, this->latitude(), this->longitude(), altitude, direction_up, resolution);
 }
 
 void QStation::automatic_timer(void) {
