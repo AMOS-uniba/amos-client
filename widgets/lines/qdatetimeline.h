@@ -11,9 +11,11 @@ private:
     ValueFormatter<QDateTime> m_value_formatter;
 public:
     explicit QDateTimeLine(
-            QWidget *parent = nullptr,
-            ColourFormatter<QDateTime> colour_formatter = [](QDateTime) -> QColor { return Qt::black; },
-            ValueFormatter<QDateTime> value_formatter = [](QDateTime value) -> QString { return value.toString("hh:mm"); }
+        QWidget *parent = nullptr,
+        ColourFormatter<QDateTime> colour_formatter = [](QDateTime) -> QColor { return Qt::black; },
+        ValueFormatter<QDateTime> value_formatter = [](QDateTime value) -> QString {
+            return value.isValid() ? value.toString("hh:mm") : "--:--";
+        }
     );
 public slots:
     void set_value(const QDateTime &new_value);

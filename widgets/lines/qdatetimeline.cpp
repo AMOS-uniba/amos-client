@@ -10,6 +10,6 @@ QDateTimeLine::QDateTimeLine(
     m_value_formatter(value_formatter)
 {}
 
-void QDateTimeLine::set_value(const QDateTime &new_value) {
+void QDateTimeLine::set_value(const QDateTime & new_value) {
     this->ui->lb_value->setText(this->m_value_formatter(new_value));
 }

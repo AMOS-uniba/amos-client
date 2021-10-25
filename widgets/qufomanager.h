@@ -35,6 +35,9 @@ private:
 
     void start_ufo_inner(void) const;
 
+    constexpr static bool DefaultEnabled = true;
+    const static QString DefaultPath;
+
 private slots:
     void on_cb_auto_clicked(bool checked);
     void on_bt_change_clicked();
@@ -48,13 +51,13 @@ public:
     inline const QString & id(void) const { return this->m_id; }
 
     void set_autostart(bool enable);
-    bool is_autostart(void) const;
+    inline bool is_autostart(void) const { return this->m_autostart; }
 
     void set_path(const QString & path);
-    const QString & path(void) const;
+    inline const QString & path(void) const { return this->m_path; };
 
-    bool is_running(void) const;
-    UfoState state(void) const;
+    inline bool is_running(void) const { return this->m_process.state() == QProcess::ProcessState::Running; };
+    inline UfoState state(void) const { return this->m_state; };
     QJsonObject json(void) const;
 
 public slots:

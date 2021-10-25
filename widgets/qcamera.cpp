@@ -99,12 +99,12 @@ void QCamera::update_clocks(void) {
 }
 
 void QCamera::load_settings_inner(const QSettings * const settings) {
-    this->set_enabled(settings->value(this->enabled_key(), true).toBool());
+    this->set_enabled(settings->value(this->enabled_key(), QCamera::DefaultEnabled).toBool());
     this->set_darkness_limit(settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble());
 }
 
 void QCamera::load_defaults(void) {
-    this->set_enabled(true);
+    this->set_enabled(QCamera::DefaultEnabled);
     this->set_darkness_limit(QCamera::DefaultDarknessLimit);
 }
 

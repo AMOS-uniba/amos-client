@@ -14,6 +14,8 @@ const UfoState QUfoManager::NotRunning   = UfoState('N', "not running", Qt::gray
 const UfoState QUfoManager::Starting     = UfoState('S', "starting", QColor::fromHsl(60, 255, 255), false, "Starting...");
 const UfoState QUfoManager::Running      = UfoState('R', "running", Qt::darkGreen, true, "Stop UFO");
 
+const QString QUfoManager::DefaultPath = "C:/AMOS/UFO2/UFO2.exe";
+
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
@@ -54,8 +56,8 @@ void QUfoManager::initialize(const QString & id) {
 }
 
 void QUfoManager::load_settings(void) {
-    this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), "C:/AMOS/UFO2/UFO2.exe").toString());
-    this->set_autostart(settings->value(QString("camera_%1/ufo_autostart").arg(this->id()), true).toBool());
+    this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), QUfoManager::DefaultPath).toString());
+    this->set_autostart(settings->value(QString("camera_%1/ufo_autostart").arg(this->id()), QUfoManager::DefaultEnabled).toBool());
 }
 
 void QUfoManager::save_settings(void) const {
@@ -72,16 +74,12 @@ void QUfoManager::set_autostart(bool enable) {
     this->ui->cb_auto->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
 
-bool QUfoManager::is_autostart(void) const { return this->m_autostart; }
-
 // Path getter and setter
 void QUfoManager::set_path(const QString & path) {
     logger.info(Concern::UFO, QString("UFO-%1: path set to \"%2\"").arg(this->id(), path));
     this->ui->le_path->setText(path);
     this->m_path = path;
 }
-
-const QString & QUfoManager::path(void) const { return this->m_path; }
 
 // Automatic action: start UFO after sunset, stop before sunrise
 void QUfoManager::auto_action(bool is_dark, const QDateTime & open_since) const {
@@ -161,12 +159,6 @@ void QUfoManager::update_state(void) {
     }
 }
 
-UfoState QUfoManager::state(void) const { return this->m_state; }
-
-bool QUfoManager::is_running(void) const {
-    return (this->m_process.state() == QProcess::ProcessState::Running);
-}
-
 /**
  * @brief QUfoManager::start_ufo
  * Conditionally start UFO Capture v2 as a child process
@@ -238,19 +230,18 @@ void QUfoManager::stop_ufo(void) const {
 
             if (child == nullptr) {
                 logger.debug_error(Concern::UFO, "Child is null");
+            } else {
+                SetActiveWindow(child);
+                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+                Sleep(1000);
+
+                if (this->is_running()) {
+                    logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
+                    this->m_process.kill();
+                }
+
+                emit this->stopped();
             }
-
-            SetActiveWindow(child);
-            SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-
-            Sleep(1000);
-
-            if (this->is_running()) {
-                logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
-                this->m_process.kill();
-            }
-
-            emit this->stopped();
         } else {
             logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
         }
