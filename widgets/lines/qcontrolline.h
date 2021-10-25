@@ -9,9 +9,9 @@
 class QControlLine: public QBooleanLine {
     Q_OBJECT
 private:
-    QPushButton *bt_toggle;
+    QPushButton * bt_toggle;
 public:
-    QControlLine(QWidget *parent);
+    QControlLine(QWidget * parent);
 
 public slots:
     void set_value(bool new_value);

@@ -1,7 +1,7 @@
 #include "qbooleanline.h"
 
 QBooleanLine::QBooleanLine(
-        QWidget *parent,
+        QWidget * parent,
         ColourFormatter<bool> colour_formatter,
         ValueFormatter<bool> value_formatter):
     QDisplayLine(parent),

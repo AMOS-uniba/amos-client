@@ -1,7 +1,7 @@
 #include "qdisplayline.h"
 #include "ui_qdisplayline.h"
 
-QDisplayLine::QDisplayLine(QWidget *parent):
+QDisplayLine::QDisplayLine(QWidget * parent):
     QWidget(parent),
     ui(new Ui::QDisplayLine),
     m_valid(false)

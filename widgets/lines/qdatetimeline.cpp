@@ -2,7 +2,7 @@
 #include "qdatetimeline.h"
 
 QDateTimeLine::QDateTimeLine(
-        QWidget *parent,
+        QWidget * parent,
         ColourFormatter<QDateTime> colour_formatter,
         ValueFormatter<QDateTime> value_formatter):
     QDisplayLine(parent),

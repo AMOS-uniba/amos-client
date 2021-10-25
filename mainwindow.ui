@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string notr="true">Astronomy</string>
+          <string notr="true">Sky info</string>
          </property>
         </widget>
        </item>
