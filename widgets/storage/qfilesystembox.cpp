@@ -8,6 +8,7 @@ extern QSettings * settings;
 QFileSystemBox::QFileSystemBox(QWidget * parent):
     QGroupBox(parent),
     m_enabled(true),
+    m_camera(""),
     m_id("")
 {
     this->m_timer = new QTimer(this);
@@ -44,19 +45,18 @@ QFileSystemBox::QFileSystemBox(QWidget * parent):
     this->connect(this->m_cb_enabled, &QCheckBox::clicked, this, &QFileSystemBox::set_enabled);
 }
 
-void QFileSystemBox::initialize(const QString & id, const QString & default_path) {
+void QFileSystemBox::initialize(const QString & camera, const QString & id, const QString & default_path) {
     if (!this->m_id.isEmpty()) {
         throw ConfigurationError("QFileSystemBox id already set");
     }
 
+    this->m_camera = camera;
     this->m_id = id;
     this->m_default_path = default_path;
 
     this->load_settings();
     this->scan_info();
 }
-
-const QString & QFileSystemBox::id(void) const { return this->m_id; }
 
 QString QFileSystemBox::path_key(void) const {
     return QString("camera_%1/%2_path").arg(((QCamera *) this->parentWidget())->id(), this->id());
@@ -85,7 +85,7 @@ bool QFileSystemBox::is_enabled(void) const {
 }
 
 void QFileSystemBox::set_enabled(bool enabled) {
-    logger.info(Concern::Storage, this->MessageEnabled().arg(this->id(), enabled ? "en" : "dis"));
+    logger.info(Concern::Storage, this->MessageEnabled().arg(this->full_id(), enabled ? "en" : "dis"));
 
     this->m_enabled = enabled;
     this->m_le_path->setEnabled(enabled);
@@ -98,7 +98,7 @@ void QFileSystemBox::set_enabled(bool enabled) {
 }
 
 void QFileSystemBox::set_directory(const QDir & new_directory) {
-    logger.info(Concern::Storage, this->MessageDirectoryChanged().arg(this->id(), new_directory.path()));
+    logger.info(Concern::Storage, this->MessageDirectoryChanged().arg(this->full_id(), new_directory.path()));
 
     this->m_directory = new_directory;
     this->m_le_path->setText(this->m_directory.path());

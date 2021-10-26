@@ -22,10 +22,6 @@ void QDisplayLine::set_tooltip(const QString & new_tooltip) {
     this->setToolTip(new_tooltip);
 }
 
-QString QDisplayLine::title(void) const {
-    return this->ui->lb_title->text();
-}
-
 void QDisplayLine::set_valid(bool valid) {
     this->m_valid = valid;
     this->setEnabled(valid);

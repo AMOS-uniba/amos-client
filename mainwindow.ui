@@ -99,7 +99,7 @@
        <item row="1" column="0">
         <widget class="QStation" name="station">
          <property name="title">
-          <string>Station information</string>
+          <string>Station</string>
          </property>
         </widget>
        </item>
@@ -112,7 +112,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string notr="true">Sky info</string>
+          <string notr="true">Sky</string>
          </property>
         </widget>
        </item>
@@ -317,7 +317,7 @@
           </sizepolicy>
          </property>
          <property name="title">
-          <string>Dome info</string>
+          <string>Dome</string>
          </property>
         </widget>
        </item>

@@ -9,7 +9,7 @@ QCamera::QCamera(QWidget * parent):
     QAmosWidget(parent),
     ui(new Ui::QCamera),
     m_id(""),
-    m_darkness_limit(-12.0)
+    m_darkness_limit(QCamera::DefaultDarknessLimit)
 {
     this->ui->setupUi(this);
 
@@ -35,9 +35,9 @@ void QCamera::initialize(const QString & id, const QStation * const station, boo
     QAmosWidget::initialize();
 
     this->ui->ufo_manager->initialize(this->id());
-    this->ui->scanner->initialize("scanner", "C:/Data");
-    this->ui->storage_primary->initialize("primary", "C:/Data");
-    this->ui->storage_permanent->initialize("permanent", "C:/Data");
+    this->ui->scanner->initialize(this->id(), "scanner", "C:/Data");
+    this->ui->storage_primary->initialize(this->id(), "primary", "C:/Data/");
+    this->ui->storage_permanent->initialize(this->id(), "permanent", "C:/Data/");
 }
 
 void QCamera::connect_slots(void) {

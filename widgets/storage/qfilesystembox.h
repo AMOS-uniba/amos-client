@@ -32,6 +32,7 @@ protected:
     bool m_enabled;
     QString m_default_path;
     QDir m_directory;
+    QString m_camera;
     QString m_id;
 
     QCheckBox * m_cb_enabled;
@@ -47,13 +48,15 @@ protected:
 public:
     explicit QFileSystemBox(QWidget * parent = nullptr);
 
-    const QString & id(void) const;
+    inline const QString & id(void) const { return this->m_id; };
+    inline const QString & camera(void) const { return this->m_camera; };
+    inline const QString full_id(void) const { return QString("%1-%2").arg(this->camera(), this->id()); };
 
     bool is_enabled(void) const;
     QStorageInfo info(void) const;
 
 public slots:
-    void initialize(const QString & id, const QString & default_path);
+    void initialize(const QString & camera, const QString & id, const QString & default_path);
     void load_settings(void);
     void save_settings(void) const;
 

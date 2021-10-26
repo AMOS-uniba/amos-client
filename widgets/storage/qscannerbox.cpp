@@ -5,8 +5,8 @@ extern QSettings * settings;
 
 QString QScannerBox::DialogTitle(void) const { return "Select UFO output directory to watch"; }
 QString QScannerBox::AbortMessage(void) const { return "Watch directory selection aborted"; }
-QString QScannerBox::MessageEnabled(void) const { return "Directory %1 %2abled"; }
-QString QScannerBox::MessageDirectoryChanged(void) const { return "Directory %1 set to \"%2\""; }
+QString QScannerBox::MessageEnabled(void) const { return "Scanner \"%1\" %2abled"; }
+QString QScannerBox::MessageDirectoryChanged(void) const { return "Scanner \"%1\" set to \"%2\""; }
 
 QScannerBox::QScannerBox(QWidget * parent):
     QFileSystemBox(parent)
