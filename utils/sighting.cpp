@@ -8,12 +8,13 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     m_prefix(prefix)
 {
     QString full = QString("%1/%2").arg(this->m_dir, this->m_prefix);
-    this->m_jpg = this->try_open(QString("%1P.jpg").arg(full), false);
-    this->m_jpt = this->try_open(QString("%1T.jpg").arg(full), false);
+    this->m_pjpg = this->try_open(QString("%1P.jpg").arg(full), false);
+    this->m_tjpg = this->try_open(QString("%1T.jpg").arg(full), false);
     this->m_xml = this->try_open(QString("%1.xml").arg(full), true);
-    this->m_bmp = this->try_open(QString("%1M.bmp").arg(full), false);
+    this->m_mbmp = this->try_open(QString("%1M.bmp").arg(full), false);
+    this->m_pbmp = this->try_open(QString("%1P.bmp").arg(full), false);
     this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
-    this->m_files = {this->m_jpg, this->m_jpt, this->m_xml, this->m_bmp, this->m_avi};
+    this->m_files = {this->m_pjpg, this->m_tjpg, this->m_xml, this->m_mbmp, this->m_pbmp, this->m_avi};
 
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
 
@@ -25,9 +26,10 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
             .arg(this->timestamp().toString("yyyy-MM-dd hh:mm:ss"))
             .arg(QStringList({
                 (this->m_xml != "") ? "XML" : "---",
-                (this->m_jpg != "") ? "JPG" : "---",
-                (this->m_jpt != "") ? "JPT" : "---",
-                (this->m_bmp != "") ? "BMP" : "---",
+                (this->m_pjpg != "") ? "PJPG" : "----",
+                (this->m_tjpg != "") ? "TJPG" : "----",
+                (this->m_pbmp != "") ? "PBMP" : "----",
+                (this->m_mbmp != "") ? "MBMP" : "----",
                 (this->m_avi != "") ? "AVI" : "---"
             }).join("+"))
             .arg(this->avi_size() / (1 << 20))
@@ -81,11 +83,12 @@ void Sighting::move(const QString & dir) {
         }
     }
 
-    this->m_jpg = this->m_files[0];
-    this->m_jpt = this->m_files[1];
+    this->m_pjpg = this->m_files[0];
+    this->m_tjpg = this->m_files[1];
     this->m_xml = this->m_files[2];
-    this->m_bmp = this->m_files[3];
-    this->m_avi = this->m_files[4];
+    this->m_mbmp = this->m_files[3];
+    this->m_pbmp = this->m_files[4];
+    this->m_avi = this->m_files[5];
 }
 
 void Sighting::copy(const QString & dir) const {
@@ -110,11 +113,11 @@ QHttpPart Sighting::jpg_part(void) const {
         jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
         jpg_part.setHeader(
             QNetworkRequest::ContentDispositionHeader,
-            QString("form-data; name=\"jpg\"; filename=\"%1\"").arg(QFileInfo(this->m_jpg).fileName())
+            QString("form-data; name=\"jpg\"; filename=\"%1\"").arg(QFileInfo(this->m_pjpg).fileName())
         );
-        QFile jpg_file(this->m_jpg);
-        jpg_file.open(QIODevice::ReadOnly);
-        jpg_part.setBody(jpg_file.readAll());
+        QFile pjpg_file(this->m_pjpg);
+        pjpg_file.open(QIODevice::ReadOnly);
+        jpg_part.setBody(pjpg_file.readAll());
     }
     return jpg_part;
 }
@@ -155,6 +158,11 @@ void Sighting::debug(void) const {
     }
 }
 
+/**
+ * @brief Sighting::hack_Y16 tries to fix faulty "Y16" videos by changing the header.
+ *        Did not work very well, currently disabled and handled by conversion scripts instead
+ * @return
+ */
 bool Sighting::hack_Y16(void) const {
     QFile avi(this->m_avi);
 

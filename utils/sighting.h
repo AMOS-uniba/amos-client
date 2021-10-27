@@ -10,7 +10,8 @@
 class Sighting {
 private:
     bool m_spectral;
-    QString m_dir, m_prefix, m_jpg, m_jpt, m_xml, m_bmp, m_avi;
+    QString m_dir, m_prefix;
+    QString m_xml, m_pjpg, m_tjpg, m_mbmp, m_pbmp, m_avi;
     QDateTime m_timestamp;
 
     QVector<QString> m_files;
