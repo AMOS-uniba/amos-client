@@ -369,12 +369,12 @@ void QDome::display_dome_state(void) {
 
     if (stateS.is_valid()) {
         if (stateS.servo_moving()) {
-            text = stateS.servo_direction() ? "opening..." : "closing";
+            text = stateS.servo_direction() ? "opening..." : "closing...";
             colour = stateS.servo_direction() ? "hsv(120, 255, 96)" : "hsv(240, 255, 96)";
         } else {
             text = stateS.cover_safety_position() ? "peeking" :
                  stateS.dome_open_sensor_active() ? "open" :
-                 stateS.dome_closed_sensor_active() ? "closed" : "inconsistent";
+                 stateS.dome_closed_sensor_active() ? "closed" : "semi-open";
             colour = stateS.cover_safety_position() ? "hsv(180, 255, 160)" :
                  stateS.dome_open_sensor_active() ? "hsv(120, 255, 192)" :
                  stateS.dome_closed_sensor_active() ? "black" : "red";
