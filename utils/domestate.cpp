@@ -110,6 +110,7 @@ QByteArray DomeStateS::full_text(void) const {
     return result;
 }
 
+// Return a JSON summary of the state
 QJsonValue DomeStateS::json() const {
     if (this->is_valid()) {
         return QJsonValue(QString(this->full_text()));
@@ -125,7 +126,12 @@ DomeStateT::DomeStateT(void):
     m_temp_SHT31(0),
     m_humi_SHT31(0) {}
 
-DomeStateT::DomeStateT(const QByteArray &response) {
+/**
+ * @brief DomeStateT::DomeStateT
+ * Construct a new DomeStateT from a response from the dome
+ * @throws InvalidState
+ */
+DomeStateT::DomeStateT(const QByteArray & response) {
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong T-state length %1").arg(response.length()));
     }

@@ -388,9 +388,9 @@ void QDome::display_dome_state(void) {
     this->ui->lb_cover_comment->setText(this->m_station->state().display_string());
 }
 
-const DomeStateS& QDome::state_S(void) const { return this->m_state_S; }
-const DomeStateT& QDome::state_T(void) const { return this->m_state_T; }
-const DomeStateZ& QDome::state_Z(void) const { return this->m_state_Z; }
+const DomeStateS & QDome::state_S(void) const { return this->m_state_S; }
+const DomeStateT & QDome::state_T(void) const { return this->m_state_T; }
+const DomeStateZ & QDome::state_Z(void) const { return this->m_state_Z; }
 
 QString QDome::status_line(void) const {
     return QString("%1 %2C %3C %4C %5% %6")
