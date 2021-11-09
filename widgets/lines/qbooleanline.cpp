@@ -17,7 +17,7 @@ void QBooleanLine::set_value_formatter(ValueFormatter<bool> new_value_formatter)
     this->m_value_formatter = new_value_formatter;
 }
 
-void QBooleanLine::set_formatters(QColor colour_on, QColor colour_off, const QString &value_on, const QString &value_off) {
+void QBooleanLine::set_formatters(QColor colour_on, QColor colour_off, const QString & value_on, const QString & value_off) {
     this->set_colour_formatter([=](bool value) -> QColor { return value ? colour_on : colour_off; });
     this->set_value_formatter([=](bool value) -> QString { return value ? value_on : value_off; });
 }

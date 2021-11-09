@@ -7,6 +7,7 @@
 #include "utils/exception.h"
 #include "utils/request.h"
 #include "utils/telegram.h"
+#include "utils/formatters.h"
 
 #include "qdome.h"
 #include "ui_qdome.h"
@@ -224,7 +225,7 @@ void QDome::set_station(const QStation * const station) { this->m_station = stat
  * Resets the formatters for all display lines
  */
 void QDome::set_formatters(void) {
-    this->ui->fl_time_alive->set_value_formatter(MainWindow::format_duration);
+    this->ui->fl_time_alive->set_value_formatter(Formatters::format_duration);
 
     this->ui->bl_servo_moving->set_formatters(Qt::darkGreen, Qt::black, "moving", "not moving");
     this->ui->bl_servo_direction->set_formatters(Qt::black, Qt::black, "opening", "closing");
@@ -505,7 +506,7 @@ void QDome::display_serial_port_info(void) const {
     this->ui->lb_serial_port_state->setText(state.display_string());
     this->ui->lb_serial_port_state->setStyleSheet(QString("QLabel { color: %1; }").arg(state.colour().name()));
     this->ui->lb_serial_data_state->setText(
-        QString("%1 (%2)").arg(info, MainWindow::format_duration_double(
+        QString("%1 (%2)").arg(info, Formatters::format_duration_double(
              this->last_received().msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0, 1
         ))
     );

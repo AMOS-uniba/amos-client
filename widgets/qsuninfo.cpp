@@ -14,7 +14,7 @@ QSunInfo::QSunInfo(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    this->ui->sl_altitude->set_colour_formatter(&Universe::altitude_colour);
+    this->ui->sl_altitude->set_colour_formatter(&Formatters::altitude_colour);
 
     this->m_timer_short = new QTimer(this);
     this->m_timer_short->setInterval(200);
@@ -107,7 +107,7 @@ void QSunInfo::update_short_term(void) {
     if (sun_hor.theta > 0) {
         this->ui->lb_sun_status->setText("day");
         this->ui->lb_sun_status->setToolTip("Sun is above the horizon");
-        colour = Universe::altitude_colour(sun_hor.theta * Deg);
+        colour = Formatters::altitude_colour(sun_hor.theta * Deg);
     } else {
         if (this->m_station->is_dark_allsky()) {
             this->ui->lb_sun_status->setText("dark");

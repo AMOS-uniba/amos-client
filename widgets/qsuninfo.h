@@ -5,6 +5,7 @@
 #include <QTimer>
 
 #include "utils/universe.h"
+#include "utils/formatters.h"
 #include "widgets/qcamera.h"
 
 namespace Ui {

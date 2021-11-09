@@ -7,7 +7,7 @@ DomeState::DomeState(void):
     m_timestamp(QDateTime::currentDateTimeUtc()),
     m_valid(false) {}
 
-float DomeState::deciint(const QByteArray &chunk) {
+float DomeState::deciint(const QByteArray & chunk) {
    short int x;
    memcpy(&x, chunk.data(), 2);
    return (float) (x / 10.0);

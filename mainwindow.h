@@ -26,9 +26,6 @@ public:
     MainWindow(QWidget * parent = nullptr);
     ~MainWindow();
 
-    static QString format_duration(unsigned int seconds);
-    static QString format_duration_double(double seconds, unsigned int places = 0);
-
 private:
     QTimer * m_timer_display;
     QTimer * m_timer_long;

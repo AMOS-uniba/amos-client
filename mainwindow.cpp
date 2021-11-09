@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent):
         {Icon::Observing, QIcon(":/images/blue.ico")},
         {Icon::NotObserving, QIcon(":/images/grey.ico")},
     };
-    this->set_icon(QStation::Manual);
+    this->set_icon(QStation::NotObserving);
     this->tray_icon->show();
 
     this->connect(this->tray_icon, &QSystemTrayIcon::activated, this, &MainWindow::icon_activated);
@@ -105,40 +105,6 @@ MainWindow::~MainWindow() {
     delete this->ui;
     delete this->m_timer_display;
     delete settings;
-}
-
-QString MainWindow::format_duration(unsigned int duration) {
-    unsigned int days = duration / 86400;
-    unsigned int hours = (duration % 86400) / 3600;
-    unsigned int minutes = (duration % 3600) / 60;
-    unsigned int seconds = duration % 60;
-
-    return QString("%1d %2:%3:%4")
-        .arg(days)
-        .arg(hours, 2, 10, QChar('0'))
-        .arg(minutes, 2, 10, QChar('0'))
-        .arg(seconds, 2, 10, QChar('0'));
-}
-
-QString MainWindow::format_duration_double(double seconds, unsigned int places) {
-    unsigned int duration = (unsigned int) seconds;
-    unsigned int d = duration / 86400;
-    unsigned int h = (duration % 86400) / 3600;
-    unsigned int m = (duration % 3600) / 60;
-    double s = fmod(seconds, 60.0);
-
-    if (d == 0) {
-        return QString("%1:%2:%3")
-            .arg(h, 2, 10, QChar('0'))
-            .arg(m, 2, 10, QChar('0'))
-            .arg(s, places + 3, 'f', places, QChar('0'));
-    } else {
-        return QString("%1d %2:%3:%4")
-            .arg(d)
-            .arg(h, 2, 10, QChar('0'))
-            .arg(m, 2, 10, QChar('0'))
-            .arg(s, places + 3, 'f', places, QChar('0'));
-    }
 }
 
 void MainWindow::on_cb_debug_stateChanged(int debug) {

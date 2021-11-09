@@ -33,6 +33,7 @@ SOURCES += \
     mainwindow.cpp \
     utils/domestate.cpp \
     utils/exception.cpp \
+    utils/formatters.cpp \
     utils/request.cpp \
     utils/serialbuffer.cpp \
     utils/sighting.cpp \
@@ -86,6 +87,7 @@ HEADERS += \
     settings.h \
     utils/domestate.h \
     utils/exception.h \
+    utils/formatters.h \
     utils/request.h \
     utils/serialbuffer.h \
     utils/sighting.h \
@@ -138,7 +140,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.7.4.2
+VERSION = 0.7.4.3
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 TARGET = "AMOS client"
 

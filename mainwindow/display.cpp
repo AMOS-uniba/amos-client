@@ -14,7 +14,7 @@ void MainWindow::display_time(void) {
     this->statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
     this->ui->lb_uptime->setText(
-        this->format_duration(this->m_start_time.secsTo(QDateTime::currentDateTimeUtc()))
+        Formatters::format_duration(this->m_start_time.secsTo(QDateTime::currentDateTimeUtc()))
     );
     this->ui->server->display_countdown();
 }
@@ -25,7 +25,8 @@ void MainWindow::display_window_title(void) {
 #else
     QString protocol = "";
 #endif
-    this->setWindowTitle(QString("AMOS client%1 [%2]%3").arg(
+    this->setWindowTitle(QString("AMOS client %1%2 [%3]%4").arg(
+                             VERSION_STRING,
                              protocol,
                              this->ui->station->is_manual() ? "manual" : "automatic",
                              this->ui->station->is_safety_overridden() ? " [safety override]" : ""

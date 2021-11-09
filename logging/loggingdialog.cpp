@@ -14,7 +14,7 @@ LoggingDialog::LoggingDialog(QWidget *parent):
     this->ui->setupUi(this);
 
     for (auto concern = EventLogger::Concerns.keyBegin(); concern != EventLogger::Concerns.keyEnd(); ++concern) {
-        const ConcernInfo& info = EventLogger::Concerns[*concern];
+        const ConcernInfo & info = EventLogger::Concerns[*concern];
         QCheckBox *checkbox = new QCheckBox(info.name, this);
         this->checkboxes.append(checkbox);
         this->ui->vl_checkboxes->addWidget(checkbox);
@@ -37,7 +37,7 @@ void LoggingDialog::on_buttons_rejected() {
 
 void LoggingDialog::set_checkbox_all() {
     bool all = true;
-    for (auto &&checkbox: this->checkboxes) {
+    for (auto && checkbox: this->checkboxes) {
         all &= (checkbox->checkState() == Qt::CheckState::Checked);
     }
     this->ui->cb_all->setCheckState(all ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
@@ -45,7 +45,7 @@ void LoggingDialog::set_checkbox_all() {
 
 void LoggingDialog::on_buttons_accepted() {
     auto concerns = EventLogger::Concerns;
-    for (auto&& checkbox: this->checkboxes) {
+    for (auto && checkbox: this->checkboxes) {
         for (auto concern = concerns.cbegin(); concern != concerns.cend(); ++concern) {
             if (concern.value().name == checkbox->objectName()) {
                 logger.set_debug_visible(concern.key(), (checkbox->checkState() == Qt::CheckState::Checked));
@@ -56,7 +56,7 @@ void LoggingDialog::on_buttons_accepted() {
 }
 
 void LoggingDialog::on_cb_all_clicked(bool checked) {
-    for (auto &&checkbox: this->checkboxes) {
+    for (auto && checkbox: this->checkboxes) {
         checkbox->setCheckState(checked ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
     }
 }
