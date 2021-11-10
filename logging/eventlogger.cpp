@@ -1,6 +1,5 @@
 #include "logging/eventlogger.h"
 
-extern QSettings * settings;
 
 EventLogger::EventLogger(QObject *parent, const QString &filename):
     BaseLogger(parent, filename),
@@ -126,7 +125,7 @@ bool EventLogger::is_debug_visible(Concern concern) const {
     return (this->debug_visible[concern]);
 }
 
-void EventLogger::load_settings(void) {
+void EventLogger::load_settings(const QSettings * const settings) {
     for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
         this->set_debug_visible(
             concern.key(),
@@ -135,7 +134,7 @@ void EventLogger::load_settings(void) {
     }
 }
 
-void EventLogger::save_settings(void) const {
+void EventLogger::save_settings(QSettings * settings) const {
     for (auto concern = this->debug_visible.cbegin(); concern != this->debug_visible.cend(); ++concern) {
         settings->setValue("logging/" + EventLogger::Concerns[concern.key()].name, concern.value());
     }

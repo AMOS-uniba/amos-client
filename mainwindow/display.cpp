@@ -1,9 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "settings.h"
-#include "include.h"
-
 
 void MainWindow::display_time(void) {
     this->statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));

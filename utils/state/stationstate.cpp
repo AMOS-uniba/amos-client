@@ -1,4 +1,5 @@
-#include "include.h"
+#include "utils/state/stationstate.h"
+
 
 StationState::StationState(unsigned char code, const QString & display_string, Icon icon, const QString & tooltip):
     State(code, display_string),

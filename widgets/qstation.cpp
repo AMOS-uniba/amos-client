@@ -66,8 +66,8 @@ QStation::~QStation() {
     delete ui;
 }
 
-void QStation::initialize(void) {
-    QAmosWidget::initialize();
+void QStation::initialize(QSettings * settings) {
+    QAmosWidget::initialize(settings);
 }
 
 void QStation::connect_slots(void) {
@@ -76,14 +76,14 @@ void QStation::connect_slots(void) {
     }
 }
 
-void QStation::load_settings_inner(const QSettings * const settings) {
+void QStation::load_settings_inner(void) {
     this->set_manual_control(
-        settings->value("manual", false).toBool()
+        this->m_settings->value("manual", false).toBool()
     );
     this->set_position(
-        settings->value("station/latitude", QStation::DefaultLatitude).toDouble(),
-        settings->value("station/longitude", QStation::DefaultLongitude).toDouble(),
-        settings->value("station/altitude", QStation::DefaultAltitude).toDouble()
+        this->m_settings->value("station/latitude", QStation::DefaultLatitude).toDouble(),
+        this->m_settings->value("station/longitude", QStation::DefaultLongitude).toDouble(),
+        this->m_settings->value("station/altitude", QStation::DefaultAltitude).toDouble()
     );
 }
 
@@ -92,11 +92,11 @@ void QStation::load_defaults(void) {
     this->set_position(QStation::DefaultLatitude, QStation::DefaultLongitude, QStation::DefaultAltitude);
 }
 
-void QStation::save_settings_inner(QSettings * settings) const {
-    settings->setValue("manual", this->is_manual());
-    settings->setValue("station/latitude", this->latitude());
-    settings->setValue("station/longitude", this->longitude());
-    settings->setValue("station/altitude", this->altitude());
+void QStation::save_settings_inner(void) const {
+    this->m_settings->setValue("manual", this->is_manual());
+    this->m_settings->setValue("station/latitude", this->latitude());
+    this->m_settings->setValue("station/longitude", this->longitude());
+    this->m_settings->setValue("station/altitude", this->altitude());
 }
 
 // Manual control
@@ -359,7 +359,7 @@ void QStation::log_state(void) const {
 /*********************** Event handlers ***********************************/
 void QStation::on_cb_manual_clicked(bool checked) {
     this->set_manual_control(checked);
-    this->save_settings(settings);
+    this->save_settings();
 }
 
 void QStation::on_cb_safety_override_clicked(bool checked) {

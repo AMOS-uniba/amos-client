@@ -56,8 +56,8 @@ private:
 
     void connect_slots(void) override;
     void load_defaults(void) override;
-    void load_settings_inner(const QSettings * const settings) override;
-    void save_settings_inner(QSettings * settings) const override;
+    void load_settings_inner(void) override;
+    void save_settings_inner(void) const override;
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
 
@@ -96,7 +96,7 @@ public:
     explicit QDome(QWidget * parent = nullptr);
     ~QDome();
 
-    virtual void initialize() override;
+    virtual void initialize(QSettings * settings) override;
     bool is_changed(void) const override;
 
     void send_command(const Command & command) const;

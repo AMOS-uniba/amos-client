@@ -77,8 +77,8 @@ public:
     void set_debug_visible(Concern concern, bool visible);
     bool is_debug_visible(Concern concern) const;
 
-    void load_settings(void);
-    void save_settings(void) const;
+    void load_settings(const QSettings * const settings);
+    void save_settings(QSettings * settings) const;
 };
 
 #endif // LOG_H

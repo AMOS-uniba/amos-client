@@ -1,4 +1,3 @@
-#include "include.h"
 #include "ui_mainwindow.h"
 
 extern EventLogger logger;
@@ -12,7 +11,7 @@ void MainWindow::load_settings(void) {
         this->ui->station->set_cameras(this->ui->camera_allsky, this->ui->camera_spectral);
         this->ui->station->set_dome(this->ui->dome);
 
-        logger.load_settings();
+        logger.load_settings(settings);
 
         // Load and set debug levels
         bool debug = settings->value("debug", false).toBool();
@@ -55,7 +54,7 @@ void MainWindow::slot_settings_changed() {
 void MainWindow::on_bt_apply_clicked() {
     foreach (QAmosWidget * widget, this->amos_widgets) {
         widget->apply_changes();
-        widget->save_settings(settings);
+        widget->save_settings();
     }
 }
 

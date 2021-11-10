@@ -160,8 +160,8 @@ QDome::~QDome() {
     delete this->m_buffer;
 }
 
-void QDome::initialize(void) {
-    QAmosWidget::initialize();
+void QDome::initialize(QSettings * settings) {
+    QAmosWidget::initialize(settings);
 
     this->list_serial_ports();
     this->check_serial_port();
@@ -183,13 +183,13 @@ void QDome::load_defaults(void) {
     this->set_serial_port(QDome::DefaultPort);
 }
 
-void QDome::load_settings_inner(const QSettings * const settings) {
+void QDome::load_settings_inner(void) {
     this->set_humidity_limits(
-        settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
-        settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
+        this->m_settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
+        this->m_settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
     );
     this->set_serial_port(
-        settings->value("dome/port", QDome::DefaultPort).toString()
+        this->m_settings->value("dome/port", QDome::DefaultPort).toString()
     );
 }
 
@@ -211,10 +211,10 @@ void QDome::discard_changes_inner(void) {
     this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
 }
 
-void QDome::save_settings_inner(QSettings * settings) const {
-    settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
-    settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
-    settings->setValue("dome/port", this->m_serial_port->portName());
+void QDome::save_settings_inner(void) const {
+    this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
+    this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
+    this->m_settings->setValue("dome/port", this->m_serial_port->portName());
 }
 
 void QDome::set_station(const QStation * const station) { this->m_station = station; }

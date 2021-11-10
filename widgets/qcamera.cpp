@@ -1,9 +1,8 @@
 #include "qcamera.h"
 #include "ui_qcamera.h"
 
-extern EventLogger logger;
-extern QSettings * settings;
 
+extern EventLogger logger;
 
 QCamera::QCamera(QWidget * parent):
     QAmosWidget(parent),
@@ -24,7 +23,7 @@ QCamera::~QCamera() {
     delete this->ui;
 }
 
-void QCamera::initialize(const QString & id, const QStation * const station, bool spectral) {
+void QCamera::initialize(QSettings * settings, const QString & id, const QStation * const station, bool spectral) {
     if (!this->m_id.isEmpty()) {
         throw ConfigurationError("QCamera id already set");
     }
@@ -32,7 +31,7 @@ void QCamera::initialize(const QString & id, const QStation * const station, boo
     this->m_station = station;
     this->m_spectral = spectral;
 
-    QAmosWidget::initialize();
+    QAmosWidget::initialize(settings);
 
     this->ui->ufo_manager->initialize(this->id());
     this->ui->scanner->initialize(this->id(), "scanner", "C:/Data");
@@ -98,9 +97,9 @@ void QCamera::update_clocks(void) {
     this->ui->sl_dome_open->set_value(this->m_station->next_sun_crossing(this->darkness_limit(), false));
 }
 
-void QCamera::load_settings_inner(const QSettings * const settings) {
-    this->set_enabled(settings->value(this->enabled_key(), QCamera::DefaultEnabled).toBool());
-    this->set_darkness_limit(settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble());
+void QCamera::load_settings_inner(void) {
+    this->set_enabled(this->m_settings->value(this->enabled_key(), QCamera::DefaultEnabled).toBool());
+    this->set_darkness_limit(this->m_settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble());
 }
 
 void QCamera::load_defaults(void) {
@@ -108,9 +107,9 @@ void QCamera::load_defaults(void) {
     this->set_darkness_limit(QCamera::DefaultDarknessLimit);
 }
 
-void QCamera::save_settings_inner(QSettings * settings) const {
-    settings->setValue(this->enabled_key(), this->is_enabled());
-    settings->setValue(this->darkness_key(), this->darkness_limit());
+void QCamera::save_settings_inner(void) const {
+    this->m_settings->setValue(this->enabled_key(), this->is_enabled());
+    this->m_settings->setValue(this->darkness_key(), this->darkness_limit());
 }
 
 void QCamera::apply_changes_inner(void) {
@@ -136,7 +135,7 @@ void QCamera::set_enabled(int enable) {
     this->ui->storage_primary->setEnabled(enable);
     this->ui->storage_permanent->setEnabled(enable);
 
-    settings->setValue(this->enabled_key(), this->is_enabled());
+    this->m_settings->setValue(this->enabled_key(), this->is_enabled());
 
     const QSignalBlocker blocker(this->ui->cb_enabled);
     this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);

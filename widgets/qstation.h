@@ -46,8 +46,8 @@ private:
 
     void connect_slots(void) override;
     void load_defaults(void) override;
-    void load_settings_inner(const QSettings * const settings) override;
-    void save_settings_inner(QSettings * settings) const override;
+    void load_settings_inner(void) override;
+    void save_settings_inner(void) const override;
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
 
@@ -119,7 +119,7 @@ public:
     QJsonObject json(void) const;
 
 public slots:
-    void initialize(void) override;
+    void initialize(QSettings * settings) override;
 
     void automatic_cover(void);
 

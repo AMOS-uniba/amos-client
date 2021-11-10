@@ -6,6 +6,7 @@
 #include "eventlogger.h"
 
 extern EventLogger logger;
+extern QSettings * settings;
 
 LoggingDialog::LoggingDialog(QWidget *parent):
     QDialog(parent),
@@ -52,7 +53,7 @@ void LoggingDialog::on_buttons_accepted() {
             }
         }
     }
-    logger.save_settings();
+    logger.save_settings(settings);
 }
 
 void LoggingDialog::on_cb_all_clicked(bool checked) {

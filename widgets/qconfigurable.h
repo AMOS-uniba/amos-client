@@ -11,10 +11,12 @@
 class QAmosWidget: public QGroupBox {
     Q_OBJECT
 protected:
+    QSettings * m_settings;
+
     virtual void load_defaults(void) = 0;
     virtual void connect_slots(void) = 0;
-    virtual void load_settings_inner(const QSettings * const settings) = 0;
-    virtual void save_settings_inner(QSettings * settings) const = 0;
+    virtual void load_settings_inner(void) = 0;
+    virtual void save_settings_inner(void) const = 0;
     virtual void apply_changes_inner(void) = 0;
     virtual void discard_changes_inner(void) = 0;
 
@@ -25,10 +27,10 @@ public:
     virtual bool is_changed(void) const = 0;
 
 public slots:
-    virtual void initialize(void);
+    virtual void initialize(QSettings * settings);
 
-    void load_settings(const QSettings * const settings);
-    void save_settings(QSettings * settings) const;
+    void load_settings(void);
+    void save_settings(void) const;
     void apply_changes(void);
     void discard_changes(void);
 

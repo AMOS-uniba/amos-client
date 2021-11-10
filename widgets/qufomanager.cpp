@@ -4,6 +4,7 @@
 #include "ui_qufomanager.h"
 #include "logging/eventlogger.h"
 
+
 extern EventLogger logger;
 extern QSettings * settings;
 
@@ -51,16 +52,16 @@ void QUfoManager::initialize(const QString & id) {
     }
     this->m_id = id;
 
-    this->load_settings(settings);
+    this->load_settings();
     this->update_state();
 }
 
-void QUfoManager::load_settings(const QSettings * const settings) {
+void QUfoManager::load_settings(void) {
     this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), QUfoManager::DefaultPath).toString());
     this->set_autostart(settings->value(QString("camera_%1/ufo_autostart").arg(this->id()), QUfoManager::DefaultEnabled).toBool());
 }
 
-void QUfoManager::save_settings(QSettings * settings) const {
+void QUfoManager::save_settings(void) const {
     settings->setValue(QString("camera_%1/ufo_autostart").arg(this->id()), this->is_autostart());
 }
 
@@ -262,7 +263,7 @@ QJsonObject QUfoManager::json(void) const {
 
 void QUfoManager::on_cb_auto_clicked(bool checked) {
     this->set_autostart(checked);
-    this->save_settings(settings);
+    this->save_settings();
 }
 
 void QUfoManager::on_bt_change_clicked(void) {
@@ -283,7 +284,7 @@ void QUfoManager::on_bt_change_clicked(void) {
             logger.info(Concern::UFO, QString("Path changed to %1").arg(filename));
             this->set_path(filename);
             this->update_state();
-            this->save_settings(settings);
+            this->save_settings();
         }
     }
 }

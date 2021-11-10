@@ -1,5 +1,3 @@
-#include "include.h"
-
 #include "qsuninfo.h"
 #include "ui_qsuninfo.h"
 #include "APC/APC_VecMat3D.h"

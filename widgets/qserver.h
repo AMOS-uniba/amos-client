@@ -31,8 +31,8 @@ private:
 
     void connect_slots(void) override;
     void load_defaults(void) override;
-    void load_settings_inner(const QSettings * const settings) override;
-    void save_settings_inner(QSettings * settings) const override;
+    void load_settings_inner(void) override;
+    void save_settings_inner(void) const override;
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
 
@@ -60,7 +60,7 @@ public:
     inline const QString & station_id(void) const { return this->m_station_id; }
 
 public slots:
-    void initialize(void) override;
+    void initialize(QSettings * settings) override;
 
     void button_send_heartbeat(void);
     void display_countdown(void);

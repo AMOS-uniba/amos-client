@@ -33,7 +33,7 @@ DomeStateS::DomeStateS(void):
     m_errors(0),
     m_time_alive(0) {}
 
-DomeStateS::DomeStateS(const QByteArray &response) {
+DomeStateS::DomeStateS(const QByteArray & response) {
     if (response.length() != 8) {
         throw InvalidState(QString("Wrong S-state length %1").arg(response.length()));
     }
@@ -176,7 +176,7 @@ DomeStateZ::DomeStateZ(void):
     DomeState(),
     m_shaft_position(0) {}
 
-DomeStateZ::DomeStateZ(const QByteArray &response) {
+DomeStateZ::DomeStateZ(const QByteArray & response) {
 #if OLD_PROTOCOL
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));

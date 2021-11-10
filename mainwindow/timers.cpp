@@ -1,4 +1,3 @@
-#include "include.h"
 #include "ui_mainwindow.h"
 
 void MainWindow::create_timers(void) {

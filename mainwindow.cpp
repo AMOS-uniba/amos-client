@@ -2,7 +2,6 @@
 #include "ui_mainwindow.h"
 
 #include "settings.h"
-#include "include.h"
 
 #include "logging/loggingdialog.h"
 #include "widgets/aboutdialog.h"
@@ -23,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->tb_log->setColumnWidth(2, 80);
 
     logger.set_display_widget(this->ui->tb_log);
-    logger.info(Concern::Operation, "------------ Initializing AMOS client ------------");
+    logger.info(Concern::Operation, QString("------------ Initializing AMOS client %1 ------------").arg(VERSION_STRING));
 
     // connect signals for handling of edits of station position
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
@@ -32,11 +31,11 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->amos_widgets = {this->ui->dome, this->ui->server, this->ui->station, this->ui->camera_allsky, this->ui->camera_spectral};
 
-    this->ui->dome->initialize();
-    this->ui->server->initialize();
-    this->ui->station->initialize();
-    this->ui->camera_allsky->initialize("allsky", this->ui->station, false);
-    this->ui->camera_spectral->initialize("spectral", this->ui->station, true);
+    this->ui->dome->initialize(settings);
+    this->ui->server->initialize(settings);
+    this->ui->station->initialize(settings);
+    this->ui->camera_allsky->initialize(settings, "allsky", this->ui->station, false);
+    this->ui->camera_spectral->initialize(settings, "spectral", this->ui->station, true);
 
     this->ui->dome->set_station(this->ui->station);
     this->ui->sun_info->set_station(this->ui->station);

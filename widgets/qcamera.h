@@ -23,8 +23,8 @@ private:
 
     void connect_slots(void) override;
     void load_defaults(void) override;
-    void load_settings_inner(const QSettings * const settings) override;
-    void save_settings_inner(QSettings * settings) const override;
+    void load_settings_inner(void) override;
+    void save_settings_inner(void) const override;
     void apply_changes_inner(void) override;
     void discard_changes_inner(void) override;
     using QAmosWidget::initialize;
@@ -55,7 +55,7 @@ private slots:
     void store_sightings(QVector<Sighting> sightings);
 
 public slots:
-    void initialize(const QString & id, const QStation * const station, bool spectral);
+    void initialize(QSettings * settings, const QString & id, const QStation * const station, bool spectral);
     void auto_action(bool is_dark, const QDateTime & open_since = QDateTime());
     void update_clocks(void);
 

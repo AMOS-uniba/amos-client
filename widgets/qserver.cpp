@@ -1,7 +1,6 @@
-#include "include.h"
 #include "widgets/qstation.h"
 
-#include "qserver.h"
+#include "widgets/qserver.h"
 #include "ui_qserver.h"
 
 extern EventLogger logger;
@@ -27,8 +26,8 @@ QServer::~QServer() {
     delete this->m_network_manager;
 }
 
-void QServer::initialize(void) {
-    QAmosWidget::initialize();
+void QServer::initialize(QSettings * settings) {
+    QAmosWidget::initialize(settings);
     this->refresh_urls();
 }
 
@@ -38,13 +37,13 @@ void QServer::connect_slots(void) {
     this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
 }
 
-void QServer::load_settings_inner(const QSettings * const settings) {
+void QServer::load_settings_inner(void) {
     this->set_station_id(
-        settings->value("station/id", "none").toString()
+        this->m_settings->value("station/id", "none").toString()
     );
     this->set_address(
-        settings->value("server/ip", "127.0.0.1").toString(),
-        settings->value("server/port", 4805).toInt()
+        this->m_settings->value("server/ip", "127.0.0.1").toString(),
+        this->m_settings->value("server/port", 4805).toInt()
     );
     this->refresh_urls();
 }
@@ -54,11 +53,10 @@ void QServer::load_defaults(void) {
     this->set_address("127.0.0.1", 4805);
 }
 
-void QServer::save_settings_inner(QSettings * settings) const {
-    settings->setValue("station/id", this->station_id());
-    settings->setValue("server/ip", this->address().toString());
-    settings->setValue("server/port", this->port());
-    settings->sync();
+void QServer::save_settings_inner(void) const {
+    this->m_settings->setValue("station/id", this->station_id());
+    this->m_settings->setValue("server/ip", this->address().toString());
+    this->m_settings->setValue("server/port", this->port());
 }
 
 void QServer::set_address(const QString & address, const unsigned short port) {
