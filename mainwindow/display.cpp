@@ -4,11 +4,6 @@
 #include "settings.h"
 #include "include.h"
 
-#include <QLabel>
-#include <QPushButton>
-
-extern EventLogger logger;
-extern QSettings *settings;
 
 void MainWindow::display_time(void) {
     this->statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
@@ -26,9 +21,9 @@ void MainWindow::display_window_title(void) {
     QString protocol = "";
 #endif
     this->setWindowTitle(QString("AMOS client %1%2 [%3]%4").arg(
-                             VERSION_STRING,
-                             protocol,
-                             this->ui->station->is_manual() ? "manual" : "automatic",
-                             this->ui->station->is_safety_overridden() ? " [safety override]" : ""
+         VERSION_STRING,
+         protocol,
+         this->ui->station->is_manual() ? "manual" : "automatic",
+         this->ui->station->is_safety_overridden() ? " [safety override]" : ""
     ));
 }

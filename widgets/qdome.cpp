@@ -13,7 +13,6 @@
 #include "ui_qdome.h"
 
 extern EventLogger logger;
-extern QSettings * settings;
 
 const Request QDome::RequestBasic               = Request('S', "basic data request");
 const Request QDome::RequestEnv                 = Request('T', "environment data request");

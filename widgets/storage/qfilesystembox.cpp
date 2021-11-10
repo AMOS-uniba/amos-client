@@ -54,7 +54,7 @@ void QFileSystemBox::initialize(const QString & camera, const QString & id, cons
     this->m_id = id;
     this->m_default_path = default_path;
 
-    this->load_settings();
+    this->load_settings(settings);
     this->scan_info();
 }
 
@@ -66,15 +66,15 @@ QString QFileSystemBox::enabled_key(void) const {
     return QString("camera_%1/%2_enabled").arg(((QCamera *) this->parentWidget())->id(), this->id());
 }
 
-void QFileSystemBox::load_settings(void) {
+void QFileSystemBox::load_settings(const QSettings * const settings) {
     this->set_directory(QDir(settings->value(this->path_key(), this->m_default_path).toString()));
     this->set_enabled(settings->value(this->enabled_key(), true).toBool());
 }
 
-void QFileSystemBox::save_settings(void) const {
+/*void QFileSystemBox::save_settings(QSettings * settings) const {
     settings->setValue(this->path_key(), this->m_directory.path());
     settings->setValue(this->enabled_key(), this->is_enabled());
-}
+}*/
 
 QStorageInfo QFileSystemBox::info(void) const {
     return QStorageInfo(this->m_directory);

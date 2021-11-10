@@ -1,5 +1,3 @@
-#include "include.h"
-
 #include "qstation.h"
 #include "ui_qstation.h"
 

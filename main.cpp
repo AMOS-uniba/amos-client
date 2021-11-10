@@ -1,10 +1,13 @@
-#include "include.h"
+#include "mainwindow.h"
+#include "logging/eventlogger.h"
+#include "logging/statelogger.h"
 
 #include <QApplication>
 
-MainWindow* main_window;
+
+MainWindow * main_window;
 EventLogger logger(main_window, "events.log");
-QSettings *settings;
+QSettings * settings;
 
 int main(int argc, char *argv[]) {
     QApplication a(argc, argv);

@@ -1,7 +1,7 @@
 #include "qscannerbox.h"
 
+
 extern EventLogger logger;
-extern QSettings * settings;
 
 QString QScannerBox::DialogTitle(void) const { return "Select UFO output directory to watch"; }
 QString QScannerBox::AbortMessage(void) const { return "Watch directory selection aborted"; }

@@ -37,7 +37,8 @@ protected:
 
     QCheckBox * m_cb_enabled;
     QLineEdit * m_le_path;
-    QPushButton * m_bt_open, * m_bt_change;
+    QPushButton * m_bt_open;
+    QPushButton * m_bt_change;
     QProgressBar * m_pb_capacity;
     QGridLayout * m_layout;
 
@@ -57,8 +58,8 @@ public:
 
 public slots:
     void initialize(const QString & camera, const QString & id, const QString & default_path);
-    void load_settings(void);
-    void save_settings(void) const;
+    void load_settings(const QSettings * const settings);
+    //void save_settings(QSettings * settings) const;
 
     void scan_info(void);
     virtual void set_directory(const QDir & new_directory);

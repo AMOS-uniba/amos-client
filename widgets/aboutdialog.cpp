@@ -1,15 +1,12 @@
-#include "include.h"
-
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
-#include "settings.h"
 
 AboutDialog::AboutDialog(QWidget * parent) :
     QDialog(parent),
     ui(new Ui::AboutDialog)
 {
-    ui->setupUi(this);
+    this->ui->setupUi(this);
     this->ui->lb_datetime->setText(QString("Built on %1 %2").arg(__DATE__, __TIME__));
     this->ui->lb_protocol->setText(
 #if OLD_PROTOCOL
@@ -22,7 +19,7 @@ AboutDialog::AboutDialog(QWidget * parent) :
 }
 
 AboutDialog::~AboutDialog() {
-    delete ui;
+    delete this->ui;
 }
 
 void AboutDialog::on_buttonBox_accepted() {

@@ -82,7 +82,6 @@ HEADERS += \
     logging/loggingdialog.h \
     logging/statelogger.h \
     forward.h \
-    include.h \
     mainwindow.h \
     settings.h \
     utils/domestate.h \
