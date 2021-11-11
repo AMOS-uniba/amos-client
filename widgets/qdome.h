@@ -25,7 +25,7 @@ namespace Ui {
 class QDome: public QAmosWidget {
     Q_OBJECT
 private:
-    constexpr static unsigned int Refresh = 200;                                // Robin time in ms
+    constexpr static unsigned int Refresh = 300;                                // Robin time in ms
     unsigned char m_robin = 0;
 
     const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
@@ -110,9 +110,9 @@ public:
 
     QJsonObject json(void) const;
 
-    const DomeStateS & state_S(void) const;
-    const DomeStateT & state_T(void) const;
-    const DomeStateZ & state_Z(void) const;
+    inline const DomeStateS & state_S(void) const { return this->m_state_S; };
+    inline const DomeStateT & state_T(void) const { return this->m_state_T; };
+    inline const DomeStateZ & state_Z(void) const { return this->m_state_Z; };
 
     QString status_line(void) const;
 

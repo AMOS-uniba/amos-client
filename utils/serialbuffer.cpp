@@ -1,13 +1,12 @@
 #include "logging/eventlogger.h"
 #include "utils/serialbuffer.h"
 
-extern EventLogger logger;
 
 SerialBuffer::SerialBuffer(void) {
     this->m_data = QByteArray();
 }
 
-void SerialBuffer::insert(const QByteArray &bytes) {
+void SerialBuffer::insert(const QByteArray & bytes) {
     for (char b: bytes) {
         this->m_data.append(b);
 

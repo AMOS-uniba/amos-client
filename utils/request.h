@@ -10,6 +10,7 @@ class Request {
 protected:
     unsigned char m_code;
     QString m_display_name;
+
 public:
     Request(unsigned char code, const QString & display_name);
     QByteArray for_telegram(void) const;
@@ -19,6 +20,7 @@ public:
 class Command: public Request {
 private:
     unsigned char m_subcode;
+
 public:
     Command(unsigned char subcode, const QString & display_name);
     QByteArray for_telegram(void) const;
