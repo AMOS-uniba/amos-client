@@ -1,12 +1,13 @@
 #include "logging/eventlogger.h"
-#include "utils/serialbuffer.h"
+#include "utils/qserialbuffer.h"
 
 
-SerialBuffer::SerialBuffer(void) {
-    this->m_data = QByteArray();
-}
+QSerialBuffer::QSerialBuffer(QObject * parent):
+    QObject(parent),
+    m_data(QByteArray())
+{}
 
-void SerialBuffer::insert(const QByteArray & bytes) {
+void QSerialBuffer::insert(const QByteArray & bytes) {
     for (char b: bytes) {
         this->m_data.append(b);
 

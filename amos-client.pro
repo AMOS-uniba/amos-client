@@ -34,8 +34,9 @@ SOURCES += \
     utils/domestate.cpp \
     utils/exception.cpp \
     utils/formatters.cpp \
+    utils/qdomethread.cpp \
+    utils/qserialbuffer.cpp \
     utils/request.cpp \
-    utils/serialbuffer.cpp \
     utils/sighting.cpp \
     utils/state/serialportstate.cpp \
     utils/state/state.cpp \
@@ -87,8 +88,9 @@ HEADERS += \
     utils/domestate.h \
     utils/exception.h \
     utils/formatters.h \
+    utils/qdomethread.h \
+    utils/qserialbuffer.h \
     utils/request.h \
-    utils/serialbuffer.h \
     utils/sighting.h \
     utils/state/serialportstate.h \
     utils/state/state.h \

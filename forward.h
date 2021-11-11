@@ -9,7 +9,6 @@ QT_FORWARD_DECLARE_CLASS(MainWindow);
 
 QT_FORWARD_DECLARE_CLASS(Request);
 QT_FORWARD_DECLARE_CLASS(Command);
-QT_FORWARD_DECLARE_CLASS(CommThread);
 
 QT_FORWARD_DECLARE_CLASS(DomeStateS);
 QT_FORWARD_DECLARE_CLASS(DomeStateT);
@@ -31,7 +30,7 @@ QT_FORWARD_DECLARE_CLASS(QStorageBox);
 #include "utils/state/stationstate.h"
 #include "utils/state/serialportstate.h"
 #include "utils/domestate.h"
-#include "utils/serialbuffer.h"
+#include "utils/qserialbuffer.h"
 #include "utils/sighting.h"
 
 #endif // FORWARD_H

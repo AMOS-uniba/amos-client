@@ -68,7 +68,7 @@ const ColourFormatter<double> QDome::TemperatureColourFormatter = [](double temp
 
 const QString QDome::DefaultPort = QString("COM1");
 
-QDome::QDome(QWidget *parent):
+QDome::QDome(QWidget * parent):
     QAmosWidget(parent),
     ui(new Ui::QDome),
     m_station(nullptr),
@@ -78,8 +78,6 @@ QDome::QDome(QWidget *parent):
     m_state_T(),
     m_state_Z()
 {
-    this->m_buffer = new SerialBuffer();
-
     this->ui->setupUi(this);
 
     this->ui->fl_time_alive->set_title("Time alive");
@@ -131,7 +129,7 @@ QDome::QDome(QWidget *parent):
     this->connect(this->ui->cl_ii, &QControlLine::toggled, this, &QDome::toggle_intensifier);
 
     this->connect(this->ui->co_serial_ports, &QComboBox::currentTextChanged, this, &QDome::set_serial_port);
-    this->connect(this->m_buffer, &SerialBuffer::message_complete, this, &QDome::process_message);
+    this->connect(this->m_buffer, &QSerialBuffer::message_complete, this, &QDome::process_message);
 
     this->m_robin_timer = new QTimer(this);
     this->m_robin_timer->setInterval(QDome::Refresh);
@@ -388,10 +386,6 @@ void QDome::display_dome_state(void) {
     this->ui->lb_cover_comment->setText(this->m_station->state().display_string());
 }
 
-const DomeStateS & QDome::state_S(void) const { return this->m_state_S; }
-const DomeStateT & QDome::state_T(void) const { return this->m_state_T; }
-const DomeStateZ & QDome::state_Z(void) const { return this->m_state_Z; }
-
 QString QDome::status_line(void) const {
     return QString("%1 %2C %3C %4C %5% %6")
         .arg(QString(this->m_state_S.full_text()))
@@ -539,7 +533,7 @@ void QDome::send(const QByteArray & message) const {
         if (!this->m_serial_port->isOpen()) {
             logger.debug_error(Concern::SerialPort, QString("Cannot send, serial port %1 is not open").arg(this->m_serial_port->portName()));
         } else {
-            Telegram telegram(this->Address, message);
+            Telegram telegram(QDome::Address, message);
             this->m_serial_port->write(telegram.compose());
         }
     }
@@ -589,9 +583,9 @@ void QDome::process_message(const QByteArray & message) {
             default:
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));
         }
-    } catch (MalformedTelegram &e) {
+    } catch (MalformedTelegram & e) {
         logger.error(Concern::SerialPort, QString("Malformed message '%1'").arg(QString(message)));
-    } catch (InvalidState &e) {
+    } catch (InvalidState & e) {
         logger.error(Concern::SerialPort, QString("Invalid state message: '%1'").arg(e.what()));
     }
 }

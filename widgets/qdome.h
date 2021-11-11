@@ -6,7 +6,7 @@
 
 #include "forward.h"
 #include "utils/domestate.h"
-#include "utils/serialbuffer.h"
+#include "utils/qserialbuffer.h"
 
 #include "widgets/qconfigurable.h"
 #include "widgets/lines/qdisplayline.h"
@@ -42,7 +42,7 @@ private:
     QTimer * m_serial_watchdog;
     QTimer * m_open_timer;
 
-    SerialBuffer * m_buffer;
+    QSerialBuffer * m_buffer;
 
     // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
     double m_humidity_limit_lower = 70.0;

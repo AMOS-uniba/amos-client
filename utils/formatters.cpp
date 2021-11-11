@@ -4,9 +4,9 @@
 QColor Formatters::linear_interpolate(QColor first, double stop1, QColor second, double stop2, double value) {
     const double x = (value - stop1) / (stop2 - stop1);
     return QColor::fromRgbF(
-        first.redF() * x + second.redF() * (1 - x),
-        first.greenF() * x + second.greenF() * (1 - x),
-        first.blueF() * x + second.blueF() * (1 - x)
+        first.redF() * (1 - x) + second.redF() * x,
+        first.greenF() * (1 - x) + second.greenF() * x,
+        first.blueF() * (1 - x) + second.blueF() * x
     );
 }
 

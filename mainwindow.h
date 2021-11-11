@@ -10,6 +10,7 @@
 
 #include "forward.h"
 #include "widgets/qconfigurable.h"
+#include "utils/qdomethread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -47,7 +48,7 @@ private:
 
     QVector<QAmosWidget *> amos_widgets;
 
-    //CommThread comm_thread;
+    QDomeThread dome_thread;
 
 private slots:
     void load_settings(void);
