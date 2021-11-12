@@ -10,41 +10,46 @@
 #include "qserialbuffer.h"
 #include "utils/telegram.h"
 
-extern EventLogger logger;
-
 
 class QDomeThread: public QThread {
     Q_OBJECT
 private:
-    QSerialPort m_port;
+    QSerialPort * m_port;
 
     QString m_port_name;
     QMutex m_mutex;
     QWaitCondition m_condition;
     bool m_quit = false;
-    unsigned int m_timeout;
     QString m_response;
 
     QSerialBuffer * m_buffer;
 
-
     void run(void) override;
-    void request(const QByteArray & request);
 
     static constexpr unsigned int ReadTimeout = 1000;
     static constexpr unsigned int WriteTimeout = 200;
+
+    void clear_port(void);
+
+private slots:
+    void process_response(void);
+    void handle_error(QSerialPort::SerialPortError spe);
+
 
 public:
     explicit QDomeThread(QObject * parent = nullptr);
     ~QDomeThread(void);
 
-    void change_settings(const QString & port_name, const unsigned int timeout, const QString & response);
+    void change_settings(const QString & port_name);
+    void request(const QByteArray & request);
 
 signals:
     void read_timeout(void);
     void write_timeout(void);
 
-    void error(const QString & message);
+    void port_changed(const QString & port_name);
+
+    void error(QSerialPort::SerialPortError spe, const QString & message);
     void message_complete(const QByteArray & message);
 };
 

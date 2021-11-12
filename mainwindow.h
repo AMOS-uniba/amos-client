@@ -48,8 +48,6 @@ private:
 
     QVector<QAmosWidget *> amos_widgets;
 
-    QDomeThread dome_thread;
-
 private slots:
     void load_settings(void);
 

@@ -141,7 +141,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.7.4.4
+VERSION = 0.8.0.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 TARGET = "AMOS client"
 

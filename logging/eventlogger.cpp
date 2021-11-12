@@ -48,7 +48,7 @@ QString EventLogger::format(const QDateTime & timestamp, Level level, const QStr
         .arg(timestamp.toString(Qt::ISODate), EventLogger::Levels[level].code, concern, message);
 }
 
-void EventLogger::write(Level level, Concern concern, const QString &message) const {
+void EventLogger::write(Level level, Concern concern, const QString & message) const {
     if (level > this->logging_level) {
         return;
     }

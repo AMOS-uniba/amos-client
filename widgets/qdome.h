@@ -28,7 +28,7 @@ private:
     constexpr static unsigned int Refresh = 300;                                // Robin time in ms
     unsigned char m_robin = 0;
 
-    const static Request RequestBasic, RequestEnv, RequestShaft, RequestShaftOld;
+    const static Request RequestBasic, RequestEnv, RequestShaft;
 
     Ui::QDome * ui;
     const QStation * m_station;
@@ -37,12 +37,11 @@ private:
     QDateTime m_last_received;
     QDateTime m_open_since;
 
-    QSerialPort * m_serial_port;
+    QDomeThread * m_dome_thread;
+
     QTimer * m_robin_timer;
     QTimer * m_serial_watchdog;
     QTimer * m_open_timer;
-
-    QSerialBuffer * m_buffer;
 
     // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
     double m_humidity_limit_lower = 70.0;
@@ -129,14 +128,13 @@ public slots:
     void set_formatters(void);
 
     void list_serial_ports(void);
-    void clear_serial_port(void);
+ //   void clear_serial_port(void);
     void set_serial_port(const QString & port);
     void check_serial_port(void);
 
     void display_serial_port_info(void) const;
 
-    void process_response(void);
-    void handle_error(QSerialPort::SerialPortError error);
+    void handle_error(QSerialPort::SerialPortError error, const QString & message);
 
     void request_status(void);
 
@@ -154,6 +152,8 @@ public slots:
     void turn_off_fan(void) const;
 
 signals:
+    void request_state(const QByteArray & request) const;
+
     void state_updated_S(const DomeStateS & state);
     void state_updated_T(const DomeStateT & state);
     void state_updated_Z(const DomeStateZ & state);
