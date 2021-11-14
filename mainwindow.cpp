@@ -59,7 +59,6 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::manual_mode_changed, this->ui->action_manual, &QAction::setChecked);
     this->connect(this->ui->station, &QStation::safety_override_changed, this, &MainWindow::display_window_title);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::show_message);
-    this->connect(this->ui->station, &QStation::state_changed, this->ui->dome, &QDome::display_serial_port_info);
     this->connect(this->ui->station, &QStation::state_changed, this, &MainWindow::set_icon);
 
     this->connect(this->ui->station, &QStation::automatic_action_allsky, this->ui->station, &QStation::automatic_cover);

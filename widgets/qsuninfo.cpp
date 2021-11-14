@@ -15,7 +15,7 @@ QSunInfo::QSunInfo(QWidget *parent) :
     this->ui->sl_altitude->set_colour_formatter(&Formatters::altitude_colour);
 
     this->m_timer_short = new QTimer(this);
-    this->m_timer_short->setInterval(200);
+    this->m_timer_short->setInterval(50);
     this->connect(this->m_timer_short, &QTimer::timeout, this, &QSunInfo::update_short_term);
     this->m_timer_short->start();
 

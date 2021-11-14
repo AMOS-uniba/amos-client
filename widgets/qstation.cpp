@@ -5,11 +5,11 @@ extern EventLogger logger;
 extern QSettings * settings;
 
 
-const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing during the day");
+const StationState QStation::Daylight           = StationState('D', "daylight", Icon::Daylight, "not observing: too light");
 const StationState QStation::Observing          = StationState('O', "observing", Icon::Observing, "observation in progress");
-const StationState QStation::NotObserving       = StationState('N', "not observing", Icon::NotObserving, "observation stopped");
+const StationState QStation::NotObserving       = StationState('N', "not observing", Icon::NotObserving, "not observing");
 const StationState QStation::Manual             = StationState('M', "manual", Icon::Manual, "manual control enabled");
-const StationState QStation::DomeUnreachable    = StationState('U', "dome unreachable", Icon::Failure, "serial port has no connection");
+const StationState QStation::DomeUnreachable    = StationState('U', "dome unreachable", Icon::Failure, "dome is not responding");
 const StationState QStation::RainOrHumid        = StationState('R', "rain or high humidity", Icon::NotObserving, "rain sensor active or humidity too high");
 const StationState QStation::NoMasterPower      = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
 const StationState QStation::Inconsistent       = StationState('I', "inconsistent", Icon::Failure, "inconsistent state");
@@ -339,7 +339,7 @@ void QStation::send_heartbeat(void) const {
 
 void QStation::set_state(StationState new_state) {
     if (new_state != this->m_state) {
-        logger.debug(Concern::Operation, QString("State changed from \"%1\" to \"%2\"")
+        logger.info(Concern::Operation, QString("State changed from \"%1\" to \"%2\"")
                      .arg(this->state().display_string(), new_state.display_string()));
         this->m_state = new_state;
         emit this->state_changed(this->m_state);

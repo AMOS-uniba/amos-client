@@ -25,7 +25,7 @@ void MainWindow::load_settings(void) {
         box.setWindowIcon(QIcon(":/images/blue.ico"));
         box.setWindowTitle("Configuration error");
         box.setStandardButtons(QMessageBox::Ok);
-        box.exec();
+        box.show();
 
         logger.fatal(Concern::Configuration, postmortem);
         exit(-4);

@@ -1,11 +1,11 @@
 #include "exception.h"
 
-RuntimeException::RuntimeException(const QString& message): std::runtime_error(message.toStdString()) {}
+RuntimeException::RuntimeException(const QString & message): std::runtime_error(message.toStdString()) {}
 
-MalformedTelegram::MalformedTelegram(const QString& message): RuntimeException(message) {}
+MalformedTelegram::MalformedTelegram(const QString & message): RuntimeException(message) {}
 
-EncodingError::EncodingError(const QString& message): RuntimeException(message) {}
+EncodingError::EncodingError(const QString & message): RuntimeException(message) {}
 
-ConfigurationError::ConfigurationError(const QString& message): std::runtime_error(message.toStdString()) {}
+ConfigurationError::ConfigurationError(const QString & message): std::runtime_error(message.toStdString()) {}
 
-InvalidState::InvalidState(const QString& message): RuntimeException(message) {}
+InvalidState::InvalidState(const QString & message): RuntimeException(message) {}

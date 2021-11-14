@@ -3,6 +3,7 @@
 #include "logging/statelogger.h"
 
 #include <QApplication>
+#include "utils/state/serialportstate.h"
 
 
 MainWindow * main_window;
@@ -13,6 +14,10 @@ int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
     a.setApplicationName("AMOS client");
     a.setOrganizationName("AMOS");
+
+    qRegisterMetaType<SerialPortState>("SerialPortState");
+    qRegisterMetaType<QVector<int> >("QVector<int>");
+
     logger.initialize();
 
     main_window = new MainWindow();

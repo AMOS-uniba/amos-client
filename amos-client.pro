@@ -34,8 +34,8 @@ SOURCES += \
     utils/domestate.cpp \
     utils/exception.cpp \
     utils/formatters.cpp \
-    utils/qdomethread.cpp \
     utils/qserialbuffer.cpp \
+    utils/qserialportmanager.cpp \
     utils/request.cpp \
     utils/sighting.cpp \
     utils/state/serialportstate.cpp \
@@ -88,8 +88,8 @@ HEADERS += \
     utils/domestate.h \
     utils/exception.h \
     utils/formatters.h \
-    utils/qdomethread.h \
     utils/qserialbuffer.h \
+    utils/qserialportmanager.h \
     utils/request.h \
     utils/sighting.h \
     utils/state/serialportstate.h \
@@ -141,7 +141,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.8.0.0
+VERSION = 0.8.0.2
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 TARGET = "AMOS client"
 

@@ -26,21 +26,18 @@ class QDome: public QAmosWidget {
     Q_OBJECT
 private:
     constexpr static unsigned int Refresh = 300;                                // Robin time in ms
-    unsigned char m_robin = 0;
-
-    const static Request RequestBasic, RequestEnv, RequestShaft;
 
     Ui::QDome * ui;
     const QStation * m_station;
 
-    constexpr static unsigned char Address = 0x99;                              // address
     QDateTime m_last_received;
     QDateTime m_open_since;
 
-    QDomeThread * m_dome_thread;
+    QThread * m_thread;
+    QSerialPortManager * m_spm;
+    SerialPortState m_sps;
+    QString m_data_state;
 
-    QTimer * m_robin_timer;
-    QTimer * m_serial_watchdog;
     QTimer * m_open_timer;
 
     // Humidity limits with hysteresis: open is humidity <= lower, close if humidity >= higher
@@ -50,6 +47,8 @@ private:
     DomeStateS m_state_S;
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
+
+    void send_command(const Command & command) const;
 
     void process_message(const QByteArray & message);
 
@@ -70,6 +69,9 @@ private slots:
     void display_env_data(const DomeStateT & state);
     void display_shaft_data(const DomeStateZ & state);
 
+    void display_data_state(void) const;
+    void reset_data(void);
+
     void toggle_hotwire(void) const;
     void toggle_intensifier(void) const;
     void toggle_fan(void) const;
@@ -87,8 +89,6 @@ public:
     const static Command CommandHotwireOn, CommandHotwireOff;
     const static Command CommandResetSlave;
 
-    const static SerialPortState SerialPortNotSet, SerialPortOpen, SerialPortError;
-
     const static ValueFormatter<double> TemperatureValueFormatter, HumidityValueFormatter;
     const static ColourFormatter<double> TemperatureColourFormatter;
 
@@ -98,14 +98,10 @@ public:
     virtual void initialize(QSettings * settings) override;
     bool is_changed(void) const override;
 
-    void send_command(const Command & command) const;
-    void send_request(const Request & request) const;
-    void send(const QByteArray & message) const;
-
     inline const QDateTime & last_received(void) const { return this->m_last_received; };
     inline const QDateTime & open_since(void) const { return this->m_open_since; };
-
-    SerialPortState serial_port_state(void) const;
+    inline SerialPortState serial_port_state(void) const { return this->m_sps; };
+    inline QString data_state(void) const { return this->m_data_state; };
 
     QJsonObject json(void) const;
 
@@ -118,25 +114,24 @@ public:
     void set_station(const QStation * const station);
 
     // Humidity getters and setters
-    bool is_humid(void) const;
-    bool is_very_humid(void) const;
-    double humidity_limit_lower(void) const;
-    double humidity_limit_upper(void) const;
+    inline bool is_humid(void) const { return (this->state_T().humidity_sht() >= this->humidity_limit_lower()); };
+    inline bool is_very_humid(void) const { return (this->state_T().humidity_sht() >= this->humidity_limit_upper()); };
+    inline double humidity_limit_lower(void) const { return this->m_humidity_limit_lower; };
+    inline double humidity_limit_upper(void) const { return this->m_humidity_limit_upper; };
+
     void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
 
 public slots:
     void set_formatters(void);
 
     void list_serial_ports(void);
- //   void clear_serial_port(void);
-    void set_serial_port(const QString & port);
-    void check_serial_port(void);
+    void handle_serial_port_selected(const QString & port);
+    void set_serial_port_state(const SerialPortState state);
+    void set_data_state(const QString & data_state);
 
-    void display_serial_port_info(void) const;
-
-    void handle_error(QSerialPort::SerialPortError error, const QString & message);
-
-    void request_status(void);
+    void handle_no_serial_port_set(void);
+    void handle_serial_port_changed(const QString & port);
+    void handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message);
 
     // Command wrappers
     void open_cover(void) const;
@@ -152,8 +147,9 @@ public slots:
     void turn_off_fan(void) const;
 
 signals:
-    void request_state(const QByteArray & request) const;
+    void command(const QByteArray & command) const;
 
+    void state_updated(void);
     void state_updated_S(const DomeStateS & state);
     void state_updated_T(const DomeStateT & state);
     void state_updated_Z(const DomeStateZ & state);
@@ -162,7 +158,7 @@ signals:
     void cover_open(int position) const;
     void cover_moved(int position) const;
 
-    void serial_port_changed(const QString & port);
+    void serial_port_selected(const QString & port);
 
     void humidity_limits_changed(double new_lower, double new_upper);
 };

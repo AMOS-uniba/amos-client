@@ -10,7 +10,7 @@
 
 #include "forward.h"
 #include "widgets/qconfigurable.h"
-#include "utils/qdomethread.h"
+#include "utils/qserialportmanager.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
