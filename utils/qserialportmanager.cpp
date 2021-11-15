@@ -32,7 +32,8 @@ void QSerialPortManager::initialize(void) {
     this->connect(this->m_request_timer, &QTimer::timeout, this, &QSerialPortManager::request_status);
 
     this->m_buffer = new QSerialBuffer(this);
-    logger.info(Concern::SerialPort, "Dome thread created");
+    logger.info(Concern::SerialPort, "Dome thread initialized");
+    emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
 }
 
 void QSerialPortManager::clear_port(void) {
@@ -84,7 +85,11 @@ void QSerialPortManager::request(const QByteArray & request) {
     if (this->m_port->isOpen()) {
         this->m_port->write(encoded);
     } else {
-        emit this->error(this->m_port->error(), this->m_port->errorString());
+        if (this->m_error_counter == 0) {
+            emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
+//            emit this->error(this->m_port->error(), this->m_port->errorString());
+        }
+//        this->m_error_counter = (this->m_error_counter + 1);
     }
 }
 
@@ -92,6 +97,8 @@ void QSerialPortManager::process_response(void) {
 //    logger.debug(Concern::SerialPort, QString("%1").arg(this->m_last_received.msecsTo(QDateTime::currentDateTimeUtc())));
 
     this->m_last_received = QDateTime::currentDateTimeUtc();
+    this->m_error_counter = 0;
+
     QByteArray response;
     while (this->m_port->bytesAvailable()) {
         response += this->m_port->readAll();
@@ -101,6 +108,9 @@ void QSerialPortManager::process_response(void) {
 }
 
 void QSerialPortManager::handle_error(QSerialPort::SerialPortError spe) {
-    emit this->port_state_changed(QSerialPortManager::SerialPortError);
-    emit this->error(spe, this->m_port->errorString());
+    if (this->m_error_counter < 1000) {
+        emit this->port_state_changed(QSerialPortManager::SerialPortError);
+        emit this->error(spe, this->m_port->errorString());
+    }
+//    this->m_error_counter = (this->m_error_counter + 1);
 }

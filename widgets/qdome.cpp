@@ -439,17 +439,10 @@ void QDome::handle_serial_port_changed(const QString & port) {
     this->m_data_state = "no data";
 }
 
-/*void QDome::display_serial_port_state(void) {
-    if ((this->m_serial_port == nullptr) || (!this->m_serial_port->isOpen())) {
-        logger.debug(Concern::SerialPort, "Serial port not working, resetting");
-        this->list_serial_ports();
-        this->ui->co_serial_ports->setCurrentIndex(0);
-    } else {
-        const QSignalBlocker blocker(this->ui->co_serial_ports);
-        this->ui->co_serial_ports->setCurrentText(this->m_serial_port->portName());
-    }
-}*/
-
+/**
+ * @brief QDome::set_open_since
+ * Remember how long the dome has been open and II active (so that UFO can be opened after a delay)
+ */
 void QDome::set_open_since(void) {
     const DomeStateS & state = this->state_S();
     if (state.is_valid() && state.dome_open_sensor_active() && state.intensifier_active()) {
@@ -472,6 +465,7 @@ void QDome::display_data_state(void) const {
 
 void QDome::set_serial_port_state(const SerialPortState state) {
     this->m_sps = state;
+    logger.debug(Concern::SerialPort, QString("Port state set to %1").arg(state.display_string()));
     this->ui->lb_serial_port_state->setText(state.display_string());
     this->ui->lb_serial_port_state->setStyleSheet(QString("QLabel { color: %1; }").arg(state.colour().name()));
 }
@@ -483,7 +477,7 @@ void QDome::set_data_state(const QString & data_state) {
 void QDome::handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message) {
     logger.error(Concern::SerialPort, QString("Error %1: %2").arg(error).arg(message));
     this->set_serial_port_state(QSerialPortManager::SerialPortError);
-    this->set_data_state(QString("error %1: %2").arg(error).arg(message));
+    this->set_data_state(QString("error %1").arg(error));
 }
 
 void QDome::handle_no_serial_port_set(void) {

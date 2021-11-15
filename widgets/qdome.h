@@ -125,11 +125,11 @@ public slots:
     void set_formatters(void);
 
     void list_serial_ports(void);
-    void handle_serial_port_selected(const QString & port);
     void set_serial_port_state(const SerialPortState state);
     void set_data_state(const QString & data_state);
 
     void handle_no_serial_port_set(void);
+    void handle_serial_port_selected(const QString & port);
     void handle_serial_port_changed(const QString & port);
     void handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message);
 

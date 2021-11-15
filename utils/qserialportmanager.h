@@ -25,7 +25,7 @@ private:
     unsigned int m_robin = 0;
 
     QDateTime m_last_received;
-
+    unsigned int m_error_counter = 0;
 
     static constexpr unsigned int ReadTimeout = 1000;
     static constexpr unsigned int WriteTimeout = 200;
