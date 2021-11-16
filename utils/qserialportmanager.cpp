@@ -23,6 +23,7 @@ QSerialPortManager::QSerialPortManager(QObject * parent):
 {}
 
 QSerialPortManager::~QSerialPortManager(void) {
+    this->m_request_timer->stop();
     delete this->m_request_timer;
 }
 
@@ -41,7 +42,7 @@ void QSerialPortManager::clear_port(void) {
     this->m_port = nullptr;
 }
 
-void QSerialPortManager::change_settings(const QString & port_name) {
+void QSerialPortManager::set_port(const QString & port_name) {
     logger.info(Concern::SerialPort, QString("Opening port %1").arg(port_name));
     this->m_port_name = port_name;
 

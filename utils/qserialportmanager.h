@@ -47,7 +47,7 @@ public:
 
     void initialize(void);
 
-    void change_settings(const QString & port_name);
+    void set_port(const QString & port_name);
 
     void request_status(void);
     void request(const QByteArray & request);

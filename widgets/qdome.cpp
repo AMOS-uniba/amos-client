@@ -138,7 +138,7 @@ QDome::QDome(QWidget * parent):
     this->connect(this->m_thread, &QThread::finished, this->m_spm, &QObject::deleteLater, Qt::QueuedConnection);
     this->connect(this->m_thread, &QThread::finished, this->m_thread, &QObject::deleteLater, Qt::QueuedConnection);
 
-    this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::change_settings, Qt::QueuedConnection);
+    this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::set_port, Qt::QueuedConnection);
     this->connect(this, &QDome::command, this->m_spm, &QSerialPortManager::request, Qt::QueuedConnection);
 
     this->connect(this->m_spm, &QSerialPortManager::message_complete, this, &QDome::process_message, Qt::QueuedConnection);
@@ -155,7 +155,7 @@ QDome::QDome(QWidget * parent):
 
 QDome::~QDome() {
     this->m_thread->quit();
-    this->m_thread->wait(500);
+    this->m_thread->wait();
     delete this->m_spm;
     delete this->ui;
 }
