@@ -33,7 +33,7 @@ void QSerialPortManager::initialize(void) {
     this->connect(this->m_request_timer, &QTimer::timeout, this, &QSerialPortManager::request_status);
 
     this->m_buffer = new QSerialBuffer(this);
-    logger.info(Concern::SerialPort, "Dome thread initialized");
+    emit this->log(Concern::SerialPort, Level::Info, "Dome thread initialized");
     emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
 }
 
@@ -43,7 +43,7 @@ void QSerialPortManager::clear_port(void) {
 }
 
 void QSerialPortManager::set_port(const QString & port_name) {
-    logger.info(Concern::SerialPort, QString("Opening port %1").arg(port_name));
+    emit this->log(Concern::SerialPort, Level::Info, QString("Opening port %1").arg(port_name));
     this->m_port_name = port_name;
 
     this->clear_port();
@@ -61,7 +61,7 @@ void QSerialPortManager::set_port(const QString & port_name) {
     if (this->m_port->open(QIODevice::ReadWrite)) {
         this->connect(this->m_port, &QSerialPort::readyRead, this, &QSerialPortManager::process_response);
         this->connect(this->m_port, &QSerialPort::errorOccurred, this, &QSerialPortManager::handle_error);
-        logger.info(Concern::SerialPort, QString("Opened %1").arg(this->m_port->portName()));
+        emit this->log(Concern::SerialPort, Level::Info, QString("Opened %1").arg(this->m_port->portName()));
 
         emit this->port_state_changed(QSerialPortManager::SerialPortOpen);
         emit this->port_changed(port_name);
@@ -81,7 +81,7 @@ void QSerialPortManager::request_status(void) {
 
 void QSerialPortManager::request(const QByteArray & request) {
     QByteArray encoded = Telegram(QSerialPortManager::Address, request).compose();
-    logger.debug(Concern::SerialPort, QString("Requesting %1 (%2)").arg(request, QString(encoded)));
+    emit this->log(Concern::SerialPort, Level::Debug, QString("Requesting %1 (%2)").arg(request, QString(encoded)));
 
     if (this->m_port->isOpen()) {
         this->m_port->write(encoded);

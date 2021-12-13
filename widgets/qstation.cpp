@@ -323,7 +323,11 @@ QJsonObject QStation::json(void) const {
             {"hll", this->dome()->humidity_limit_lower()},
             {"hlu", this->dome()->humidity_limit_upper()},
         }},
+#if OLD_PROTOCOL
+        {"cv", QString("%1%2").arg(VERSION_STRING, "S")},
+#else
         {"cv", VERSION_STRING},
+#endif
     };
 }
 

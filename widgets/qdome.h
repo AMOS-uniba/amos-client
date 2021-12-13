@@ -133,6 +133,8 @@ public slots:
     void handle_serial_port_changed(const QString & port);
     void handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message);
 
+    void pass_log_message(Concern concern, Level level, const QString & message);
+
     // Command wrappers
     void open_cover(void) const;
     void close_cover(void) const;

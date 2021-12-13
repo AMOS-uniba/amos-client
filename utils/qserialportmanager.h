@@ -61,6 +61,8 @@ signals:
     void port_state_changed(SerialPortState sps);
     void error(QSerialPort::SerialPortError spe, const QString & message);
     void message_complete(const QByteArray & message);
+
+    void log(Concern concern, Level level, const QString & message);
 };
 
 #endif // QSERIALPORTMANAGER_H

@@ -145,6 +145,7 @@ QDome::QDome(QWidget * parent):
     this->connect(this->m_spm, &QSerialPortManager::error, this, &QDome::handle_serial_port_error, Qt::QueuedConnection);
     this->connect(this->m_spm, &QSerialPortManager::port_changed, this, &QDome::handle_serial_port_changed, Qt::QueuedConnection);
     this->connect(this->m_spm, &QSerialPortManager::port_state_changed, this, &QDome::set_serial_port_state, Qt::QueuedConnection);
+    this->connect(this->m_spm, &QSerialPortManager::log, this, &QDome::pass_log_message, Qt::QueuedConnection);
 
     this->m_thread->start();
 
@@ -482,6 +483,22 @@ void QDome::handle_serial_port_error(QSerialPort::SerialPortError error, const Q
 
 void QDome::handle_no_serial_port_set(void) {
     this->set_serial_port_state(QSerialPortManager::SerialPortNotSet);
+}
+
+void QDome::pass_log_message(Concern concern, Level level, const QString & message) {
+    switch (level) {
+        case Level::Debug: {
+            logger.debug(concern, message);
+            break;
+        }
+        case Level::Warning: {
+            logger.warning(concern, message);
+            break;
+        }
+        default: {
+            logger.info(concern, message);
+        }
+    }
 }
 
 QJsonObject QDome::json(void) const {
