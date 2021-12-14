@@ -70,7 +70,6 @@ private slots:
     void display_shaft_data(const DomeStateZ & state);
 
     void display_data_state(void) const;
-    void reset_data(void);
 
     void toggle_hotwire(void) const;
     void toggle_intensifier(void) const;

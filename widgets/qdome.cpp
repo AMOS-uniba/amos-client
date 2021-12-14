@@ -128,7 +128,6 @@ QDome::QDome(QWidget * parent):
     this->m_open_timer->setInterval(100);
     this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::set_open_since);
     this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::display_data_state);
-    this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::reset_data);
     this->m_open_timer->start();
 
     this->m_thread = new QThread(this);
@@ -386,17 +385,6 @@ void QDome::display_dome_state(void) {
     this->ui->lb_cover_state->setText(text);
     this->ui->lb_cover_state->setStyleSheet(QString("QLabel {color: %1; }").arg(colour));
     this->ui->lb_cover_comment->setText(this->m_station->state().display_string());
-}
-
-void QDome::reset_data(void) {
-    if (this->m_last_received.msecsTo(QDateTime::currentDateTimeUtc()) > 500) {
-        this->m_state_S = DomeStateS();
-        emit this->state_updated_S(this->state_S());
-        this->m_state_T = DomeStateT();
-        emit this->state_updated_T(this->state_T());
-        this->m_state_Z = DomeStateZ();
-        emit this->state_updated_Z(this->state_Z());
-    }
 }
 
 QString QDome::status_line(void) const {

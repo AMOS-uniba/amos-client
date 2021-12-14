@@ -95,7 +95,7 @@ void QSerialPortManager::request(const QByteArray & request) {
 }
 
 void QSerialPortManager::process_response(void) {
-//    logger.debug(Concern::SerialPort, QString("%1").arg(this->m_last_received.msecsTo(QDateTime::currentDateTimeUtc())));
+    emit this->log(Concern::SerialPort, Level::Debug, QString("%1").arg(this->m_last_received.msecsTo(QDateTime::currentDateTimeUtc())));
 
     this->m_last_received = QDateTime::currentDateTimeUtc();
     this->m_error_counter = 0;

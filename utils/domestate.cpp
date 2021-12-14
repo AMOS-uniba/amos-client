@@ -14,10 +14,11 @@ float DomeState::deciint(const QByteArray & chunk) {
 }
 
 bool DomeState::is_valid(void) const {
-    return (this->m_valid && (this->age() < 3.0));
+    logger.debug(Concern::SerialPort, QString("State age is %1").arg(this->age()));
+    return (this->m_valid && (this->age() < 2.0));
 }
 
-const QDateTime& DomeState::timestamp(void) const {
+const QDateTime & DomeState::timestamp(void) const {
     return this->m_timestamp;
 }
 
@@ -33,7 +34,9 @@ DomeStateS::DomeStateS(void):
     m_errors(0),
     m_time_alive(0) {}
 
-DomeStateS::DomeStateS(const QByteArray & response) {
+DomeStateS::DomeStateS(const QByteArray & response):
+    DomeState()
+{
     if (response.length() != 8) {
         throw InvalidState(QString("Wrong S-state length %1").arg(response.length()));
     }
@@ -131,7 +134,9 @@ DomeStateT::DomeStateT(void):
  * Construct a new DomeStateT from a response from the dome
  * @throws InvalidState
  */
-DomeStateT::DomeStateT(const QByteArray & response) {
+DomeStateT::DomeStateT(const QByteArray & response):
+    DomeState()
+{
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong T-state length %1").arg(response.length()));
     }
@@ -176,7 +181,9 @@ DomeStateZ::DomeStateZ(void):
     DomeState(),
     m_shaft_position(0) {}
 
-DomeStateZ::DomeStateZ(const QByteArray & response) {
+DomeStateZ::DomeStateZ(const QByteArray & response):
+    DomeState()
+{
 #if OLD_PROTOCOL
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
