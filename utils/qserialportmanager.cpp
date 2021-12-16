@@ -43,7 +43,7 @@ void QSerialPortManager::clear_port(void) {
 }
 
 void QSerialPortManager::set_port(const QString & port_name) {
-    emit this->log(Concern::SerialPort, Level::Info, QString("Opening port %1").arg(port_name));
+    emit this->log(Concern::SerialPort, Level::Debug, QString("Trying to port %1").arg(port_name));
     this->m_port_name = port_name;
 
     this->clear_port();
@@ -86,11 +86,7 @@ void QSerialPortManager::request(const QByteArray & request) {
     if (this->m_port->isOpen()) {
         this->m_port->write(encoded);
     } else {
-        if (this->m_error_counter == 0) {
-            emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
-//            emit this->error(this->m_port->error(), this->m_port->errorString());
-        }
-//        this->m_error_counter = (this->m_error_counter + 1);
+        emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
     }
 }
 
@@ -109,9 +105,6 @@ void QSerialPortManager::process_response(void) {
 }
 
 void QSerialPortManager::handle_error(QSerialPort::SerialPortError spe) {
-    if (this->m_error_counter < 1000) {
-        emit this->port_state_changed(QSerialPortManager::SerialPortError);
-        emit this->error(spe, this->m_port->errorString());
-    }
-//    this->m_error_counter = (this->m_error_counter + 1);
+    emit this->port_state_changed(QSerialPortManager::SerialPortError);
+    emit this->error(spe, this->m_port->errorString());
 }

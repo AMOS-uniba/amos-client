@@ -16,6 +16,8 @@ int main(int argc, char *argv[]) {
     a.setOrganizationName("AMOS");
 
     qRegisterMetaType<SerialPortState>("SerialPortState");
+    qRegisterMetaType<Concern>("Concern");
+    qRegisterMetaType<Level>("Level");
     qRegisterMetaType<QVector<int> >("QVector<int>");
 
     logger.initialize();

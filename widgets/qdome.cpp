@@ -122,7 +122,9 @@ QDome::QDome(QWidget * parent):
     this->connect(this->ui->cl_fan, &QControlLine::toggled, this, &QDome::toggle_fan);
     this->connect(this->ui->cl_ii, &QControlLine::toggled, this, &QDome::toggle_intensifier);
 
-    this->connect(this->ui->co_serial_ports, &QComboBox::currentTextChanged, this, &QDome::handle_serial_port_selected);
+    this->connect(this->ui->co_serial_ports, QOverload<int>::of(&QComboBox::activated), this, [=](int index){
+        this->handle_serial_port_selected(this->ui->co_serial_ports->itemText(index));
+    });
 
     this->m_open_timer = new QTimer(this);
     this->m_open_timer->setInterval(100);
