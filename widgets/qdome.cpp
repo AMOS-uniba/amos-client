@@ -24,7 +24,7 @@ const Command QDome::CommandIIOn                = Command('\x07', "turn on image
 const Command QDome::CommandIIOff               = Command('\x08', "turn off image intensifier");
 const Command QDome::CommandHotwireOn           = Command('\x09', "turn on hotwire");
 const Command QDome::CommandHotwireOff          = Command('\x0A', "turn off hotwire");
-const Command QDome::CommandResetSlave          = Command('\x0B', "reset slave");
+const Command QDome::CommandSoftwareReset       = Command('\x0B', "software reset");
 
 const ValueFormatter<double> QDome::TemperatureValueFormatter = [](double value) {
     return QString("%1 °C").arg(value, 3, 'f', 1);
@@ -147,6 +147,7 @@ QDome::QDome(QWidget * parent):
     this->connect(this->m_spm, &QSerialPortManager::port_changed, this, &QDome::handle_serial_port_changed, Qt::QueuedConnection);
     this->connect(this->m_spm, &QSerialPortManager::port_state_changed, this, &QDome::set_serial_port_state, Qt::QueuedConnection);
     this->connect(this->m_spm, &QSerialPortManager::log, this, &QDome::pass_log_message, Qt::QueuedConnection);
+    this->connect(this->ui->pb_sw_reset, &QPushButton::pressed, this, &QDome::request_sw_reset);
 
     this->m_thread->start();
 
@@ -331,13 +332,15 @@ void QDome::display_basic_data(const DomeStateS & state) {
     this->ui->bl_error_t_CPU->set_value(state.error_t_CPU());
     this->ui->bl_error_rain->set_value(state.emergency_closing_rain());
 
-    this->ui->bt_cover_close->setEnabled(state.is_valid() && this->m_station->is_manual() && !state.dome_closed_sensor_active());
-    this->ui->bt_cover_open->setEnabled(state.is_valid() && this->m_station->is_manual() && !state.dome_open_sensor_active());
+    bool valid_manual = state.is_valid() && this->m_station->is_manual();
+    this->ui->bt_cover_close->setEnabled(valid_manual && !state.dome_closed_sensor_active());
+    this->ui->bt_cover_open->setEnabled(valid_manual && !state.dome_open_sensor_active());
 
-    this->ui->cl_lens_heating->set_enabled(state.is_valid() && this->m_station->is_manual());
-    this->ui->cl_camera_heating->set_enabled(state.is_valid() && this->m_station->is_manual());
-    this->ui->cl_fan->set_enabled(state.is_valid() && this->m_station->is_manual());
-    this->ui->cl_ii->set_enabled(state.is_valid() && this->m_station->is_manual());
+    this->ui->cl_lens_heating->set_enabled(valid_manual);
+    this->ui->cl_camera_heating->set_enabled(valid_manual);
+    this->ui->cl_fan->set_enabled(valid_manual);
+    this->ui->cl_ii->set_enabled(valid_manual);
+    this->ui->pb_sw_reset->setEnabled(valid_manual);
 }
 
 void QDome::display_env_data(const DomeStateT & state) {
@@ -572,6 +575,11 @@ void QDome::turn_on_hotwire(void) const {
 void QDome::turn_off_hotwire(void) const {
     logger.info(Concern::Operation, "Turning off the hotwire");
     this->send_command(QDome::CommandHotwireOff);
+}
+
+void QDome::request_sw_reset(void) const {
+    logger.info(Concern::Operation, "Requesting software reset");
+    this->send_command(QDome::CommandSoftwareReset);
 }
 
 // High level command to open the cover. Opens only if it is dark, or if in override mode.

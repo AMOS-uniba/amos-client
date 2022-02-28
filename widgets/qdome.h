@@ -86,7 +86,7 @@ public:
     const static Command CommandFanOn, CommandFanOff;
     const static Command CommandIIOn, CommandIIOff;
     const static Command CommandHotwireOn, CommandHotwireOff;
-    const static Command CommandResetSlave;
+    const static Command CommandSoftwareReset;
 
     const static ValueFormatter<double> TemperatureValueFormatter, HumidityValueFormatter;
     const static ColourFormatter<double> TemperatureColourFormatter;
@@ -132,20 +132,19 @@ public slots:
     void handle_serial_port_changed(const QString & port);
     void handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message);
 
-    void pass_log_message(Concern concern, Level level, const QString & message);
-
     // Command wrappers
     void open_cover(void) const;
     void close_cover(void) const;
+    void request_sw_reset(void) const;
 
     void turn_on_intensifier(void) const;
     void turn_off_intensifier(void) const;
-
     void turn_on_hotwire(void) const;
     void turn_off_hotwire(void) const;
-
     void turn_on_fan(void) const;
     void turn_off_fan(void) const;
+
+    void pass_log_message(Concern concern, Level level, const QString & message);
 
 signals:
     void command(const QByteArray & command) const;

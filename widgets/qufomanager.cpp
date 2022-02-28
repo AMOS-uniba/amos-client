@@ -62,6 +62,7 @@ void QUfoManager::load_settings(void) {
 }
 
 void QUfoManager::save_settings(void) const {
+    settings->setValue(QString("camera_%1/ufo_path").arg(this->id()), this->m_path);
     settings->setValue(QString("camera_%1/ufo_autostart").arg(this->id()), this->is_autostart());
 }
 
@@ -219,9 +220,9 @@ void QUfoManager::stop_ufo(void) const {
         HWND child;
 
         if (this->is_running()) {
-            logger.debug(Concern::UFO, QString("UFO-%1: Trying to stop politely").arg(this->id()));
+            logger.info(Concern::UFO, QString("UFO-%1 stopping").arg(this->id()));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
-            Sleep(1000);
+            Sleep(200);
 
             logger.debug(Concern::UFO, "Clicking the dialog button");
             child = GetLastActivePopup(this->m_frame);
@@ -233,7 +234,7 @@ void QUfoManager::stop_ufo(void) const {
             } else {
                 SetActiveWindow(child);
                 SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-                Sleep(1000);
+                Sleep(200);
 
                 if (this->is_running()) {
                     logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
