@@ -18,10 +18,6 @@ bool DomeState::is_valid(void) const {
     return (this->m_valid && (this->age() < 2.0));
 }
 
-const QDateTime & DomeState::timestamp(void) const {
-    return this->m_timestamp;
-}
-
 float DomeState::age(void) const {
     return this->m_timestamp.msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0;
 }
@@ -52,37 +48,6 @@ DomeStateS::DomeStateS(const QByteArray & response):
     this->m_valid     = true;
     logger.debug(Concern::SerialPort, QString("S state received: %1").arg(QString(this->full_text())));
 }
-
-bool DomeStateS::servo_moving(void) const                   { return this->m_basic & 0x01; }
-bool DomeStateS::servo_direction(void) const                { return this->m_basic & 0x02; }
-bool DomeStateS::dome_open_sensor_active(void) const        { return this->m_basic & 0x04; }
-bool DomeStateS::dome_closed_sensor_active(void) const      { return this->m_basic & 0x08; }
-bool DomeStateS::lens_heating_active(void) const            { return this->m_basic & 0x10; }
-bool DomeStateS::camera_heating_active(void) const          { return this->m_basic & 0x20; }
-bool DomeStateS::intensifier_active(void) const             { return this->m_basic & 0x40; }
-bool DomeStateS::fan_active(void) const                     { return this->m_basic & 0x80; }
-
-bool DomeStateS::rain_sensor_active(void) const             { return this->m_env & 0x01; }
-bool DomeStateS::light_sensor_active(void) const            { return this->m_env & 0x02; }
-#if OLD_PROTOCOL
-bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x08; }
-#else
-bool DomeStateS::computer_power_sensor_active(void) const   { return this->m_env & 0x04; }
-#endif
-bool DomeStateS::cover_safety_position(void) const          { return this->m_env & 0x20; }
-bool DomeStateS::servo_blocked(void) const                  { return this->m_env & 0x80; }
-
-bool DomeStateS::error_t_lens(void) const                   { return this->m_errors & 0x01; }
-bool DomeStateS::error_SHT31(void) const                    { return this->m_errors & 0x02; }
-bool DomeStateS::emergency_closing_light(void) const        { return this->m_errors & 0x04; }
-bool DomeStateS::error_watchdog_reset(void) const           { return this->m_errors & 0x08; }
-bool DomeStateS::error_brownout_reset(void) const           { return this->m_errors & 0x10; }
-bool DomeStateS::error_master_power(void) const             { return this->m_errors & 0x20; }
-bool DomeStateS::error_t_CPU(void) const                    { return this->m_errors & 0x40; }
-bool DomeStateS::emergency_closing_rain(void) const         { return this->m_errors & 0x80; }
-
-unsigned int DomeStateS::time_alive(void) const             { return this->m_time_alive / 75; }
-
 
 // Return textual representation of the state (three bytes as received, char for true, dash for false)
 QByteArray DomeStateS::full_text(void) const {

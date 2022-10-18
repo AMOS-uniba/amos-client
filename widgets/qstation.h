@@ -113,9 +113,9 @@ public:
     QDateTime next_sun_crossing(double altitude, bool direction_up, int resolution = 60) const;
     QDateTime next_moon_crossing(double altitude, bool direction_up, int resolution = 60) const;
 
-    QString state_logger_filename(void) const;
+    inline QString state_logger_filename(void) const { return this->m_state_logger->filename(); };
+    inline StationState state(void) const { return this->m_state; };
 
-    StationState state(void) const;
     QJsonObject json(void) const;
 
 public slots:

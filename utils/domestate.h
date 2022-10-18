@@ -20,7 +20,7 @@ protected:
     bool m_valid;
     DomeState(void);
 public:
-    const QDateTime & timestamp(void) const;
+    inline const QDateTime & timestamp(void) const { return this->m_timestamp; };
     float age(void) const;
     void set_valid(void);
     bool is_valid(void) const;
@@ -38,31 +38,35 @@ public:
     DomeStateS(void);
     DomeStateS(const QByteArray & response);
 
-    bool servo_moving(void) const;
-    bool servo_direction(void) const;
-    bool dome_open_sensor_active(void) const;
-    bool dome_closed_sensor_active(void) const;
-    bool lens_heating_active(void) const;
-    bool camera_heating_active(void) const;
-    bool intensifier_active(void) const;
-    bool fan_active(void) const;
+    inline bool servo_moving(void) const                    { return this->m_basic & 0x01; };
+    inline bool servo_direction(void) const                 { return this->m_basic & 0x02; };
+    inline bool dome_open_sensor_active(void) const         { return this->m_basic & 0x04; };
+    inline bool dome_closed_sensor_active(void) const       { return this->m_basic & 0x08; };
+    inline bool lens_heating_active(void) const             { return this->m_basic & 0x10; };
+    inline bool camera_heating_active(void) const           { return this->m_basic & 0x20; };
+    inline bool intensifier_active(void) const              { return this->m_basic & 0x40; };
+    inline bool fan_active(void) const                      { return this->m_basic & 0x80; };
 
-    bool rain_sensor_active(void) const;
-    bool light_sensor_active(void) const;
-    bool computer_power_sensor_active(void) const;
-    bool cover_safety_position(void) const;
-    bool servo_blocked(void) const;
+    inline bool rain_sensor_active(void) const              { return this->m_env & 0x01; };
+    inline bool light_sensor_active(void) const             { return this->m_env & 0x02; };
+#if OLD_PROTOCOL
+    inline bool computer_power_sensor_active(void) const    { return this->m_env & 0x08; };
+#else
+    inline bool computer_power_sensor_active(void) const    { return this->m_env & 0x04; };
+#endif
+    inline bool cover_safety_position(void) const           { return this->m_env & 0x20; };
+    inline bool servo_blocked(void) const                   { return this->m_env & 0x80; };
 
-    bool error_t_lens(void) const;
-    bool error_SHT31(void) const;
-    bool emergency_closing_light(void) const;
-    bool error_watchdog_reset(void) const;
-    bool error_brownout_reset(void) const;
-    bool error_master_power(void) const;
-    bool error_t_CPU(void) const;
-    bool emergency_closing_rain(void) const;
+    inline bool error_t_lens(void) const                    { return this->m_errors & 0x01; };
+    inline bool error_SHT31(void) const                     { return this->m_errors & 0x02; };
+    inline bool emergency_closing_light(void) const         { return this->m_errors & 0x04; };
+    inline bool error_watchdog_reset(void) const            { return this->m_errors & 0x08; };
+    inline bool error_brownout_reset(void) const            { return this->m_errors & 0x10; };
+    inline bool error_master_power(void) const              { return this->m_errors & 0x20; };
+    inline bool error_t_CPU(void) const                     { return this->m_errors & 0x40; };
+    inline bool emergency_closing_rain(void) const          { return this->m_errors & 0x80; };
 
-    unsigned int time_alive(void) const;
+    inline unsigned int time_alive(void) const              { return this->m_time_alive / 75; };
 
     QByteArray full_text(void) const;
     QJsonValue json(void) const override;

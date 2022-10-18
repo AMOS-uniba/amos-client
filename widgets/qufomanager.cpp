@@ -235,14 +235,14 @@ void QUfoManager::stop_ufo(void) const {
                 SetActiveWindow(child);
                 SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
                 Sleep(200);
-
-                if (this->is_running()) {
-                    logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
-                    this->m_process.kill();
-                }
-
-                emit this->stopped();
             }
+
+            if (this->is_running()) {
+                logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
+                this->m_process.kill();
+            }
+
+            emit this->stopped();
         } else {
             logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
         }

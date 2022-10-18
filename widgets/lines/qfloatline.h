@@ -11,9 +11,9 @@ private:
     ValueFormatter<double> m_value_formatter;
 public:
     explicit QFloatLine(
-            QWidget *parent = nullptr,
-            ColourFormatter<double> colour_formatter = [](double) -> QColor { return Qt::black; },
-            ValueFormatter<double> value_formatter = [](double value) -> QString { return QString("%1°").arg(value, 3, 'f', 3); }
+        QWidget * parent = nullptr,
+        ColourFormatter<double> colour_formatter = [](double) -> QColor { return Qt::black; },
+        ValueFormatter<double> value_formatter = [](double value) -> QString { return QString("%1°").arg(value, 3, 'f', 3); }
     );
 
     void set_colour_formatter(ColourFormatter<double> new_colour_formatter);

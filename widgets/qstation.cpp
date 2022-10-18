@@ -331,11 +331,13 @@ QJsonObject QStation::json(void) const {
     };
 }
 
+/** Heartbeat action: log state and send **/
 void QStation::heartbeat(void) const {
     this->log_state();
     this->send_heartbeat();
 }
 
+/** Actually send a heartbeat through the server **/
 void QStation::send_heartbeat(void) const {
     logger.debug(Concern::Heartbeat, "Sending a heartbeat...");
     this->m_server->send_heartbeat(this->json());
@@ -349,10 +351,6 @@ void QStation::set_state(StationState new_state) {
         emit this->state_changed(this->m_state);
     }
 }
-
-StationState QStation::state(void) const { return this->m_state; }
-
-QString QStation::state_logger_filename(void) const { return this->m_state_logger->filename(); }
 
 void QStation::log_state(void) const {
     this->m_state_logger->log(QString("%1° %2 %3")
@@ -393,6 +391,7 @@ void QStation::on_cb_safety_override_clicked(bool checked) {
     }
 }
 
+/**************************** Change handlers *****************************/
 bool QStation::is_changed(void) const {
     return (
         (abs(this->ui->dsb_latitude->value() - this->latitude()) > 1e-9) ||
