@@ -1,6 +1,6 @@
 QT     += core gui serialport network widgets
 
-CONFIG += c++11
+CONFIG += c++14
 CONFIG += static
 
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -141,7 +141,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 0.8.1.6
+VERSION = 0.8.1.7
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 TARGET = "AMOS client"
 

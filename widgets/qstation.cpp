@@ -315,13 +315,18 @@ QJsonObject QStation::json(void) const {
     return QJsonObject {
         {"auto", !this->is_manual()},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
-        {"st", QString(this->state().code())},
+        {"st", QString(QChar(this->state().code()))},
         {"dome", this->dome()->json()},
         {"cas", this->camera_allsky()->json()},
         {"csp", this->camera_spectral()->json()},
         {"cfg", QJsonObject {
             {"hll", this->dome()->humidity_limit_lower()},
             {"hlu", this->dome()->humidity_limit_upper()},
+        }},
+        {"pos", QJsonObject {
+            {"lat", this->latitude()},
+            {"lon", this->longitude()},
+            {"alt", this->altitude()},
         }},
 #if OLD_PROTOCOL
         {"cv", QString("%1%2").arg(VERSION_STRING, "S")},
@@ -355,7 +360,7 @@ void QStation::set_state(StationState new_state) {
 void QStation::log_state(void) const {
     this->m_state_logger->log(QString("%1° %2 %3")
                               .arg(this->sun_altitude(), 5, 'f', 1)
-                              .arg(QString(this->state().code()), this->dome()->status_line()));
+                              .arg(QString(QChar(this->state().code())), this->dome()->status_line()));
 }
 
 /*********************** Event handlers ***********************************/

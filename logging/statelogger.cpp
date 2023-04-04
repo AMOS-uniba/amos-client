@@ -11,7 +11,7 @@ void StateLogger::log(const QString & message) const {
     QDateTime now = QDateTime::currentDateTimeUtc();
     QString full = this->format(now, message);
     QTextStream out(this->m_file);
-    out.setCodec("UTF-8");
+    //out.setCodec("UTF-8");
 
     if (this->m_file != nullptr) {
         out << full << Qt::endl;

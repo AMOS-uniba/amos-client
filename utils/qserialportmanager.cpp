@@ -12,7 +12,7 @@ const Request QSerialPortManager::RequestShaft              = Request('Z', "shaf
 #endif
 
 const SerialPortState QSerialPortManager::SerialPortNotSet  = SerialPortState('N', "not set", QColor(96, 96, 96));
-const SerialPortState QSerialPortManager::SerialPortOpen    = SerialPortState('O', "open", QColor(0, 192, 0));
+const SerialPortState QSerialPortManager::SerialPortOpen    = SerialPortState('O', "connected", QColor(0, 192, 0));
 const SerialPortState QSerialPortManager::SerialPortError   = SerialPortState('E', "error", QColor(240, 0, 0));
 
 
