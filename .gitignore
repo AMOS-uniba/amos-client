@@ -15,6 +15,7 @@
 build/*
 debug/*
 release/*
+.qtc_clangd/*
 
 # Qt-es
 object_script.*.Release
