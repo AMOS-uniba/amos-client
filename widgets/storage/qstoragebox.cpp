@@ -5,12 +5,8 @@ extern QSettings * settings;
 
 QString QStorageBox::DialogTitle(void) const { return "Select storage directory"; }
 QString QStorageBox::AbortMessage(void) const { return "Storage directory selection aborted"; }
-QString QStorageBox::MessageEnabled(void) const {
-    return "Storage \"%1\" %2abled";
-}
-QString QStorageBox::MessageDirectoryChanged(void) const {
-    return "Storage \"%1\" directory set to \"%2\"";
-}
+QString QStorageBox::MessageEnabled(void) const { return "Storage \"%1\" %2abled"; }
+QString QStorageBox::MessageDirectoryChanged(void) const { return "Storage \"%1\" directory set to \"%2\""; }
 
 QStorageBox::QStorageBox(QWidget * parent):
     QFileSystemBox(parent)
@@ -44,6 +40,7 @@ void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
 QJsonObject QStorageBox::json(void) const {
     QStorageInfo storage_info = this->info();
     return QJsonObject {
+        {"on", this->is_enabled()},
         {"a", storage_info.bytesAvailable()},
         {"t", storage_info.bytesTotal()},
     };
