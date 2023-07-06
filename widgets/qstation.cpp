@@ -38,6 +38,7 @@ QString QStation::temperature_colour(float temperature) {
 QStation::QStation(QWidget * parent):
     QAmosWidget(parent),
     ui(new Ui::QStation),
+    m_start_time(QDateTime::currentDateTimeUtc()),
     m_latitude(49.0),
     m_longitude(18.0),
     m_altitude(1.0),
@@ -314,6 +315,7 @@ void QStation::automatic_cover(void) {
 QJsonObject QStation::json(void) const {
     return QJsonObject {
         {"auto", !this->is_manual()},
+        {"start", this->m_start_time.toString(Qt::ISODate)},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"st", QString(QChar(this->state().code()))},
         {"dome", this->dome()->json()},

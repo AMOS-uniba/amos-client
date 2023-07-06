@@ -6,12 +6,10 @@
 
 #include "forward.h"
 #include "utils/domestate.h"
-#include "utils/qserialbuffer.h"
 
+#include "utils/qserialportmanager.h"
 #include "widgets/qconfigurable.h"
 #include "widgets/lines/qdisplayline.h"
-#include "mainwindow.h"
-#include "widgets/qdomewidget.h"
 #include "widgets/qstation.h"
 
 namespace Ui {

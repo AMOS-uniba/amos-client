@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include "settings.h"
-
 #include "logging/loggingdialog.h"
 #include "widgets/aboutdialog.h"
 
@@ -12,7 +10,6 @@ extern QSettings * settings;
 MainWindow::MainWindow(QWidget *parent):
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_start_time(QDateTime::currentDateTimeUtc()),
     m_terminate(false)
 {
     this->ui->setupUi(this);
@@ -26,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     // connect signals for handling of edits of station position
     settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
-    settings->setValue("run/last_run", this->m_start_time);
+    settings->setValue("run/last_run", this->ui->station->start_time());
     this->load_settings();
 
     this->amos_widgets = {this->ui->dome, this->ui->server, this->ui->station, this->ui->camera_allsky, this->ui->camera_spectral};

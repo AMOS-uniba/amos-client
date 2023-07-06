@@ -6,7 +6,7 @@ void MainWindow::display_time(void) {
     this->statusBar()->showMessage(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
     this->ui->lb_uptime->setText(
-        Formatters::format_duration(this->m_start_time.secsTo(QDateTime::currentDateTimeUtc()))
+        Formatters::format_duration(this->ui->station->start_time().secsTo(QDateTime::currentDateTimeUtc()))
     );
     this->ui->server->display_countdown();
 }

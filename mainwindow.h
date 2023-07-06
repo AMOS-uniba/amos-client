@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
+#include <QDesktopServices>
 
 #include "forward.h"
 #include "widgets/qconfigurable.h"
@@ -43,7 +44,6 @@ private:
     QMenu * trayIconMenu;
 
     QMap<Icon, QIcon> icons;
-    const QDateTime m_start_time;
     bool m_terminate;
 
     QVector<QAmosWidget *> amos_widgets;
@@ -81,5 +81,5 @@ private slots:
     void on_bt_apply_clicked();
     void on_bt_discard_clicked();
     void on_pb_logging_options_clicked();
-    };
+};
 #endif // MAINWINDOW_H

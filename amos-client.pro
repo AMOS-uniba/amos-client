@@ -1,6 +1,6 @@
 QT     += core gui serialport network widgets
 
-CONFIG += c++14
+CONFIG += c++20
 CONFIG += static
 
 # You can make your code fail to compile if it uses deprecated APIs.

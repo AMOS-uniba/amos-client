@@ -122,7 +122,7 @@ QDome::QDome(QWidget * parent):
     this->connect(this->ui->cl_fan, &QControlLine::toggled, this, &QDome::toggle_fan);
     this->connect(this->ui->cl_ii, &QControlLine::toggled, this, &QDome::toggle_intensifier);
 
-    this->connect(this->ui->co_serial_ports, QOverload<int>::of(&QComboBox::activated), this, [=](int index){
+    this->connect(this->ui->co_serial_ports, QOverload<int>::of(&QComboBox::activated), this, [this](int index){
         this->handle_serial_port_selected(this->ui->co_serial_ports->itemText(index));
     });
 
@@ -251,7 +251,7 @@ void QDome::set_formatters(void) {
     this->ui->fl_t_SHT31->set_value_formatter(QDome::TemperatureValueFormatter);
     this->ui->fl_t_SHT31->set_colour_formatter(QDome::TemperatureColourFormatter);
     this->ui->fl_h_SHT31->set_value_formatter(QDome::HumidityValueFormatter);
-    this->ui->fl_h_SHT31->set_colour_formatter([=](double humidity) -> QColor {
+    this->ui->fl_h_SHT31->set_colour_formatter([this](double humidity) -> QColor {
         return (humidity < this->humidity_limit_lower()) ? Qt::black :
             (humidity > this->humidity_limit_upper()) ? Qt::red : Qt::blue;
     });

@@ -2,12 +2,12 @@
 #define QSTATION_H
 
 #include <QGroupBox>
+#include <QMessageBox>
 
 #include "forward.h"
 #include "APC/APC_include.h"
 #include "utils/universe.h"
 #include "widgets/qdome.h"
-#include "widgets/qufomanager.h"
 #include "widgets/qserver.h"
 #include "widgets/qcamera.h"
 
@@ -23,6 +23,7 @@ private:
     Ui::QStation * ui;
 
     // Position on the WGS84 spheroid
+    const QDateTime m_start_time;
     double m_latitude;
     double m_longitude;
     double m_altitude;
@@ -73,6 +74,8 @@ public:
     bool is_changed(void) const override;
 
     static QString temperature_colour(float temperature);
+
+    inline const QDateTime & start_time(void) const { return this->m_start_time; }
 
     // Manual control
     void set_manual_control(bool manual);
@@ -131,11 +134,11 @@ signals:
     void manual_mode_changed(bool manual);
     void safety_override_changed(bool overridden);
 
-    void position_changed(void) const;
-    void state_changed(StationState state) const;
+    void position_changed(void);
+    void state_changed(StationState state);
 
-    void automatic_action_allsky(bool is_dark, const QDateTime & open_since) const;
-    void automatic_action_spectral(bool is_dark, const QDateTime & open_since) const;
+    void automatic_action_allsky(bool is_dark, const QDateTime & open_since);
+    void automatic_action_spectral(bool is_dark, const QDateTime & open_since);
 };
 
 #endif // QSTATION_H
