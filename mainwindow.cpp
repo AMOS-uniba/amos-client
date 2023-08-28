@@ -22,7 +22,7 @@ MainWindow::MainWindow(QWidget *parent):
     logger.info(Concern::Operation, QString("------------ Initializing AMOS client %1 ------------").arg(VERSION_STRING));
 
     // connect signals for handling of edits of station position
-    settings = new QSettings(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation) + "/settings.ini", QSettings::IniFormat, this);
+    settings = new QSettings("./settings.ini", QSettings::IniFormat, this);
     settings->setValue("run/last_run", this->ui->station->start_time());
     this->load_settings();
 

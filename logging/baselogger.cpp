@@ -1,5 +1,3 @@
-#include <QStandardPaths>
-
 #include "logging/baselogger.h"
 #include "utils/exception.h"
 
@@ -16,7 +14,7 @@ BaseLogger::~BaseLogger(void) {
 }
 
 void BaseLogger::initialize(void) {
-    this->m_directory.setPath(QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation));
+    this->m_directory.setPath(".");
 
     if (!QDir().mkpath(this->m_directory.path())) {
         throw ConfigurationError(QString("Could not create log folder %1").arg(this->m_directory.path()));

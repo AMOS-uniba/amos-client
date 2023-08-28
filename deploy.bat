@@ -1,2 +1,2 @@
-C:\Qt\5.15.1\mingw81_64\bin\windeployqt.exe --no-translations --no-system-d3d-compiler "D:\School\amos-client\release\amos-client.exe"
+C:\Qt\6.5.0\mingw_64\bin\windeployqt.exe --no-translations --no-system-d3d-compiler "C:\AMOS\amos-client\release\AMOS client.exe"
 cmd /k
