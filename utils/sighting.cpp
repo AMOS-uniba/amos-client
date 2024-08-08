@@ -18,6 +18,7 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     this->m_files = {this->m_pjpg, this->m_tjpg, this->m_xml, this->m_mbmp, this->m_pbmp, this->m_avi};
 
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
+    this->m_uuid = QUuid::createUuidV5(QUuid{}, this->m_xml);
 
     if (!this->m_timestamp.isValid()) {
         throw RuntimeException("Invalid sighting file name");
@@ -145,6 +146,7 @@ QHttpPart Sighting::json(void) const {
         {"spectral", this->is_spectral()},
         {"timestamp", this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")},
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
+        {"uuid", this->m_uuid.toString(QUuid::WithBraces)}
     };
 
     auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);
@@ -161,7 +163,7 @@ void Sighting::debug(void) const {
 
 /**
  * @brief Sighting::hack_Y16 tries to fix faulty "Y16" videos by changing the header.
- *        Did not work very well, currently disabled and handled by conversion scripts instead
+ *        Did not work very well, currently it is disabled and handled by conversion scripts instead
  * @return
  */
 bool Sighting::hack_Y16(void) const {

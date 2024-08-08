@@ -13,17 +13,18 @@ QServer::QServer(QWidget * parent):
 {
     this->ui->setupUi(this);
 
-    this->m_network_manager = new QNetworkAccessManager(this);
-    this->connect(this->m_network_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_ok);
-
+    this->m_heartbeat_manager = new QNetworkAccessManager(this);
+    this->m_sighting_manager = new QNetworkAccessManager(this);
     this->connect(this->ui->bt_send_heartbeat, &QPushButton::clicked, this, &QServer::button_send_heartbeat);
-
     this->connect(this, &QServer::settings_saved, this, &QServer::refresh_urls);
+    this->connect(this->m_heartbeat_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_finished);
+    this->connect(this->m_sighting_manager, &QNetworkAccessManager::finished, this, &QServer::sighting_finished);
 }
 
 QServer::~QServer() {
     delete this->ui;
-    delete this->m_network_manager;
+    delete this->m_heartbeat_manager;
+    delete this->m_sighting_manager;
 }
 
 void QServer::initialize(QSettings * settings) {
@@ -108,8 +109,9 @@ void QServer::send_heartbeat(const QJsonObject & heartbeat) const {
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
     logger.debug(Concern::Server, QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
-    QNetworkReply * reply = this->m_network_manager->post(request, message);
+    QNetworkReply * reply = this->m_heartbeat_manager->post(request, message);
     this->connect(reply, &QNetworkReply::errorOccurred, this, &QServer::heartbeat_error);
+
     this->m_last_heartbeat = QDateTime::currentDateTimeUtc();
 }
 
@@ -125,17 +127,19 @@ void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
     );
 }
 
-void QServer::heartbeat_ok(QNetworkReply * reply) {
-    logger.debug(
-        Concern::Server,
-        QString("Heartbeat received (HTTP code %1), response \"%2\"").arg(
-            reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
-            QString(reply->readAll())
-        )
-    );
+void QServer::heartbeat_finished(QNetworkReply * reply) {
     reply->deleteLater();
 
-    emit this->heartbeat_sent();
+    if (reply->error() == QNetworkReply::NoError) {
+        logger.debug(
+            Concern::Server,
+            QString("Heartbeat received (HTTP code %1), response \"%2\"").arg(
+                reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
+                QString(reply->readAll())
+            )
+        );
+        emit this->heartbeat_created();
+    }
 }
 
 void QServer::send_sightings(QVector<Sighting> sightings) const {
@@ -155,8 +159,38 @@ void QServer::send_sighting(const Sighting & sighting) const {
     multipart->append(sighting.json());
 
     QNetworkRequest request(this->m_url_sighting);
-    QNetworkReply * reply = this->m_network_manager->post(request, multipart);
+    QNetworkReply * reply = this->m_sighting_manager->post(request, multipart);
     multipart->setParent(reply); // delete the multiPart with the reply
+    this->connect(reply, &QNetworkReply::errorOccurred, this, &QServer::sighting_error);
+}
+
+void QServer::sighting_finished(QNetworkReply * reply) {
+    reply->deleteLater();
+
+    if (reply->error() == QNetworkReply::NoError) {
+        logger.debug(
+            Concern::Server,
+            QString("Sighting created (HTTP code %1), response \"%2\"").arg(
+                reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
+                QString(reply->readAll())
+            )
+        );
+        emit this->sighting_created();
+    } else {
+        emit this->sighting_failed();
+    }
+}
+
+void QServer::sighting_error(QNetworkReply::NetworkError error) {
+    auto reply = static_cast<QNetworkReply *>(sender());
+    logger.error(
+        Concern::Server,
+        QString("Sighting could not be sent: (error %1: %2) %3")
+                .arg(error)
+                .arg(reply->errorString())
+                .arg(QString(reply->readAll())
+        )
+    );
 }
 
 void QServer::button_send_heartbeat(void) {

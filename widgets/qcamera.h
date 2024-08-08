@@ -60,10 +60,10 @@ public slots:
     void update_clocks(void);
 
 signals:
-    void darkness_limit_changed(double new_limit) const;
+    void darkness_limit_changed(double new_limit);
 
-    void sightings_found(QVector<Sighting> sightings) const;
-    void sightings_stored(QVector<Sighting> sightings) const;
+    void sightings_found(QVector<Sighting> sightings);
+    void sightings_stored(QVector<Sighting> sightings);
 };
 
 #endif // QCAMERA_H

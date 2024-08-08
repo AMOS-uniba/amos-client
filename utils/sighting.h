@@ -13,6 +13,7 @@ private:
     QString m_dir, m_prefix;
     QString m_xml, m_pjpg, m_tjpg, m_mbmp, m_pbmp, m_avi;
     QDateTime m_timestamp;
+    QUuid m_uuid;
 
     QVector<QString> m_files;
 

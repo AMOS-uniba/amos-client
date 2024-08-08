@@ -8,7 +8,6 @@
 
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
-#include "utils/exception.h"
 #include "logging/eventlogger.h"
 
 namespace Ui {
@@ -19,7 +18,8 @@ class QServer: public QAmosWidget {
     Q_OBJECT
 private:
     Ui::QServer * ui;
-    QNetworkAccessManager * m_network_manager;
+    QNetworkAccessManager * m_heartbeat_manager;
+    QNetworkAccessManager * m_sighting_manager;
     mutable QDateTime m_last_heartbeat;
 
     QHostAddress m_address;
@@ -44,7 +44,9 @@ private slots:
     void set_station_id(const QString & station_id);
 
     void heartbeat_error(QNetworkReply::NetworkError error);
-    void heartbeat_ok(QNetworkReply * reply);
+    void heartbeat_finished(QNetworkReply * reply);
+    void sighting_error(QNetworkReply::NetworkError error);
+    void sighting_finished(QNetworkReply * reply);
     void refresh_urls(void);
 
     void send_sighting(const Sighting & sighting) const;
@@ -69,8 +71,9 @@ public slots:
     void send_sightings(QVector<Sighting> sightings) const;
 
 signals:
-    void request_heartbeat(void) const;
-    void heartbeat_sent(void) const;
+    void request_heartbeat(void);
+    void heartbeat_created(void);
+    void sighting_created(void);
 };
 
 #endif // QSERVER_H
