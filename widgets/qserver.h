@@ -74,6 +74,7 @@ signals:
     void request_heartbeat(void);
     void heartbeat_created(void);
     void sighting_created(void);
+    void sighting_failed(void);
 };
 
 #endif // QSERVER_H

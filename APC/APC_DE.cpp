@@ -41,17 +41,6 @@ namespace // Unnamed namespace
 
     // Auxiliary functions
 
-    template <class T>
-    T max (T a, T b) {
-        return (a>b) ? a : b;
-    };
-
-    template <class T>
-    T min (T a, T b) {
-        return (a<b) ? a : b;
-    };
-
-
     // sign: returns absolute value of a with sign of b
     double sign(double a, double b) {
         return (b>=0.0) ? fabs(a) : - fabs(a);
@@ -241,7 +230,7 @@ void SolverDE::Step (double& x, double y[], double& eps, bool& crash) {
         absh = fabs(h);
         if (eps<16.0*sum*h*h)
             absh=0.25*sqrt(eps/sum);
-        h = sign(std::max(absh, fouru*fabs(x)), h);
+        h = sign(max(absh, fouru*fabs(x)), h);
         hold = 0.0;
         hnew = 0.0;
         k = 1;
@@ -665,7 +654,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
 
 
     // Test for improper parameters
-    eps = std::max(relerr,abserr);
+    eps = max(relerr, abserr);
 
     if ( ( neqn   <   1    ) ||             // invalid number of equations
             ( relerr <   0.0  ) ||             // negative relative error bound
@@ -704,7 +693,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
         for (int l=1; l<=neqn; l++)
             yy[l] = y[l];
         delsgn = sign(1.0, del);
-        h      = sign(std::max(fouru*fabs(x), fabs(tout-x)), tout-x );
+        h      = sign(max(fouru*fabs(x), fabs(tout-x)), tout-x );
     }
 
 
@@ -757,7 +746,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
 
 
         // Limit step size, set weight vector and take a step
-        h  = sign(std::min(fabs(h), fabs(tend-x)), h);
+        h  = sign(min(fabs(h), fabs(tend-x)), h);
         for (int l=1; l<=neqn; l++)
             wt[l] = releps*fabs(yy[l]) + abseps;
 

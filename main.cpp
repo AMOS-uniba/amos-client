@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     qRegisterMetaType<SerialPortState>("SerialPortState");
     qRegisterMetaType<Concern>("Concern");
     qRegisterMetaType<Level>("Level");
-    qRegisterMetaType<QVector<int> >("QVector<int>");
+    qRegisterMetaType<QVector<int>>("QVector<int>");
 
     logger.initialize();
 
