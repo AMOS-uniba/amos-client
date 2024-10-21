@@ -1,4 +1,3 @@
-#include "logging/eventlogger.h"
 #include "utils/qserialbuffer.h"
 
 

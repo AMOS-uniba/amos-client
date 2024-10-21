@@ -51,7 +51,7 @@ QString Sighting::try_open(const QString & path, bool required) {
         return path;
     } else {
         if (required) {
-            throw RuntimeException(QString("Could not open sighting file %1").arg(path));
+            throw InvalidSighting(QString("Could not open sighting file %1").arg(path));
         } else {
             return "";
         }

@@ -2,7 +2,6 @@
 #define QSERIALBUFFER_H
 
 #include <QObject>
-#include <QQueue>
 
 class QSerialBuffer: public QObject {
     Q_OBJECT

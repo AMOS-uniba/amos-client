@@ -29,4 +29,10 @@ public:
     InvalidState(const QString & message);
 };
 
+class InvalidSighting: public RuntimeException {
+public:
+    InvalidSighting(const QString & message);
+};
+
+
 #endif // EXCEPTION_H

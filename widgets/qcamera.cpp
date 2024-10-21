@@ -100,6 +100,8 @@ void QCamera::defer_sighting(const QString & sighting_id) {
         for (auto & k: this->m_deferred_sightings) {
             logger.debug(Concern::Sightings, QString("Deferred until %1").arg(k.toString()));
         }
+    } catch (InvalidSighting & exc) {
+        // pass
     } catch (RuntimeException & exc) {
         logger.error(Concern::Sightings, exc.what());
     }
@@ -111,6 +113,8 @@ void QCamera::discard_sighting(const QString & sighting_id) {
         logger.debug(Concern::Sightings, QString("About to discard sighting '%1'").arg(sighting.prefix()));
         this->ui->storage_primary->discard_sighting(sighting);
         this->m_deferred_sightings.remove(sighting_id);
+    } catch (InvalidSighting & exc) {
+        // pass
     } catch (RuntimeException & exc) {
         logger.error(Concern::Sightings, exc.what());
     }
@@ -122,6 +126,8 @@ void QCamera::store_sighting(const QString & sighting_id) {
         logger.debug(Concern::Sightings, QString("Storing sighting '%1'").arg(sighting.prefix()));
         this->ui->storage_primary->store_sighting(sighting, true);
         this->m_deferred_sightings.remove(sighting_id);
+    } catch (InvalidSighting & exc) {
+        // pass
     } catch (RuntimeException & exc) {
         logger.error(Concern::Sightings, exc.what());
     }

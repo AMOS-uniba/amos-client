@@ -30,6 +30,7 @@ QSerialPortManager::QSerialPortManager(QObject * parent):
 QSerialPortManager::~QSerialPortManager(void) {
     this->m_request_timer->stop();
     delete this->m_request_timer;
+    this->m_request_timer = nullptr;
 }
 
 void QSerialPortManager::initialize(void) {
