@@ -1,5 +1,5 @@
 #include "utils/request.h"
-
+#include "logging/eventlogger.h"
 
 extern EventLogger logger;
 

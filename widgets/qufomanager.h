@@ -6,9 +6,10 @@
 
 #include "windows.h"
 #include "winuser.h"
-#include "process.h"
-#include "widgets/qstation.h"
 #include "utils/state/ufostate.h"
+
+
+QT_FORWARD_DECLARE_CLASS(QStation);
 
 namespace Ui {
     class QUfoManager;
@@ -36,7 +37,8 @@ private:
     void start_ufo_inner(void) const;
 
     constexpr static bool DefaultEnabled = true;
-    const static QString DefaultPath;
+    const static QString DefaultPathAllSky;
+    const static QString DefaultPathSpectral;
 
 private slots:
     void on_cb_auto_clicked(bool checked);

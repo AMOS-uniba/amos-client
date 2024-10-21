@@ -1,5 +1,11 @@
+#include <QTimer>
+#include <QJsonObject>
+
 #include "qstation.h"
 #include "ui_qstation.h"
+
+#include "utils/universe.h"
+#include "utils/exception.h"
 
 extern EventLogger logger;
 extern QSettings * settings;

@@ -4,8 +4,6 @@
 #include <QString>
 #include <QByteArray>
 
-#include "forward.h"
-
 class Request {
 protected:
     unsigned char m_code;

@@ -4,11 +4,6 @@
 #include <QString>
 #include <QSerialPort>
 
-#include "forward.h"
-#include "settings.h"
-
-#include "utils/exception.h"
-
 #include "logging/eventlogger.h"
 
 

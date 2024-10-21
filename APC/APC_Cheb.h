@@ -29,11 +29,8 @@ typedef Vec3D (*C3Dfunct)(double t);
 
 // Cheb3D: three dimensional Chebyshev approximation
 class Cheb3D {
-
 public:
-
-    // Constructor
-    Cheb3D (
+    Cheb3D(
         C3Dfunct f,   // Pointer to function to fit
         int n,        // Degree of fit polynomial
         double dt     // Interval size

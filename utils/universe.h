@@ -3,7 +3,6 @@
 
 #include <QDateTime>
 
-#include "forward.h"
 #include "APC\APC_include.h"
 
 namespace Universe {

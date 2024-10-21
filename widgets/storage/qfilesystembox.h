@@ -14,7 +14,6 @@
 #include <QStorageInfo>
 
 #include "logging/eventlogger.h"
-#include "utils/exception.h"
 #include "utils/sighting.h"
 
 
@@ -26,6 +25,7 @@ protected:
     virtual QString MessageEnabled(void) const = 0;
     virtual QString MessageDirectoryChanged(void) const = 0;
 
+    constexpr static unsigned int ScanInterval = 5000;
     QString path_key(void) const;
     QString enabled_key(void) const;
 
@@ -50,6 +50,7 @@ public:
     explicit QFileSystemBox(QWidget * parent = nullptr);
 
     inline const QString & id(void) const { return this->m_id; };
+    inline const QDir & directory(void) const { return this->m_directory; };
     inline const QString & camera(void) const { return this->m_camera; };
     inline const QString full_id(void) const { return QString("%1-%2").arg(this->camera(), this->id()); };
 

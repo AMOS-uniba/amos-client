@@ -1,7 +1,8 @@
-#include "forward.h"
-
 #ifndef UFOSTATE_H
 #define UFOSTATE_H
+
+#include <QColor>
+#include "utils/state/state.h"
 
 class UfoState: public State {
 private:

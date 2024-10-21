@@ -1,7 +1,7 @@
-#include "forward.h"
-
 #ifndef TELEGRAM_H
 #define TELEGRAM_H
+
+#include <QByteArray>
 
 class Telegram {
 private:

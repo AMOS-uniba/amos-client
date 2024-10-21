@@ -1,5 +1,10 @@
+#include <QJsonObject>
+
 #include "qcamera.h"
 #include "ui_qcamera.h"
+
+#include "widgets/qstation.h"
+#include "utils/exception.h"
 
 
 extern EventLogger logger;
@@ -11,9 +16,6 @@ QCamera::QCamera(QWidget * parent):
     m_darkness_limit(QCamera::DefaultDarknessLimit)
 {
     this->ui->setupUi(this);
-
-    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this, &QCamera::sightings_found);
-    this->connect(this, &QCamera::sightings_found, this, &QCamera::store_sightings);
 
     this->ui->sl_dome_close->set_title("Observation ends");
     this->ui->sl_dome_open->set_title("Observation starts");
@@ -34,14 +36,15 @@ void QCamera::initialize(QSettings * settings, const QString & id, const QStatio
     QAmosWidget::initialize(settings);
 
     this->ui->ufo_manager->initialize(this->id());
-    this->ui->scanner->initialize(this->id(), "scanner", "C:/Data");
-    this->ui->storage_primary->initialize(this->id(), "primary", "C:/Data/");
-    this->ui->storage_permanent->initialize(this->id(), "permanent", "C:/Data/");
+    this->ui->scanner->initialize(this->id(), "scanner", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
+    this->ui->storage_primary->initialize(this->id(), "primary", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
+    this->ui->storage_permanent->initialize(this->id(), "permanent", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
 }
 
 void QCamera::connect_slots(void) {
-    this->connect(this->ui->cb_enabled, &QCheckBox::stateChanged, this, &QCamera::set_enabled);
-    this->connect(this->ui->cb_enabled, &QCheckBox::stateChanged, this, &QCamera::update_clocks);
+    this->connect(this->ui->cb_enabled, &QCheckBox::checkStateChanged, this, &QCamera::set_enabled);
+    this->connect(this->ui->cb_enabled, &QCheckBox::checkStateChanged, this, &QCamera::update_clocks);
+    this->connect(this->ui->scanner, &QScannerBox::sightings_found, this, &QCamera::process_sightings);
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
     this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
 }
@@ -70,15 +73,58 @@ void QCamera::auto_action(bool is_dark, const QDateTime & open_since) {
     }
 }
 
-void QCamera::store_sightings(QVector<Sighting> sightings) {
-    logger.debug(Concern::Sightings, "Storing sightings...");
+void QCamera::process_sightings(QVector<Sighting> sightings) {
+    logger.debug(Concern::Sightings, QString("Processing %1 sightings:").arg(sightings.count()));
 
     for (auto & sighting: sightings) {
-        this->ui->storage_primary->store_sighting(sighting, true);
-        sighting.debug();
+        if (this->m_deferred_sightings.contains(sighting.prefix())) {
+            logger.debug(Concern::Sightings,
+                         QString("Sighting %1 is deferred until %2")
+                         .arg(sighting.prefix(), this->m_deferred_sightings[sighting.prefix()].toString(Qt::ISODate)));
+            if (this->m_deferred_sightings[sighting.prefix()] < QDateTime::currentDateTimeUtc()) {
+                this->m_deferred_sightings.remove(sighting.prefix());
+                logger.debug(Concern::Sightings, QString("Removed sighting %1 from deferred").arg(sighting.prefix()));
+            }
+        } else {
+            logger.info(Concern::Sightings, QString("Found sighting %2").arg(sighting.str()));
+            emit this->sighting_found(sighting);
+        }
     }
+}
 
-    emit this->sightings_stored(sightings);
+void QCamera::defer_sighting(const QString & sighting_id) {
+    try {
+        auto sighting = Sighting(this->ui->scanner->directory().path(), sighting_id, this->m_spectral);
+        logger.debug(Concern::Sightings, QString("Deferring sighting '%1'").arg(sighting.prefix()));
+        this->m_deferred_sightings.insert(sighting.prefix(), QDateTime::currentDateTimeUtc().addSecs(QCamera::DeferTime));
+        for (auto & k: this->m_deferred_sightings) {
+            logger.debug(Concern::Sightings, QString("Deferred until %1").arg(k.toString()));
+        }
+    } catch (RuntimeException & exc) {
+        logger.error(Concern::Sightings, exc.what());
+    }
+}
+
+void QCamera::discard_sighting(const QString & sighting_id) {
+    try {
+        auto sighting = Sighting(this->ui->scanner->directory().path(), sighting_id, this->m_spectral);
+        logger.debug(Concern::Sightings, QString("About to discard sighting '%1'").arg(sighting.prefix()));
+        this->ui->storage_primary->discard_sighting(sighting);
+        this->m_deferred_sightings.remove(sighting_id);
+    } catch (RuntimeException & exc) {
+        logger.error(Concern::Sightings, exc.what());
+    }
+}
+
+void QCamera::store_sighting(const QString & sighting_id) {
+    try {
+        auto sighting = Sighting(this->ui->scanner->directory().path(), sighting_id, this->m_spectral);
+        logger.debug(Concern::Sightings, QString("Storing sighting '%1'").arg(sighting.prefix()));
+        this->ui->storage_primary->store_sighting(sighting, true);
+        this->m_deferred_sightings.remove(sighting_id);
+    } catch (RuntimeException & exc) {
+        logger.error(Concern::Sightings, exc.what());
+    }
 }
 
 void QCamera::set_darkness_limit(double new_darkness_limit) {

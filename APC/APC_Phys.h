@@ -67,7 +67,7 @@ double PosAng (const Vec3D& r, const Vec3D& d);
 //   f         Geometrical flattening
 //
 //------------------------------------------------------------------------------
-void Shape (PlanetType Planet, double& R_equ, double& f);
+void Shape(PlanetType Planet, double& R_equ, double& f);
 
 
 //------------------------------------------------------------------------------
@@ -88,8 +88,8 @@ void Shape (PlanetType Planet, double& R_equ, double& f);
 //   Sense     Sense of rotation (direct or retrograde)
 //
 //------------------------------------------------------------------------------
-void Orient ( PlanetType Planet, SystemType System, double T,
-              Mat3D& E, RotationType& Sense );
+void Orient(PlanetType Planet, SystemType System, double T,
+            Mat3D& E, RotationType& Sense );
 
 
 //------------------------------------------------------------------------------

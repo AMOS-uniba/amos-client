@@ -5,8 +5,6 @@
 #include <QObject>
 #include <QSettings>
 
-#include "utils/exception.h"
-
 
 class QAmosWidget: public QGroupBox {
     Q_OBJECT
@@ -35,9 +33,9 @@ public slots:
     void discard_changes(void);
 
 signals:
-    void settings_changed(void) const;
-    void settings_saved(void) const;
-    void settings_discarded(void) const;
+    void settings_changed(void);
+    void settings_saved(void);
+    void settings_discarded(void);
 };
 
 #endif // QCONFIGURABLE_H

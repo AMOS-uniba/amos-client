@@ -68,11 +68,12 @@ void Vec3D::CalcPolarAngles () {
 //
 // Default constructor (used for creation of temporary Vec3D-objects)
 //
-Vec3D::Vec3D ()
-: m_r(0.0),
-m_theta(0.0),
-m_phi(0.0),
-m_bPolarValid(false) {
+Vec3D::Vec3D ():
+    m_phi(0.0),
+    m_theta(0.0),
+    m_r(0.0),
+    m_bPolarValid(false)
+{
     m_Vec[0] = 0.0;
     m_Vec[1] = 0.0;
     m_Vec[2] = 0.0;
@@ -82,11 +83,12 @@ m_bPolarValid(false) {
 //
 // Constructor for component-wise initialization
 //
-Vec3D::Vec3D (double X, double Y, double Z)
-: m_r(0.0),
-m_theta(0.0),
-m_phi(0.0),
-m_bPolarValid(false) {
+Vec3D::Vec3D (double X, double Y, double Z):
+    m_phi(0.0),
+    m_theta(0.0),
+    m_r(0.0),
+    m_bPolarValid(false)
+{
     m_Vec[0] = X;
     m_Vec[1] = Y;
     m_Vec[2] = Z;
@@ -96,7 +98,12 @@ m_bPolarValid(false) {
 //
 // Conversion constructor from polar components
 //
-Vec3D::Vec3D (const Polar& polar): m_bPolarValid(true), m_theta(polar.theta), m_phi(polar.phi), m_r(polar.r) {
+Vec3D::Vec3D (const Polar & polar):
+    m_phi(polar.phi),
+    m_theta(polar.theta),
+    m_r(polar.r),
+    m_bPolarValid(true)
+{
     const double cosEl = cos(m_theta);
 
     m_Vec[0] = polar.r * cos(m_phi) * cosEl;

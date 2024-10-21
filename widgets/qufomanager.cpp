@@ -1,8 +1,11 @@
 #include <QFileDialog>
+#include <QTimer>
+#include <QJsonObject>
 
 #include "qufomanager.h"
 #include "ui_qufomanager.h"
 #include "logging/eventlogger.h"
+#include "utils/exception.h"
 
 
 extern EventLogger logger;
@@ -15,7 +18,8 @@ const UfoState QUfoManager::NotRunning   = UfoState('N', "not running", Qt::gray
 const UfoState QUfoManager::Starting     = UfoState('S', "starting", QColor::fromHsl(60, 255, 255), false, "Starting...");
 const UfoState QUfoManager::Running      = UfoState('R', "running", Qt::darkGreen, true, "Stop UFO");
 
-const QString QUfoManager::DefaultPath = "C:/AMOS/UFO2/UFO2.exe";
+const QString QUfoManager::DefaultPathAllSky = "C:/AMOS/UFO2/UFO2.exe";
+const QString QUfoManager::DefaultPathSpectral = "C:/AMOS/UFOHD2/UFOHD2.exe";
 
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
@@ -57,7 +61,7 @@ void QUfoManager::initialize(const QString & id) {
 }
 
 void QUfoManager::load_settings(void) {
-    this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), QUfoManager::DefaultPath).toString());
+    this->set_path(settings->value(QString("camera_%1/ufo_path").arg(this->id()), QUfoManager::DefaultPathAllSky).toString());
     this->set_autostart(settings->value(QString("camera_%1/ufo_autostart").arg(this->id()), QUfoManager::DefaultEnabled).toBool());
 }
 

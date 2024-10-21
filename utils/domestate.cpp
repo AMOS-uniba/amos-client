@@ -1,4 +1,7 @@
+#include <QJsonObject>
+
 #include "domestate.h"
+#include "utils/exception.h"
 
 extern EventLogger logger;
 

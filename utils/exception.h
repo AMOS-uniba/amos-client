@@ -2,8 +2,7 @@
 #define EXCEPTION_H
 
 #include <stdexcept>
-
-#include "forward.h"
+#include <QString>
 
 class RuntimeException: public std::runtime_error {
 public:

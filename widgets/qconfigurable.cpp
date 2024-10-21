@@ -1,4 +1,7 @@
 #include "widgets/qconfigurable.h"
+#include "utils/exception.h"
+
+#include "logging/eventlogger.h"
 
 
 extern EventLogger logger;

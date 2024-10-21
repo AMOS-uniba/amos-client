@@ -8,9 +8,11 @@
 #include <QSystemTrayIcon>
 #include <QCloseEvent>
 #include <QDesktopServices>
+#include <QIcon>
 
 #include "forward.h"
 #include "widgets/qconfigurable.h"
+#include "utils/state/stationstate.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

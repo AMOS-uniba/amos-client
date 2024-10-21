@@ -4,9 +4,8 @@
 #include <QGroupBox>
 #include <QMessageBox>
 
-#include "forward.h"
 #include "APC/APC_include.h"
-#include "utils/universe.h"
+#include "utils/state/stationstate.h"
 #include "widgets/qdome.h"
 #include "widgets/qserver.h"
 #include "widgets/qcamera.h"

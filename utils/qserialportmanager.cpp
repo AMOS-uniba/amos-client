@@ -1,4 +1,9 @@
+#include <QTimer>
+#include <QWaitCondition>
+
 #include "qserialportmanager.h"
+#include "logging/eventlogger.h"
+#include "utils/telegram.h"
 
 extern EventLogger logger;
 

@@ -1,13 +1,13 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
-#include "settings.h"
 #include "logging/include.h"
 
 #include "utils/exception.h"
 #include "utils/request.h"
 #include "utils/telegram.h"
 #include "utils/formatters.h"
+#include "widgets/qstation.h"
 
 #include "qdome.h"
 #include "ui_qdome.h"

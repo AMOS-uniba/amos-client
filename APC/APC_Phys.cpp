@@ -79,7 +79,7 @@ double PosAng (const Vec3D& r, const Vec3D& d) {
 void Shape (PlanetType Planet, double& R_equ, double& f) {
     switch (Planet) {
         case Sun:
-        R_equ =696000.0;
+        R_equ = 696000.0;
         f = 0.0;
         break;
         case Mercury:
@@ -154,14 +154,14 @@ void Shape (PlanetType Planet, double& R_equ, double& f) {
 //   Celestial Mechanics and Dynamical Astronomy 63, 127-148 (1996)
 //
 //------------------------------------------------------------------------------
-void Orient ( PlanetType Planet, SystemType System, double T,
-              Mat3D& E, RotationType& Sense ) {
+void Orient(PlanetType Planet, SystemType System, double T,
+            Mat3D& E, RotationType& Sense)
+{
     //
     // Variables
     //
     double N, RA, Dec, W;
-    double d = 36525.0*T;
-
+    double d = 36525.0 * T;
 
     // Right ascension and declination of the axis of rotation
     // with respect to the equator and equinox of J2000;
@@ -208,47 +208,45 @@ void Orient ( PlanetType Planet, SystemType System, double T,
         }
         break;
         case Saturn:
-        RA  =  40.589 -   0.036*T;
-        Dec =  83.537 -   0.004*T;
-        switch (System) {
-            case Sys_I   :
-            case Sys_II  :
-            W = 227.2037 + 844.3000000*d;
+            RA  =  40.589 -   0.036*T;
+            Dec =  83.537 -   0.004*T;
+            switch (System) {
+                case Sys_I   :
+                case Sys_II  :
+                W = 227.2037 + 844.3000000*d;
+                break;
+                case Sys_III :
+                W =  38.90   + 810.7939024*d;
+                break;
+            }
             break;
-            case Sys_III :
-            W =  38.90   + 810.7939024*d;
-            break;
-        }
-        break;
         case Uranus:
-        RA  = 257.311;
-        Dec = -15.175;
-        W   = 203.81  - 501.1600928*d;
-        break; // System III
+            RA  = 257.311;
+            Dec = -15.175;
+            W   = 203.81  - 501.1600928*d;
+            break; // System III
         case Neptune:
-        N   = Rad*(357.85+52.316*T);
-        RA  = 299.36  + 0.70*sin(N);
-        Dec =  43.46  - 0.51*cos(N);
-        W   = 253.18  + 536.3128492*d - 0.48*sin(N);
-        break;
+            N   = Rad*(357.85+52.316*T);
+            RA  = 299.36  + 0.70*sin(N);
+            Dec =  43.46  - 0.51*cos(N);
+            W   = 253.18  + 536.3128492*d - 0.48*sin(N);
+            break;
         case Pluto:
-        RA  = 313.02;
-        Dec =   9.09;
-        W   = 236.77  -  56.3623195*d;
+                RA  = 313.02;
+                Dec =   9.09;
+                W   = 236.77  -  56.3623195*d;
     }
 
-    RA*=Rad;
-    Dec*=Rad;
-    W=Rad*Modulo(W,360.0);
-
+    RA *= Rad;
+    Dec *= Rad;
+    W = Rad * Modulo(W, 360.0);
 
     // Transformation from Earth mean equator and equinox of J2000 to
     // body fixed equator and prime meridian system
     //E = R_z(W) * R_x(pi/2.0-Dec) * R_z(pi/2.0+RA);
 
-
     // Sense of rotation
-    if ( Planet==Venus || Planet==Uranus || Planet==Pluto )
+    if ((Planet == Venus) || (Planet == Uranus) || (Planet == Pluto))
         Sense = Retrograde;
     else
         Sense = Direct;
@@ -363,8 +361,8 @@ void Illum ( const Vec3D& r, const Vec3D& r_Earth,
 //        otherwise
 //
 //------------------------------------------------------------------------------
-double Bright ( PlanetType Planet, double r, double Delta, double phi,
-                double lat, double Dlong ) {
+double Bright(PlanetType Planet, double r, double Delta, double phi,
+              double lat, double Dlong) {
     //
     // Variables
     //
@@ -374,7 +372,7 @@ double Bright ( PlanetType Planet, double r, double Delta, double phi,
     p = Deg*phi/100.0;
 
     // Brightness at unit distance
-    switch ( Planet ) {
+    switch (Planet) {
         case Sun:
             return 0.0;
         case Mercury:
@@ -405,8 +403,11 @@ double Bright ( PlanetType Planet, double r, double Delta, double phi,
             break;
         case Pluto:
             mag = -1.0;
+            break;
+        default:
+            break;
     }
 
     // Apparent brightness
-    return ( mag + 5.0*log10(r*Delta) );
+    return (mag + 5.0 * log10(r * Delta));
 }

@@ -1,5 +1,13 @@
 #include "utils/sighting.h"
 
+#include "exception.h"
+#include "utils/exception.h"
+#include "logging/eventlogger.h"
+
+#include <QFileInfo>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 
 extern EventLogger logger;
 
@@ -20,24 +28,18 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
     this->m_uuid = QUuid::createUuidV5(QUuid{}, this->m_xml);
 
+    logger.debug(
+        Concern::Sightings,
+        QString("Creating a Sighting from '%1' (%2)")
+            .arg(full)
+            .arg(this->spectral_string())
+    );
+
     if (!this->m_timestamp.isValid()) {
         throw RuntimeException("Invalid sighting file name");
     } else {
-        logger.info(Concern::Sightings, QString("New %1 sighting '%2*' from %3 (%4, %5 MB)")
-            .arg(this->is_spectral() ? "spectral" : "allsky", prefix)
-            .arg(this->timestamp().toString("yyyy-MM-dd hh:mm:ss"))
-            .arg(QStringList({
-                (this->m_xml != "") ? "XML" : "---",
-                (this->m_pjpg != "") ? "PJPG" : "----",
-                (this->m_tjpg != "") ? "TJPG" : "----",
-                (this->m_pbmp != "") ? "PBMP" : "----",
-                (this->m_mbmp != "") ? "MBMP" : "----",
-                (this->m_avi != "") ? "AVI" : "---"
-            }).join("+"))
-            .arg(this->avi_size() / (1 << 20))
-        );
     }
-//    this->hack_Y16();
+//    this->hack_Y16(); // Currently disabled, handled by copying script (but should be solved in UFO)
 }
 
 Sighting::~Sighting(void) {
@@ -54,6 +56,21 @@ QString Sighting::try_open(const QString & path, bool required) {
             return "";
         }
     }
+}
+
+QString Sighting::str(void) const {
+    return QString("%1 from %2 (%3, %4 MB)")
+        .arg(this->spectral_string())
+        .arg(this->timestamp().toString("yyyy-MM-dd hh:mm:ss"))
+        .arg(QStringList({
+            (this->m_xml  != "") ?  "XML" :  "---",
+            (this->m_pjpg != "") ? "PJPG" : "----",
+            (this->m_tjpg != "") ? "TJPG" : "----",
+            (this->m_pbmp != "") ? "PBMP" : "----",
+            (this->m_mbmp != "") ? "MBMP" : "----",
+            (this->m_avi  != "") ?  "AVI" :  "---"
+        }).join("+"))
+        .arg(this->avi_size() / (1 << 20));
 }
 
 qint64 Sighting::avi_size(void) const {
@@ -84,17 +101,10 @@ void Sighting::move(const QString & dir) {
             file = new_path;
         }
     }
-
-    this->m_pjpg = this->m_files[0];
-    this->m_tjpg = this->m_files[1];
-    this->m_xml = this->m_files[2];
-    this->m_mbmp = this->m_files[3];
-    this->m_pbmp = this->m_files[4];
-    this->m_avi = this->m_files[5];
 }
 
 void Sighting::copy(const QString & dir) const {
-    logger.debug(Concern::Sightings, QString("Copying to %1").arg(dir));
+    logger.debug(Concern::Sightings, QString("Copying to '%1' to '%2'").arg(this->prefix(), dir));
     QDir().mkpath(dir);
 
     for (auto & file: this->m_files) {
@@ -107,10 +117,29 @@ void Sighting::copy(const QString & dir) const {
     }
 }
 
+void Sighting::discard() {
+    logger.warning(Concern::Sightings, QString("Discarding sighting %1").arg(this->prefix()));
+    try {
+        for (auto & file: this->m_files) {
+            if (file.isEmpty()) {
+                logger.debug(Concern::Sightings, QString("File not present in the sighting"));
+            } else {
+                if (QFile::remove(file)) {
+                    logger.debug(Concern::Sightings, QString("Deleted file '%1'").arg(file));
+                } else {
+                    logger.error(Concern::Sightings, QString("Could not delete file '%1'").arg(file));
+                }
+            }
+        }
+    } catch (std::exception &) {
+        logger.error(Concern::Sightings, QString("Error while removing sighting '%1'").arg(this->prefix()));
+    }
+}
+
 QHttpPart Sighting::jpg_part(void) const {
     QHttpPart jpg_part;
     if (this->m_xml == "") {
-        logger.error(Concern::Sightings, QString("XML file not present in sighting %1").arg(this->m_prefix));
+        logger.error(Concern::Sightings, QString("XML file not present in sighting '%1'").arg(this->m_prefix));
     } else {
         jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
         jpg_part.setHeader(
@@ -151,7 +180,7 @@ QHttpPart Sighting::json(void) const {
 
     auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);
     text_part.setBody(text);
-    logger.debug(Concern::Sightings, text);
+    logger.debug(Concern::Sightings, QString("Sighting '%1' has content '%2'").arg(this->prefix(), text));
     return text_part;
 }
 

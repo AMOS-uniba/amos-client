@@ -2,6 +2,8 @@
 #include "ui_qsuninfo.h"
 #include "APC/APC_VecMat3D.h"
 
+#include "utils/formatters.h"
+#include "utils/universe.h"
 #include "widgets/qstation.h"
 
 extern EventLogger logger;

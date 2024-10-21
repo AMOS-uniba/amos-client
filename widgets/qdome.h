@@ -4,13 +4,13 @@
 #include <QGroupBox>
 #include <QSerialPort>
 
-#include "forward.h"
 #include "utils/domestate.h"
 
 #include "utils/qserialportmanager.h"
 #include "widgets/qconfigurable.h"
 #include "widgets/lines/qdisplayline.h"
-#include "widgets/qstation.h"
+
+QT_FORWARD_DECLARE_CLASS(QStation);
 
 namespace Ui {
     class QDome;

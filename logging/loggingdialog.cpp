@@ -23,7 +23,7 @@ LoggingDialog::LoggingDialog(QWidget *parent):
         checkbox->setText(info.caption);
         checkbox->setCheckState(logger.is_debug_visible(*concern) ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
-        this->connect(checkbox, &QCheckBox::stateChanged, this, &LoggingDialog::set_checkbox_all);
+        this->connect(checkbox, &QCheckBox::checkStateChanged, this, &LoggingDialog::set_checkbox_all);
     }
     this->set_checkbox_all();
 }

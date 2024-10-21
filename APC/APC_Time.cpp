@@ -363,21 +363,16 @@ ostream& operator << (ostream& os, const DateTime& DT) {
     os << right;
 
     switch ( DT.m_Format ) {
-
         case None:
-
-        CalDat (DT.m_Mjd, Year, Month, Day, Hours);
-
-        os.fill('0');
-        os << setw(4) << Year  << "/"
-        << setw(2) << Month << "/"
-        << setw(2) << Day;
-        os.fill(' ');
-
+            CalDat(DT.m_Mjd, Year, Month, Day, Hours);
+            os.fill('0');
+            os << setw(4) << Year  << "/"
+                << setw(2) << Month << "/"
+                << setw(2) << Day;
+            os.fill(' ');
         break;
 
         case DDd:
-
         CalDat (DT.m_Mjd, Year, Month, Day, Hours);
 
         os.fill('0');
@@ -390,7 +385,6 @@ ostream& operator << (ostream& os, const DateTime& DT) {
         break;
 
         case HHh:
-
         // round to 0.1h
         MjdRound = floor(240.0*DT.m_Mjd+0.5)/240.0+0.0001;
 
@@ -422,42 +416,39 @@ ostream& operator << (ostream& os, const DateTime& DT) {
         os << setw(2) << H << "h"
         << setw(2) << M << "m";
         os.fill(' ');
-
         break;
 
         case HHMMSS:
+            // round to 1 sec
+            MjdRound = floor(86400.0*DT.m_Mjd+0.5)/86400.0+0.000001;
 
-        // round to 1 sec
-        MjdRound = floor(86400.0*DT.m_Mjd+0.5)/86400.0+0.000001;
+            CalDat (MjdRound, Year, Month, Day, H, M, S);
 
-        CalDat (MjdRound, Year, Month, Day, H, M, S);
+            os.fill('0');
+            os << setw(4) << Year  << "/"
+            << setw(2) << Month << "/"
+            << setw(2) << Day   << " ";
+            os << setw(2) << H << "h"
+            << setw(2) << M << "m"
+            << setw(2) << int(S) << "s";
+            os.fill(' ');
+            break;
 
-        os.fill('0');
-        os << setw(4) << Year  << "/"
-        << setw(2) << Month << "/"
-        << setw(2) << Day   << " ";
-        os << setw(2) << H << "h"
-        << setw(2) << M << "m"
-        << setw(2) << int(S) << "s";
-        os.fill(' ');
+        case HHMMSSs: //this formatting added by J. Vilagi
+            fac = 86400.0 * pow(10.0, p);
 
+            MjdRound = floor(fac*fabs(DT.m_Mjd)+0.5)/fac+0.1/fac;
+            CalDat (MjdRound, Year, Month, Day, H, M, S);
 
-    case HHMMSSs://this formatting added by J. Vilagi
+            os.fill('0');
+            os << setw(4) << Year  << "/"
+            << setw(2) << Month << "/"
+            << setw(2) << Day   << " ";
+            os << setw(2) << H << "h"
+            << setw(2) << M << "m" << fixed  << setw(3+p) << S << "s";
+            os.fill(' ');
 
-        fac = 86400.0*pow(10.0,p);
-
-        MjdRound = floor(fac*fabs(DT.m_Mjd)+0.5)/fac+0.1/fac;
-        CalDat (MjdRound, Year, Month, Day, H, M, S);
-
-        os.fill('0');
-        os << setw(4) << Year  << "/"
-        << setw(2) << Month << "/"
-        << setw(2) << Day   << " ";
-        os << setw(2) << H << "h"
-        << setw(2) << M << "m" << fixed  << setw(3+p) << S << "s";
-        os.fill(' ');
-
-        break;
+            break;
 }
 
 

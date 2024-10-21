@@ -1,6 +1,8 @@
-#include "widgets/qstation.h"
+#include <QJsonDocument>
 
+#include "widgets/qstation.h"
 #include "widgets/qserver.h"
+#include "utils/exception.h"
 #include "ui_qserver.h"
 
 extern EventLogger logger;
@@ -18,7 +20,7 @@ QServer::QServer(QWidget * parent):
     this->connect(this->ui->bt_send_heartbeat, &QPushButton::clicked, this, &QServer::button_send_heartbeat);
     this->connect(this, &QServer::settings_saved, this, &QServer::refresh_urls);
     this->connect(this->m_heartbeat_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_finished);
-    this->connect(this->m_sighting_manager, &QNetworkAccessManager::finished, this, &QServer::sighting_finished);
+    this->connect(this->m_sighting_manager, &QNetworkAccessManager::finished, this, &QServer::sighting_received);
 }
 
 QServer::~QServer() {
@@ -101,13 +103,13 @@ void QServer::refresh_urls(void) {
 }
 
 void QServer::send_heartbeat(const QJsonObject & heartbeat) const {
-    logger.debug(Concern::Server, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
+    logger.debug(Concern::Heartbeat, QString("Sending a heartbeat to %1").arg(this->m_url_heartbeat.toString()));
 
     QNetworkRequest request(this->m_url_heartbeat);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
-    logger.debug(Concern::Server, QString("Heartbeat assembled: '%1'").arg(QString(message)));
+    logger.debug(Concern::Heartbeat, QString("Heartbeat assembled: '%1'").arg(QString(message)));
 
     QNetworkReply * reply = this->m_heartbeat_manager->post(request, message);
     this->connect(reply, &QNetworkReply::errorOccurred, this, &QServer::heartbeat_error);
@@ -133,7 +135,7 @@ void QServer::heartbeat_finished(QNetworkReply * reply) {
     if (reply->error() == QNetworkReply::NoError) {
         logger.debug(
             Concern::Server,
-            QString("Heartbeat received (HTTP code %1), response \"%2\"").arg(
+            QString("Heartbeat accepted (HTTP code %1), response \"%2\"").arg(
                 reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
                 QString(reply->readAll())
             )
@@ -142,59 +144,72 @@ void QServer::heartbeat_finished(QNetworkReply * reply) {
     }
 }
 
-void QServer::send_sightings(QVector<Sighting> sightings) const {
-    for (auto & sighting: sightings) {
-        this->send_sighting(sighting);
-        sighting.debug();
-    }
-}
-
-void QServer::send_sighting(const Sighting & sighting) const {
-    logger.debug(Concern::Server, QString("Sending sighting %1 to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
+void QServer::send_sighting(Sighting & sighting) {
+    logger.debug(Concern::Server, QString("Sending sighting '%1' to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-
     multipart->append(sighting.jpg_part());
     multipart->append(sighting.xml_part());
     multipart->append(sighting.json());
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply * reply = this->m_sighting_manager->post(request, multipart);
-    multipart->setParent(reply); // delete the multiPart with the reply
-    this->connect(reply, &QNetworkReply::errorOccurred, this, &QServer::sighting_error);
+    reply->setProperty("sighting", sighting.prefix());
+    multipart->setParent(reply); // delete the multipart with the reply
+
+    emit this->sighting_sent(sighting.prefix());
 }
 
-void QServer::sighting_finished(QNetworkReply * reply) {
-    reply->deleteLater();
+void QServer::sighting_received(QNetworkReply * reply) {
+    QString sighting_id = reply->property("sighting").toString();
+    QNetworkReply::NetworkError error = reply->error();
 
-    if (reply->error() == QNetworkReply::NoError) {
-        logger.debug(
-            Concern::Server,
-            QString("Sighting created (HTTP code %1), response \"%2\"").arg(
-                reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
-                QString(reply->readAll())
-            )
-        );
-        emit this->sighting_created();
-    } else {
-        emit this->sighting_failed();
-    }
+    switch (error) {
+        case QNetworkReply::NoError: {
+            // OK, accepted by the server
+            logger.debug(
+                Concern::Server,
+                QString("Sighting %1 created (HTTP code %2), response \"%2\"").arg(
+                    sighting_id,
+                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
+                    QString(reply->readAll())
+                )
+            );
+            emit this->sighting_accepted(sighting_id);
+            break;
+        }
+        case QNetworkReply::ContentConflictError: {
+            // Explicitly not OK, sighting already exists and can be deleted
+            logger.error(
+                Concern::Server,
+                QString("Sighting %1 rejected due to duplicate UUID (error %2: %3) %4")
+                    .arg(sighting_id)
+                    .arg(reply->error())
+                    .arg(reply->errorString())
+                    .arg(QString(reply->readAll())
+                )
+            );
+            emit this->sighting_conflict(sighting_id);
+            break;
+        }
+        default: {
+            // Other error
+            logger.error(
+                Concern::Server,
+                QString("Unknown error on sighting %1 (%2: %3)")
+                    .arg(sighting_id)
+                    .arg(reply->error())
+                    .arg(reply->errorString())
+            );
+            emit this->sighting_error(sighting_id, error);
+            break;
+        }
+    };
 }
 
-void QServer::sighting_error(QNetworkReply::NetworkError error) {
-    auto reply = static_cast<QNetworkReply *>(sender());
-    logger.error(
-        Concern::Server,
-        QString("Sighting could not be sent: (error %1: %2) %3")
-                .arg(error)
-                .arg(reply->errorString())
-                .arg(QString(reply->readAll())
-        )
-    );
-}
 
 void QServer::button_send_heartbeat(void) {
-    logger.info(Concern::Server, "Requesting a manual heartbeat");
+    logger.info(Concern::Server, "Sending a heartbeat after an explicit request");
     emit this->request_heartbeat();
 }
 

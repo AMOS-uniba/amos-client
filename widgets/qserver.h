@@ -9,10 +9,12 @@
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
 #include "logging/eventlogger.h"
+#include "utils/sighting.h"
 
 namespace Ui {
     class QServer;
 }
+
 
 class QServer: public QAmosWidget {
     Q_OBJECT
@@ -45,11 +47,8 @@ private slots:
 
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_finished(QNetworkReply * reply);
-    void sighting_error(QNetworkReply::NetworkError error);
-    void sighting_finished(QNetworkReply * reply);
     void refresh_urls(void);
 
-    void send_sighting(const Sighting & sighting) const;
 
 public:
     explicit QServer(QWidget * parent = nullptr);
@@ -68,13 +67,21 @@ public slots:
     void display_countdown(void);
 
     void send_heartbeat(const QJsonObject & heartbeat) const;
-    void send_sightings(QVector<Sighting> sightings) const;
+    void send_sighting(Sighting & sighting);
+
+    void sighting_received(QNetworkReply * reply);
 
 signals:
     void request_heartbeat(void);
     void heartbeat_created(void);
-    void sighting_created(void);
-    void sighting_failed(void);
+
+    void sighting_sent(const QString & sighting_id);
+    // Sighting was accepted, store it
+    void sighting_accepted(const QString & sighting_id);
+    // Sighting was rejected, delete it
+    void sighting_conflict(const QString & sighting_id);
+    // Sighting could not reach server, defer and try again later
+    void sighting_error(const QString & sighting_id, QNetworkReply::NetworkError error);
 };
 
 #endif // QSERVER_H

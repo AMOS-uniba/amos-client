@@ -1,3 +1,4 @@
+#include <QJsonObject>
 #include "qstoragebox.h"
 
 extern EventLogger logger;
@@ -12,14 +13,8 @@ QStorageBox::QStorageBox(QWidget * parent):
     QFileSystemBox(parent)
 {}
 
-const QDir QStorageBox::directory_for_sighting(const QDateTime & datetime) const {
+const QDir QStorageBox::directory_for_timestamp(const QDateTime & datetime) const {
     return QDir(QString("%1/%2/").arg(this->m_directory.path(), datetime.toString("yyyy/MM/dd")));
-}
-
-void QStorageBox::store_sightings(QVector<Sighting> sightings, bool del) const {
-    for (auto & sighting: sightings) {
-        this->store_sighting(sighting, del);
-    }
 }
 
 void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
@@ -29,12 +24,16 @@ void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
 #if SEPARATE_SIGHTINGS
         QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
 #else
-        QString path = this->directory_for_sighting(sighting.timestamp()).path();
+        QString path = this->directory_for_timestamp(sighting.timestamp()).path();
 #endif
         del ? sighting.move(path) : sighting.copy(path);
     } else {
         logger.debug(Concern::Storage, QString("Storage \"%1\" disabled, not %2ing").arg(this->id(), del ? "mov" : "copy"));
     }
+}
+
+void QStorageBox::discard_sighting(Sighting & sighting) const {
+    sighting.discard();
 }
 
 QJsonObject QStorageBox::json(void) const {

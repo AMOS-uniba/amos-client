@@ -1,7 +1,8 @@
-#include "forward.h"
-
 #ifndef SERIALPORTSTATE_H
 #define SERIALPORTSTATE_H
+
+#include <QColor>
+#include "utils/state/state.h"
 
 class SerialPortState: public State {
 private:

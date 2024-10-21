@@ -167,7 +167,7 @@ namespace // Unnamed namespace
 //   v       Heliocentric velocity [AU/d], true-of-date ecliptic and equinox
 //
 //------------------------------------------------------------------------------
-void State (PlanetType Planet, double T, Vec3D& r, Vec3D& v) {
+void State(PlanetType Planet, double T, Vec3D& r, Vec3D& v) {
     //
     // Constants
     //
@@ -179,111 +179,111 @@ void State (PlanetType Planet, double T, Vec3D& r, Vec3D& v) {
     double a, e, M0, O, i, w, n, T0;
     Mat3D  PQR;
 
-
     // Orbital elements; ecliptic and equinox of J2000
-    switch ( Planet ) {
+    switch (Planet) {
         case Sun:
-        r = v = Vec3D();  // Null vector
-        return;
+            r = v = Vec3D();  // Null vector
+            return;
         case Mercury:
-        a =  0.387099;
-        e = 0.205634;
-        M0 = 174.7947;
-        n = 149472.6738;
-        O =  48.331;
-        i = 7.0048;
-        w  =  77.4552;
-        T0 = 0.0;
-        break;
+            a =  0.387099;
+            e = 0.205634;
+            M0 = 174.7947;
+            n = 149472.6738;
+            O =  48.331;
+            i = 7.0048;
+            w  =  77.4552;
+            T0 = 0.0;
+            break;
         case Venus:
-        a =  0.723332;
-        e = 0.006773;
-        M0 =  50.4071;
-        n  = 58517.8149;
-        O =  76.680;
-        i = 3.3946;
-        w  = 131.5718;
-        T0 = 0.0;
-        break;
+            a =  0.723332;
+            e = 0.006773;
+            M0 =  50.4071;
+            n  = 58517.8149;
+            O =  76.680;
+            i = 3.3946;
+            w  = 131.5718;
+            T0 = 0.0;
+            break;
         case Earth:
-        a =  1.000000;
-        e = 0.016709;
-        M0 = 357.5256;
-        n  = 35999.3720;
-        O = 174.876;
-        i = 0.0000;
-        w  = 102.9400;
-        T0 = 0.0;
-        break;
+            a =  1.000000;
+            e = 0.016709;
+            M0 = 357.5256;
+            n  = 35999.3720;
+            O = 174.876;
+            i = 0.0000;
+            w  = 102.9400;
+            T0 = 0.0;
+            break;
         case Mars:
-        a =  1.523692;
-        e = 0.093405;
-        M0 =  19.3879;
-        n  = 19140.3023;
-        O =  49.557;
-        i = 1.8496;
-        w  = 336.0590;
-        T0 = 0.0;
-        break;
+            a =  1.523692;
+            e = 0.093405;
+            M0 =  19.3879;
+            n  = 19140.3023;
+            O =  49.557;
+            i = 1.8496;
+            w  = 336.0590;
+            T0 = 0.0;
+            break;
         case Jupiter:
-        a =  5.204267;
-        e = 0.048775;
-        M0 =  18.8185;
-        n  =  3033.6272;
-        O = 100.4908;
-        i = 1.3046;
-        w  =  15.5576;
-        T0 = 0.0;
-        break;
+            a =  5.204267;
+            e = 0.048775;
+            M0 =  18.8185;
+            n  =  3033.6272;
+            O = 100.4908;
+            i = 1.3046;
+            w  =  15.5576;
+            T0 = 0.0;
+            break;
         case Saturn:
-        a =  9.582018;
-        e = 0.055723;
-        M0 = 320.3477;
-        n  =  1213.8664;
-        O = 113.6427;
-        i = 2.4852;
-        w  =  89.6567;
-        T0 = 0.0;
-        break;
+            a =  9.582018;
+            e = 0.055723;
+            M0 = 320.3477;
+            n  =  1213.8664;
+            O = 113.6427;
+            i = 2.4852;
+            w  =  89.6567;
+            T0 = 0.0;
+            break;
         case Uranus:
-        a = 19.229412;
-        e = 0.044406;
-        M0 = 142.9559;
-        n  =   426.9282;
-        O =  73.9893;
-        i = 0.7726;
-        w  = 170.5310;
-        T0 = 0.0;
-        break;
+            a = 19.229412;
+            e = 0.044406;
+            M0 = 142.9559;
+            n  =   426.9282;
+            O =  73.9893;
+            i = 0.7726;
+            w  = 170.5310;
+            T0 = 0.0;
+            break;
         case Neptune:
-        a = 30.103658;
-        e = 0.011214;
-        M0 = 267.7649;
-        n  =   217.9599;
-        O = 131.7942;
-        i = 1.7680;
-        w  =  37.4435;
-        T0 = 0.0;
-        break;
+            a  =  30.103658;
+            e  =   0.011214;
+            M0 = 267.7649;
+            n  = 217.9599;
+            O  = 131.7942;
+            i  =   1.7680;
+            w  =  37.4435;
+            T0 =   0.0;
+            break;
         case Pluto:
-        a = 39.264230;
-        e = 0.244672;
-        M0 =  15.0233;
-        n  =   146.3183;
-        O = 110.2867;
-        i = 17.1514;
-        w =  224.0499;
-        T0 = 0.0;
+            a = 39.264230;
+            e = 0.244672;
+            M0 =  15.0233;
+            n  =   146.3183;
+            O = 110.2867;
+            i = 17.1514;
+            w =  224.0499;
+            T0 = 0.0;
+            break;
+        default:
+            r = v = Vec3D();  // Null vector
+            return;
     }
 
     // State vector w.r.t. true-of-date ecliptic and equinox
-    Ellip ( GM_Sun, Rad*(M0+n*(T-T0)), a, e, r, v );  // w.r.t. Orbital plane
-
-    PQR = GaussVec ( Rad*(O+p*T), Rad*i, Rad*(w-O) ); // Transform. to ecliptic
-
-    r = PQR*r;                                        // Ecliptic
-    v = PQR*v;                                        // coordinates
-
+    Ellip(GM_Sun, Rad * (M0 + n * (T - T0)), a, e, r, v);  // w.r.t. Orbital plane
+    PQR = GaussVec(Rad * (O + p * T), Rad * i, Rad * (w - O)); // Transform. to ecliptic
+    r = PQR * r;                                        // Ecliptic
+    v = PQR * v;                                        // coordinates
 }
 
 
@@ -300,13 +300,9 @@ void State (PlanetType Planet, double T, Vec3D& r, Vec3D& v) {
 //
 //------------------------------------------------------------------------------
 Vec3D KepPosition (PlanetType Planet, double T) {
-    //
-    // Variables
-    //
     Vec3D r, v;
 
-
-    State ( Planet, T, r, v );
+    State(Planet, T, r, v);
     return r;
 }
 

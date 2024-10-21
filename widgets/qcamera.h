@@ -6,6 +6,8 @@
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
 
+QT_FORWARD_DECLARE_CLASS(QStation);
+
 namespace Ui {
     class QCamera;
 }
@@ -20,6 +22,9 @@ private:
     bool m_spectral;
 
     double m_darkness_limit;
+
+    constexpr static qint64 DeferTime = 30;            // Time in seconds: how long to defer an unsent sighting
+    QMap<QString, QDateTime> m_deferred_sightings;
 
     void connect_slots(void) override;
     void load_defaults(void) override;
@@ -52,18 +57,22 @@ private slots:
     void set_enabled(int enable);
     void set_darkness_limit(double new_limit);
 
-    void store_sightings(QVector<Sighting> sightings);
+    void process_sightings(QVector<Sighting> sightings);
 
 public slots:
     void initialize(QSettings * settings, const QString & id, const QStation * const station, bool spectral);
     void auto_action(bool is_dark, const QDateTime & open_since = QDateTime());
     void update_clocks(void);
 
+    void store_sighting(const QString & sighting_id);
+    void discard_sighting(const QString & sighting_id);
+    void defer_sighting(const QString & sighting_id);
+
 signals:
     void darkness_limit_changed(double new_limit);
 
-    void sightings_found(QVector<Sighting> sightings);
-    void sightings_stored(QVector<Sighting> sightings);
+    void sighting_found(Sighting & sightings);
+    void sightings_stored(QVector<Sighting> & sightings);
 };
 
 #endif // QCAMERA_H

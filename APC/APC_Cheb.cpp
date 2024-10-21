@@ -28,8 +28,9 @@
 //
 // Constructor
 //
-Cheb3D::Cheb3D (C3Dfunct f, int n, double dt)
-: m_n(n), m_f(f), m_dt(dt), m_Valid(false) {
+Cheb3D::Cheb3D (C3Dfunct f, int n, double dt):
+    m_f(f), m_n(n), m_dt(dt), m_Valid(false)
+{
     Cx = new double[n+1];
     Cy = new double[n+1];
     Cz = new double[n+1];

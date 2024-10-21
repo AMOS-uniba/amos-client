@@ -4,9 +4,7 @@
 #include <QGroupBox>
 #include <QTimer>
 
-#include "utils/universe.h"
-#include "utils/formatters.h"
-#include "widgets/qcamera.h"
+QT_FORWARD_DECLARE_CLASS(QStation);
 
 namespace Ui {
     class QSunInfo;

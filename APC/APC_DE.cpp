@@ -36,52 +36,42 @@ namespace // Unnamed namespace
     //
     const int maxnum = 500;  // Maximum number of steps to take
     const double umach = numeric_limits<double>::epsilon();
-    const double twou  = 2.0*umach;
-    const double fouru = 4.0*umach;
+    const double twou  = 2.0 * umach;
+    const double fouru = 4.0 * umach;
 
     // Auxiliary functions
 
     // sign: returns absolute value of a with sign of b
     double sign(double a, double b) {
-        return (b>=0.0) ? fabs(a) : - fabs(a);
+        return (b >= 0.0) ? fabs(a) : -fabs(a);
     };
 
 }
 
-
-//
-// SolverDE definitions
-//
-
-
-//
-// Constructor
-//
-SolverDE::SolverDE (DEfunct F, int Neqn)
-: neqn(Neqn), f(F) {
+SolverDE::SolverDE(DEfunct F, int Neqn):
+    f(F), neqn(Neqn)
+{
     yy    = new double[Neqn+1];
     wt    = new double[Neqn+1];
     p     = new double[Neqn+1];
     yp    = new double[Neqn+1];
     ypout = new double[Neqn+1];
-
     phi   = new double*[Neqn+1];
-    for (int i=0; i<=Neqn; i++)
-        phi[i]=new double[17];
+
+    for (int i = 0; i <= Neqn; i++) {
+        phi[i] = new double[17];
+    }
 };
 
-
-//
-// Destructor
-//
 SolverDE::~SolverDE () {
     delete[] yy;
     delete[] wt;
     delete[] p;
     delete[] yp;
     delete[] ypout;
-    for (int i=0; i<=neqn; i++)
+    for (int i = 0; i <= neqn; i++) {
         delete[] phi[i];
+    }
     delete[] phi;
 };
 

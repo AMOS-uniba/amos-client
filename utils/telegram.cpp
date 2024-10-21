@@ -1,5 +1,8 @@
 #include "telegram.h"
 
+#include "exception.h"
+#include "logging/eventlogger.h"
+
 extern EventLogger logger;
 
 // Construct a new telegram from
@@ -63,6 +66,7 @@ unsigned char Telegram::char_to_hex(unsigned char value) {
 
     // Fall-through: unknown byte, throw exception
     throw EncodingError(QString("Invalid character to decode: %1").arg(value));
+    return 0;
 }
 
 // Convert a hexadecimal value (0-15) to a character [0-9A-F]
@@ -77,6 +81,7 @@ unsigned char Telegram::hex_to_char(unsigned char value) {
 
     // Fall-through: unknown value, throw exception
     throw EncodingError(QString("Invalid value to encode: %1").arg(value));
+    return 0;
 }
 
 // Encode least significant quad to char

@@ -1,9 +1,9 @@
-#include "forward.h"
+#ifndef STATIONSTATE_H
+#define STATIONSTATE_H
 
 #include <QIcon>
 
-#ifndef STATIONSTATE_H
-#define STATIONSTATE_H
+#include "utils/state/state.h"
 
 enum class Icon {
     Observing,

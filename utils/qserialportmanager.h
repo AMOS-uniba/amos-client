@@ -5,11 +5,11 @@
 #include <QThread>
 #include <QMutex>
 #include <QSerialPort>
-#include <QWaitCondition>
-
 #include "qserialbuffer.h"
-#include "utils/telegram.h"
 #include "utils/request.h"
+#include "utils/state/serialportstate.h"
+
+#include "logging/eventlogger.h"
 
 
 class QSerialPortManager: public QObject {

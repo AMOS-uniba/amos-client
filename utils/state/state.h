@@ -1,7 +1,7 @@
-#include "forward.h"
-
 #ifndef STATE_H
 #define STATE_H
+
+#include <QString>
 
 class State {
 private:

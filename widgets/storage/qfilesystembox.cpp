@@ -1,5 +1,7 @@
-#include "qstoragebox.h"
+#include <QTimer>
+#include "qfilesystembox.h"
 
+#include "utils/exception.h"
 #include "widgets/qcamera.h"
 
 extern EventLogger logger;
@@ -12,7 +14,7 @@ QFileSystemBox::QFileSystemBox(QWidget * parent):
     m_id("")
 {
     this->m_timer = new QTimer(this);
-    this->m_timer->setInterval(2000);
+    this->m_timer->setInterval(QFileSystemBox::ScanInterval);
     this->connect(this->m_timer, &QTimer::timeout, this, &QFileSystemBox::scan_info);
     this->m_timer->start();
 

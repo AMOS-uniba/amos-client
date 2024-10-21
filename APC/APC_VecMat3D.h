@@ -82,37 +82,37 @@ public:
     friend Vec3D Row(const Mat3D& Mat, kar_index Index);
 
     // in-place addition of another vector
-    void operator += (const Vec3D& Vec);
+    void operator += (const Vec3D & Vec);
 
     // in-place subtraction of another vector
-    void operator -= (const Vec3D& Vec);
+    void operator -= (const Vec3D & Vec);
 
     // dot product
-    friend double Dot (const Vec3D& left, const Vec3D& right);
+    friend double Dot (const Vec3D & left, const Vec3D & right);
 
     // norm of vector
-    friend double Norm (const Vec3D& Vec);
+    friend double Norm (const Vec3D & Vec);
 
     // scalar multiplication
-    friend Vec3D operator * (double fScalar, const Vec3D& Vec);
-    friend Vec3D operator * (const Vec3D& Vec, double fScalar);
+    friend Vec3D operator * (double fScalar, const Vec3D & Vec);
+    friend Vec3D operator * (const Vec3D & Vec, double fScalar);
 
-    friend double operator * (const Vec3D& left, const Vec3D& right);
+    friend double operator * (const Vec3D & left, const Vec3D & right);
 
     // scalar division
-    friend Vec3D operator / (const Vec3D& Vec, double fScalar);
+    friend Vec3D operator / (const Vec3D & Vec, double fScalar);
 
     // unary minus of vector
-    friend Vec3D operator - (const Vec3D& Vec);
+    friend Vec3D operator - (const Vec3D & Vec);
 
     // addition of vectors
-    friend Vec3D operator + (const Vec3D& left, const Vec3D& right);
+    friend Vec3D operator + (const Vec3D & left, const Vec3D & right);
 
     // subtraction of vectors
-    friend Vec3D operator - (const Vec3D& left, const Vec3D& right);
+    friend Vec3D operator - (const Vec3D & left, const Vec3D & right);
 
     // vector product
-    friend Vec3D Cross (const Vec3D& left, const Vec3D& right);
+    friend Vec3D Cross(const Vec3D& left, const Vec3D& right);
 
     // matrix-vector product
     friend Vec3D operator * (const Mat3D& Mat, const Vec3D& Vec);
@@ -135,7 +135,7 @@ private:
     bool   m_bPolarValid;   // status flag for validity of polar coordinates
 
     // On-demand calculation of polar components
-    void CalcPolarAngles ();
+    void CalcPolarAngles();
 };
 
 

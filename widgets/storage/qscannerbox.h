@@ -20,7 +20,7 @@ public:
     void scan_sightings(void);
 
 signals:
-    void sightings_found(QVector<Sighting> sightings);
+    void sightings_found(QVector<Sighting> & sightings);
 };
 
 #endif // QSCANNERBOX_H

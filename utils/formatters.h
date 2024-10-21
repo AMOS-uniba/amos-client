@@ -1,7 +1,7 @@
 #ifndef FORMATTERS_H
 #define FORMATTERS_H
 
-#include "forward.h"
+#include <QColor>
 
 namespace Formatters {
     struct Node {

@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include "utils/exception.h"
+
+
 extern EventLogger logger;
 extern QSettings * settings;
 
