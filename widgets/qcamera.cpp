@@ -74,7 +74,14 @@ void QCamera::auto_action(bool is_dark, const QDateTime & open_since) {
 }
 
 void QCamera::process_sightings(QVector<Sighting> sightings) {
-    logger.debug(Concern::Sightings, QString("Processing %1 sightings:").arg(sightings.count()));
+    if (this->m_deferred_sightings.count() > 0) {
+        logger.info(Concern::Sightings,
+                    QString("Processing %1 deferred sightings (%2 total)")
+                        .arg(this->m_deferred_sightings.count(), sightings.count())
+        );
+    } else {
+        logger.debug(Concern::Sightings, QString("Processing %1 sightings").arg(sightings.count()));
+    }
 
     for (auto & sighting: sightings) {
         if (this->m_deferred_sightings.contains(sighting.prefix())) {
@@ -86,7 +93,7 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
                 logger.debug(Concern::Sightings, QString("Removed sighting %1 from deferred").arg(sighting.prefix()));
             }
         } else {
-            logger.info(Concern::Sightings, QString("Found sighting %2").arg(sighting.str()));
+            logger.debug(Concern::Sightings, QString("Found sighting %2").arg(sighting.str()));
             emit this->sighting_found(sighting);
         }
     }
@@ -123,7 +130,7 @@ void QCamera::discard_sighting(const QString & sighting_id) {
 void QCamera::store_sighting(const QString & sighting_id) {
     try {
         auto sighting = Sighting(this->ui->scanner->directory().path(), sighting_id, this->m_spectral);
-        logger.debug(Concern::Sightings, QString("Storing sighting '%1'").arg(sighting.prefix()));
+        logger.info(Concern::Sightings, QString("Storing sighting '%1'").arg(sighting.prefix()));
         this->ui->storage_primary->store_sighting(sighting, true);
         this->m_deferred_sightings.remove(sighting_id);
     } catch (InvalidSighting & exc) {

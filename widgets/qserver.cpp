@@ -167,9 +167,9 @@ void QServer::sighting_received(QNetworkReply * reply) {
     switch (error) {
         case QNetworkReply::NoError: {
             // OK, accepted by the server
-            logger.debug(
+            logger.info(
                 Concern::Server,
-                QString("Sighting %1 created (HTTP code %2), response \"%2\"").arg(
+                QString("Sighting '%1' created on the server (HTTP code %2), response \"%3\"").arg(
                     sighting_id,
                     reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
                     QString(reply->readAll())
@@ -182,7 +182,7 @@ void QServer::sighting_received(QNetworkReply * reply) {
             // Explicitly not OK, sighting already exists and can be deleted
             logger.error(
                 Concern::Server,
-                QString("Sighting %1 rejected due to duplicate UUID (error %2: %3) %4")
+                QString("Sighting '%1' rejected due to duplicate UUID (error %2: %3) %4")
                     .arg(sighting_id)
                     .arg(reply->error())
                     .arg(reply->errorString())
@@ -192,11 +192,22 @@ void QServer::sighting_received(QNetworkReply * reply) {
             emit this->sighting_conflict(sighting_id);
             break;
         }
+        case QNetworkReply::UnknownNetworkError: {
+            logger.debug_error(
+                Concern::Server,
+                QString("Timed out on sighting '%1' (%2: %3)")
+                    .arg(sighting_id)
+                    .arg(reply->error())
+                    .arg(reply->errorString())
+            );
+            emit this->sighting_error(sighting_id, error);
+            break;
+        }
         default: {
             // Other error
             logger.error(
                 Concern::Server,
-                QString("Unknown error on sighting %1 (%2: %3)")
+                QString("Unknown error on sighting '%1' (%2: %3)")
                     .arg(sighting_id)
                     .arg(reply->error())
                     .arg(reply->errorString())
