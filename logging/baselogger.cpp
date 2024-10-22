@@ -1,5 +1,5 @@
 #include "logging/baselogger.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 
 BaseLogger::BaseLogger(QObject * parent, const QString & filename):
     QObject(parent),

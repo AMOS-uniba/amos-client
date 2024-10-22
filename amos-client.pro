@@ -32,7 +32,7 @@ SOURCES += \
     mainwindow/tray.cpp \
     mainwindow.cpp \
     utils/domestate.cpp \
-    utils/exception.cpp \
+    utils/exceptions.cpp \
     utils/formatters.cpp \
     utils/qserialbuffer.cpp \
     utils/qserialportmanager.cpp \
@@ -86,7 +86,7 @@ HEADERS += \
     mainwindow.h \
     settings.h \
     utils/domestate.h \
-    utils/exception.h \
+    utils/exceptions.h \
     utils/formatters.h \
     utils/qserialbuffer.h \
     utils/qserialportmanager.h \

@@ -3,7 +3,7 @@
 
 #include "logging/include.h"
 
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 #include "utils/request.h"
 #include "utils/telegram.h"
 #include "utils/formatters.h"

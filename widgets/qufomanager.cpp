@@ -5,7 +5,7 @@
 #include "qufomanager.h"
 #include "ui_qufomanager.h"
 #include "logging/eventlogger.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 
 
 extern EventLogger logger;

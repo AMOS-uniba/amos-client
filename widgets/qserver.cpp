@@ -2,7 +2,7 @@
 
 #include "widgets/qstation.h"
 #include "widgets/qserver.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 #include "ui_qserver.h"
 
 extern EventLogger logger;

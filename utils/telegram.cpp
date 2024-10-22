@@ -1,6 +1,6 @@
 #include "telegram.h"
 
-#include "exception.h"
+#include "exceptions.h"
 #include "logging/eventlogger.h"
 
 extern EventLogger logger;

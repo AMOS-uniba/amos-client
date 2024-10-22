@@ -1,5 +1,5 @@
 #include "widgets/qconfigurable.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 
 #include "logging/eventlogger.h"
 

@@ -2,7 +2,7 @@
 
 #include "qscannerbox.h"
 #include "../qcamera.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 
 
 extern EventLogger logger;

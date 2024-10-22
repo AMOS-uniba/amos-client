@@ -1,7 +1,7 @@
 #include <QTimer>
 #include "qfilesystembox.h"
 
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 #include "widgets/qcamera.h"
 
 extern EventLogger logger;

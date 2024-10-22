@@ -1,7 +1,6 @@
 #include "utils/sighting.h"
 
-#include "exception.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 #include "logging/eventlogger.h"
 
 #include <QFileInfo>

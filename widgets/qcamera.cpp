@@ -4,7 +4,7 @@
 #include "ui_qcamera.h"
 
 #include "widgets/qstation.h"
-#include "utils/exception.h"
+#include "utils/exceptions.h"
 
 
 extern EventLogger logger;
