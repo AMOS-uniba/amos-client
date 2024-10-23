@@ -31,6 +31,7 @@ SOURCES += \
     mainwindow/timers.cpp \
     mainwindow/tray.cpp \
     mainwindow.cpp \
+    models/qsightingmodel.cpp \
     utils/domestate.cpp \
     utils/exceptions.cpp \
     utils/formatters.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     logging/statelogger.h \
     forward.h \
     mainwindow.h \
+    models/qsightingmodel.h \
     settings.h \
     utils/domestate.h \
     utils/exceptions.h \

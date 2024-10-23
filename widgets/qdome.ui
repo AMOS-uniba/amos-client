@@ -48,14 +48,13 @@
        <number>3</number>
       </property>
       <property name="sizeConstraint">
-       <enum>QLayout::SetMaximumSize</enum>
+       <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
       </property>
       <item>
        <widget class="QLabel" name="lb_cover_state">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
-          <weight>75</weight>
           <italic>false</italic>
           <bold>true</bold>
           <kerning>true</kerning>
@@ -65,7 +64,7 @@
          <string>???</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -75,7 +74,7 @@
          <string>???</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignCenter</set>
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -162,6 +161,9 @@
    </item>
    <item row="6" column="0" colspan="2">
     <widget class="QProgressBar" name="pb_cover">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Position of the dome cover&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="maximum">
       <number>400</number>
      </property>
@@ -567,56 +569,15 @@
       <property name="topMargin">
        <number>3</number>
       </property>
-      <item row="0" column="1">
-       <widget class="QComboBox" name="co_serial_ports">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>2</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="contextMenuPolicy">
-         <enum>Qt::PreventContextMenu</enum>
-        </property>
-        <property name="placeholderText">
-         <string>not selected</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QLabel" name="lb_serial_port_state">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-          <weight>75</weight>
-          <bold>true</bold>
-          <kerning>true</kerning>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>state of serial port</string>
-        </property>
-        <property name="text">
-         <string>undefined</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QLabel" name="lb_serial_data_state">
-        <property name="toolTip">
-         <string>state of the data</string>
-        </property>
-        <property name="text">
-         <string>undefined</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
+      <property name="rightMargin">
+       <number>9</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
+      <property name="spacing">
+       <number>3</number>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="lx_serial_port_device">
         <property name="sizePolicy">
@@ -630,10 +591,58 @@
         </property>
        </widget>
       </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="lb_serial_data_state">
+        <property name="toolTip">
+         <string>state of the data</string>
+        </property>
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="co_serial_ports">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>2</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
+        </property>
+        <property name="placeholderText">
+         <string>not selected</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="0" colspan="2">
-       <widget class="Line" name="line">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="QLabel" name="lb_serial_port_state">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+          <bold>true</bold>
+          <kerning>true</kerning>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>state of serial port</string>
+        </property>
+        <property name="text">
+         <string>undefined</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -655,10 +664,13 @@
       </size>
      </property>
      <property name="title">
-      <string>Humidity limits</string>
+      <string>Relative humidity limits</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
        <number>3</number>
       </property>
       <property name="verticalSpacing">
@@ -683,7 +695,7 @@
          <string>close if humidity exceeds this level</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="showGroupSeparator" stdset="0">
          <bool>true</bool>
@@ -717,7 +729,7 @@
          <string>open only if humidity is below this level</string>
         </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
         <property name="showGroupSeparator" stdset="0">
          <bool>true</bool>

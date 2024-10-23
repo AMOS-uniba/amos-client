@@ -13,6 +13,7 @@ private:
     QString m_dir, m_prefix;
     QString m_xml, m_pjpg, m_tjpg, m_mbmp, m_pbmp, m_avi;
     QDateTime m_timestamp;
+    QDateTime m_deferred_until;
     QUuid m_uuid;
 
     QVector<QString> m_files;
@@ -38,6 +39,7 @@ public:
 
     void move(const QString & dir);
     void copy(const QString & dir) const;
+    void defer(float seconds);
     void discard();
 
     bool hack_Y16(void) const;

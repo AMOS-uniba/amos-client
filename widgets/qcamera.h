@@ -23,7 +23,6 @@ private:
 
     double m_darkness_limit;
 
-    constexpr static qint64 DeferTime = 30;            // Time in seconds: how long to defer an unsent sighting
     QMap<QString, QDateTime> m_deferred_sightings;
 
     void connect_slots(void) override;
@@ -41,6 +40,7 @@ private:
     constexpr static bool DefaultEnabled = true;
 
 public:
+    constexpr static float DeferTime = 30;            // Time in seconds: how long to defer an unsent sighting
     explicit QCamera(QWidget * parent = nullptr);
     ~QCamera();
 
@@ -50,6 +50,8 @@ public:
     inline bool is_enabled(void) const { return this->m_enabled; }
     inline bool is_spectral(void) const { return this->m_spectral; }
     inline double darkness_limit(void) const { return this->m_darkness_limit; }
+
+    inline const QMap<QString, QDateTime> & deferred_sightings(void) const { return this->m_deferred_sightings; };
 
     QJsonObject json(void) const;
 

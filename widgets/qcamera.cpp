@@ -17,8 +17,8 @@ QCamera::QCamera(QWidget * parent):
 {
     this->ui->setupUi(this);
 
+    this->ui->sl_dome_open->set_title("Observation begins");
     this->ui->sl_dome_close->set_title("Observation ends");
-    this->ui->sl_dome_open->set_title("Observation starts");
 }
 
 QCamera::~QCamera() {

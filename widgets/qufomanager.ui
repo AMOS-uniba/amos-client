@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>279</width>
-    <height>107</height>
+    <width>277</width>
+    <height>124</height>
    </rect>
   </property>
   <property name="title">
@@ -26,12 +26,18 @@
       <string>Start and stop automatically</string>
      </property>
      <property name="text">
-      <string>Auto start/stop</string>
+      <string>Automatic</string>
      </property>
     </widget>
    </item>
    <item row="2" column="1">
     <widget class="QPushButton" name="bt_toggle">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="text">
       <string>Run UFO</string>
      </property>
@@ -68,7 +74,6 @@
      <property name="font">
       <font>
        <pointsize>12</pointsize>
-       <weight>75</weight>
        <italic>false</italic>
        <bold>true</bold>
        <kerning>true</kerning>
@@ -78,7 +83,7 @@
       <string>undefined</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>

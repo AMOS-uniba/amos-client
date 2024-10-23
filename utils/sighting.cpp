@@ -1,12 +1,11 @@
-#include "utils/sighting.h"
-
-#include "utils/exceptions.h"
-#include "logging/eventlogger.h"
-
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "widgets/qcamera.h"
+#include "utils/sighting.h"
+#include "utils/exceptions.h"
+#include "logging/eventlogger.h"
 
 extern EventLogger logger;
 
@@ -18,10 +17,10 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
     QString full = QString("%1/%2").arg(this->m_dir, this->m_prefix);
     this->m_pjpg = this->try_open(QString("%1P.jpg").arg(full), false);
     this->m_tjpg = this->try_open(QString("%1T.jpg").arg(full), false);
-    this->m_xml = this->try_open(QString("%1.xml").arg(full), true);
+    this->m_xml  = this->try_open(QString( "%1.xml").arg(full),  true);
     this->m_mbmp = this->try_open(QString("%1M.bmp").arg(full), false);
     this->m_pbmp = this->try_open(QString("%1P.bmp").arg(full), false);
-    this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
+    this->m_avi  = this->try_open(QString( "%1.avi").arg(full), false);
     this->m_files = {this->m_pjpg, this->m_tjpg, this->m_xml, this->m_mbmp, this->m_pbmp, this->m_avi};
 
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
@@ -38,7 +37,7 @@ Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
         throw RuntimeException("Invalid sighting file name");
     } else {
     }
-//    this->hack_Y16(); // Currently disabled, handled by copying script (but should be solved in UFO)
+//    this->hack_Y16(); // Currently disabled, handled by copying script (but it should be solved in UFO)
 }
 
 Sighting::~Sighting(void) {
@@ -114,6 +113,10 @@ void Sighting::copy(const QString & dir) const {
             logger.error(Concern::Sightings, QString("Could not copy file '%1' to '%2'").arg(file, new_path));
         }
     }
+}
+
+void Sighting::defer(float seconds) {
+    this->m_deferred_until = QDateTime::currentDateTimeUtc().addSecs(seconds);
 }
 
 void Sighting::discard() {
