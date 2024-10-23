@@ -25,7 +25,7 @@ protected:
     virtual QString MessageEnabled(void) const = 0;
     virtual QString MessageDirectoryChanged(void) const = 0;
 
-    constexpr static unsigned int ScanInterval = 5000;
+    constexpr static unsigned int ScanInterval = 2000;
     QString path_key(void) const;
     QString enabled_key(void) const;
 

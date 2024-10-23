@@ -3,6 +3,7 @@
 
 #include <QGroupBox>
 
+#include "models/qsightingmodel.h"
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
 
@@ -17,6 +18,8 @@ class QCamera: public QAmosWidget {
 private:
     Ui::QCamera * ui;
     const QStation * m_station;
+    QSightingModel * m_sighting_model;
+
     QString m_id;
     bool m_enabled;
     bool m_spectral;

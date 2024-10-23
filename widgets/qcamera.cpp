@@ -17,12 +17,14 @@ QCamera::QCamera(QWidget * parent):
 {
     this->ui->setupUi(this);
 
+    this->m_sighting_model = new QSightingModel(this);
     this->ui->sl_dome_open->set_title("Observation begins");
     this->ui->sl_dome_close->set_title("Observation ends");
 }
 
 QCamera::~QCamera() {
     delete this->ui;
+    delete this->m_sighting_model;
 }
 
 void QCamera::initialize(QSettings * settings, const QString & id, const QStation * const station, bool spectral) {
@@ -39,6 +41,8 @@ void QCamera::initialize(QSettings * settings, const QString & id, const QStatio
     this->ui->scanner->initialize(this->id(), "scanner", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
     this->ui->storage_primary->initialize(this->id(), "primary", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
     this->ui->storage_permanent->initialize(this->id(), "permanent", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
+    this->ui->tv_sightings->setModel(this->m_sighting_model);
+    this->ui->tv_sightings->show();
 }
 
 void QCamera::connect_slots(void) {
@@ -47,6 +51,7 @@ void QCamera::connect_slots(void) {
     this->connect(this->ui->scanner, &QScannerBox::sightings_found, this, &QCamera::process_sightings);
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
     this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
+    this->connect(this, &QCamera::sighting_found, this->m_sighting_model, &QSightingModel::update_data);
 }
 
 bool QCamera::is_changed(void) const {
@@ -77,7 +82,8 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
     if (this->m_deferred_sightings.count() > 0) {
         logger.info(Concern::Sightings,
                     QString("Processing %1 deferred sightings (%2 total)")
-                        .arg(this->m_deferred_sightings.count(), sightings.count())
+                        .arg(this->m_deferred_sightings.count())
+                        .arg(sightings.count())
         );
     } else {
         logger.debug(Concern::Sightings, QString("Processing %1 sightings").arg(sightings.count()));
@@ -93,7 +99,7 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
                 logger.debug(Concern::Sightings, QString("Removed sighting %1 from deferred").arg(sighting.prefix()));
             }
         } else {
-            logger.debug(Concern::Sightings, QString("Found sighting %2").arg(sighting.str()));
+            logger.debug(Concern::Sightings, QString("Found sighting %1").arg(sighting.str()));
             emit this->sighting_found(sighting);
         }
     }
@@ -102,8 +108,12 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
 void QCamera::defer_sighting(const QString & sighting_id) {
     try {
         auto sighting = Sighting(this->ui->scanner->directory().path(), sighting_id, this->m_spectral);
-        logger.debug(Concern::Sightings, QString("Deferring sighting '%1'").arg(sighting.prefix()));
-        this->m_deferred_sightings.insert(sighting.prefix(), QDateTime::currentDateTimeUtc().addSecs(QCamera::DeferTime));
+        auto until = QDateTime::currentDateTimeUtc().addSecs(QCamera::DeferTime);
+        logger.debug(Concern::Sightings,
+                     QString("Deferring sighting '%1' until %2")
+                         .arg(sighting.prefix())
+                         .arg(until.toString(Qt::ISODate)));
+        this->m_deferred_sightings.insert(sighting.prefix(), until);
         for (auto & k: this->m_deferred_sightings) {
             logger.debug(Concern::Sightings, QString("Deferred until %1").arg(k.toString()));
         }

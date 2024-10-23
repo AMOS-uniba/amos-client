@@ -56,6 +56,7 @@ SOURCES += \
     widgets/qdome.cpp \
     widgets/qdomewidget.cpp \
     widgets/qserver.cpp \
+    widgets/qsightingbuffer.cpp \
     widgets/qstation.cpp \
     widgets/qsuninfo.cpp \
     widgets/qufomanager.cpp \
@@ -111,6 +112,7 @@ HEADERS += \
     widgets/qdome.h \
     widgets/qdomewidget.h \
     widgets/qserver.h \
+    widgets/qsightingbuffer.h \
     widgets/qstation.h \
     widgets/qsuninfo.h \
     widgets/qufomanager.h \
@@ -126,6 +128,7 @@ FORMS += \
     widgets/qcamera.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
+    widgets/qsightingbuffer.ui \
     widgets/qstation.ui \
     widgets/qsuninfo.ui \
     widgets/qufomanager.ui

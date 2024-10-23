@@ -16,8 +16,7 @@ private:
     } Property;
     const QCamera * m_camera;
 
-    QString title(int role) const;
-    QString value(const QModelIndex & index) const;
+    QVector<QVector<int>> tadata = {{0, 3, 5}, {4, 5, 3}};
 public:
     QSightingModel(const QCamera * camera, QObject * parent = nullptr);
 
@@ -25,6 +24,9 @@ public:
     int columnCount(const QModelIndex & parent = QModelIndex()) const override;
     QVariant data(const QModelIndex & index, int role) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+
+public slots:
+    void update_data();
 };
 
 #endif // QSIGHTINGMODEL_H
