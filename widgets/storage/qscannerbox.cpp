@@ -22,7 +22,7 @@ void QScannerBox::scan_sightings(void) {
     if (this->is_enabled()) {
         QVector<Sighting> sightings;
 
-        QString dir = this->m_directory.path();
+        QString dir = this->m_directory.canonicalPath();
         logger.debug(Concern::Storage, QString("Listing files in %1").arg(dir));
 
         QStringList xmls = this->m_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);

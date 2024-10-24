@@ -4,7 +4,7 @@
 #include <QAbstractTableModel>
 #include <QObject>
 
-QT_FORWARD_DECLARE_CLASS(QCamera);
+QT_FORWARD_DECLARE_CLASS(QSightingBuffer);
 
 class QSightingModel: public QAbstractTableModel {
     Q_OBJECT
@@ -15,11 +15,9 @@ private:
         DeferredUntil = 2,
         DeferredFor = 3,
     } Property;
-    const QCamera * m_camera;
-
-    QVector<QVector<int>> tadata = {{0, 3, 5}, {4, 5, 3}};
+    const QSightingBuffer * m_buffer;
 public:
-    QSightingModel(const QCamera * camera, QObject * parent = nullptr);
+    QSightingModel(const QSightingBuffer * buffer, QObject * parent = nullptr);
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex & parent = QModelIndex()) const override;

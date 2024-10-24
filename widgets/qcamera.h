@@ -3,7 +3,6 @@
 
 #include <QGroupBox>
 
-#include "models/qsightingmodel.h"
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
 
@@ -18,15 +17,12 @@ class QCamera: public QAmosWidget {
 private:
     Ui::QCamera * ui;
     const QStation * m_station;
-    QSightingModel * m_sighting_model;
 
     QString m_id;
     bool m_enabled;
     bool m_spectral;
 
     double m_darkness_limit;
-
-    QMap<QString, QDateTime> m_deferred_sightings;
 
     void connect_slots(void) override;
     void load_defaults(void) override;
@@ -39,11 +35,12 @@ private:
     inline QString enabled_key(void) const { return QString("camera_%1/enabled").arg(this->id()); }
     inline QString darkness_key(void) const { return QString("camera_%1/darkness_limit").arg(this->id()); }
 
+    bool is_sighting_valid(const Sighting & sighting) const;
+
     constexpr static double DefaultDarknessLimit = -12.0;
     constexpr static bool DefaultEnabled = true;
 
 public:
-    constexpr static float DeferTime = 30;            // Time in seconds: how long to defer an unsent sighting
     explicit QCamera(QWidget * parent = nullptr);
     ~QCamera();
 
@@ -53,8 +50,6 @@ public:
     inline bool is_enabled(void) const { return this->m_enabled; }
     inline bool is_spectral(void) const { return this->m_spectral; }
     inline double darkness_limit(void) const { return this->m_darkness_limit; }
-
-    inline const QMap<QString, QDateTime> & deferred_sightings(void) const { return this->m_deferred_sightings; };
 
     QJsonObject json(void) const;
 
@@ -69,9 +64,8 @@ public slots:
     void auto_action(bool is_dark, const QDateTime & open_since = QDateTime());
     void update_clocks(void);
 
-    void store_sighting(const QString & sighting_id);
-    void discard_sighting(const QString & sighting_id);
-    void defer_sighting(const QString & sighting_id);
+    void store_sighting(Sighting & sighting);
+    void discard_sighting(Sighting & sighting);
 
 signals:
     void darkness_limit_changed(double new_limit);

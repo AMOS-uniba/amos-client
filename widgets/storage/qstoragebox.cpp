@@ -18,21 +18,17 @@ const QDir QStorageBox::directory_for_timestamp(const QDateTime & datetime) cons
 }
 
 void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
-    if (this->m_enabled) {
-        logger.debug(Concern::Storage, QString("Storage \"%1\" storing a sighting").arg(this->id()));
-
+    logger.debug(Concern::Storage, QString("Storage \"%1\" storing a sighting").arg(this->id()));
 #if SEPARATE_SIGHTINGS
-        QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
+    QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
 #else
-        QString path = this->directory_for_timestamp(sighting.timestamp()).path();
+    QString path = this->directory_for_timestamp(sighting.timestamp()).path();
 #endif
-        del ? sighting.move(path) : sighting.copy(path);
-    } else {
-        logger.debug(Concern::Storage, QString("Storage \"%1\" disabled, not %2ing").arg(this->id(), del ? "mov" : "copy"));
-    }
+    del ? sighting.move(path) : sighting.copy(path);
 }
 
 void QStorageBox::discard_sighting(Sighting & sighting) const {
+    logger.debug(Concern::Storage, QString("Storage \"%1\" discarding a sighting"));
     sighting.discard();
 }
 

@@ -1,17 +1,15 @@
 #include "qsightingmodel.h"
+#include "widgets/qsightingbuffer.h"
 
-#include <widgets/qcamera.h>
-
-QSightingModel::QSightingModel(const QCamera * camera, QObject * parent):
+QSightingModel::QSightingModel(const QSightingBuffer * buffer, QObject * parent):
     QAbstractTableModel(parent),
-    m_camera(camera)
-{
-}
+    m_buffer(buffer)
+{}
 
 int QSightingModel::rowCount(const QModelIndex & index) const {
     Q_UNUSED(index);
-    qDebug() << this->m_camera->deferred_sightings().count() + 1;
-    return this->m_camera->deferred_sightings().count() + 1;
+    qDebug() << this->m_buffer->sightings().count() + 1;
+    return this->m_buffer->sightings().count() + 1;
 }
 
 int QSightingModel::columnCount(const QModelIndex & index) const {
@@ -20,21 +18,18 @@ int QSightingModel::columnCount(const QModelIndex & index) const {
 }
 
 QVariant QSightingModel::data(const QModelIndex & index, int role) const {
-    if (!index.isValid() || (index.row() >= this->m_camera->deferred_sightings().count())) {
+    if (!index.isValid() || (index.row() >= this->m_buffer->sightings().count())) {
         return QVariant();
     }
 
-    auto sighting = std::next(this->m_camera->deferred_sightings().constBegin(), index.row());
+    auto item = std::next(this->m_buffer->sightings().constBegin(), index.row());
     switch (role) {
         case Qt::DisplayRole: {
             switch (index.column()) {
-                case Property::ID:              return sighting.key();
-                case Property::Status:			return sighting.value();
-                case Property::DeferredUntil:	return sighting.value();
-                case Property::DeferredFor:	    {
-                    int ms = (sighting.value() - QDateTime::currentDateTime()).count() / 1000;
-                    return ms >= 0 ? QString("%1").arg(ms) : "0";
-                }
+                case Property::ID:              return item.key();
+                case Property::Status:			return item.value().str();
+                case Property::DeferredUntil:	return item.value().deferred_until().toString(Qt::ISODate);
+                case Property::DeferredFor:	    return item.value().deferred_for();
                 default:                        return QVariant();
             }
             break;

@@ -3,6 +3,7 @@
 
 #include "logging/loggingdialog.h"
 #include "widgets/aboutdialog.h"
+#include "widgets/qsightingbuffer.h"
 
 extern EventLogger logger;
 extern QSettings * settings;
@@ -67,12 +68,10 @@ MainWindow::MainWindow(QWidget *parent):
 
     this->connect(this->ui->camera_allsky, &QCamera::sighting_found, this->ui->sb_sightings, &QSightingBuffer::insert);
     this->connect(this->ui->camera_spectral, &QCamera::sighting_found, this->ui->sb_sightings, &QSightingBuffer::insert);
-    this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_allsky, &QCamera::store_sighting);
-    this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_allsky, &QCamera::discard_sighting);
-    this->connect(this->ui->server, &QServer::sighting_sent, this->ui->camera_allsky, &QCamera::defer_sighting);
-    this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
-    this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_spectral, &QCamera::discard_sighting);
-    this->connect(this->ui->server, &QServer::sighting_sent, this->ui->camera_spectral, &QCamera::defer_sighting);
+    // this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_allsky, &QCamera::store_sighting);
+    // this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_allsky, &QCamera::discard_sighting);
+    // this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
+    // this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_spectral, &QCamera::discard_sighting);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
