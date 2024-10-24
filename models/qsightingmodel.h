@@ -13,6 +13,7 @@ private:
         ID = 0,
         Status = 1,
         DeferredUntil = 2,
+        DeferredFor = 3,
     } Property;
     const QCamera * m_camera;
 

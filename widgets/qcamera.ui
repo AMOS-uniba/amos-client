@@ -26,8 +26,8 @@
    <property name="bottomMargin">
     <number>9</number>
    </property>
-   <item row="2" column="0" colspan="2">
-    <widget class="QScannerBox" name="scanner">
+   <item row="4" column="0" colspan="2">
+    <widget class="QStorageBox" name="storage_permanent">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -35,7 +35,33 @@
       </size>
      </property>
      <property name="title">
-      <string>Watch directory</string>
+      <string>Permanent storage</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QUfoManager" name="ufo_manager">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>110</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>UFO manager</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QStorageBox" name="storage_primary">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>90</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Primary storage</string>
      </property>
     </widget>
    </item>
@@ -149,21 +175,8 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QUfoManager" name="ufo_manager">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>110</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>UFO manager</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QStorageBox" name="storage_primary">
+   <item row="2" column="0" colspan="2">
+    <widget class="QScannerBox" name="scanner">
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -171,61 +184,8 @@
       </size>
      </property>
      <property name="title">
-      <string>Primary storage</string>
+      <string>Watch directory</string>
      </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QStorageBox" name="storage_permanent">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Permanent storage</string>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="0" colspan="2">
-    <widget class="QGroupBox" name="gb_sightings">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="title">
-      <string>Sightings</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="QTableView" name="tv_sightings">
-        <property name="editTriggers">
-         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-        </property>
-        <property name="dragDropOverwriteMode">
-         <bool>false</bool>
-        </property>
-        <property name="alternatingRowColors">
-         <bool>true</bool>
-        </property>
-        <property name="selectionMode">
-         <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
-        </property>
-        <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectionBehavior::SelectColumns</enum>
-        </property>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderMinimumSectionSize">
-         <number>150</number>
-        </attribute>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
   </layout>

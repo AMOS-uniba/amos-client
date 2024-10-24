@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>239</width>
-    <height>161</height>
+    <width>359</width>
+    <height>123</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,6 +26,25 @@
    <property name="topMargin">
     <number>9</number>
    </property>
+   <item row="0" column="1">
+    <widget class="QCheckBox" name="cb_safety_override">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>1</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="layoutDirection">
+      <enum>Qt::LayoutDirection::RightToLeft</enum>
+     </property>
+     <property name="text">
+      <string>Safety override</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0" colspan="2">
     <widget class="Line" name="line_up">
      <property name="orientation">
@@ -49,28 +68,9 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QCheckBox" name="cb_safety_override">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>1</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="layoutDirection">
-      <enum>Qt::LayoutDirection::RightToLeft</enum>
-     </property>
-     <property name="text">
-      <string>Safety override</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="0" colspan="2">
     <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -83,11 +83,24 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <property name="verticalSpacing">
-       <number>3</number>
-      </property>
-      <item row="3" column="1" colspan="2">
-       <widget class="QDoubleSpinBox" name="dsb_altitude">
+      <item>
+       <widget class="QLabel" name="lx_lat">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>φ</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="dsb_latitude">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -95,7 +108,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>altitude above mean sea level</string>
+         <string>geographic latitude of the station</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -104,24 +117,24 @@
          <bool>true</bool>
         </property>
         <property name="suffix">
-         <string> m</string>
+         <string>°</string>
         </property>
         <property name="decimals">
-         <number>1</number>
+         <number>6</number>
         </property>
         <property name="minimum">
-         <double>0.000000000000000</double>
+         <double>-90.000000000000000</double>
         </property>
         <property name="maximum">
-         <double>65535.000000000000000</double>
+         <double>90.000000000000000</double>
         </property>
         <property name="singleStep">
-         <double>0.100000000000000</double>
+         <double>0.000001000000000</double>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="lx_alt">
+      <item>
+       <widget class="QLabel" name="lx_lon">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -129,14 +142,14 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Altitude</string>
+         <string>λ</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="2" column="1" colspan="2">
+      <item>
        <widget class="QDoubleSpinBox" name="dsb_longitude">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -170,8 +183,8 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="lx_lon">
+      <item>
+       <widget class="QLabel" name="lx_alt">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -179,31 +192,15 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Longitude</string>
+         <string>h</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="lx_lat">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Latitude</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="QDoubleSpinBox" name="dsb_latitude">
+      <item>
+       <widget class="QDoubleSpinBox" name="dsb_altitude">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -211,7 +208,7 @@
          </sizepolicy>
         </property>
         <property name="toolTip">
-         <string>geographic latitude of the station</string>
+         <string>altitude above mean sea level</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -220,19 +217,19 @@
          <bool>true</bool>
         </property>
         <property name="suffix">
-         <string>°</string>
+         <string> m</string>
         </property>
         <property name="decimals">
-         <number>6</number>
+         <number>1</number>
         </property>
         <property name="minimum">
-         <double>-90.000000000000000</double>
+         <double>0.000000000000000</double>
         </property>
         <property name="maximum">
-         <double>90.000000000000000</double>
+         <double>65535.000000000000000</double>
         </property>
         <property name="singleStep">
-         <double>0.000001000000000</double>
+         <double>0.100000000000000</double>
         </property>
        </widget>
       </item>

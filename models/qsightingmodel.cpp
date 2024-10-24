@@ -10,18 +10,16 @@ QSightingModel::QSightingModel(const QCamera * camera, QObject * parent):
 
 int QSightingModel::rowCount(const QModelIndex & index) const {
     Q_UNUSED(index);
-    return 5;
-    qDebug() << QString("%1 rows").arg(this->m_camera->deferred_sightings().count());
-    return this->m_camera->deferred_sightings().count();
+    qDebug() << this->m_camera->deferred_sightings().count() + 1;
+    return this->m_camera->deferred_sightings().count() + 1;
 }
 
 int QSightingModel::columnCount(const QModelIndex & index) const {
     Q_UNUSED(index);
-    return 3;
+    return 4;
 }
 
 QVariant QSightingModel::data(const QModelIndex & index, int role) const {
-    qDebug() << "Asking for data";
     if (!index.isValid() || (index.row() >= this->m_camera->deferred_sightings().count())) {
         return QVariant();
     }
@@ -33,6 +31,10 @@ QVariant QSightingModel::data(const QModelIndex & index, int role) const {
                 case Property::ID:              return sighting.key();
                 case Property::Status:			return sighting.value();
                 case Property::DeferredUntil:	return sighting.value();
+                case Property::DeferredFor:	    {
+                    int ms = (sighting.value() - QDateTime::currentDateTime()).count() / 1000;
+                    return ms >= 0 ? QString("%1").arg(ms) : "0";
+                }
                 default:                        return QVariant();
             }
             break;
@@ -48,7 +50,6 @@ QVariant QSightingModel::data(const QModelIndex & index, int role) const {
 }
 
 QVariant QSightingModel::headerData(int section, Qt::Orientation orientation, int role) const {
-    qDebug() << "Requested header data";
     if (role != Qt::DisplayRole) {
         return QVariant();
     }
@@ -58,6 +59,7 @@ QVariant QSightingModel::headerData(int section, Qt::Orientation orientation, in
             case Property::ID: 				return "ID";
             case Property::DeferredUntil:	return "deferred until";
             case Property::Status:			return "status";
+            case Property::DeferredFor:     return "remaining";
             default:						return QVariant();
         }
     } else {

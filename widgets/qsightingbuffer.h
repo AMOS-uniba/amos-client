@@ -17,9 +17,10 @@ private:
 public:
     explicit QSightingBuffer(QWidget * parent = nullptr);
     ~QSightingBuffer();
-
-    void insert(const QString & sighting_id, const Sighting & sighting);
+public slots:
+    void insert(const Sighting & sighting);
     void remove(const QString & sighting_id);
+    void defer(const QString & sighting_id);
 };
 
 #endif // QSIGHTINGBUFFER_H

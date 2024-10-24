@@ -41,8 +41,6 @@ void QCamera::initialize(QSettings * settings, const QString & id, const QStatio
     this->ui->scanner->initialize(this->id(), "scanner", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
     this->ui->storage_primary->initialize(this->id(), "primary", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
     this->ui->storage_permanent->initialize(this->id(), "permanent", QString("C:/Data/%1").arg(spectral ? "Spectral" : "AllSky"));
-    this->ui->tv_sightings->setModel(this->m_sighting_model);
-    this->ui->tv_sightings->show();
 }
 
 void QCamera::connect_slots(void) {

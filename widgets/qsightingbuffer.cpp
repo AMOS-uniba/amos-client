@@ -12,6 +12,10 @@ QSightingBuffer::~QSightingBuffer() {
     delete ui;
 }
 
+void QSightingBuffer::insert(const Sighting & sighting) {
+    this->m_sightings.insert(sighting.prefix(), sighting);
+}
+
 void QSightingBuffer::remove(const QString & sighting_id) {
 
 }
