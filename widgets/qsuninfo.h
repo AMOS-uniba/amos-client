@@ -18,6 +18,9 @@ private:
 
     QTimer * m_timer_short;
     QTimer * m_timer_long;
+
+    constexpr static unsigned int ShortTimerInterval = 1000;
+    constexpr static unsigned int LongTimerInterval = 60000;
 public:
     explicit QSunInfo(QWidget * parent = nullptr);
     ~QSunInfo();

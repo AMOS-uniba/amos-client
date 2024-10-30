@@ -144,7 +144,7 @@ void QServer::heartbeat_finished(QNetworkReply * reply) {
     }
 }
 
-void QServer::send_sighting(Sighting & sighting) {
+void QServer::send_sighting(const Sighting & sighting) const {
     logger.debug(Concern::Server, QString("Sending sighting '%1' to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
@@ -186,10 +186,21 @@ void QServer::sighting_received(QNetworkReply * reply) {
                     .arg(sighting_id)
                     .arg(reply->error())
                     .arg(reply->errorString())
-                    .arg(QString(reply->readAll())
-                )
+                    .arg(QString(reply->readAll()))
             );
             emit this->sighting_conflict(sighting_id);
+            break;
+        }
+        case QNetworkReply::UnknownContentError: {
+            logger.error(
+                Concern::Server,
+                QString("Sighting '%1' rejected due to wrong station ID (error %2: %3) %4")
+                    .arg(sighting_id)
+                    .arg(reply->error())
+                    .arg(reply->errorString())
+                    .arg(QString(reply->readAll()))
+            );
+            emit this->sighting_error(sighting_id, error);
             break;
         }
         case QNetworkReply::UnknownNetworkError: {

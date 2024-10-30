@@ -2,8 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include "logging/loggingdialog.h"
-#include "widgets/aboutdialog.h"
-#include "widgets/qsightingbuffer.h"
+#include "widgets/qaboutdialog.h"
+#include "models/qsightingmodel.h"
 
 extern EventLogger logger;
 extern QSettings * settings;
@@ -66,12 +66,21 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_allsky, &QCamera::update_clocks);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);
 
-    this->connect(this->ui->camera_allsky, &QCamera::sighting_found, this->ui->sb_sightings, &QSightingBuffer::insert);
-    this->connect(this->ui->camera_spectral, &QCamera::sighting_found, this->ui->sb_sightings, &QSightingBuffer::insert);
-    // this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_allsky, &QCamera::store_sighting);
-    // this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_allsky, &QCamera::discard_sighting);
-    // this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
-    // this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_spectral, &QCamera::discard_sighting);
+    auto model = this->ui->sb_sightings->model();
+    this->connect(this->ui->camera_allsky, &QCamera::sighting_found, model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_found, model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_allsky, &QCamera::sighting_stored, model, &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_stored, this->ui->sb_sightings->model(), &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_allsky, &QCamera::sighting_discarded, this->ui->sb_sightings->model(), &QSightingModel::mark_discarded);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_discarded, this->ui->sb_sightings->model(), &QSightingModel::mark_discarded);
+    this->connect(model, &QSightingModel::sighting_to_send, this->ui->server, &QServer::send_sighting);
+    this->connect(this->ui->server, &QServer::sighting_accepted, model, &QSightingModel::store_sighting);
+    this->connect(this->ui->server, &QServer::sighting_conflict, model, &QSightingModel::discard_sighting);
+    this->connect(this->ui->server, &QServer::sighting_error, model, &QSightingModel::defer_sighting);
+    this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_allsky, &QCamera::store_sighting);
+    this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky, &QCamera::discard_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::discard_sighting);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
@@ -155,7 +164,7 @@ void MainWindow::on_action_debug_triggered() {
 }
 
 void MainWindow::on_action_about_triggered() {
-    AboutDialog dialog(this);
+    QAboutDialog dialog(this);
     dialog.exec();
 }
 

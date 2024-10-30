@@ -13,14 +13,16 @@ Sighting::Sighting(void):
     m_valid(false),
     m_spectral(false),
     m_dir(QDir()),
-    m_prefix("")
+    m_prefix(""),
+    m_status(Status::Unprocessed)
 {}
 
 Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
     m_valid(true),
     m_spectral(spectral),
     m_dir(dir),
-    m_prefix(prefix)
+    m_prefix(prefix),
+    m_status(Status::Unprocessed)
 {
     this->m_xml  = this->try_open( ".xml",  true);
     this->m_pjpg = this->try_open("P.jpg", false);
@@ -28,9 +30,13 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
     this->m_mbmp = this->try_open("M.bmp", false);
     this->m_pbmp = this->try_open("P.bmp", false);
     this->m_avi  = this->try_open( ".avi", false);
+    auto info = QFileInfo(this->m_avi);
+    this->m_avi_size = info.exists() ? info.size() : 0;
+
     this->m_full = QString("%1/%2").arg(this->m_dir.canonicalPath(), this->m_prefix);
 
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
+    this->m_deferred_until = QDateTime();
     this->m_uuid = QUuid::createUuidV5(QUuid{}, this->m_xml);
 
     logger.debug(
@@ -78,9 +84,27 @@ QString Sighting::str(void) const {
         .arg(this->avi_size() / (1 << 20));
 }
 
-qint64 Sighting::avi_size(void) const {
-    auto info = QFileInfo(this->m_avi);
-    return info.exists() ? info.size() : -1;
+QString Sighting::status_string(void) const {
+    switch (this->m_status) {
+        case Status::Unprocessed:       return "not processed";
+        case Status::Deferred:          return QString("deferred until %1").arg(this->deferred_until().toString("hh:mm:ss"));
+        case Status::Sent:              return "sent";
+        case Status::Duplicate:         return "duplicate";
+        case Status::Accepted:          return "accepted";
+        case Status::Rejected:          return "rejected";
+        case Status::UnknownStation:    return "unknown station";
+        case Status::Stored:            return "stored";
+        case Status::Discarded:         return "discarded";
+    }
+    return "";
+}
+
+void Sighting::set_status(Status new_status) {
+    this->m_status = new_status;
+    logger.debug(Concern::Sightings,
+                 QString("Status of '%1' set to %2")
+                     .arg(this->prefix())
+                     .arg(this->status_string()));
 }
 
 void Sighting::copy_or_move(const QDir & dir, bool keep) {
@@ -110,7 +134,9 @@ void Sighting::copy_or_move(const QDir & dir, bool keep) {
             file = new_path;
         }
     }
-    this->m_valid &= keep;	// If moving, no longer valid, if copying, keep it
+    this->m_valid = keep;	                // If moving, no longer valid, if copying, keep it
+    this->m_dir = keep ? this->m_dir : dir; // If moving, change the directory
+    this->set_status(Status::Stored);
 }
 
 void Sighting::move(const QDir & dir) {
@@ -122,7 +148,16 @@ void Sighting::copy(const QDir & dir) {
 }
 
 void Sighting::defer(float seconds) {
+    logger.debug(Concern::Sightings, QString("Deferring sighting '%1'").arg(this->prefix()));
     this->m_deferred_until = QDateTime::currentDateTimeUtc().addSecs(seconds);
+}
+
+double Sighting::deferred_for(void) const {
+    if (this->deferred_until().isValid()) {
+        return static_cast<double>((this->deferred_until() - QDateTime::currentDateTimeUtc()).count()) / 1000.0;
+    } else {
+        return std::numeric_limits<double>::quiet_NaN();
+    }
 }
 
 void Sighting::discard() {
@@ -139,6 +174,8 @@ void Sighting::discard() {
                 }
             }
         }
+        this->set_status(Status::Discarded);
+        this->m_deferred_until = QDateTime();
     } catch (std::exception &) {
         logger.error(Concern::Sightings, QString("Error while discarding sighting '%1'").arg(this->prefix()));
     }

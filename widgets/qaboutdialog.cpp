@@ -1,8 +1,8 @@
-#include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+#include "qaboutdialog.h"
+#include "ui_qaboutdialog.h"
 
 
-AboutDialog::AboutDialog(QWidget * parent) :
+QAboutDialog::QAboutDialog(QWidget * parent) :
     QDialog(parent),
     ui(new Ui::AboutDialog)
 {
@@ -18,10 +18,10 @@ AboutDialog::AboutDialog(QWidget * parent) :
     this->ui->lb_version->setText(QString("Version %1").arg(VERSION_STRING));
 }
 
-AboutDialog::~AboutDialog() {
+QAboutDialog::~QAboutDialog() {
     delete this->ui;
 }
 
-void AboutDialog::on_buttonBox_accepted() {
+void QAboutDialog::on_buttonBox_accepted() {
     this->close();
 }

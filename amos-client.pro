@@ -45,12 +45,12 @@ SOURCES += \
     utils/state/ufostate.cpp \
     utils/telegram.cpp \
     utils/universe.cpp \
-    widgets/aboutdialog.cpp \
     widgets/lines/qbooleanline.cpp \
     widgets/lines/qcontrolline.cpp \
     widgets/lines/qdatetimeline.cpp \
     widgets/lines/qdisplayline.cpp \
     widgets/lines/qfloatline.cpp \
+    widgets/qaboutdialog.cpp \
     widgets/qcamera.cpp \
     widgets/qconfigurable.cpp \
     widgets/qdome.cpp \
@@ -101,12 +101,12 @@ HEADERS += \
     utils/state/ufostate.h \
     utils/telegram.h \
     utils/universe.h \
-    widgets/aboutdialog.h \
     widgets/lines/qbooleanline.h \
     widgets/lines/qcontrolline.h \
     widgets/lines/qdatetimeline.h \
     widgets/lines/qdisplayline.h \
     widgets/lines/qfloatline.h \
+    widgets/qaboutdialog.h \
     widgets/qcamera.h \
     widgets/qconfigurable.h \
     widgets/qdome.h \
@@ -123,8 +123,8 @@ HEADERS += \
 FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
-    widgets/aboutdialog.ui \
     widgets/lines/qdisplayline.ui \
+    widgets/qaboutdialog.ui \
     widgets/qcamera.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \

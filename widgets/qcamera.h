@@ -70,8 +70,9 @@ public slots:
 signals:
     void darkness_limit_changed(double new_limit);
 
-    void sighting_found(Sighting & sightings);
-    void sightings_stored(QVector<Sighting> & sightings);
+    void sighting_found(Sighting & sighting);
+    void sighting_stored(Sighting & sighting);
+    void sighting_discarded(Sighting & sighting);
 };
 
 #endif // QCAMERA_H

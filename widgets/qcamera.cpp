@@ -82,15 +82,15 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
 
 bool QCamera::is_sighting_valid(const Sighting & sighting) const {
     if (sighting.dir() != this->ui->scanner->directory().absolutePath()) {
-        logger.error(Concern::Sightings,
-                     QString("Sighting '%1' dir %2 does not match scanner directory '%2'!")
+        logger.debug_error(Concern::Sightings,
+                     QString("Sighting '%1' dir '%2' does not match scanner directory '%3'!")
                          .arg(sighting.prefix())
                          .arg(sighting.dir().canonicalPath())
                          .arg(this->ui->scanner->directory().absolutePath()));
         return false;
     }
     if (sighting.is_spectral() != this->is_spectral()) {
-        logger.error(Concern::Sightings,
+        logger.debug_error(Concern::Sightings,
                      QString("Sighting '%1' is not of correct kind for this camera")
                          .arg(sighting.prefix()));
         return false;
@@ -99,10 +99,11 @@ bool QCamera::is_sighting_valid(const Sighting & sighting) const {
 }
 
 void QCamera::discard_sighting(Sighting & sighting) {
-    if (this->is_sighting_valid(sighting)) {
+    if (this->is_sighting_valid(sighting) && (sighting.is_spectral() == this->is_spectral())) {
         try {
             logger.debug(Concern::Sightings, QString("About to discard sighting '%1'").arg(sighting.prefix()));
             this->ui->storage_primary->discard_sighting(sighting);
+            emit this->sighting_discarded(sighting);
         } catch (RuntimeException & exc) {
             logger.error(Concern::Sightings, exc.what());
         }
@@ -110,10 +111,11 @@ void QCamera::discard_sighting(Sighting & sighting) {
 }
 
 void QCamera::store_sighting(Sighting & sighting) {
-    if (this->is_sighting_valid(sighting)) {
+    if (this->is_sighting_valid(sighting) && (sighting.is_spectral() == this->is_spectral())) {
         try {
             logger.debug(Concern::Sightings, QString("About to store sighting '%1'").arg(sighting.prefix()));
-            this->ui->storage_primary->store_sighting(sighting);
+            this->ui->storage_primary->store_sighting(sighting, true);
+            emit this->sighting_stored(sighting);
         } catch (RuntimeException & exc) {
             logger.error(Concern::Sightings, exc.what());
         }

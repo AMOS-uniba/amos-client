@@ -67,7 +67,7 @@ public slots:
     void display_countdown(void);
 
     void send_heartbeat(const QJsonObject & heartbeat) const;
-    void send_sighting(Sighting & sighting);
+    void send_sighting(const Sighting & sighting) const;
 
     void sighting_received(QNetworkReply * reply);
 
@@ -75,7 +75,7 @@ signals:
     void request_heartbeat(void);
     void heartbeat_created(void);
 
-    void sighting_sent(const QString & sighting_id);
+    void sighting_sent(const QString & sighting_id) const;
     // Sighting was accepted, store it
     void sighting_accepted(const QString & sighting_id);
     // Sighting was rejected, delete it
