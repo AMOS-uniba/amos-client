@@ -457,7 +457,7 @@ void QDome::display_data_state(void) const {
     this->ui->picture->set_reachable(this->state_S().is_valid());
 }
 
-void QDome::set_serial_port_state(const SerialPortState state) {
+void QDome::set_serial_port_state(SerialPortState state) {
     this->m_sps = state;
     logger.debug(Concern::SerialPort, QString("Port state set to %1").arg(state.display_string()));
     this->ui->lb_serial_port_state->setText(state.display_string());

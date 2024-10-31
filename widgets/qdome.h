@@ -23,7 +23,7 @@ namespace Ui {
 class QDome: public QAmosWidget {
     Q_OBJECT
 private:
-    constexpr static unsigned int Refresh = 300;                                // Robin time in ms
+    constexpr static unsigned int Refresh = 300;    // Robin time in ms
 
     Ui::QDome * ui;
     const QStation * m_station;
@@ -122,7 +122,7 @@ public slots:
     void set_formatters(void);
 
     void list_serial_ports(void);
-    void set_serial_port_state(const SerialPortState state);
+    void set_serial_port_state(SerialPortState state);
     void set_data_state(const QString & data_state);
 
     void handle_no_serial_port_set(void);

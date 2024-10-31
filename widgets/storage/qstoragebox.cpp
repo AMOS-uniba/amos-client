@@ -17,18 +17,18 @@ const QDir QStorageBox::directory_for_timestamp(const QDateTime & datetime) cons
     return QDir(QString("%1/%2/").arg(this->m_directory.path(), datetime.toString("yyyy/MM/dd")));
 }
 
-void QStorageBox::store_sighting(Sighting & sighting, bool del) const {
+void QStorageBox::store_sighting(Sighting & sighting) const {
     logger.debug(Concern::Storage, QString("Storage \"%1\" storing a sighting").arg(this->id()));
 #if SEPARATE_SIGHTINGS
     QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
 #else
     QString path = this->directory_for_timestamp(sighting.timestamp()).path();
 #endif
-    del ? sighting.move(path) : sighting.copy(path);
+    sighting.move(path);
 }
 
 void QStorageBox::discard_sighting(Sighting & sighting) const {
-    logger.debug(Concern::Storage, QString("Storage \"%1\" discarding a sighting"));
+    logger.debug(Concern::Storage, QString("Storage \"%1\" discarding a sighting").arg(this->id()));
     sighting.discard();
 }
 

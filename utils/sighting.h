@@ -11,15 +11,17 @@
 class Sighting {
 public:
     typedef enum {
-        Unprocessed = 0,
-        Sent = 1,
-        Deferred = 2,
-        Duplicate = 10,
-        Accepted = 20,
-        Rejected = 21,
-        UnknownStation = 30,
-        Stored = 99,
-        Discarded = 150,
+        Unprocessed         = 0x00,
+        Sent                = 0x01,
+        Accepted            = 0x10,
+        Duplicate           = 0x11,
+        Rejected            = 0x12,
+        UnknownStation      = 0x13,
+        UnknownError        = 0x14,
+        Timeout             = 0x20,
+        RemoteHostClosed    = 0x21,
+        Stored              = 0x40,
+        Discarded           = 0x41,
     } Status;
 private:
     bool m_valid;
@@ -34,7 +36,6 @@ private:
     Status m_status;
 
     QString try_open(const QString & path, bool required);
-    void copy_or_move(const QDir & dir, bool keep);
 public:
     Sighting(void);
     Sighting(const QDir & dir, const QString & prefix, bool spectral);
@@ -70,9 +71,9 @@ public:
 
     void debug(void) const;
 
-    void move(const QDir & dir);
-    void copy(const QDir & dir);
+    bool move(const QDir & dir);
     void defer(float seconds);
+    void undefer(void);
     void discard(void);
 
     bool hack_Y16(void) const;

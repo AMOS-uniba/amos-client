@@ -6,15 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1140</width>
-    <height>860</height>
+    <width>1095</width>
+    <height>824</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="1" column="0" colspan="4">
     <widget class="QTableView" name="tv_sightings">
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
@@ -51,8 +51,38 @@
      </attribute>
     </widget>
    </item>
+   <item row="0" column="0">
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pb_send">
+     <property name="text">
+      <string>Send now</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QPushButton" name="pb_reload">
+     <property name="text">
+      <string>Reload</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tv_sightings</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

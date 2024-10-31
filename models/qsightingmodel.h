@@ -13,15 +13,17 @@ QT_FORWARD_DECLARE_CLASS(QSightingBuffer);
 class QSightingModel: public QAbstractTableModel {
     Q_OBJECT
 private:
+    constexpr static float DeferTime = 5;                   // Time in seconds: how long to defer a Sighting
+    constexpr static int DeferRefreshInterval = 100;        // Time in ms: how often to refresh the view
+    constexpr static int SendInterval = 5000;               // Time in ms: how often to try to send sightings
+
     typedef enum {
         ID = 0,
-        Spectral = 1,
-        Timestamp = 2,
-        Size = 3,
-        DeferredUntil = 4,
-        DeferredFor = 5,
-        Status = 6,
-        //Address = 7,
+        Spectral,
+        Timestamp,
+        Size,
+        DeferredFor,
+        Status,
     } Property;
 
     QMap<QString, Sighting> m_sightings;
@@ -31,10 +33,6 @@ private:
 
     virtual bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
     virtual bool removeRows(int row, int count, const QModelIndex & parent = QModelIndex()) override;
-
-    constexpr static float DeferTime = 5;                   // Time in seconds: how long to defer a Sighting
-    constexpr static int DeferRefreshInterval = 500;        // Time in ms: how often to refresh the view
-    constexpr static int SendInterval = 5000;               // Time in ms: how often to try to send sightings
 public:
     QSightingModel(QObject * parent = nullptr);
 
@@ -50,13 +48,17 @@ private slots:
     void set_status(Sighting & sighting, Sighting::Status status);
 public slots:
     void send_sightings(void);
+    void force_send_sightings(void);
     void insert_sighting(const Sighting & sighting);        // found by camera
     void mark_stored(Sighting & sighting);                  // stored by camera
     void mark_discarded(Sighting & sighting);               // discarded by camera
 
+    void mark_sent(const QString & sighting_id);            // sent by server, but no response so far
     void store_sighting(const QString & sighting_id);       // accepted by server
     void discard_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
+
+    void reload(void);
 signals:
     void sighting_to_send(const Sighting & sighting);
     void sighting_deleted(Sighting & sighting);

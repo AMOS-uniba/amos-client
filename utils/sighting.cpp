@@ -87,16 +87,18 @@ QString Sighting::str(void) const {
 QString Sighting::status_string(void) const {
     switch (this->m_status) {
         case Status::Unprocessed:       return "not processed";
-        case Status::Deferred:          return QString("deferred until %1").arg(this->deferred_until().toString("hh:mm:ss"));
         case Status::Sent:              return "sent";
+        case Status::Timeout:           return "timeout";
         case Status::Duplicate:         return "duplicate";
         case Status::Accepted:          return "accepted";
         case Status::Rejected:          return "rejected";
         case Status::UnknownStation:    return "unknown station";
         case Status::Stored:            return "stored";
         case Status::Discarded:         return "discarded";
+        case Status::RemoteHostClosed:  return "host not found";
+        case Status::UnknownError:      return "unknown error";
     }
-    return "";
+    return "<error>";
 }
 
 void Sighting::set_status(Status new_status) {
@@ -107,9 +109,11 @@ void Sighting::set_status(Status new_status) {
                      .arg(this->status_string()));
 }
 
-void Sighting::copy_or_move(const QDir & dir, bool keep) {
-    logger.debug(Concern::Sightings, QString("%1ing '%2' to '%3'").arg(keep ? "Copy" : "Mov", this->prefix(), dir.canonicalPath()));
-    QDir().mkpath(dir.canonicalPath());
+bool Sighting::move(const QDir & dir) {
+    QDir().mkpath(dir.path());
+    logger.debug(Concern::Sightings, QString("Moving '%1' to '%2'").arg(this->prefix(), dir.canonicalPath()));
+
+    bool success = true;
 
     for (auto & file: this->files()) {
         if (file.isEmpty()) {
@@ -119,37 +123,40 @@ void Sighting::copy_or_move(const QDir & dir, bool keep) {
 
             if (QFile::exists(new_path)) {
                 logger.warning(Concern::Sightings,
-                               QString("Could not %1 the sighting, deleting file '%2' first...")
-                                   .arg(keep ? "copy" : "move", new_path));
+                               QString("Could not move the sighting, deleting file '%3' first...")
+                                   .arg(new_path));
                 QFile::remove(new_path);
             }
 
-            bool result = keep ? QFile::copy(file, new_path) : QFile::rename(file, new_path);
+            bool result = QFile::rename(file, new_path);
+            success &= result;
 
             if (result) {
-                logger.debug(Concern::Sightings, QString("%1ed '%2' to '%3'").arg(keep ? "Copi" : "Mov", file, new_path));
+                logger.debug(Concern::Sightings, QString("Moved '%3' to '%4'").arg(file, new_path));
             } else {
-                logger.error(Concern::Sightings, QString("Could not %1 file '%2' to '%3'").arg(keep ? "copy" : "move", file, new_path));
+                logger.error(Concern::Sightings, QString("Could not move file '%3' to '%4'").arg(file, new_path));
             }
             file = new_path;
         }
     }
-    this->m_valid = keep;	                // If moving, no longer valid, if copying, keep it
-    this->m_dir = keep ? this->m_dir : dir; // If moving, change the directory
-    this->set_status(Status::Stored);
-}
-
-void Sighting::move(const QDir & dir) {
-    this->copy_or_move(dir, false);
-}
-
-void Sighting::copy(const QDir & dir) {
-    this->copy_or_move(dir, true);
+    if (success) {
+        this->m_valid = false;
+        this->m_dir = dir;
+        this->undefer();
+        this->set_status(Status::Stored);
+    } else {
+        logger.error(Concern::Sightings, QString("Error when moving sighting '%1'").arg(this->prefix()));
+    }
+    return success;
 }
 
 void Sighting::defer(float seconds) {
     logger.debug(Concern::Sightings, QString("Deferring sighting '%1'").arg(this->prefix()));
     this->m_deferred_until = QDateTime::currentDateTimeUtc().addSecs(seconds);
+}
+
+void Sighting::undefer(void) {
+    this->m_deferred_until = QDateTime();
 }
 
 double Sighting::deferred_for(void) const {
@@ -175,7 +182,7 @@ void Sighting::discard() {
             }
         }
         this->set_status(Status::Discarded);
-        this->m_deferred_until = QDateTime();
+        this->undefer();
     } catch (std::exception &) {
         logger.error(Concern::Sightings, QString("Error while discarding sighting '%1'").arg(this->prefix()));
     }
