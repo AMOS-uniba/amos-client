@@ -30,6 +30,7 @@ private:
 
     QDateTime m_last_received;
     QDateTime m_open_since;
+    bool m_enabled;
 
     QThread * m_thread;
     QSerialPortManager * m_spm;
@@ -46,8 +47,6 @@ private:
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
 
-    void send_command(const Command & command) const;
-
     void process_message(const QByteArray & message);
 
     void connect_slots(void) override;
@@ -59,9 +58,12 @@ private:
 
     constexpr static double DefaultHumidityLower = 75.0;
     constexpr static double DefaultHumidityUpper = 90.0;
+    constexpr static bool DefaultEnabled = true;
     const static QString DefaultPort;
 
 private slots:
+    void send_command(const Command & command) const;
+
     void display_dome_state(void);
     void display_basic_data(const DomeStateS & state);
     void display_env_data(const DomeStateT & state);
@@ -77,6 +79,7 @@ private slots:
     void on_bt_cover_close_clicked();
 
     void set_open_since(void);
+    void set_enabled(int enable);
 
 public:
     const static Command CommandNoOp;
@@ -94,6 +97,7 @@ public:
 
     virtual void initialize(QSettings * settings) override;
     bool is_changed(void) const override;
+    inline bool is_enabled(void) const { return this->m_enabled; }
 
     inline const QDateTime & last_received(void) const { return this->m_last_received; };
     inline const QDateTime & open_since(void) const { return this->m_open_since; };
@@ -122,13 +126,13 @@ public slots:
     void set_formatters(void);
 
     void list_serial_ports(void);
-    void set_serial_port_state(SerialPortState state);
+    void set_serial_port_state(const SerialPortState & state);
     void set_data_state(const QString & data_state);
 
     void handle_no_serial_port_set(void);
     void handle_serial_port_selected(const QString & port);
     void handle_serial_port_changed(const QString & port);
-    void handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message);
+    void handle_serial_port_error(const QString & port, QSerialPort::SerialPortError error, const QString & message);
 
     // Command wrappers
     void open_cover(void) const;
@@ -152,12 +156,12 @@ signals:
     void state_updated_T(const DomeStateT & state);
     void state_updated_Z(const DomeStateZ & state);
 
-    void cover_closed(int position) const;
-    void cover_open(int position) const;
-    void cover_moved(int position) const;
+    void cover_closed(int position);
+    void cover_open(int position);
+    void cover_moved(int position);
 
+    void enabled_set(int enabled);
     void serial_port_selected(const QString & port);
-
     void humidity_limits_changed(double new_lower, double new_upper);
 };
 

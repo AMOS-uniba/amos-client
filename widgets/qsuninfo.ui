@@ -7,15 +7,24 @@
     <x>0</x>
     <y>0</y>
     <width>270</width>
-    <height>196</height>
+    <height>223</height>
    </rect>
   </property>
   <property name="title">
    <string>Universe</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
    <property name="topMargin">
     <number>3</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
    </property>
    <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="gb_sun">
@@ -123,7 +132,7 @@
       <item>
        <widget class="Line" name="li_sun">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -280,7 +289,7 @@
       <item>
        <widget class="Line" name="li_moon">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
        </widget>
       </item>
@@ -342,7 +351,6 @@
      <property name="font">
       <font>
        <pointsize>12</pointsize>
-       <weight>75</weight>
        <bold>true</bold>
        <kerning>true</kerning>
       </font>
@@ -351,7 +359,7 @@
       <string>???</string>
      </property>
      <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <set>Qt::AlignmentFlag::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -359,15 +367,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFloatLine</class>
-   <extends>QWidget</extends>
-   <header>widgets/lines/qfloatline.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QDateTimeLine</class>
    <extends>QWidget</extends>
    <header>widgets/lines/qdatetimeline.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFloatLine</class>
+   <extends>QWidget</extends>
+   <header>widgets/lines/qfloatline.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

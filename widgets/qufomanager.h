@@ -34,7 +34,7 @@ private:
     UfoState m_state;
     void update_state(void);
 
-    void start_ufo_inner(void) const;
+    void start_ufo_inner(void);
 
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPathAllSky;
@@ -66,18 +66,18 @@ public slots:
     void initialize(const QString & id);
     void load_settings(void);
     void save_settings(void) const;
-    void auto_action(bool is_dark, const QDateTime & open_since) const;
+    void auto_action(bool is_dark, const QDateTime & open_since);
 
     void start_ufo(unsigned int delay = 0) const;
-    void stop_ufo(void) const;
+    void stop_ufo(void);
 
     void log_state_change(const UfoState & state) const;
 
 signals:
-    void started(void) const;
-    void stopped(void) const;
+    void started(void);
+    void stopped(void);
 
-    void state_changed(UfoState state) const;
+    void state_changed(const UfoState & state);
 };
 
 #endif // QUFOMANAGER_H

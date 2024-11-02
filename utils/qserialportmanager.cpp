@@ -8,21 +8,23 @@
 extern EventLogger logger;
 
 
-const Request QSerialPortManager::RequestBasic              = Request('S', "basic data request");
-const Request QSerialPortManager::RequestEnv                = Request('T', "environment data request");
+const Request QSerialPortManager::RequestBasic        = Request('S', "basic data request");
+const Request QSerialPortManager::RequestEnv          = Request('T', "environment data request");
 #if OLD_PROTOCOL
-const Request QSerialPortManager::RequestShaft              = Request('W', "shaft position request (old protocol)");
+const Request QSerialPortManager::RequestShaft        = Request('W', "shaft position request (old protocol)");
 #else
-const Request QSerialPortManager::RequestShaft              = Request('Z', "shaft position request");
+const Request QSerialPortManager::RequestShaft        = Request('Z', "shaft position request");
 #endif
 
-const SerialPortState QSerialPortManager::SerialPortNotSet  = SerialPortState('N', "not set", QColor(96, 96, 96));
-const SerialPortState QSerialPortManager::SerialPortOpen    = SerialPortState('O', "connected", QColor(0, 192, 0));
-const SerialPortState QSerialPortManager::SerialPortError   = SerialPortState('E', "error", QColor(240, 0, 0));
+const SerialPortState QSerialPortManager::Disabled    = SerialPortState('D', "disabled", QColor(160, 160, 160));
+const SerialPortState QSerialPortManager::NotSet      = SerialPortState('N', "not set", QColor(96, 96, 96));
+const SerialPortState QSerialPortManager::Open        = SerialPortState('O', "connected", QColor(0, 192, 0));
+const SerialPortState QSerialPortManager::Error       = SerialPortState('E', "error", QColor(240, 0, 0));
 
 
 QSerialPortManager::QSerialPortManager(QObject * parent):
     QObject(parent),
+    m_enabled(false),
     m_request_timer(nullptr),
     m_port(nullptr)
 {}
@@ -30,7 +32,6 @@ QSerialPortManager::QSerialPortManager(QObject * parent):
 QSerialPortManager::~QSerialPortManager(void) {
     this->m_request_timer->stop();
     delete this->m_request_timer;
-    this->m_request_timer = nullptr;
 }
 
 void QSerialPortManager::initialize(void) {
@@ -40,7 +41,17 @@ void QSerialPortManager::initialize(void) {
 
     this->m_buffer = new QSerialBuffer(this);
     emit this->log(Concern::SerialPort, Level::Info, "Dome thread initialized");
-    emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
+    this->set_enabled(false);
+}
+
+void QSerialPortManager::set_enabled(bool enabled) {
+    emit this->log(Concern::SerialPort, Level::Warning, QString("Now %1abled").arg(enabled ? "en" : "dis"));
+    this->m_enabled = enabled;
+    if (enabled) {
+        this->m_request_timer->start();
+    } else {
+        this->m_request_timer->stop();
+    }
 }
 
 void QSerialPortManager::clear_port(void) {
@@ -49,8 +60,7 @@ void QSerialPortManager::clear_port(void) {
 }
 
 void QSerialPortManager::set_port(const QString & port_name) {
-    emit this->log(Concern::SerialPort, Level::Debug, QString("Trying to port %1").arg(port_name));
-    this->m_port_name = port_name;
+    emit this->log(Concern::SerialPort, Level::Warning, QString("Trying to open port '%1'").arg(port_name));
 
     this->clear_port();
 
@@ -58,8 +68,6 @@ void QSerialPortManager::set_port(const QString & port_name) {
     this->m_port->setPortName(port_name);
     this->m_port->setBaudRate(QSerialPort::Baud9600);
     this->m_port->setDataBits(QSerialPort::Data8);
-
-    this->m_request_timer->start();
 
     this->disconnect(this->m_buffer, &QSerialBuffer::message_complete, this, &QSerialPortManager::message_complete);
     this->connect(this->m_buffer, &QSerialBuffer::message_complete, this, &QSerialPortManager::message_complete);
@@ -69,12 +77,17 @@ void QSerialPortManager::set_port(const QString & port_name) {
         this->connect(this->m_port, &QSerialPort::errorOccurred, this, &QSerialPortManager::handle_error);
         emit this->log(Concern::SerialPort, Level::Info, QString("Opened %1").arg(this->m_port->portName()));
 
-        emit this->port_state_changed(QSerialPortManager::SerialPortOpen);
+        emit this->port_state_changed(QSerialPortManager::Open);
         emit this->port_changed(port_name);
     } else {
-        emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
-        emit this->error(this->m_port->error(), this->m_port->errorString());
+        if (this->m_port->portName() == "") {
+            emit this->port_state_changed(QSerialPortManager::NotSet);
+        } else {
+            emit this->error(this->m_port->portName(), this->m_port->error(), this->m_port->errorString());
+        }
     }
+
+    this->m_request_timer->start();
 }
 
 void QSerialPortManager::request_status(void) {
@@ -92,7 +105,7 @@ void QSerialPortManager::request(const QByteArray & request) {
     if (this->m_port->isOpen()) {
         this->m_port->write(encoded);
     } else {
-        emit this->port_state_changed(QSerialPortManager::SerialPortNotSet);
+        emit this->port_state_changed(QSerialPortManager::NotSet);
     }
 }
 
@@ -107,10 +120,10 @@ void QSerialPortManager::process_response(void) {
         response += this->m_port->readAll();
     }
     this->m_buffer->insert(response);
-    emit this->port_state_changed(QSerialPortManager::SerialPortOpen);
+    emit this->port_state_changed(QSerialPortManager::Open);
 }
 
 void QSerialPortManager::handle_error(QSerialPort::SerialPortError spe) {
-    emit this->port_state_changed(QSerialPortManager::SerialPortError);
-    emit this->error(spe, this->m_port->errorString());
+    emit this->port_state_changed(QSerialPortManager::Error);
+    emit this->error(this->m_port->portName(), spe, this->m_port->errorString());
 }

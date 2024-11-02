@@ -13,7 +13,19 @@
   <property name="windowTitle">
    <string>GroupBox</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gl_sightings">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="topMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <property name="bottomMargin">
+    <number>6</number>
+   </property>
    <item row="1" column="0" colspan="4">
     <widget class="QTableView" name="tv_sightings">
      <property name="editTriggers">
@@ -29,7 +41,7 @@
       <bool>true</bool>
      </property>
      <property name="selectionMode">
-      <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+      <enum>QAbstractItemView::SelectionMode::NoSelection</enum>
      </property>
      <property name="selectionBehavior">
       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
@@ -52,7 +64,7 @@
     </widget>
    </item>
    <item row="0" column="0">
-    <spacer name="horizontalSpacer">
+    <spacer name="hs_sightings">
      <property name="orientation">
       <enum>Qt::Orientation::Horizontal</enum>
      </property>

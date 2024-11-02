@@ -15,11 +15,12 @@
 class QSerialPortManager: public QObject {
     Q_OBJECT
 private:
+    bool m_enabled;
+
     QTimer * m_request_timer;
     QSerialPort * m_port;
     QSerialBuffer * m_buffer;
 
-    QString m_port_name;
     bool m_quit = false;
     QString m_response;
     unsigned int m_robin = 0;
@@ -40,7 +41,7 @@ private slots:
     void handle_error(QSerialPort::SerialPortError spe);
 
 public:
-    const static SerialPortState SerialPortNotSet, SerialPortOpen, SerialPortError;
+    const static SerialPortState Disabled, NotSet, Open, Error;
 
     explicit QSerialPortManager(QObject * parent = nullptr);
     ~QSerialPortManager(void);
@@ -51,6 +52,8 @@ public:
 
     void request_status(void);
     void request(const QByteArray & request);
+public slots:
+    void set_enabled(bool enabled);
 
 signals:
     void read_timeout(void);
@@ -59,7 +62,7 @@ signals:
     void port_changed(const QString & port_name);
 
     void port_state_changed(SerialPortState sps);
-    void error(QSerialPort::SerialPortError spe, const QString & message);
+    void error(const QString & port_name, QSerialPort::SerialPortError spe, const QString & message);
     void message_complete(const QByteArray & message);
 
     void log(Concern concern, Level level, const QString & message);

@@ -87,7 +87,7 @@ void QUfoManager::set_path(const QString & path) {
 }
 
 // Automatic action: start UFO after sunset, stop before sunrise
-void QUfoManager::auto_action(bool is_dark, const QDateTime & open_since) const {
+void QUfoManager::auto_action(bool is_dark, const QDateTime & open_since) {
     if (this->m_autostart) {
         logger.debug(Concern::UFO, QString("UFO-%1: Automatic action").arg(this->id()));
 
@@ -196,7 +196,7 @@ void QUfoManager::start_ufo(unsigned int delay) const {
  * @brief QUfoManager::start_ufo_inner
  * Actually starts UFO, private function
  */
-void QUfoManager::start_ufo_inner(void) const {
+void QUfoManager::start_ufo_inner(void) {
     logger.debug(Concern::UFO, QString("UFO-%1 starting").arg(this->id()));
     this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
@@ -217,7 +217,7 @@ void QUfoManager::start_ufo_inner(void) const {
  * @brief QUfoManager::stop_ufo
  * Stops UFO Capture v2 (three polite attempts by Jozef's method, then kill)
  */
-void QUfoManager::stop_ufo(void) const {
+void QUfoManager::stop_ufo(void) {
     if (this->m_process.state() == QProcess::ProcessState::NotRunning) {
         logger.debug(Concern::UFO, QString("UFO-%1: Not running").arg(this->id()));
     } else {

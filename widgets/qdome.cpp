@@ -64,7 +64,7 @@ QDome::QDome(QWidget * parent):
     m_last_received(QDateTime::currentDateTimeUtc()),
     m_thread(nullptr),
     m_spm(nullptr),
-    m_sps(QSerialPortManager::SerialPortNotSet),
+    m_sps(QSerialPortManager::NotSet),
     m_state_S(),
     m_state_T(),
     m_state_Z()
@@ -139,21 +139,8 @@ QDome::QDome(QWidget * parent):
     this->connect(this->m_thread, &QThread::finished, this->m_spm, &QObject::deleteLater, Qt::QueuedConnection);
     this->connect(this->m_thread, &QThread::finished, this->m_thread, &QObject::deleteLater, Qt::QueuedConnection);
 
-    this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::set_port, Qt::QueuedConnection);
-    this->connect(this, &QDome::command, this->m_spm, &QSerialPortManager::request, Qt::QueuedConnection);
-
-    this->connect(this->m_spm, &QSerialPortManager::message_complete, this, &QDome::process_message, Qt::QueuedConnection);
-    this->connect(this->m_spm, &QSerialPortManager::error, this, &QDome::handle_serial_port_error, Qt::QueuedConnection);
-    this->connect(this->m_spm, &QSerialPortManager::port_changed, this, &QDome::handle_serial_port_changed, Qt::QueuedConnection);
-    this->connect(this->m_spm, &QSerialPortManager::port_state_changed, this, &QDome::set_serial_port_state, Qt::QueuedConnection);
-    this->connect(this->m_spm, &QSerialPortManager::log, this, &QDome::pass_log_message, Qt::QueuedConnection);
-    this->connect(this->ui->pb_sw_reset, &QPushButton::pressed, this, &QDome::request_sw_reset);
-
+    this->list_serial_ports();
     this->m_thread->start();
-
-    emit this->cover_closed(0);
-    emit this->cover_open(400);
-    emit this->cover_moved(0);
 }
 
 QDome::~QDome() {
@@ -166,8 +153,11 @@ QDome::~QDome() {
 void QDome::initialize(QSettings * settings) {
     QAmosWidget::initialize(settings);
 
-    this->list_serial_ports();
     this->set_formatters();
+
+    emit this->cover_closed(0);
+    emit this->cover_open(400);
+    emit this->cover_moved(0);
 
     this->display_basic_data(this->m_state_S);
     this->display_env_data(this->m_state_T);
@@ -179,6 +169,20 @@ void QDome::connect_slots(void) {
     for (auto && widget: {this->ui->dsb_humidity_limit_lower, this->ui->dsb_humidity_limit_upper}) {
         this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::settings_changed);
     }
+
+    qDebug() << "Connecting slots";
+    this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::set_port, Qt::QueuedConnection);
+    this->connect(this, &QDome::command, this->m_spm, &QSerialPortManager::request, Qt::QueuedConnection);
+    this->connect(this->ui->cb_enabled, &QCheckBox::checkStateChanged, this, &QDome::set_enabled);
+    this->connect(this->ui->cb_enabled, &QCheckBox::checkStateChanged, this->m_spm, &QSerialPortManager::set_enabled, Qt::QueuedConnection);
+
+    this->connect(this->m_spm, &QSerialPortManager::message_complete, this, &QDome::process_message, Qt::QueuedConnection);
+    this->connect(this->m_spm, &QSerialPortManager::error, this, &QDome::handle_serial_port_error, Qt::QueuedConnection);
+    this->connect(this->m_spm, &QSerialPortManager::port_changed, this, &QDome::handle_serial_port_changed, Qt::QueuedConnection);
+    this->connect(this->m_spm, &QSerialPortManager::port_state_changed, this, &QDome::set_serial_port_state, Qt::QueuedConnection);
+    this->connect(this->m_spm, &QSerialPortManager::log, this, &QDome::pass_log_message, Qt::QueuedConnection);
+    this->connect(this->ui->pb_sw_reset, &QPushButton::pressed, this, &QDome::request_sw_reset);
+
 }
 
 void QDome::load_defaults(void) {
@@ -187,6 +191,9 @@ void QDome::load_defaults(void) {
 }
 
 void QDome::load_settings_inner(void) {
+    this->set_enabled(
+        this->m_settings->value("dome/enabled", QDome::DefaultEnabled).toBool()
+    );
     this->set_humidity_limits(
         this->m_settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
         this->m_settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
@@ -194,6 +201,7 @@ void QDome::load_settings_inner(void) {
     this->handle_serial_port_selected(
         this->m_settings->value("dome/port", QDome::DefaultPort).toString()
     );
+    qDebug() << "Load settings inner" << "enabled" << this->is_enabled();
 }
 
 bool QDome::is_changed(void) const {
@@ -215,6 +223,7 @@ void QDome::discard_changes_inner(void) {
 }
 
 void QDome::save_settings_inner(void) const {
+    this->m_settings->setValue("dome/enabled", this->is_enabled());
     this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
     this->m_settings->setValue("dome/port", this->ui->co_serial_ports->currentText());
@@ -430,7 +439,7 @@ void QDome::handle_serial_port_changed(const QString & port) {
     this->ui->co_serial_ports->setCurrentText(port);
 
     this->m_last_received = QDateTime::currentDateTimeUtc();
-    this->m_data_state = "no data";
+    this->set_data_state("no data");
 }
 
 /**
@@ -448,6 +457,29 @@ void QDome::set_open_since(void) {
     }
 }
 
+void QDome::set_enabled(int enable) {
+    qDebug() << "Set enabled:" << enable;
+    this->m_enabled = (bool) enable;
+    logger.info(Concern::Operation, QString("Dome: %2abled").arg(enable ? "en" : "dis"));
+
+    this->ui->inner->setEnabled(enable);
+    this->set_data_state(enable ? "no data" : "disabled");
+    this->m_last_received = QDateTime::currentDateTimeUtc();
+
+    emit this->enabled_set(enable);
+    if (enable) {
+        emit this->ui->co_serial_ports->activated(this->ui->co_serial_ports->currentIndex());
+        this->set_serial_port_state(QSerialPortManager::NotSet);
+    } else {
+        this->set_serial_port_state(QSerialPortManager::Disabled);
+    }
+
+    this->m_settings->setValue("dome/enabled", this->is_enabled());
+
+    const QSignalBlocker blocker(this->ui->cb_enabled);
+    this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
+}
+
 void QDome::display_data_state(void) const {
     this->ui->lb_serial_data_state->setText(
         QString("%1 (%2)").arg(this->data_state(), Formatters::format_duration_double(
@@ -457,8 +489,9 @@ void QDome::display_data_state(void) const {
     this->ui->picture->set_reachable(this->state_S().is_valid());
 }
 
-void QDome::set_serial_port_state(SerialPortState state) {
+void QDome::set_serial_port_state(const SerialPortState & state) {
     this->m_sps = state;
+    qDebug() << "Set serial port state to " << state.display_string();
     logger.debug(Concern::SerialPort, QString("Port state set to %1").arg(state.display_string()));
     this->ui->lb_serial_port_state->setText(state.display_string());
     this->ui->lb_serial_port_state->setStyleSheet(QString("QLabel { color: %1; }").arg(state.colour().name()));
@@ -468,14 +501,14 @@ void QDome::set_data_state(const QString & data_state) {
     this->m_data_state = data_state;
 }
 
-void QDome::handle_serial_port_error(QSerialPort::SerialPortError error, const QString & message) {
-    logger.error(Concern::SerialPort, QString("Error %1: %2").arg(error).arg(message));
-    this->set_serial_port_state(QSerialPortManager::SerialPortError);
+void QDome::handle_serial_port_error(const QString & port, QSerialPort::SerialPortError error, const QString & message) {
+    logger.error(Concern::SerialPort, QString("Error on port %1, %2: %3").arg(port).arg(error).arg(message));
+    this->set_serial_port_state(QSerialPortManager::Error);
     this->set_data_state(QString("error %1").arg(error));
 }
 
 void QDome::handle_no_serial_port_set(void) {
-    this->set_serial_port_state(QSerialPortManager::SerialPortNotSet);
+    this->set_serial_port_state(QSerialPortManager::NotSet);
 }
 
 void QDome::pass_log_message(Concern concern, Level level, const QString & message) {
@@ -496,6 +529,7 @@ void QDome::pass_log_message(Concern concern, Level level, const QString & messa
 
 QJsonObject QDome::json(void) const {
     return QJsonObject {
+        {"on", this->is_enabled()},
         {"st", QString(QChar(this->serial_port_state().code()))},
         {"s", this->m_state_S.json()},
         {"t", this->m_state_T.json()},
@@ -516,6 +550,7 @@ void QDome::process_message(const QByteArray & message) {
 
         switch (decoded[0]) {
             case 'C':
+                [[fallthrough]];
             case 'S':
                 this->m_state_S = DomeStateS(decoded);
                 emit this->state_updated_S(this->m_state_S);
@@ -633,7 +668,7 @@ void QDome::turn_on_intensifier(void) const {
         logger.info(Concern::Operation, "Turning on the image intensifier");
         this->send_command(QDome::CommandIIOn);
     } else {
-        logger.warning(Concern::Operation, "Refusing to turn on II: it must be dark, or in manual mode with safety overridden");
+        logger.error(Concern::Operation, "Refusing to turn on II: it must be dark, or in manual mode with safety overridden");
     }
 }
 
