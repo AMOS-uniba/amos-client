@@ -58,7 +58,7 @@ public slots:
     void discard_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
 
-    void reload(void);
+    void clear(void);
 signals:
     void sighting_to_send(const Sighting & sighting);
     void sighting_deleted(Sighting & sighting);

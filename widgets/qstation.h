@@ -34,7 +34,7 @@ private:
     StateLogger * m_state_logger;
 
     // Pointers to subordinate widgets
-    const QDome * m_dome;
+    QDome * m_dome;
     const QServer * m_server;
     const QCamera * m_camera_allsky;
     const QCamera * m_camera_spectral;
@@ -89,8 +89,8 @@ public:
     inline const QCamera * camera_spectral(void) const { return this->m_camera_spectral; }
 
     // Dome getter and setter
-    void set_dome(const QDome * const dome);
-    inline const QDome * dome(void) const { return this->m_dome; }
+    inline void set_dome(QDome * dome) { this->m_dome = dome; }
+    inline QDome * dome(void) const { return this->m_dome; }
 
     // Server getter and setter
     void set_server(const QServer * const server);

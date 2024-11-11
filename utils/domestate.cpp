@@ -17,7 +17,7 @@ float DomeState::deciint(const QByteArray & chunk) {
 }
 
 bool DomeState::is_valid(void) const {
-    logger.debug(Concern::SerialPort, QString("State age is %1").arg(this->age()));
+    logger.detail(Concern::SerialPort, QString("State age is %1").arg(this->age()));
     return (this->m_valid && (this->age() < 2.0));
 }
 

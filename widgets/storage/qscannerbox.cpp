@@ -44,4 +44,5 @@ void QScannerBox::scan_sightings(void) {
     } else {
         logger.debug(Concern::Storage, "Scanner disabled, not scanning");
     }
+    emit this->sightings_scanned();
 }

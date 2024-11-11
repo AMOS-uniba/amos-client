@@ -70,6 +70,7 @@ public slots:
 signals:
     void darkness_limit_changed(double new_limit);
 
+    void sightings_scanned(void);
     void sighting_found(Sighting & sighting);
     void sighting_stored(Sighting & sighting);
     void sighting_discarded(Sighting & sighting);

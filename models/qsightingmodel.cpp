@@ -231,7 +231,7 @@ void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::
     emit this->sighting_deferred(sighting);
 }
 
-void QSightingModel::reload(void) {
+void QSightingModel::clear(void) {
     this->m_sightings.clear();
     this->beginResetModel();
     this->endResetModel();

@@ -169,10 +169,6 @@ void QStation::set_cameras(const QCamera * const allsky, const QCamera * const s
     this->m_camera_spectral = spectral;
 }
 
-void QStation::set_dome(const QDome * const dome) {
-    this->m_dome = dome;
-}
-
 void QStation::set_server(const QServer * const server) {
     this->m_server = server;
     this->connect(this->m_server, &QServer::request_heartbeat, this, &QStation::send_heartbeat);
