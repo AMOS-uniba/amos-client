@@ -98,16 +98,17 @@ void QUfoManager::auto_action(bool is_dark, const QDateTime & open_since) {
                 logger.debug_error(Concern::UFO, QString("UFO-%1: File not found").arg(this->id()));
             } else {
                 if (is_dark) {
-                    if (!open_since.isValid()) {
-                        logger.debug(Concern::UFO, QString("Camera %1: Dome is not open or II is off").arg(this->id()));
-                    } else {
+                    if (open_since.isValid()) {
                         logger.debug(Concern::UFO, QString("Camera %1: Cover open and II active for %2 s")
                             .arg(this->id())
                             .arg(open_since.secsTo(QDateTime::currentDateTimeUtc()))
                         );
-                        if (open_since.secsTo(QDateTime::currentDateTimeUtc()) > 10) {
+                        if (open_since.secsTo(QDateTime::currentDateTimeUtc()) > QUfoManager::OpenDelay) {
                             this->start_ufo();
                         }
+                    } else {
+                        logger.debug(Concern::UFO, QString("Camera %1: Dome is not open or II is off, stopping UFO").arg(this->id()));
+                        this->stop_ufo();
                     }
                 } else {
                     this->stop_ufo();
@@ -203,10 +204,10 @@ void QUfoManager::start_ufo_inner(void) {
     this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
     this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
 
-    Sleep(1000);
+    Sleep(QUfoManager::SleepTime);
     this->m_frame = FindWindowA(nullptr, "UFOCapture");
     logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2").arg(this->id()).arg((long long) this->m_frame));
-    Sleep(1000);
+    Sleep(QUfoManager::SleepTime);
     ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
     this->m_start_scheduled = false;
 
@@ -226,11 +227,12 @@ void QUfoManager::stop_ufo(void) {
         if (this->is_running()) {
             logger.info(Concern::UFO, QString("UFO-%1 stopping").arg(this->id()));
             SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
-            Sleep(200);
+            Sleep(QUfoManager::SleepTime);
 
             logger.debug(Concern::UFO, "Clicking the dialog button");
             child = GetLastActivePopup(this->m_frame);
 
+            Sleep(QUfoManager::SleepTime);
             logger.debug(Concern::UFO, QString("Child dialog's HWND is %1").arg((long long) child));
 
             if (child == nullptr) {
@@ -238,7 +240,8 @@ void QUfoManager::stop_ufo(void) {
             } else {
                 SetActiveWindow(child);
                 SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-                Sleep(200);
+                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+                Sleep(QUfoManager::SleepTime);
             }
 
             if (this->is_running()) {

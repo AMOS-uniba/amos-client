@@ -243,7 +243,7 @@ void Orient(PlanetType Planet, SystemType System, double T,
 
     // Transformation from Earth mean equator and equinox of J2000 to
     // body fixed equator and prime meridian system
-    //E = R_z(W) * R_x(pi/2.0-Dec) * R_z(pi/2.0+RA);
+    E = R_z(W) * R_x(pi/2.0-Dec) * R_z(pi/2.0+RA);
 
     // Sense of rotation
     if ((Planet == Venus) || (Planet == Uranus) || (Planet == Pluto))

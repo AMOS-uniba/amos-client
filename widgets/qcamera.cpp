@@ -67,10 +67,10 @@ QJsonObject QCamera::json(void) const {
 }
 
 void QCamera::auto_action(bool is_dark, const QDateTime & open_since) {
-    if (!this->is_enabled()) {
-        logger.debug(Concern::UFO, QString("Camera %1: automatic action skipped, camera is disabled").arg(this->id()));
-    } else {
+    if (this->is_enabled()) {
         this->ui->ufo_manager->auto_action(is_dark, open_since);
+    } else {
+        logger.debug(Concern::UFO, QString("Camera %1: automatic action skipped, camera is disabled").arg(this->id()));
     }
 }
 

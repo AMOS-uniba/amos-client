@@ -159,7 +159,7 @@ void QDome::initialize(QSettings * settings) {
     this->display_data_state();
 
     emit this->ui->cb_enabled->checkStateChanged(this->is_enabled() ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
-    this->ui->co_serial_ports->setCurrentText();
+    this->ui->co_serial_ports->setCurrentText(settings->value("dome/port").toString());
 }
 
 void QDome::connect_slots(void) {
@@ -189,6 +189,7 @@ void QDome::load_defaults(void) {
 }
 
 void QDome::load_settings_inner(void) {
+    logger.warning(Concern::SerialPort, QString("Loading dome settings"));
     this->set_enabled(
         this->m_settings->value("dome/enabled", QDome::DefaultEnabled).toBool()
     );
@@ -220,6 +221,7 @@ void QDome::discard_changes_inner(void) {
 }
 
 void QDome::save_settings_inner(void) const {
+    logger.warning(Concern::SerialPort, QString("Saving settings"));
     this->m_settings->setValue("dome/enabled", this->is_enabled());
     this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
@@ -426,20 +428,27 @@ void QDome::list_serial_ports(void) {
     } else {
         this->ui->co_serial_ports->setPlaceholderText("not selected");
         this->ui->co_serial_ports->setEnabled(true);
-        this->handle_serial_port_changed(old);
+        if (old != "") {
+            this->handle_serial_port_changed(old);
+        }
     }
 }
 
 void QDome::handle_serial_port_selected(const QString & port) {
     logger.warning(Concern::SerialPort, QString("Handling setting of serial port to '%1'").arg(port));
-    emit this->serial_port_selected(port);
-    this->save_settings();
+    if (port == "") {
+        return;
+    } else {
+        emit this->serial_port_selected(port);
+    }
 }
 
 void QDome::handle_serial_port_changed(const QString & port) {
     logger.warning(Concern::SerialPort, QString("Handling change of serial port to '%1'").arg(port));
+
     const QSignalBlocker blocker(this->ui->co_serial_ports);
     this->ui->co_serial_ports->setCurrentText(port);
+    this->save_settings();
 
     this->m_last_received = QDateTime::currentDateTimeUtc();
     this->set_data_state("no data");
@@ -452,10 +461,13 @@ void QDome::handle_serial_port_changed(const QString & port) {
 void QDome::set_open_since(void) {
     const DomeStateS & state = this->state_S();
     if (state.is_valid() && state.dome_open_sensor_active() && state.intensifier_active()) {
+        // If there is no valid past state, set it
         if (!this->m_open_since.isValid()) {
             this->m_open_since = QDateTime::currentDateTimeUtc();
         }
+        // If there is, everything is fine, so don't touch anything
     } else {
+        // Otherwise we are not open, set to invalid
         this->m_open_since = QDateTime();
     }
 }
