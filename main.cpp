@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "mainwindow.h"
 #include "logging/eventlogger.h"
 #include "logging/statelogger.h"

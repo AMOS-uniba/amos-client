@@ -51,14 +51,14 @@ void QSerialPortManager::initialize(void) {
 }
 
 void QSerialPortManager::set_enabled(bool enabled) {
-    emit this->log(Concern::SerialPort, Level::Warning,
+    emit this->log(Concern::SerialPort, Level::Debug,
                    QString("Serial port manager: now %1abled").arg(enabled ? "en" : "dis"));
     this->m_enabled = enabled;
     this->reset();
 }
 
 void QSerialPortManager::set_port(const QString & port_name) {
-    emit this->log(Concern::SerialPort, Level::Warning,
+    emit this->log(Concern::SerialPort, Level::Debug,
                    QString("Serial port manager: trying to open port '%1'").arg(port_name));
     this->m_port->close();
     this->m_port->setPortName(port_name);

@@ -189,7 +189,7 @@ void QDome::load_defaults(void) {
 }
 
 void QDome::load_settings_inner(void) {
-    logger.warning(Concern::SerialPort, QString("Loading dome settings"));
+    logger.debug(Concern::SerialPort, QString("Loading dome settings"));
     this->set_enabled(
         this->m_settings->value("dome/enabled", QDome::DefaultEnabled).toBool()
     );
@@ -221,7 +221,7 @@ void QDome::discard_changes_inner(void) {
 }
 
 void QDome::save_settings_inner(void) const {
-    logger.warning(Concern::SerialPort, QString("Saving settings"));
+    logger.debug(Concern::SerialPort, QString("Saving settings"));
     this->m_settings->setValue("dome/enabled", this->is_enabled());
     this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
@@ -411,14 +411,14 @@ QString QDome::status_line(void) const {
 }
 
 void QDome::list_serial_ports(void) {
-    logger.warning(Concern::SerialPort, "Listing serial ports");
+    logger.debug(Concern::SerialPort, "Listing serial ports");
     auto old = this->ui->co_serial_ports->currentText();
 
     this->ui->co_serial_ports->clear();
     auto serial_ports = QSerialPortInfo::availablePorts();
 
     for (QSerialPortInfo & sp: serial_ports) {
-        logger.warning(Concern::SerialPort, sp.portName());
+        logger.debug(Concern::SerialPort, sp.portName());
         this->ui->co_serial_ports->addItem(sp.portName());
     }
 
@@ -435,7 +435,7 @@ void QDome::list_serial_ports(void) {
 }
 
 void QDome::handle_serial_port_selected(const QString & port) {
-    logger.warning(Concern::SerialPort, QString("Handling setting of serial port to '%1'").arg(port));
+    logger.debug(Concern::SerialPort, QString("Handling setting of serial port to '%1'").arg(port));
     if (port == "") {
         return;
     } else {
@@ -444,7 +444,7 @@ void QDome::handle_serial_port_selected(const QString & port) {
 }
 
 void QDome::handle_serial_port_changed(const QString & port) {
-    logger.warning(Concern::SerialPort, QString("Handling change of serial port to '%1'").arg(port));
+    logger.debug(Concern::SerialPort, QString("Handling change of serial port to '%1'").arg(port));
 
     const QSignalBlocker blocker(this->ui->co_serial_ports);
     this->ui->co_serial_ports->setCurrentText(port);
