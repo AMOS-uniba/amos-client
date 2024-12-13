@@ -8,8 +8,6 @@
 
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
-#include "logging/eventlogger.h"
-#include "utils/sighting.h"
 
 namespace Ui {
     class QServer;

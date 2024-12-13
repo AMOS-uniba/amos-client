@@ -1,5 +1,7 @@
 #include <QJsonObject>
 
+#include "settings.h"
+#include "logging/eventlogger.h"
 #include "domestate.h"
 #include "utils/exceptions.h"
 
@@ -142,8 +144,6 @@ QJsonValue DomeStateT::json(void) const {
         return QJsonValue(QJsonValue::Null);
     }
 }
-
-
 
 DomeStateZ::DomeStateZ(void):
     DomeState(),

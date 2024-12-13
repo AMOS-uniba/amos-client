@@ -1,8 +1,10 @@
 #include <QJsonDocument>
 
+#include "logging/eventlogger.h"
 #include "widgets/qstation.h"
 #include "widgets/qserver.h"
 #include "utils/exceptions.h"
+
 #include "ui_qserver.h"
 
 extern EventLogger logger;

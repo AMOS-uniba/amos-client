@@ -1,6 +1,7 @@
 #include <QTimer>
 #include <QWaitCondition>
 
+#include "settings.h"
 #include "qserialportmanager.h"
 #include "logging/eventlogger.h"
 #include "utils/telegram.h"

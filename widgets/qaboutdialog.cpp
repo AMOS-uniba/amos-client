@@ -1,3 +1,4 @@
+#include "settings.h"
 #include "qaboutdialog.h"
 #include "ui_qaboutdialog.h"
 

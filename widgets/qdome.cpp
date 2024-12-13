@@ -1,6 +1,7 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
+#include "settings.h"
 #include "logging/include.h"
 
 #include "utils/exceptions.h"

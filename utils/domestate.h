@@ -3,8 +3,9 @@
 
 #include <QString>
 #include <QSerialPort>
+#include <QDateTime>
 
-#include "logging/eventlogger.h"
+#include "settings.h"
 
 
 class DomeState {

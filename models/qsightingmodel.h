@@ -13,7 +13,7 @@ QT_FORWARD_DECLARE_CLASS(QSightingBuffer);
 class QSightingModel: public QAbstractTableModel {
     Q_OBJECT
 private:
-    constexpr static float DeferTime = 5;                   // Time in seconds: how long to defer a Sighting
+    constexpr static float DeferTime = 60;                  // Time in seconds: how long to defer a Sighting
     constexpr static int DeferRefreshInterval = 100;        // Time in ms: how often to refresh the view
     constexpr static int SendInterval = 5000;               // Time in ms: how often to try to send sightings
 

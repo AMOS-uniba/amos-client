@@ -104,10 +104,6 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->sun_info->update_long_term();
     this->ui->camera_allsky->update_clocks();
     this->ui->camera_spectral->update_clocks();
-#if OLD_PROTOCOL
-//    this->ui->dome->set_cover_minimum(-26);
-//    this->ui->dome->set_cover_maximum(26);
-#endif
     logger.info(Concern::Operation, "Initialization complete");
 }
 

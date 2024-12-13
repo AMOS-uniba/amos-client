@@ -11,7 +11,6 @@
 #include <QIcon>
 
 #include "forward.h"
-#include "settings.h"
 #include "widgets/qconfigurable.h"
 #include "utils/state/stationstate.h"
 
