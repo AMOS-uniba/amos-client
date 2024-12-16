@@ -87,7 +87,6 @@ HEADERS += \
     forward.h \
     mainwindow.h \
     models/qsightingmodel.h \
-    settings.h \
     utils/domestate.h \
     utils/exceptions.h \
     utils/formatters.h \
@@ -146,8 +145,10 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 1.2.4
+VERSION = 1.2.6
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+# Magic values: 2020 for new, 2015 for old
+DEFINES += PROTOCOL=2020
 TARGET = "AMOS client"
 
 QMAKE_TARGET_COMPANY = AMOS

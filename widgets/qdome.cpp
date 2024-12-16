@@ -1,7 +1,6 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 
-#include "settings.h"
 #include "logging/include.h"
 
 #include "utils/exceptions.h"
@@ -570,9 +569,9 @@ void QDome::process_message(const QByteArray & message) {
                 this->m_state_T = DomeStateT(decoded);
                 emit this->state_updated_T(this->m_state_T);
                 break;
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
             case 'W':
-#else
+#elif PROTOCOL == 2020
             case 'Z':
 #endif
                 this->m_state_Z = DomeStateZ(decoded);

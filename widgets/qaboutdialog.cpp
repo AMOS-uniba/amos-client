@@ -1,4 +1,3 @@
-#include "settings.h"
 #include "qaboutdialog.h"
 #include "ui_qaboutdialog.h"
 
@@ -9,14 +8,13 @@ QAboutDialog::QAboutDialog(QWidget * parent) :
 {
     this->ui->setupUi(this);
     this->ui->lb_datetime->setText(QString("Built on %1 %2").arg(__DATE__, __TIME__));
-    this->ui->lb_protocol->setText(
-#if OLD_PROTOCOL
-    "Compiled for old protocol (Senec)"
-#else
-    "Compiled for new protocol"
-#endif
-    );
+#if PROTOCOL == 2015
+    this->ui->lb_protocol->setText("Compiled for old protocol (Senec)");
+    this->ui->lb_version->setText(QString("Version %1%2").arg(VERSION_STRING).arg("sc"));
+#elif PROTOCOL == 2020
+    this->ui->lb_protocol->setText("Compiled for new protocol");
     this->ui->lb_version->setText(QString("Version %1").arg(VERSION_STRING));
+#endif
 }
 
 QAboutDialog::~QAboutDialog() {

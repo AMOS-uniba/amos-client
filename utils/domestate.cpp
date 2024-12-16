@@ -1,6 +1,5 @@
 #include <QJsonObject>
 
-#include "settings.h"
 #include "logging/eventlogger.h"
 #include "domestate.h"
 #include "utils/exceptions.h"
@@ -152,7 +151,7 @@ DomeStateZ::DomeStateZ(void):
 DomeStateZ::DomeStateZ(const QByteArray & response):
     DomeState()
 {
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }
@@ -160,7 +159,7 @@ DomeStateZ::DomeStateZ(const QByteArray & response):
         throw InvalidState(QString("Invalid first char of W state message '%1'").arg(QString(QChar(response[0]))));
     }
     memcpy(&this->m_shaft_position, response.mid(7, 2).data(), 2);
-#else
+#elif PROTOCOL == 2020
     if (response.length() != 3) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }

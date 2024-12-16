@@ -1,4 +1,3 @@
-#include "settings.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
@@ -15,9 +14,9 @@ void MainWindow::display_time(void) {
 }
 
 void MainWindow::display_window_title(void) {
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
     QString protocol = " <Senec>";
-#else
+#elif PROTOCOL == 2020
     QString protocol = "";
 #endif
     this->setWindowTitle(QString("AMOS client %1%2 [%3]%4").arg(

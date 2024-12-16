@@ -1,7 +1,6 @@
 #include <QTimer>
 #include <QWaitCondition>
 
-#include "settings.h"
 #include "qserialportmanager.h"
 #include "logging/eventlogger.h"
 #include "utils/telegram.h"
@@ -11,9 +10,9 @@ extern EventLogger logger;
 
 const Request QSerialPortManager::RequestBasic        = Request('S', "basic data request");
 const Request QSerialPortManager::RequestEnv          = Request('T', "environment data request");
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
 const Request QSerialPortManager::RequestShaft        = Request('W', "shaft position request (old protocol)");
-#else
+#elif PROTOCOL == 2020
 const Request QSerialPortManager::RequestShaft        = Request('Z', "shaft position request");
 #endif
 
@@ -117,8 +116,6 @@ void QSerialPortManager::request(const QByteArray & request) {
 }
 
 void QSerialPortManager::process_response(void) {
-    emit this->log(Concern::SerialPort, Level::Debug, QString("%1").arg(this->m_last_received.msecsTo(QDateTime::currentDateTimeUtc())));
-
     this->m_last_received = QDateTime::currentDateTimeUtc();
     this->m_error_counter = 0;
 

@@ -1,7 +1,6 @@
 #include <QTimer>
 #include <QJsonObject>
 
-#include "settings.h"
 #include "qstation.h"
 #include "ui_qstation.h"
 #include "utils/universe.h"
@@ -332,9 +331,9 @@ QJsonObject QStation::json(void) const {
             {"lon", this->longitude()},
             {"alt", this->altitude()},
         }},
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
         {"cv", QString("%1%2").arg(VERSION_STRING, "sc")},
-#else
+#elif PROTOCOL == 2020
         {"cv", VERSION_STRING},
 #endif
     };

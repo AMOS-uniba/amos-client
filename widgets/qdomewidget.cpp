@@ -39,7 +39,7 @@ void QDomeWidget::set_cover_maximum(int new_maximum) {
 }
 
 void QDomeWidget::set_reachable(bool reachable) {
-    logger.debug(Concern::Operation, QString("Dome is %1reachable").arg(reachable ? "" : "un"));
+    logger.detail(Concern::Operation, QString("Dome is %1reachable").arg(reachable ? "" : "un"));
     this->m_reachable = reachable;
     this->repaint();
 }
