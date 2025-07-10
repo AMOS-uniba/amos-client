@@ -74,7 +74,7 @@ Vec3D MoonEqu (double T);
 //   Dec       Declination of the Moon in [rad]
 //
 //------------------------------------------------------------------------------
-void MiniMoon (double T, double& RA, double& Dec);
+void MiniMoon(double T, double& RA, double& Dec);
 
 
 #endif   // include blocker

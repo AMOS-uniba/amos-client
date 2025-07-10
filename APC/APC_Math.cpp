@@ -179,31 +179,26 @@ void DMS(double Dd, int& D, int& M, double& S) {
 //   abscissae are spaced equally.
 //
 //------------------------------------------------------------------------------
-void Quad ( double y_minus, double y_0, double y_plus,
-            double& xe, double& ye, double& root1,
-            double& root2, int& n_root ) {
-    //
-    // Variables
-    //
-    double a,b,c, dis, dx;
-
-
+void Quad(double y_minus, double y_0, double y_plus,
+          double & xe, double & ye,
+          double & root1, double & root2, int & n_root) {
+    double a, b, c, dx;
     n_root = 0;
 
     // Coefficients of interpolating parabola y=a*x^2+b*x+c
-    a  = 0.5*(y_plus+y_minus) - y_0;
-    b  = 0.5*(y_plus-y_minus);
-    c  = y_0;
+    a = 0.5 * (y_plus + y_minus) - y_0;
+    b = 0.5 * (y_plus - y_minus);
+    c = y_0;
 
     // Find extreme value
-    xe = -b/(2.0*a);
-    ye = (a*xe+b) * xe + c;
+    xe = -b / (2.0*a);
+    ye = (a * xe + b) * xe + c;
 
-    dis = b*b - 4.0*a*c; // Discriminant of y=a*x^2+b*x+c
+    double dis = b * b - 4.0 * a * c; // Discriminant of y=a*x^2+b*x+c
 
     if (dis >= 0) // Parabola has roots
     {
-        dx = 0.5 * sqrt (dis) / fabs (a);
+        dx = 0.5 * std::sqrt(dis) / std::fabs(a);
 
         root1 = xe - dx;
         root2 = xe + dx;
