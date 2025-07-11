@@ -46,7 +46,7 @@ QStation::QStation(QWidget * parent):
     m_start_time(QDateTime::currentDateTimeUtc()),
     m_latitude(49.0),
     m_longitude(18.0),
-    m_altitude(1.0),
+    m_altitude(0.0),
     m_manual_control(false),
     m_safety_override(false),
     m_state(QStation::DomeUnreachable)
@@ -60,11 +60,6 @@ QStation::QStation(QWidget * parent):
     this->m_timer_automatic->setInterval(1000);
     this->connect(this->m_timer_automatic, &QTimer::timeout, this, &QStation::automatic_timer);
     this->m_timer_automatic->start();
-
-    this->m_timer_heartbeat = new QTimer(this);
-    this->m_timer_heartbeat->setInterval(QStation::HeartbeatInterval);
-    this->connect(this->m_timer_heartbeat, &QTimer::timeout, this, &QStation::heartbeat);
-    this->m_timer_heartbeat->start();
 }
 
 QStation::~QStation() {
@@ -336,6 +331,7 @@ QJsonObject QStation::json(void) const {
 #elif PROTOCOL == 2020
         {"cv", VERSION_STRING},
 #endif
+        {"cs", this->start_time().toString(Qt::ISODate)},
     };
 }
 

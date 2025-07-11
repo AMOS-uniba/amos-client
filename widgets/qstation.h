@@ -40,7 +40,6 @@ private:
     const QCamera * m_camera_spectral;
 
     QTimer * m_timer_automatic;
-    QTimer * m_timer_heartbeat;
 
     void set_state(StationState new_state);
 
@@ -65,7 +64,6 @@ private slots:
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower, Inconsistent;
-    constexpr static unsigned int HeartbeatInterval = 60000;
 
     explicit QStation(QWidget * parent = nullptr);
     ~QStation();

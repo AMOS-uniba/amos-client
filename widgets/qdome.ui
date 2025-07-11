@@ -824,11 +824,13 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>cb_enabled</tabstop>
   <tabstop>co_serial_ports</tabstop>
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>dsb_humidity_limit_lower</tabstop>
   <tabstop>bt_cover_open</tabstop>
   <tabstop>bt_cover_close</tabstop>
+  <tabstop>pb_sw_reset</tabstop>
  </tabstops>
  <resources/>
  <connections/>

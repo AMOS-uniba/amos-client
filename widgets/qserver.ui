@@ -40,9 +40,6 @@
      <property name="text">
       <string>IP address</string>
      </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-     </property>
     </widget>
    </item>
    <item row="3" column="0" colspan="5">
@@ -70,7 +67,7 @@
        <widget class="QLabel" name="lx_countdown">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>10</horstretch>
+          <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
@@ -89,7 +86,7 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>50</width>
+          <width>40</width>
           <height>0</height>
          </size>
         </property>
@@ -103,6 +100,38 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="sb_interval">
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
+        <property name="suffix">
+         <string> s</string>
+        </property>
+        <property name="minimum">
+         <number>5</number>
+        </property>
+        <property name="maximum">
+         <number>120</number>
+        </property>
+        <property name="singleStep">
+         <number>5</number>
         </property>
        </widget>
       </item>
@@ -157,9 +186,6 @@
      </property>
      <property name="text">
       <string>Station ID</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
      </property>
     </widget>
    </item>
@@ -227,6 +253,13 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>le_station_id</tabstop>
+  <tabstop>le_ip</tabstop>
+  <tabstop>sb_port</tabstop>
+  <tabstop>sb_interval</tabstop>
+  <tabstop>bt_send_heartbeat</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

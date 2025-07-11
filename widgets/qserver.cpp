@@ -1,4 +1,5 @@
 #include <QJsonDocument>
+#include <QTimer>
 
 #include "logging/eventlogger.h"
 #include "widgets/qstation.h"
@@ -23,6 +24,10 @@ QServer::QServer(QWidget * parent):
     this->connect(this, &QServer::settings_saved, this, &QServer::refresh_urls);
     this->connect(this->m_heartbeat_manager, &QNetworkAccessManager::finished, this, &QServer::heartbeat_finished);
     this->connect(this->m_sighting_manager, &QNetworkAccessManager::finished, this, &QServer::sighting_received);
+
+    this->m_timer_heartbeat = new QTimer(this);
+    this->m_timer_heartbeat->setInterval(60000);
+    this->m_timer_heartbeat->start();
 }
 
 QServer::~QServer() {
@@ -40,6 +45,7 @@ void QServer::connect_slots(void) {
     this->connect(this->ui->le_station_id, &QLineEdit::textChanged, this, &QServer::settings_changed);
     this->connect(this->ui->le_ip, &QLineEdit::textChanged, this, &QServer::settings_changed);
     this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
+    this->connect(this->ui->sb_interval, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
 }
 
 void QServer::load_settings_inner(void) {
@@ -50,18 +56,23 @@ void QServer::load_settings_inner(void) {
         this->m_settings->value("server/ip", "127.0.0.1").toString(),
         this->m_settings->value("server/port", 4805).toInt()
     );
+    this->set_heartbeat_interval(
+        this->m_settings->value("server/interval", 60).toInt()
+    );
     this->refresh_urls();
 }
 
 void QServer::load_defaults(void) {
     this->set_station_id("none");
     this->set_address("127.0.0.1", 4805);
+    this->set_heartbeat_interval(60);
 }
 
 void QServer::save_settings_inner(void) const {
     this->m_settings->setValue("station/id", this->station_id());
     this->m_settings->setValue("server/ip", this->address().toString());
     this->m_settings->setValue("server/port", this->port());
+    this->m_settings->setValue("server/interval", this->heartbeat_interval());
 }
 
 void QServer::set_address(const QString & address, const unsigned short port) {
@@ -88,6 +99,16 @@ void QServer::set_station_id(const QString & id) {
 
     logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_station_id));
 }
+
+void QServer::set_heartbeat_interval(unsigned int interval) {
+    this->m_heartbeat_interval = interval;
+    this->m_last_heartbeat = QDateTime::currentDateTime();
+    logger.info(Concern::Server, QString("Heartbeat interval set to %1 s").arg(this->heartbeat_interval()));
+    this->m_timer_heartbeat->stop();
+    this->m_timer_heartbeat->setInterval(interval * 1000);
+    this->m_timer_heartbeat->start();
+}
+
 
 void QServer::refresh_urls(void) {
     this->m_url_heartbeat = QUrl(
@@ -231,7 +252,6 @@ void QServer::sighting_received(QNetworkReply * reply) {
     };
 }
 
-
 void QServer::button_send_heartbeat(void) {
     logger.info(Concern::Server, "Sending a heartbeat after an explicit request");
     emit this->request_heartbeat();
@@ -239,11 +259,11 @@ void QServer::button_send_heartbeat(void) {
 
 void QServer::display_countdown(void) {
     this->ui->lb_countdown->setText(QString("%1 s")
-        .arg(QStation::HeartbeatInterval / 1000 - this->m_last_heartbeat.secsTo(QDateTime::currentDateTimeUtc())));
+        .arg(this->heartbeat_interval() - this->m_last_heartbeat.secsTo(QDateTime::currentDateTimeUtc())));
 }
 
 bool QServer::is_changed(void) const {
-    return (this->is_id_changed() || this->is_address_changed());
+    return (this->is_id_changed() || this->is_address_changed() || this->is_interval_changed());
 }
 
 bool QServer::is_id_changed(void) const {
@@ -257,12 +277,19 @@ bool QServer::is_address_changed(void) const {
     );
 }
 
+bool QServer::is_interval_changed(void) const {
+    return (this->ui->sb_interval->value() != this->heartbeat_interval());
+}
+
 void QServer::apply_changes_inner(void) {
-    if (this->ui->le_station_id->text() != this->station_id()) {
+    if (this->is_id_changed()) {
         this->set_station_id(this->ui->le_station_id->text());
     }
-    if ((this->ui->le_ip->text() != this->address().toString()) || (this->ui->sb_port->value() != this->port())) {
+    if (this->is_address_changed()) {
         this->set_address(this->ui->le_ip->text(), this->ui->sb_port->value());
+    }
+    if (this->is_interval_changed()) {
+        this->set_heartbeat_interval(this->ui->sb_interval->value());
     }
 }
 
@@ -270,4 +297,5 @@ void QServer::discard_changes_inner(void) {
     this->ui->le_ip->setText(this->address().toString());
     this->ui->sb_port->setValue(this->port());
     this->ui->le_station_id->setText(this->station_id());
+    this->ui->sb_interval->setValue(this->heartbeat_interval());
 }
