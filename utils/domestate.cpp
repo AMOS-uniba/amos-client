@@ -26,7 +26,6 @@ float DomeState::age(void) const {
     return this->m_timestamp.msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0;
 }
 
-
 DomeStateS::DomeStateS(void):
     DomeState(),
     m_basic(0),
@@ -85,7 +84,10 @@ QByteArray DomeStateS::full_text(void) const {
 // Return a JSON summary of the state
 QJsonValue DomeStateS::json() const {
     if (this->is_valid()) {
-        return QJsonValue(QString(this->full_text()));
+        return QJsonObject {
+            {"s", QJsonValue(QString(this->full_text()))},
+            {"ta", QJsonValue(static_cast<int>(this->time_alive()))}
+        };
     } else {
         return QJsonValue(QJsonValue::Null);
     }
