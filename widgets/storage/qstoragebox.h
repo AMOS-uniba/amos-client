@@ -18,7 +18,7 @@ public:
     const QDir directory_for_timestamp(const QDateTime & datetime = QDateTime::currentDateTimeUtc()) const;
 
 public slots:
-    void store_sighting(Sighting & sighting, bool del = false) const;
+    void store_sighting(Sighting & sighting) const;
     void discard_sighting(Sighting & sighting) const;
 
 signals:

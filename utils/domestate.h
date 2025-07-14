@@ -3,8 +3,7 @@
 
 #include <QString>
 #include <QSerialPort>
-
-#include "logging/eventlogger.h"
+#include <QDateTime>
 
 
 class DomeState {
@@ -44,9 +43,9 @@ public:
 
     inline bool rain_sensor_active(void) const              { return this->m_env & 0x01; };
     inline bool light_sensor_active(void) const             { return this->m_env & 0x02; };
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
     inline bool computer_power_sensor_active(void) const    { return this->m_env & 0x08; };
-#else
+#elif PROTOCOL == 2020
     inline bool computer_power_sensor_active(void) const    { return this->m_env & 0x04; };
 #endif
     inline bool cover_safety_position(void) const           { return this->m_env & 0x20; };

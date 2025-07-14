@@ -21,9 +21,6 @@
 #ifndef INC_APC_CONST_H
 #define INC_APC_CONST_H
 
-//
-// Constants
-//
 constexpr double pi        = 3.14159265358979324;
 constexpr double pi2       = 2.0*pi;
 constexpr double Rad       = pi / 180.0;
@@ -31,20 +28,20 @@ constexpr double Deg       = 180.0 / pi;
 constexpr double Arcs      = 3600.0 * 180.0/pi;
 
 // Radii of Earth, Sun and Moon
-const double R_Earth   =   6378.137;     // [km]
-const double R_Sun     = 696000.0;       // [km]
-const double R_Moon    =   1738.0;       // [km]
+constexpr double R_Earth   =   6378.137;     // [km]
+constexpr double R_Sun     = 696000.0;       // [km]
+constexpr double R_Moon    =   1738.0;       // [km]
 
-const double MJD_J2000 = 51544.5;        // MJD of Epoch J2000.0
-const double T_J2000   =  0.0;           // Epoch J2000.0
-const double T_B1950   = -0.500002108;   // Epoch B1950
+constexpr double MJD_J2000 = 51544.5;        // MJD of Epoch J2000.0
+constexpr double T_J2000   =  0.0;           // Epoch J2000.0
+constexpr double T_B1950   = -0.500002108;   // Epoch B1950
 
-const double kGauss    = 0.01720209895;  // gravitational constant
-const double GM_Sun    = kGauss*kGauss;  // [AU^3/d^2]
+constexpr double kGauss    = 0.01720209895;  // gravitational constant
+constexpr double GM_Sun    = kGauss*kGauss;  // [AU^3/d^2]
 
-const double AU        = 149597870.691;    // Astronomical unit [km]
+constexpr double AU        = 149597870.691;    // Astronomical unit [km]
 
-const double c_light   = 299792.458/AU*86400;  // speed of light [AU/d]
+constexpr double c_light   = 299792.458 / AU * 86400;  // speed of light [AU/d]
 
 
 #endif  // include blocker

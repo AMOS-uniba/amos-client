@@ -1,56 +1,68 @@
-#include "utils/sighting.h"
-
-#include "utils/exceptions.h"
-#include "logging/eventlogger.h"
-
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QJsonDocument>
 
+#include "widgets/qcamera.h"
+#include "utils/sighting.h"
+#include "utils/exceptions.h"
+#include "logging/eventlogger.h"
 
 extern EventLogger logger;
 
-Sighting::Sighting(const QString & dir, const QString & prefix, bool spectral):
+Sighting::Sighting(void):
+    m_valid(false),
+    m_spectral(false),
+    m_dir(QDir()),
+    m_prefix(""),
+    m_status(Status::Unprocessed)
+{}
+
+Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
+    m_valid(true),
     m_spectral(spectral),
     m_dir(dir),
-    m_prefix(prefix)
+    m_prefix(prefix),
+    m_status(Status::Unprocessed)
 {
-    QString full = QString("%1/%2").arg(this->m_dir, this->m_prefix);
-    this->m_pjpg = this->try_open(QString("%1P.jpg").arg(full), false);
-    this->m_tjpg = this->try_open(QString("%1T.jpg").arg(full), false);
-    this->m_xml = this->try_open(QString("%1.xml").arg(full), true);
-    this->m_mbmp = this->try_open(QString("%1M.bmp").arg(full), false);
-    this->m_pbmp = this->try_open(QString("%1P.bmp").arg(full), false);
-    this->m_avi = this->try_open(QString("%1.avi").arg(full), false);
-    this->m_files = {this->m_pjpg, this->m_tjpg, this->m_xml, this->m_mbmp, this->m_pbmp, this->m_avi};
+    this->m_xml  = this->try_open( ".xml",  true);
+    this->m_pjpg = this->try_open("P.jpg", false);
+    this->m_tjpg = this->try_open("T.jpg", false);
+    this->m_mbmp = this->try_open("M.bmp", false);
+    this->m_pbmp = this->try_open("P.bmp", false);
+    this->m_avi  = this->try_open( ".avi", false);
+    auto info = QFileInfo(this->m_avi);
+    this->m_avi_size = info.exists() ? info.size() : 0;
+
+    this->m_full = QString("%1/%2").arg(this->m_dir.canonicalPath(), this->m_prefix);
 
     this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
+    this->m_deferred_until = QDateTime();
     this->m_uuid = QUuid::createUuidV5(QUuid{}, this->m_xml);
 
     logger.debug(
         Concern::Sightings,
         QString("Creating a Sighting from '%1' (%2)")
-            .arg(full)
-            .arg(this->spectral_string())
+            .arg(this->m_full, this->spectral_string())
     );
 
     if (!this->m_timestamp.isValid()) {
         throw RuntimeException("Invalid sighting file name");
     } else {
     }
-//    this->hack_Y16(); // Currently disabled, handled by copying script (but should be solved in UFO)
+//    this->hack_Y16(); // Currently disabled, handled by copying script (but it should be solved in UFO)
 }
 
-Sighting::~Sighting(void) {
-    this->m_files.clear();
+QVector<QString> Sighting::files(void) const {
+    return {this->m_xml, this->m_pjpg, this->m_tjpg, this->m_mbmp, this->m_pbmp, this->m_avi};
 }
 
-QString Sighting::try_open(const QString & path, bool required) {
-    if (QFileInfo::exists(path)) {
-        return path;
+QString Sighting::try_open(const QString & suffix, bool required) {
+    QString full_path = QString("%1/%2%3").arg(this->m_dir.canonicalPath(), this->m_prefix, suffix);
+    if (QFileInfo::exists(full_path)) {
+        return full_path;
     } else {
         if (required) {
-            throw InvalidSighting(QString("Could not open sighting file %1").arg(path));
+            throw InvalidSighting(QString("Could not open sighting file %1").arg(full_path));
         } else {
             return "";
         }
@@ -72,54 +84,93 @@ QString Sighting::str(void) const {
         .arg(this->avi_size() / (1 << 20));
 }
 
-qint64 Sighting::avi_size(void) const {
-    auto info = QFileInfo(this->m_avi);
-    return info.exists() ? info.size() : -1;
+QString Sighting::status_string(void) const {
+    switch (this->m_status) {
+        case Status::Unprocessed:       return "not processed";
+        case Status::Sent:              return "sent";
+        case Status::Timeout:           return "timeout";
+        case Status::Duplicate:         return "duplicate";
+        case Status::Accepted:          return "accepted";
+        case Status::Rejected:          return "rejected";
+        case Status::UnknownStation:    return "unknown station";
+        case Status::Stored:            return "stored";
+        case Status::Discarded:         return "discarded";
+        case Status::RemoteHostClosed:  return "host not found";
+        case Status::UnknownError:      return "unknown error";
+    }
+    return "<error>";
 }
 
-void Sighting::move(const QString & dir) {
-    QDir().mkpath(dir);
+void Sighting::set_status(Status new_status) {
+    this->m_status = new_status;
+    logger.debug(Concern::Sightings,
+                 QString("Status of '%1' set to %2")
+                     .arg(this->prefix())
+                     .arg(this->status_string()));
+}
 
-    for (auto & file: this->m_files) {
+bool Sighting::move(const QDir & dir) {
+    QDir().mkpath(dir.path());
+    logger.debug(Concern::Sightings, QString("Moving '%1' to '%2'").arg(this->prefix(), dir.canonicalPath()));
+
+    bool success = true;
+
+    for (auto & file: this->files()) {
         if (file.isEmpty()) {
-            logger.debug(Concern::Sightings, QString("File not present in the sighting, skipping"));
+            logger.debug(Concern::Sightings, QString("File '%1' not present in the sighting, skipping").arg(file));
         } else {
-            QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
+            QString new_path = QString("%1/%2").arg(dir.canonicalPath(), QFileInfo(file).fileName());
 
             if (QFile::exists(new_path)) {
-                logger.warning(Concern::Sightings, QString("Could not move the sighting, deleting file '%1' first...").arg(new_path));
+                logger.warning(Concern::Sightings,
+                               QString("Could not move the sighting, deleting file '%3' first...")
+                                   .arg(new_path));
                 QFile::remove(new_path);
             }
 
-            if (QFile::rename(file, new_path)) {
-                logger.debug(Concern::Sightings, QString("Moved '%1' to '%2'").arg(file, new_path));
-            } else {
-                logger.error(Concern::Sightings, QString("Could not move file '%1' to '%2'").arg(file, new_path));
-            }
+            bool result = QFile::rename(file, new_path);
+            success &= result;
 
+            if (result) {
+                logger.debug(Concern::Sightings, QString("Moved '%3' to '%4'").arg(file, new_path));
+            } else {
+                logger.error(Concern::Sightings, QString("Could not move file '%3' to '%4'").arg(file, new_path));
+            }
             file = new_path;
         }
     }
+    if (success) {
+        this->m_valid = false;
+        this->m_dir = dir;
+        this->undefer();
+        this->set_status(Status::Stored);
+    } else {
+        logger.error(Concern::Sightings, QString("Error when moving sighting '%1'").arg(this->prefix()));
+    }
+    return success;
 }
 
-void Sighting::copy(const QString & dir) const {
-    logger.debug(Concern::Sightings, QString("Copying to '%1' to '%2'").arg(this->prefix(), dir));
-    QDir().mkpath(dir);
+void Sighting::defer(float seconds) {
+    logger.debug(Concern::Sightings, QString("Deferring sighting '%1'").arg(this->prefix()));
+    this->m_deferred_until = QDateTime::currentDateTimeUtc().addSecs(seconds);
+}
 
-    for (auto & file: this->m_files) {
-        QString new_path = QString("%1/%2").arg(dir, QFileInfo(file).fileName());
-        if (QFile::copy(file, new_path)) {
-            logger.debug(Concern::Sightings, QString("Copied '%1' to '%2'").arg(file, new_path));
-        } else {
-            logger.error(Concern::Sightings, QString("Could not copy file '%1' to '%2'").arg(file, new_path));
-        }
+void Sighting::undefer(void) {
+    this->m_deferred_until = QDateTime();
+}
+
+double Sighting::deferred_for(void) const {
+    if (this->deferred_until().isValid()) {
+        return static_cast<double>((this->deferred_until() - QDateTime::currentDateTimeUtc()).count()) / 1000.0;
+    } else {
+        return std::numeric_limits<double>::quiet_NaN();
     }
 }
 
 void Sighting::discard() {
-    logger.warning(Concern::Sightings, QString("Discarding sighting %1").arg(this->prefix()));
+    logger.warning(Concern::Sightings, QString("Discarding sighting '%1'").arg(this->prefix()));
     try {
-        for (auto & file: this->m_files) {
+        for (auto & file: this->files()) {
             if (file.isEmpty()) {
                 logger.debug(Concern::Sightings, QString("File not present in the sighting"));
             } else {
@@ -130,8 +181,10 @@ void Sighting::discard() {
                 }
             }
         }
+        this->set_status(Status::Discarded);
+        this->undefer();
     } catch (std::exception &) {
-        logger.error(Concern::Sightings, QString("Error while removing sighting '%1'").arg(this->prefix()));
+        logger.error(Concern::Sightings, QString("Error while discarding sighting '%1'").arg(this->prefix()));
     }
 }
 
@@ -184,7 +237,7 @@ QHttpPart Sighting::json(void) const {
 }
 
 void Sighting::debug(void) const {
-    for (auto & file: this->m_files) {
+    for (auto & file: this->files()) {
         qDebug() << file;
     }
 }

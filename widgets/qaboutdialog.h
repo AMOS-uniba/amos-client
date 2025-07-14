@@ -7,12 +7,12 @@ namespace Ui {
     class AboutDialog;
     }
 
-class AboutDialog: public QDialog {
+class QAboutDialog: public QDialog {
     Q_OBJECT
 
 public:
-    explicit AboutDialog(QWidget * parent = nullptr);
-    ~AboutDialog();
+    explicit QAboutDialog(QWidget * parent = nullptr);
+    ~QAboutDialog();
 
 private slots:
     void on_buttonBox_accepted();

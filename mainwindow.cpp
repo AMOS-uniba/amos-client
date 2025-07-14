@@ -2,7 +2,8 @@
 #include "ui_mainwindow.h"
 
 #include "logging/loggingdialog.h"
-#include "widgets/aboutdialog.h"
+#include "widgets/qaboutdialog.h"
+#include "models/qsightingmodel.h"
 
 extern EventLogger logger;
 extern QSettings * settings;
@@ -65,14 +66,26 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_allsky, &QCamera::update_clocks);
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);
 
-    this->connect(this->ui->camera_allsky, &QCamera::sighting_found, this->ui->server, &QServer::send_sighting);
-    this->connect(this->ui->camera_spectral, &QCamera::sighting_found, this->ui->server, &QServer::send_sighting);
-    this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_allsky, &QCamera::store_sighting);
-    this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_allsky, &QCamera::discard_sighting);
-    this->connect(this->ui->server, &QServer::sighting_sent, this->ui->camera_allsky, &QCamera::defer_sighting);
-    this->connect(this->ui->server, &QServer::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
-    this->connect(this->ui->server, &QServer::sighting_conflict, this->ui->camera_spectral, &QCamera::discard_sighting);
-    this->connect(this->ui->server, &QServer::sighting_sent, this->ui->camera_spectral, &QCamera::defer_sighting);
+    auto model = this->ui->sb_sightings->model();
+    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,   this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,   this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_found,      model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_found,      model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_stored,     model, &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_stored,     model, &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_discarded,  model, &QSightingModel::mark_discarded);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_discarded,  model, &QSightingModel::mark_discarded);
+    this->connect(model, &QSightingModel::sighting_to_send, this->ui->server, &QServer::send_sighting);
+    this->connect(this->ui->server, &QServer::sighting_sent,     model, &QSightingModel::mark_sent);
+    this->connect(this->ui->server, &QServer::sighting_accepted, model, &QSightingModel::store_sighting);
+    this->connect(this->ui->server, &QServer::sighting_conflict, model, &QSightingModel::discard_sighting);
+    this->connect(this->ui->server, &QServer::sighting_error,    model, &QSightingModel::defer_sighting);
+    this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_allsky,   &QCamera::store_sighting);
+    this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky,   &QCamera::discard_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::discard_sighting);
+
+    this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::send_heartbeat);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
@@ -93,10 +106,6 @@ MainWindow::MainWindow(QWidget *parent):
     this->ui->sun_info->update_long_term();
     this->ui->camera_allsky->update_clocks();
     this->ui->camera_spectral->update_clocks();
-#if OLD_PROTOCOL
-//    this->ui->dome->set_cover_minimum(-26);
-//    this->ui->dome->set_cover_maximum(26);
-#endif
     logger.info(Concern::Operation, "Initialization complete");
 }
 
@@ -156,7 +165,7 @@ void MainWindow::on_action_debug_triggered() {
 }
 
 void MainWindow::on_action_about_triggered() {
-    AboutDialog dialog(this);
+    QAboutDialog dialog(this);
     dialog.exec();
 }
 

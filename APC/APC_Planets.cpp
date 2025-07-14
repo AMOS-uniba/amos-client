@@ -28,19 +28,12 @@
 #include "APC_PrecNut.h"
 #include "APC_VecMat3D.h"
 
-namespace // Unnamed namespace
-{
-    //
-    // Constants
-    //
-    const int o   = 16;         // Index offset
-    const int dim = 2*o+1;      // Work array dimension
+namespace {
+    constexpr int o   = 16;         // Index offset
+    constexpr int dim = 2 * o + 1;  // Work array dimension
 
-
-    //
     // Definition of Pert class for summing up trigonometric perturbation
     // series
-    //
     class Pert {
     public:
 
@@ -168,14 +161,8 @@ namespace // Unnamed namespace
 //
 //------------------------------------------------------------------------------
 void State(PlanetType Planet, double T, Vec3D& r, Vec3D& v) {
-    //
-    // Constants
-    //
-    const double p = 1.3970;        // Centential precession [deg]
+    constexpr double p = 1.3970;        // Centential precession [deg]
 
-    //
-    // Variables
-    //
     double a, e, M0, O, i, w, n, T0;
     Mat3D  PQR;
 

@@ -20,6 +20,7 @@ public:
     void scan_sightings(void);
 
 signals:
+    void sightings_scanned(void);
     void sightings_found(QVector<Sighting> & sightings);
 };
 

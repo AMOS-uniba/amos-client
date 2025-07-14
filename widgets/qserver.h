@@ -8,8 +8,6 @@
 
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
-#include "logging/eventlogger.h"
-#include "utils/sighting.h"
 
 namespace Ui {
     class QServer;
@@ -22,11 +20,14 @@ private:
     Ui::QServer * ui;
     QNetworkAccessManager * m_heartbeat_manager;
     QNetworkAccessManager * m_sighting_manager;
+
+    QTimer * m_timer_heartbeat;
     mutable QDateTime m_last_heartbeat;
 
     QHostAddress m_address;
     unsigned short m_port;
     QString m_station_id;
+    int m_heartbeat_interval;
 
     QUrl m_url_heartbeat;
     QUrl m_url_sighting;
@@ -40,10 +41,12 @@ private:
 
     bool is_id_changed(void) const;
     bool is_address_changed(void) const;
+    bool is_interval_changed(void) const;
 
 private slots:
     void set_address(const QString & address, const unsigned short port);
     void set_station_id(const QString & station_id);
+    void set_heartbeat_interval(unsigned int interval);
 
     void heartbeat_error(QNetworkReply::NetworkError error);
     void heartbeat_finished(QNetworkReply * reply);
@@ -59,6 +62,9 @@ public:
     inline const QHostAddress & address(void) const { return this->m_address; }
     inline const unsigned short & port(void) const { return this->m_port; }
     inline const QString & station_id(void) const { return this->m_station_id; }
+    inline const int & heartbeat_interval(void) const { return this->m_heartbeat_interval; }
+
+    inline const QTimer * timer_heartbeat(void) const { return this->m_timer_heartbeat; }
 
 public slots:
     void initialize(QSettings * settings) override;
@@ -67,7 +73,7 @@ public slots:
     void display_countdown(void);
 
     void send_heartbeat(const QJsonObject & heartbeat) const;
-    void send_sighting(Sighting & sighting);
+    void send_sighting(const Sighting & sighting) const;
 
     void sighting_received(QNetworkReply * reply);
 
@@ -75,7 +81,7 @@ signals:
     void request_heartbeat(void);
     void heartbeat_created(void);
 
-    void sighting_sent(const QString & sighting_id);
+    void sighting_sent(const QString & sighting_id) const;
     // Sighting was accepted, store it
     void sighting_accepted(const QString & sighting_id);
     // Sighting was rejected, delete it

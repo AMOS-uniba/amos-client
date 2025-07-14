@@ -34,13 +34,12 @@ private:
     StateLogger * m_state_logger;
 
     // Pointers to subordinate widgets
-    const QDome * m_dome;
+    QDome * m_dome;
     const QServer * m_server;
     const QCamera * m_camera_allsky;
     const QCamera * m_camera_spectral;
 
     QTimer * m_timer_automatic;
-    QTimer * m_timer_heartbeat;
 
     void set_state(StationState new_state);
 
@@ -65,7 +64,6 @@ private slots:
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower, Inconsistent;
-    constexpr static unsigned int HeartbeatInterval = 60000;
 
     explicit QStation(QWidget * parent = nullptr);
     ~QStation();
@@ -89,8 +87,8 @@ public:
     inline const QCamera * camera_spectral(void) const { return this->m_camera_spectral; }
 
     // Dome getter and setter
-    void set_dome(const QDome * const dome);
-    inline const QDome * dome(void) const { return this->m_dome; }
+    inline void set_dome(QDome * dome) { this->m_dome = dome; }
+    inline QDome * dome(void) const { return this->m_dome; }
 
     // Server getter and setter
     void set_server(const QServer * const server);

@@ -143,25 +143,25 @@ namespace // Unnamed namespace
         for (int i=0; i<=3; i++) {
             switch(i) {
                 case 0:
-                arg=l;
-                max=4;
-                fac=1.000002208;
-                break;
+                    arg=l;
+                    max=4;
+                    fac=1.000002208;
+                    break;
                 case 1:
-                arg=ls;
-                max=3;
-                fac=0.997504612-0.002495388*T;
-                break;
+                    arg=ls;
+                    max=3;
+                    fac=0.997504612-0.002495388*T;
+                    break;
                 case 2:
-                arg=F;
-                max=4;
-                fac=1.000002708+139.978*Dgam;
-                break;
+                    arg=F;
+                    max=4;
+                    fac=1.000002708+139.978*Dgam;
+                    break;
                 case 3:
-                arg=D;
-                max=6;
-                fac=1.0;
-                break;
+                    arg=D;
+                    max=6;
+                    fac=1.0;
+                    break;
             };
 
             Cos[o][i]=1.0;

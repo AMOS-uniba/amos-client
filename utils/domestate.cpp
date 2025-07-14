@@ -1,5 +1,6 @@
 #include <QJsonObject>
 
+#include "logging/eventlogger.h"
 #include "domestate.h"
 #include "utils/exceptions.h"
 
@@ -17,14 +18,13 @@ float DomeState::deciint(const QByteArray & chunk) {
 }
 
 bool DomeState::is_valid(void) const {
-    logger.debug(Concern::SerialPort, QString("State age is %1").arg(this->age()));
+    logger.detail(Concern::SerialPort, QString("State age is %1").arg(this->age()));
     return (this->m_valid && (this->age() < 2.0));
 }
 
 float DomeState::age(void) const {
     return this->m_timestamp.msecsTo(QDateTime::currentDateTimeUtc()) / 1000.0;
 }
-
 
 DomeStateS::DomeStateS(void):
     DomeState(),
@@ -84,7 +84,10 @@ QByteArray DomeStateS::full_text(void) const {
 // Return a JSON summary of the state
 QJsonValue DomeStateS::json() const {
     if (this->is_valid()) {
-        return QJsonValue(QString(this->full_text()));
+        return QJsonObject {
+            {"s", QJsonValue(QString(this->full_text()))},
+            {"ta", QJsonValue(static_cast<int>(this->time_alive()))}
+        };
     } else {
         return QJsonValue(QJsonValue::Null);
     }
@@ -143,8 +146,6 @@ QJsonValue DomeStateT::json(void) const {
     }
 }
 
-
-
 DomeStateZ::DomeStateZ(void):
     DomeState(),
     m_shaft_position(0) {}
@@ -152,7 +153,7 @@ DomeStateZ::DomeStateZ(void):
 DomeStateZ::DomeStateZ(const QByteArray & response):
     DomeState()
 {
-#if OLD_PROTOCOL
+#if PROTOCOL == 2015
     if (response.length() != 9) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }
@@ -160,7 +161,7 @@ DomeStateZ::DomeStateZ(const QByteArray & response):
         throw InvalidState(QString("Invalid first char of W state message '%1'").arg(QString(QChar(response[0]))));
     }
     memcpy(&this->m_shaft_position, response.mid(7, 2).data(), 2);
-#else
+#elif PROTOCOL == 2020
     if (response.length() != 3) {
         throw InvalidState(QString("Wrong Z-state length %1").arg(response.length()));
     }

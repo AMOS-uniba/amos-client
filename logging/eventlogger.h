@@ -1,3 +1,6 @@
+#ifndef EVENTLOGGER_H
+#define EVENTLOGGER_H
+
 #include <QObject>
 #include <QDateTime>
 #include <QTableWidget>
@@ -7,9 +10,6 @@
 #include <QSettings>
 
 #include "logging/baselogger.h"
-
-#ifndef EVENTLOGGER_H
-#define EVENTLOGGER_H
 
 enum class Level {
     DebugDetail = 10,
@@ -57,7 +57,6 @@ private:
     QMap<Concern, bool> debug_visible;
 
     QString format(const QDateTime & timestamp, Level level, const QString & concern, const QString & message) const;
-    void write(Level level, Concern concern, const QString & message) const;
 public:
     const static QMap<Concern, ConcernInfo> Concerns;
 
@@ -66,6 +65,7 @@ public:
     void set_display_widget(QTableWidget * widget);
     void set_level(Level new_level);
 
+    void write(Level level, Concern concern, const QString & message) const;
     void detail(Concern concern, const QString & message) const;
     void debug(Concern concern, const QString & message) const;
     void debug_error(Concern concern, const QString & message) const;

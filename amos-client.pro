@@ -5,7 +5,7 @@ CONFIG += static
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
     APC/APC_Cheb.cpp \
@@ -31,6 +31,7 @@ SOURCES += \
     mainwindow/timers.cpp \
     mainwindow/tray.cpp \
     mainwindow.cpp \
+    models/qsightingmodel.cpp \
     utils/domestate.cpp \
     utils/exceptions.cpp \
     utils/formatters.cpp \
@@ -44,17 +45,18 @@ SOURCES += \
     utils/state/ufostate.cpp \
     utils/telegram.cpp \
     utils/universe.cpp \
-    widgets/aboutdialog.cpp \
     widgets/lines/qbooleanline.cpp \
     widgets/lines/qcontrolline.cpp \
     widgets/lines/qdatetimeline.cpp \
     widgets/lines/qdisplayline.cpp \
     widgets/lines/qfloatline.cpp \
+    widgets/qaboutdialog.cpp \
     widgets/qcamera.cpp \
     widgets/qconfigurable.cpp \
     widgets/qdome.cpp \
     widgets/qdomewidget.cpp \
     widgets/qserver.cpp \
+    widgets/qsightingbuffer.cpp \
     widgets/qstation.cpp \
     widgets/qsuninfo.cpp \
     widgets/qufomanager.cpp \
@@ -84,7 +86,7 @@ HEADERS += \
     logging/statelogger.h \
     forward.h \
     mainwindow.h \
-    settings.h \
+    models/qsightingmodel.h \
     utils/domestate.h \
     utils/exceptions.h \
     utils/formatters.h \
@@ -98,17 +100,18 @@ HEADERS += \
     utils/state/ufostate.h \
     utils/telegram.h \
     utils/universe.h \
-    widgets/aboutdialog.h \
     widgets/lines/qbooleanline.h \
     widgets/lines/qcontrolline.h \
     widgets/lines/qdatetimeline.h \
     widgets/lines/qdisplayline.h \
     widgets/lines/qfloatline.h \
+    widgets/qaboutdialog.h \
     widgets/qcamera.h \
     widgets/qconfigurable.h \
     widgets/qdome.h \
     widgets/qdomewidget.h \
     widgets/qserver.h \
+    widgets/qsightingbuffer.h \
     widgets/qstation.h \
     widgets/qsuninfo.h \
     widgets/qufomanager.h \
@@ -119,11 +122,12 @@ HEADERS += \
 FORMS += \
     logging/loggingdialog.ui \
     mainwindow.ui \
-    widgets/aboutdialog.ui \
     widgets/lines/qdisplayline.ui \
+    widgets/qaboutdialog.ui \
     widgets/qcamera.ui \
     widgets/qdome.ui \
     widgets/qserver.ui \
+    widgets/qsightingbuffer.ui \
     widgets/qstation.ui \
     widgets/qsuninfo.ui \
     widgets/qufomanager.ui
@@ -141,8 +145,11 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 1.1.0
+VERSION = 1.3.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
+# Magic values: 2020 for new, 2015 for old, otherwise WILL NOT compile!
+# This is to ensure that the state is consistent and you do not get a half-old, half-new monster
+DEFINES += PROTOCOL=2020
 TARGET = "AMOS client"
 
 QMAKE_TARGET_COMPANY = AMOS
