@@ -69,7 +69,7 @@ double Universe::moon_azimuth(const double latitude, const double longitude, con
 
 QDateTime Universe::next_crossing(std::function<double(double, double, QDateTime)> fun,
                                   double latitude, double longitude, double altitude, bool direction_up, int resolution) {
-    QDateTime now = QDateTime::fromTime_t((QDateTime::currentDateTimeUtc().toTime_t() / resolution) * resolution);
+    QDateTime now = QDateTime::fromSecsSinceEpoch((QDateTime::currentDateTimeUtc().toSecsSinceEpoch() / resolution) * resolution);
     double oldalt = fun(latitude, longitude, now);
 
     for (int i = 1; i <= 86400 / resolution; ++i) {

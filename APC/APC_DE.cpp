@@ -241,7 +241,7 @@ void SolverDE::Step (double& x, double y[], double& eps, bool& crash) {
         absh = fabs(h);
         if (eps<16.0*sum*h*h)
             absh=0.25*sqrt(eps/sum);
-        h = sign(max(absh, fouru*fabs(x)), h);
+        h = sign(std::max(absh, fouru*fabs(x)), h);
         hold = 0.0;
         hnew = 0.0;
         k = 1;
@@ -442,7 +442,7 @@ void SolverDE::Step (double& x, double y[], double& eps, bool& crash) {
 
         // Test if order should be lowered
         if (km2 >0)
-            if (max(erkm1,erkm2)<=erk)
+            if (std::max(erkm1,erkm2)<=erk)
                 knew=km1;
         if (km2==0)
             if (erkm1<=0.5*erk)
@@ -581,7 +581,7 @@ void SolverDE::Step (double& x, double y[], double& eps, bool& crash) {
                 // Using estimated error at order k+1, determine
                 // appropriate order for next step
                 if (k>1) {
-                    if ( erkm1<=min(erk,erkp1)) {
+                    if ( erkm1<= std::min(erk,erkp1)) {
                         // lower order
                         k=km1;
                         erk=erkm1;
@@ -622,8 +622,8 @@ void SolverDE::Step (double& x, double y[], double& eps, bool& crash) {
         if (p5eps<erk) {
             temp2 = k+1;
             r = pow(p5eps/erk, 1.0/temp2);
-            hnew = absh*max(0.5, min(0.9,r));
-            hnew = sign(max(hnew, fouru*fabs(x)), h);
+            hnew = absh*std::max(0.5, std::min(0.9,r));
+            hnew = sign(std::max(hnew, fouru*fabs(x)), h);
         }
         else
             hnew = h;
@@ -665,7 +665,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
 
 
     // Test for improper parameters
-    eps   = max(relerr,abserr);
+    eps   = std::max(relerr,abserr);
 
     if ( ( neqn   <   1    ) ||             // invalid number of equations
             ( relerr <   0.0  ) ||             // negative relative error bound
@@ -704,7 +704,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
         for (int l=1; l<=neqn; l++)
             yy[l] = y[l];
         delsgn = sign(1.0, del);
-        h      = sign( max(fouru*fabs(x), fabs(tout-x)), tout-x );
+        h      = sign(std::max(fouru*fabs(x), fabs(tout-x)), tout-x );
     }
 
 
@@ -757,7 +757,7 @@ void SolverDE::Integ ( double y[], double& t, double tout,
 
 
         // Limit step size, set weight vector and take a step
-        h  = sign(min(fabs(h), fabs(tend-x)), h);
+        h  = sign(std::min(fabs(h), fabs(tend-x)), h);
         for (int l=1; l<=neqn; l++)
             wt[l] = releps*fabs(yy[l]) + abseps;
 

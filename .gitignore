@@ -38,6 +38,8 @@ Makefile*
 *.qm
 *.prl
 
+.qtc_clangd/*
+
 # Qt unit tests
 target_wrapper.*
 
