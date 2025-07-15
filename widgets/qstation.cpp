@@ -310,6 +310,7 @@ void QStation::automatic_cover(void) {
 
 QJsonObject QStation::json(void) const {
     return QJsonObject {
+        {"protocol", HEARTBEAT_PROTOCOL_VERSION},
         {"auto", !this->is_manual()},
         {"start", this->m_start_time.toString(Qt::ISODate)},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},

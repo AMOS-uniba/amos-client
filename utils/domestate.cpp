@@ -89,7 +89,7 @@ QJsonValue DomeStateS::json() const {
             {"ta", QJsonValue(static_cast<int>(this->time_alive()))}
         };
     } else {
-        return QJsonValue(QJsonValue::Null);
+        return QJsonValue::Null;
     }
 }
 
