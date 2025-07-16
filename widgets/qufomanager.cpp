@@ -152,6 +152,7 @@ void QUfoManager::update_state(void) {
             }
         }
     }
+    logger.debug(Concern::UFO, QString("UFO-%1 state is %2").arg(this->id(), new_ufo_state.display_string()));
 
     this->ui->lb_state->setText(new_ufo_state.display_string());
     this->ui->lb_state->setStyleSheet(QString("QLabel { color: %1; }").arg(new_ufo_state.colour().name()));
@@ -159,7 +160,7 @@ void QUfoManager::update_state(void) {
     this->ui->bt_toggle->setText(new_ufo_state.button_text());
     this->ui->cb_auto->setEnabled(new_ufo_state.button_enabled());
 
-    if (new_ufo_state != new_ufo_state) {
+    if (new_ufo_state != this->m_state) {
         this->m_state = new_ufo_state;
         emit this->state_changed(new_ufo_state);
     }

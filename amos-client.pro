@@ -145,10 +145,10 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 1.3.1
+VERSION = 1.3.2
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 # Magic values: 2020 for new, 2015 for old, otherwise WILL NOT compile!
-# This is to ensure that the state is consistent and you do not get a half-old, half-new monster
+# This is to ensure that the selection is consistent and you do not get a half-old, half-new monster
 DEFINES += PROTOCOL=2020
 DEFINES += HEARTBEAT_PROTOCOL_VERSION=2
 TARGET = "AMOS client"
