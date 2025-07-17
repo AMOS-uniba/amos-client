@@ -38,6 +38,15 @@ void QAmosWidget::discard_changes(void) {
     this->discard_changes_inner();
 }
 
+void QAmosWidget::display_changed(QWidget * widget, QVariant new_value, QVariant old_value) {
+    widget->setStyleSheet(
+        QString("background-color: %1; font-weight: %2;").arg(
+            new_value != old_value ? "orange" : "white",
+            new_value != old_value ? "bold" : "normal"
+        )
+    );
+}
+
 void QAmosWidget::initialize(QSettings * settings) {
     this->m_settings = settings;
     this->connect_slots();

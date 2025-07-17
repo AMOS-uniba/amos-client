@@ -299,3 +299,24 @@ void QServer::discard_changes_inner(void) {
     this->ui->le_station_id->setText(this->station_id());
     this->ui->sb_interval->setValue(this->heartbeat_interval());
 }
+
+void QServer::on_le_station_id_textChanged(const QString & text) {
+    Q_UNUSED(text);
+    this->display_changed(this->ui->le_station_id, this->ui->le_station_id->text(), this->station_id());
+}
+
+void QServer::on_sb_interval_valueChanged(int value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->sb_interval, this->ui->sb_interval->value(), this->heartbeat_interval());
+}
+
+void QServer::on_le_ip_textChanged(const QString & text) {
+    Q_UNUSED(text);
+    this->display_changed(this->ui->le_ip, this->ui->le_ip->text(), this->address().toString());
+}
+
+void QServer::on_sb_port_valueChanged(int value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->sb_port, this->ui->sb_port->value(), this->port());
+}
+

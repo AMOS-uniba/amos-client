@@ -52,6 +52,13 @@ private slots:
     void heartbeat_finished(QNetworkReply * reply);
     void refresh_urls(void);
 
+    void on_le_station_id_textChanged(const QString &arg1);
+
+    void on_sb_interval_valueChanged(int arg1);
+
+    void on_le_ip_textChanged(const QString &arg1);
+
+    void on_sb_port_valueChanged(int arg1);
 
 public:
     explicit QServer(QWidget * parent = nullptr);

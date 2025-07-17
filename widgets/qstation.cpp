@@ -416,3 +416,21 @@ void QStation::discard_changes_inner(void) {
     this->ui->dsb_longitude->setValue(this->longitude());
     this->ui->dsb_altitude->setValue(this->altitude());
 }
+
+void QStation::on_dsb_latitude_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_latitude, this->latitude(), value);
+}
+
+
+void QStation::on_dsb_longitude_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_longitude, this->longitude(), value);
+}
+
+
+void QStation::on_dsb_altitude_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_altitude, this->altitude(), value);
+}
+

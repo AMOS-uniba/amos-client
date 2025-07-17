@@ -18,6 +18,8 @@ protected:
     virtual void apply_changes_inner(void) = 0;
     virtual void discard_changes_inner(void) = 0;
 
+    void display_changed(QWidget * widget, QVariant new_value, QVariant old_value);
+
 public:
     explicit QAmosWidget(QWidget * parent = nullptr);
     ~QAmosWidget(void);
