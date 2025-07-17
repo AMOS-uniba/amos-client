@@ -144,12 +144,11 @@ void QUfoManager::update_state(void) {
                     new_ufo_state = QUfoManager::NotRunning;
                 } else {
                     new_ufo_state = QUfoManager::NotAnExe;
-                    break;
                 }
             } else {
                 new_ufo_state = QUfoManager::NotFound;
-                break;
             }
+            break;
         }
     }
     logger.debug(Concern::UFO, QString("UFO-%1 state is %2").arg(this->id(), new_ufo_state.display_string()));
