@@ -59,6 +59,8 @@ private slots:
 
     void process_sightings(QVector<Sighting> sightings);
 
+    void on_dsb_darkness_limit_valueChanged(double value);
+
 public slots:
     void initialize(QSettings * settings, const QString & id, const QStation * const station, bool spectral);
     void auto_action(bool is_dark, const QDateTime & open_since = QDateTime());

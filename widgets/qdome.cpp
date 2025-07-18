@@ -213,6 +213,8 @@ void QDome::apply_changes_inner(void) {
     if (this->is_changed()) {
         this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
     }
+    emit this->ui->dsb_humidity_limit_lower->valueChanged(this->humidity_limit_lower());
+    emit this->ui->dsb_humidity_limit_upper->valueChanged(this->humidity_limit_upper());
 }
 
 void QDome::discard_changes_inner(void) {
@@ -702,3 +704,15 @@ void QDome::on_bt_cover_close_clicked() {
     logger.info(Concern::Operation, "Manual command: close the cover");
     this->close_cover();
 }
+
+void QDome::on_dsb_humidity_limit_upper_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_humidity_limit_upper, this->ui->dsb_humidity_limit_upper->value(), this->humidity_limit_upper());
+}
+
+
+void QDome::on_dsb_humidity_limit_lower_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_humidity_limit_lower, this->ui->dsb_humidity_limit_lower->value(), this->humidity_limit_lower());
+}
+

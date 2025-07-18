@@ -61,12 +61,9 @@ private slots:
 
     void on_cb_manual_clicked(bool checked);
     void on_cb_safety_override_clicked(bool checked);
-
-    void on_dsb_latitude_valueChanged(double arg1);
-
-    void on_dsb_longitude_valueChanged(double arg1);
-
-    void on_dsb_altitude_valueChanged(double arg1);
+    void on_dsb_latitude_valueChanged(double value);
+    void on_dsb_longitude_valueChanged(double value);
+    void on_dsb_altitude_valueChanged(double value);
 
 public:
     const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower, Inconsistent;

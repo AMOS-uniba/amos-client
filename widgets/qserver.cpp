@@ -291,6 +291,10 @@ void QServer::apply_changes_inner(void) {
     if (this->is_interval_changed()) {
         this->set_heartbeat_interval(this->ui->sb_interval->value());
     }
+    emit this->ui->le_station_id->textChanged(this->station_id());
+    emit this->ui->le_ip->textChanged(this->address().toString());
+    emit this->ui->sb_port->valueChanged(this->port());
+    emit this->ui->sb_interval->valueChanged(this->heartbeat_interval());
 }
 
 void QServer::discard_changes_inner(void) {

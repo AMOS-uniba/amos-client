@@ -158,6 +158,7 @@ void QCamera::apply_changes_inner(void) {
     if (this->is_changed()) {
         this->set_darkness_limit(this->ui->dsb_darkness_limit->value());
     }
+    emit this->ui->dsb_darkness_limit->valueChanged(this->darkness_limit());
 }
 
 void QCamera::discard_changes_inner(void) {
@@ -182,3 +183,9 @@ void QCamera::set_enabled(int enable) {
     const QSignalBlocker blocker(this->ui->cb_enabled);
     this->ui->cb_enabled->setCheckState(enable ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 }
+
+void QCamera::on_dsb_darkness_limit_valueChanged(double value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->dsb_darkness_limit, this->darkness_limit(), value);
+}
+

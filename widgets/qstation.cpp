@@ -409,6 +409,9 @@ void QStation::apply_changes_inner(void) {
     if (this->is_changed()) {
         this->set_position(this->ui->dsb_latitude->value(), this->ui->dsb_longitude->value(), this->ui->dsb_altitude->value());
     }
+    emit this->ui->dsb_latitude->valueChanged(this->latitude());
+    emit this->ui->dsb_longitude->valueChanged(this->longitude());
+    emit this->ui->dsb_altitude->valueChanged(this->altitude());
 }
 
 void QStation::discard_changes_inner(void) {

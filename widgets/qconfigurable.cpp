@@ -41,7 +41,7 @@ void QAmosWidget::discard_changes(void) {
 void QAmosWidget::display_changed(QWidget * widget, QVariant new_value, QVariant old_value) {
     widget->setStyleSheet(
         QString("background-color: %1; font-weight: %2;").arg(
-            new_value != old_value ? "orange" : "white",
+            new_value != old_value ? "hsl(25, 100%, 70%)" : "white",
             new_value != old_value ? "bold" : "normal"
         )
     );

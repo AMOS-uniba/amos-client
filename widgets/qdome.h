@@ -81,6 +81,9 @@ private slots:
     void set_open_since(void);
     void set_enabled(int enable);
 
+    void on_dsb_humidity_limit_upper_valueChanged(double value);
+    void on_dsb_humidity_limit_lower_valueChanged(double value);
+
 public:
     const static Command CommandNoOp;
     const static Command CommandOpenCover, CommandCloseCover;
