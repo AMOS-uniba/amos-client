@@ -160,7 +160,7 @@ void Orient(PlanetType Planet, SystemType System, double T,
     //
     // Variables
     //
-    double N, RA, Dec, W;
+    double N, RA = 0, Dec = 0, W = 0;
     double d = 36525.0 * T;
 
     // Right ascension and declination of the axis of rotation
@@ -168,45 +168,45 @@ void Orient(PlanetType Planet, SystemType System, double T,
     // Prime meridian orientation
     switch (Planet) {
         case Sun:
-        RA  = 286.13;
-        Dec =  63.87;
-        W   =  84.182 +  14.1844000*d;
-        break;
+            RA  = 286.13;
+            Dec =  63.87;
+            W   =  84.182 +  14.1844000*d;
+            break;
         case Mercury:
-        RA  = 281.01  -   0.033*T;
-        Dec =  61.45  -   0.005*T;
-        W   = 329.68  +   6.1385025*d;
-        break;
+            RA  = 281.01  -   0.033*T;
+            Dec =  61.45  -   0.005*T;
+            W   = 329.68  +   6.1385025*d;
+            break;
         case Venus:
-        RA  = 272.76;
-        Dec =  67.16;
-        W   = 160.20  -   1.4813688*d;
-        break;
+            RA  = 272.76;
+            Dec =  67.16;
+            W   = 160.20  -   1.4813688*d;
+            break;
         case Earth:
-        RA  =   0.00  -   0.641*T;
-        Dec =  90.00  -   0.557*T;
-        W   = 190.16  + 360.9856235*d;
-        break;
+            RA  =   0.00  -   0.641*T;
+            Dec =  90.00  -   0.557*T;
+            W   = 190.16  + 360.9856235*d;
+            break;
         case Mars:
-        RA  = 317.681 -   0.108*T;
-        Dec =  52.886 -   0.061*T;
-        W   = 176.901 + 350.8919830*d;
-        break;
+            RA  = 317.681 -   0.108*T;
+            Dec =  52.886 -   0.061*T;
+            W   = 176.901 + 350.8919830*d;
+            break;
         case Jupiter:
-        RA  = 268.05  -   0.009*T;
-        Dec =  64.49  +   0.003*T;
-        switch (System) {
-            case Sys_I   :
-            W =  67.10  + 877.900*d;
+            RA  = 268.05  -   0.009*T;
+            Dec =  64.49  +   0.003*T;
+            switch (System) {
+                case Sys_I   :
+                W =  67.10  + 877.900*d;
+                break;
+                case Sys_II  :
+                W =  43.30  + 870.270*d;
+                break;
+                case Sys_III :
+                W = 284.695 + 870.536*d;
+                break;
+            }
             break;
-            case Sys_II  :
-            W =  43.30  + 870.270*d;
-            break;
-            case Sys_III :
-            W = 284.695 + 870.536*d;
-            break;
-        }
-        break;
         case Saturn:
             RA  =  40.589 -   0.036*T;
             Dec =  83.537 -   0.004*T;
@@ -232,9 +232,10 @@ void Orient(PlanetType Planet, SystemType System, double T,
             W   = 253.18  + 536.3128492*d - 0.48*sin(N);
             break;
         case Pluto:
-                RA  = 313.02;
-                Dec =   9.09;
-                W   = 236.77  -  56.3623195*d;
+            RA  = 313.02;
+            Dec =   9.09;
+            W   = 236.77  -  56.3623195*d;
+            break;
     }
 
     RA *= Rad;
@@ -366,7 +367,7 @@ double Bright(PlanetType Planet, double r, double Delta, double phi,
     //
     // Variables
     //
-    double  p, sd, dl, mag;
+    double  p, sd, dl, mag = 0.0;
 
     // Normalized phase angle
     p = Deg*phi/100.0;

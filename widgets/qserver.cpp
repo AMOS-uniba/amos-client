@@ -192,11 +192,14 @@ void QServer::sighting_received(QNetworkReply * reply) {
             // OK, accepted by the server
             logger.info(
                 Concern::Server,
-                QString("Sighting '%1' created on the server (HTTP code %2), response \"%3\"").arg(
+                QString("Sighting '%1' created on the server (HTTP code %2)").arg(
                     sighting_id,
-                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString(),
-                    QString(reply->readAll())
+                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()
                 )
+            );
+            logger.debug(
+                Concern::Server,
+                QString("Response \"%3\"").arg(QString(reply->readAll()))
             );
             emit this->sighting_accepted(sighting_id);
             break;
