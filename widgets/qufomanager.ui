@@ -89,6 +89,12 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>le_path</tabstop>
+  <tabstop>cb_auto</tabstop>
+  <tabstop>bt_toggle</tabstop>
+  <tabstop>bt_change</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

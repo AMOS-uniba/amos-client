@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>258</width>
-    <height>522</height>
+    <height>552</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,45 +32,6 @@
    <property name="spacing">
     <number>6</number>
    </property>
-   <item row="4" column="0" colspan="2">
-    <widget class="QStorageBox" name="storage_permanent">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Permanent storage</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QUfoManager" name="ufo_manager">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>110</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>UFO manager</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QStorageBox" name="storage_primary">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>90</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Primary storage</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="2">
     <widget class="QFrame" name="frame">
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -229,7 +190,7 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="0" colspan="2">
+   <item row="3" column="0" colspan="2">
     <widget class="QScannerBox" name="scanner">
      <property name="minimumSize">
       <size>
@@ -239,6 +200,52 @@
      </property>
      <property name="title">
       <string>Watch directory</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="0" colspan="2">
+    <widget class="QStorageBox" name="storage_permanent">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>90</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Permanent storage</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QStorageBox" name="storage_primary">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>90</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>Primary storage</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QUfoManager" name="ufo_manager">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>110</height>
+      </size>
+     </property>
+     <property name="title">
+      <string>UFO manager</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QPushButton" name="pb_generate">
+     <property name="text">
+      <string>Generate a test sighting</string>
      </property>
     </widget>
    </item>

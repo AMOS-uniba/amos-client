@@ -1,4 +1,5 @@
 #include <QJsonObject>
+#include <QRandomGenerator>
 
 #include "qcamera.h"
 #include "ui_qcamera.h"
@@ -48,6 +49,7 @@ void QCamera::connect_slots(void) {
     this->connect(this->ui->scanner, &QScannerBox::sightings_scanned, this, &QCamera::sightings_scanned);
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
     this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
+    this->connect(this->ui->pb_generate, &QPushButton::clicked, this, &QCamera::generate_sighting);
 }
 
 bool QCamera::is_changed(void) const {
@@ -79,6 +81,68 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
         logger.debug(Concern::Sightings, QString("Found sighting %1").arg(sighting.str()));
         emit this->sighting_found(sighting);
     }
+}
+
+void QCamera::generate_sighting() {
+    // Generate a fake sighting at current timestamp and save the corresponding files to the Watcher directory
+    auto timestamp = QDateTime::currentDateTimeUtc();
+
+    QString prefix = QString("%1/M%2_%3_")
+                         .arg(this->ui->scanner->directory().canonicalPath())
+                         .arg(timestamp.toString("yyyyMMdd_HHmmss"), this->m_station->server()->station_id()
+    );
+
+    QFile xml_file(QString("%1%2.%3")
+                       .arg(prefix, "", "xml"));
+    xml_file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    // Generate a random number of frames between 10 and 50
+    std::uniform_int_distribution<int> dist_count(10, 50);
+    int frame_count = dist_count(*QRandomGenerator::global());
+
+    QTextStream xml_stream(&xml_file);
+    xml_stream
+        << "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n"
+        << "<ufocapture_record version=\"215\" "
+        << QString("y=\"%1\" mo=\"%2\" d=\"%3\" h=\"%4\" m=\"%5\" s=\"%6\" ").arg(
+                timestamp.toString("yyyy"),
+                timestamp.toString("MM"),
+                timestamp.toString("dd"),
+                timestamp.toString("hh"),
+                timestamp.toString("mm"),
+                timestamp.toString("ss")
+            )
+        << QString("trig=\"1\" frames=\"%1\" ").arg(frame_count)
+        << QString("lng=\"%1\" lat=\"%2\" alt=\"%3\" ")
+            .arg(this->m_station->longitude(), 0, 'f', 6)
+            .arg(this->m_station->latitude(), 0, 'f', 6)
+            .arg(this->m_station->altitude(), 0, 'f', 3)
+        << "tz=\"0\" u2=\"224\" cx=\"1600\" cy=\"1200\" fps=\"20.000\" head=\"20\" tail=\"20\" diff=\"1\" sipos=\"9\" sisize=\"15\" dlev=\"91\" dsize=\"3\" "
+        << QString("lid=\"AGO-ALLSKY\" observer=\"%1\" ").arg(this->m_station->server()->station_id())
+        << "sid=\"\" cam=\"\" lens=\"\" cap=\"\" comment=\"\" interlace=\"0\" bbf=\"0\" dropframe=\"0\">";
+    xml_stream << "<ufocapture_paths hit=\"45\">";
+
+    // Generate some random coordinates and velocities in detector pixel space
+    std::uniform_real_distribution<double> dist_pos(600, 1000);
+    double x0 = dist_pos(*QRandomGenerator::global());
+    double y0 = dist_pos(*QRandomGenerator::global());
+    std::uniform_real_distribution<double> dist_vel(-5, 5);
+    double dx = dist_vel(*QRandomGenerator::global());
+    double dy = dist_vel(*QRandomGenerator::global());
+    std::normal_distribution<double> dist_brightness(128.0, 10.0);
+
+    // For every frame, make up something and add it to the XML file
+    for (int frame = 0; frame < frame_count; ++frame) {
+        int brightness = static_cast<int>(dist_brightness(*QRandomGenerator::global()));
+        xml_stream << QString("        <uc_path fno=\"%1\" ono=\"11\" pixel=\"3\" bmax=\"%2\" x=\"%3\" y=\"%4\"></uc_path>\n")
+            .arg(frame)
+            .arg(brightness)
+            .arg(x0 + frame * dx, 0, 'f', 3)
+            .arg(y0 + frame * dy, 0, 'f', 3);
+    }
+    xml_stream << "    </ufocapture_paths>\n</ufocapture_record>";
+
+    xml_file.close();
 }
 
 bool QCamera::is_sighting_valid(const Sighting & sighting) const {

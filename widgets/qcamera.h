@@ -58,6 +58,7 @@ private slots:
     void set_darkness_limit(double new_limit);
 
     void process_sightings(QVector<Sighting> sightings);
+    void generate_sighting(void);
 
     void on_dsb_darkness_limit_valueChanged(double value);
 

@@ -145,7 +145,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 1.3.5
+VERSION = 1.4.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 # Magic values: 2020 for new, 2015 for old, otherwise WILL NOT compile!
 # This is to ensure that the selection is consistent and you do not get a half-old, half-new monster

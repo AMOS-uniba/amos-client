@@ -37,6 +37,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>Allow potentially destructive actions (hardware might still prevent execution)</string>
+     </property>
      <property name="layoutDirection">
       <enum>Qt::LayoutDirection::RightToLeft</enum>
      </property>
@@ -59,6 +62,9 @@
        <horstretch>1</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>Enable sending commands, disable automatic ones</string>
      </property>
      <property name="text">
       <string>Manual control</string>

@@ -121,7 +121,7 @@ QVariant QSightingModel::headerData(int section, Qt::Orientation orientation, in
             case Property::Timestamp:       return "timestamp";
             case Property::Size:            return "AVI size";
             case Property::Status:			return "status";
-            case Property::DeferredFor:     return "remaining";
+            case Property::DeferredFor:     return "try again in";
             default:						return QVariant();
         }
     } else {

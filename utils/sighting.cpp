@@ -47,9 +47,7 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
 
     if (!this->m_timestamp.isValid()) {
         throw RuntimeException("Invalid sighting file name");
-    } else {
     }
-//    this->hack_Y16(); // Currently disabled, handled by copying script (but it should be solved in UFO)
 }
 
 QVector<QString> Sighting::files(void) const {

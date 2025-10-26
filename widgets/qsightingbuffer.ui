@@ -100,6 +100,8 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>pb_clear</tabstop>
+  <tabstop>pb_send</tabstop>
   <tabstop>tv_sightings</tabstop>
  </tabstops>
  <resources/>
