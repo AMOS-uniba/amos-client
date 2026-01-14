@@ -145,7 +145,7 @@ RC_ICONS = images/blue.ico
 
 QT_FATAL_WARNINGS = 1
 
-VERSION = 1.4.0
+VERSION = 1.5.0
 DEFINES += VERSION_STRING=\\\"$${VERSION}\\\"
 # Magic values: 2020 for new, 2015 for old, otherwise WILL NOT compile!
 # This is to ensure that the selection is consistent and you do not get a half-old, half-new monster
@@ -155,3 +155,6 @@ TARGET = "AMOS client"
 
 QMAKE_TARGET_COMPANY = AMOS
 QMAKE_TARGET_PRODUCT = AMOS client
+
+DISTFILES += \
+    readme.md

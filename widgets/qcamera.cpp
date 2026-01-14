@@ -87,9 +87,10 @@ void QCamera::generate_sighting() {
     // Generate a fake sighting at current timestamp and save the corresponding files to the Watcher directory
     auto timestamp = QDateTime::currentDateTimeUtc();
 
-    QString prefix = QString("%1/M%2_%3_")
-                         .arg(this->ui->scanner->directory().canonicalPath())
-                         .arg(timestamp.toString("yyyyMMdd_HHmmss"), this->m_station->server()->station_id()
+    QString prefix = QString("%1/M%2_%3_").arg(
+        this->ui->scanner->directory().canonicalPath(),
+        timestamp.toString("yyyyMMdd_HHmmss"),
+        this->m_station->server()->station_id()
     );
 
     QFile xml_file(QString("%1%2.%3")
@@ -148,10 +149,11 @@ void QCamera::generate_sighting() {
 bool QCamera::is_sighting_valid(const Sighting & sighting) const {
     if (sighting.is_spectral() != this->is_spectral()) {
         logger.debug_error(Concern::Sightings,
-                     QString("Sighting '%1' does not match the type of this '%2' camera")
+                     QString("Sighting '%1' does not match the type of this '%2' camera, ignoring")
                          .arg(sighting.prefix(), this->id()));
         return false;
     }
+
     if (sighting.dir() != this->ui->scanner->directory().absolutePath()) {
         logger.debug_error(Concern::Sightings,
                            QString("Sighting '%1' dir '%2' does not match scanner directory '%3'!").arg(
@@ -164,18 +166,6 @@ bool QCamera::is_sighting_valid(const Sighting & sighting) const {
     return true;
 }
 
-void QCamera::discard_sighting(Sighting & sighting) {
-    // Discard the sighting, even if it is invalid
-    try {
-        logger.debug(Concern::Sightings,
-                     QString("Camera '%1' about to discard sighting '%2'").arg(this->id(), sighting.prefix()));
-        this->ui->storage_primary->discard_sighting(sighting);
-        emit this->sighting_discarded(sighting);
-    } catch (RuntimeException & exc) {
-        logger.error(Concern::Sightings, exc.what());
-    }
-}
-
 void QCamera::store_sighting(Sighting & sighting) {
     if (this->is_sighting_valid(sighting)) {
         try {
@@ -183,6 +173,20 @@ void QCamera::store_sighting(Sighting & sighting) {
                          QString("Camera '%1' about to store sighting '%2'").arg(this->id(), sighting.prefix()));
             this->ui->storage_primary->store_sighting(sighting);
             emit this->sighting_stored(sighting);
+        } catch (RuntimeException & exc) {
+            logger.error(Concern::Sightings, exc.what());
+        }
+    }
+}
+
+void QCamera::quarantine_sighting(Sighting & sighting) {
+    // Quarantine the sighting, even if it is invalid
+    if (this->is_sighting_valid(sighting)) {
+        try {
+            logger.debug(Concern::Sightings,
+                         QString("Camera '%1' about to quarantine sighting '%2'").arg(this->id(), sighting.prefix()));
+            this->ui->storage_primary->quarantine_sighting(sighting);
+            emit this->sighting_quarantined(sighting);
         } catch (RuntimeException & exc) {
             logger.error(Concern::Sightings, exc.what());
         }

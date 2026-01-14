@@ -17,19 +17,21 @@ const QDir QStorageBox::directory_for_timestamp(const QDateTime & datetime) cons
     return QDir(QString("%1/%2/").arg(this->m_directory.path(), datetime.toString("yyyy/MM/dd")));
 }
 
+const QDir QStorageBox::quarantine_directory(const Sighting & sighting) const {
+    return QDir(QString("%1/%2/%3/").arg(this->m_directory.path(), "quarantine", sighting.prefix()));
+}
+
 void QStorageBox::store_sighting(Sighting & sighting) const {
     logger.debug(Concern::Storage, QString("Storage \"%1\" storing a sighting").arg(this->id()));
-#if SEPARATE_SIGHTINGS
-    QString path = QString("%1/%2").arg(this->current_directory().path(), sighting.prefix());
-#else
     QString path = this->directory_for_timestamp(sighting.timestamp()).path();
-#endif
     sighting.move(path);
 }
 
-void QStorageBox::discard_sighting(Sighting & sighting) const {
-    logger.debug(Concern::Storage, QString("Storage \"%1\" discarding a sighting").arg(this->id()));
-    sighting.discard();
+void QStorageBox::quarantine_sighting(Sighting & sighting) const {
+    logger.debug(Concern::Storage, QString("Storage \"%1\" quarantining a sighting").arg(this->id()));
+    QString path = this->quarantine_directory(sighting).path();
+    QDir().mkdir(path);
+    sighting.move(path);
 }
 
 QJsonObject QStorageBox::json(void) const {

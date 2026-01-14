@@ -208,28 +208,44 @@ void QServer::sighting_received(QNetworkReply * reply) {
             // Explicitly not OK, sighting already exists and can be deleted
             logger.error(
                 Concern::Server,
-                QString("Sighting '%1' rejected due to duplicate UUID (error %2: %3) %4")
+                QString("Sighting '%1' rejected due to conflict (error %2: %3) %4")
                     .arg(sighting_id)
                     .arg(reply->error())
                     .arg(reply->errorString())
                     .arg(QString(reply->readAll()))
             );
-            emit this->sighting_conflict(sighting_id);
+            emit this->sighting_conflict(sighting_id, error);
+            break;
+        }
+        case QNetworkReply::ContentOperationNotPermittedError: {
+            logger.error(
+                Concern::Server,
+                QString("Sighting '%1' was partially processed but is faulty (error %2: %3) %4")
+                    .arg(sighting_id)
+                    .arg(reply->error())
+                    .arg(reply->errorString())
+                    .arg(QString(reply->readAll()))
+            );
+            emit this->sighting_conflict(sighting_id, error);
             break;
         }
         case QNetworkReply::UnknownContentError: {
+            // Unknown content: the server read the sighting but does not like it.
             logger.error(
                 Concern::Server,
-                QString("Sighting '%1' rejected due to wrong station ID (error %2: %3) %4")
+                QString("Sighting '%1' rejected (error %2: %3) %4")
                     .arg(sighting_id)
                     .arg(reply->error())
                     .arg(reply->errorString())
                     .arg(QString(reply->readAll()))
             );
-            emit this->sighting_error(sighting_id, error);
+            emit this->sighting_conflict(sighting_id, error);
             break;
         }
         case QNetworkReply::UnknownNetworkError: {
+            // Network error: the server did not respond or something is amiss during transfer,
+            // but there is no explicit comfirmation that this sighting can be discarded.
+            // Attempt again.
             logger.debug_error(
                 Concern::Server,
                 QString("Timed out on sighting '%1' (%2: %3)")
@@ -241,7 +257,7 @@ void QServer::sighting_received(QNetworkReply * reply) {
             break;
         }
         default: {
-            // Other error
+            // Other error. Attempt again.
             logger.error(
                 Concern::Server,
                 QString("Unknown error on sighting '%1' (%2: %3)")

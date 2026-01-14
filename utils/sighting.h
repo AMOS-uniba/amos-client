@@ -11,17 +11,20 @@
 class Sighting {
 public:
     typedef enum {
+        // Raw
         Unprocessed         = 0x00,
         Sent                = 0x01,
+        // Remote response
         Accepted            = 0x10,
         Duplicate           = 0x11,
         Rejected            = 0x12,
-        UnknownStation      = 0x13,
-        UnknownError        = 0x14,
+        UnknownError        = 0x13,
+        // Connection problems
         Timeout             = 0x20,
         RemoteHostClosed    = 0x21,
+        // Final states
         Stored              = 0x40,
-        Discarded           = 0x41,
+        Quarantined         = 0x41
     } Status;
 private:
     bool m_valid;
@@ -50,7 +53,7 @@ public:
     inline bool is_spectral(void) const { return this->m_spectral ? true : false; }
     inline bool is_deferred(void) const { return (this->deferred_until() >= QDateTime::currentDateTimeUtc()); }
     inline bool is_finished(void) const {
-        return this->m_status == Status::Stored || this->m_status == Status::Discarded;
+        return this->m_status == Status::Stored || this->m_status == Status::Quarantined;
     }
     inline bool is_processed(void) const {
         return !(this->m_status == Status::Unprocessed || this->m_status == Status::Sent);
@@ -74,7 +77,6 @@ public:
     bool move(const QDir & dir);
     void defer(float seconds);
     void undefer(void);
-    void discard(void);
 
     bool hack_Y16(void) const;
 };

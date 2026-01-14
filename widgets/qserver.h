@@ -88,8 +88,8 @@ signals:
     void sighting_sent(const QString & sighting_id) const;
     // Sighting was accepted, store it
     void sighting_accepted(const QString & sighting_id);
-    // Sighting was rejected, delete it
-    void sighting_conflict(const QString & sighting_id);
+    // Sighting was rejected, quarantine or delete it
+    void sighting_conflict(const QString & sighting_id, QNetworkReply::NetworkError error);
     // Sighting could not reach server, defer and try again later
     void sighting_error(const QString & sighting_id, QNetworkReply::NetworkError error);
 };

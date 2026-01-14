@@ -90,11 +90,10 @@ QString Sighting::status_string(void) const {
         case Status::Duplicate:         return "duplicate";
         case Status::Accepted:          return "accepted";
         case Status::Rejected:          return "rejected";
-        case Status::UnknownStation:    return "unknown station";
         case Status::Stored:            return "stored";
-        case Status::Discarded:         return "discarded";
         case Status::RemoteHostClosed:  return "host not found";
         case Status::UnknownError:      return "unknown error";
+        case Status::Quarantined:       return "quarantined";
     }
     return "<error>";
 }
@@ -102,9 +101,9 @@ QString Sighting::status_string(void) const {
 void Sighting::set_status(Status new_status) {
     this->m_status = new_status;
     logger.debug(Concern::Sightings,
-                 QString("Status of '%1' set to %2")
-                     .arg(this->prefix())
-                     .arg(this->status_string()));
+                 QString("Status of '%1' set to %2").arg(
+                         this->prefix(),
+                         this->status_string()));
 }
 
 bool Sighting::move(const QDir & dir) {
@@ -141,7 +140,6 @@ bool Sighting::move(const QDir & dir) {
         this->m_valid = false;
         this->m_dir = dir;
         this->undefer();
-        this->set_status(Status::Stored);
     } else {
         logger.error(Concern::Sightings, QString("Error when moving sighting '%1'").arg(this->prefix()));
     }
@@ -162,27 +160,6 @@ double Sighting::deferred_for(void) const {
         return static_cast<double>((this->deferred_until() - QDateTime::currentDateTimeUtc()).count()) / 1000.0;
     } else {
         return std::numeric_limits<double>::quiet_NaN();
-    }
-}
-
-void Sighting::discard() {
-    logger.warning(Concern::Sightings, QString("Discarding sighting '%1'").arg(this->prefix()));
-    try {
-        for (auto & file: this->files()) {
-            if (file.isEmpty()) {
-                logger.debug(Concern::Sightings, QString("File not present in the sighting"));
-            } else {
-                if (QFile::remove(file)) {
-                    logger.debug(Concern::Sightings, QString("Deleted file '%1'").arg(file));
-                } else {
-                    logger.error(Concern::Sightings, QString("Could not delete file '%1'").arg(file));
-                }
-            }
-        }
-        this->set_status(Status::Discarded);
-        this->undefer();
-    } catch (std::exception &) {
-        logger.error(Concern::Sightings, QString("Error while discarding sighting '%1'").arg(this->prefix()));
     }
 }
 

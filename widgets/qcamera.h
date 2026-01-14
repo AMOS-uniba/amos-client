@@ -68,7 +68,7 @@ public slots:
     void update_clocks(void);
 
     void store_sighting(Sighting & sighting);
-    void discard_sighting(Sighting & sighting);
+    void quarantine_sighting(Sighting & sighting);
 
 signals:
     void darkness_limit_changed(double new_limit);
@@ -76,7 +76,7 @@ signals:
     void sightings_scanned(void);
     void sighting_found(Sighting & sighting);
     void sighting_stored(Sighting & sighting);
-    void sighting_discarded(Sighting & sighting);
+    void sighting_quarantined(Sighting & sighting);
 };
 
 #endif // QCAMERA_H

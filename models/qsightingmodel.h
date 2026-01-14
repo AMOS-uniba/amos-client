@@ -51,18 +51,18 @@ public slots:
     void force_send_sightings(void);
     void insert_sighting(const Sighting & sighting);        // found by camera
     void mark_stored(Sighting & sighting);                  // stored by camera
-    void mark_discarded(Sighting & sighting);               // discarded by camera
+    void mark_quarantined(Sighting & sighting);             // quarantined by camera
 
     void mark_sent(const QString & sighting_id);            // sent by server, but no response so far
     void store_sighting(const QString & sighting_id);       // accepted by server
-    void discard_sighting(const QString & sighting_id);     // rejected by server
+    void quarantine_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
 
     void clear(void);
 signals:
     void sighting_to_send(const Sighting & sighting);
-    void sighting_deleted(Sighting & sighting);
     void sighting_stored(Sighting & sighting);
+    void sighting_quarantined(Sighting & sighting);
     void sighting_accepted(Sighting & sighting);
     void sighting_rejected(Sighting & sighting);
     void sighting_deferred(Sighting & sighting);

@@ -87,15 +87,14 @@ QVariant QSightingModel::data(const QModelIndex & index, int role) const {
                         return QColor(0, 224, 0);
                     case Sighting::Status::Duplicate:       [[fallthrough]];
                     case Sighting::Status::Rejected:        [[fallthrough]];
-                    case Sighting::Status::UnknownStation:  [[fallthrough]];
                     case Sighting::Status::Timeout:         [[fallthrough]];
                     case Sighting::Status::UnknownError:    [[fallthrough]];
                     case Sighting::Status::RemoteHostClosed:
                         return QColor(255, 0, 0);
                     case Sighting::Status::Stored:
                         return QColor(0, 192, 0);
-                    case Sighting::Status::Discarded:
-                        return QColor(160, 0, 0);
+                    case Sighting::Status::Quarantined:
+                        return QColor(192, 0, 128);
                 }
             } else {
                 return QVariant();
@@ -186,8 +185,8 @@ void QSightingModel::mark_stored(Sighting & sighting) {
     this->set_status(sighting, Sighting::Status::Stored);
 }
 
-void QSightingModel::mark_discarded(Sighting & sighting) {
-    this->set_status(sighting, Sighting::Status::Discarded);
+void QSightingModel::mark_quarantined(Sighting & sighting) {
+    this->set_status(sighting, Sighting::Status::Quarantined);
 }
 
 void QSightingModel::mark_sent(const QString & sighting_id) {
@@ -201,7 +200,7 @@ void QSightingModel::store_sighting(const QString & sighting_id) {
     emit this->sighting_accepted(sighting);
 }
 
-void QSightingModel::discard_sighting(const QString & sighting_id) {
+void QSightingModel::quarantine_sighting(const QString & sighting_id) {
     auto & sighting = this->sightings()[sighting_id];
     this->set_status(sighting, Sighting::Status::Rejected);
     emit this->sighting_rejected(sighting);
@@ -211,7 +210,7 @@ void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::
     auto & sighting = this->sightings()[sighting_id];
     switch (error) {
         case QNetworkReply::UnknownContentError: {
-            this->set_status(sighting, Sighting::Status::UnknownStation);
+            this->set_status(sighting, Sighting::Status::Rejected);
             break;
         }
         case QNetworkReply::RemoteHostClosedError: {

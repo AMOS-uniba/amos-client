@@ -67,23 +67,23 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->station, &QStation::position_changed, this->ui->camera_spectral, &QCamera::update_clocks);
 
     auto model = this->ui->sb_sightings->model();
-    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,   this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
-    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,   this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
-    this->connect(this->ui->camera_allsky,   &QCamera::sighting_found,      model, &QSightingModel::insert_sighting);
-    this->connect(this->ui->camera_spectral, &QCamera::sighting_found,      model, &QSightingModel::insert_sighting);
-    this->connect(this->ui->camera_allsky,   &QCamera::sighting_stored,     model, &QSightingModel::mark_stored);
-    this->connect(this->ui->camera_spectral, &QCamera::sighting_stored,     model, &QSightingModel::mark_stored);
-    this->connect(this->ui->camera_allsky,   &QCamera::sighting_discarded,  model, &QSightingModel::mark_discarded);
-    this->connect(this->ui->camera_spectral, &QCamera::sighting_discarded,  model, &QSightingModel::mark_discarded);
+    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_stored,      model, &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_stored,      model, &QSightingModel::mark_stored);
+    this->connect(this->ui->camera_allsky,   &QCamera::sighting_quarantined, model, &QSightingModel::mark_quarantined);
+    this->connect(this->ui->camera_spectral, &QCamera::sighting_quarantined, model, &QSightingModel::mark_quarantined);
     this->connect(model, &QSightingModel::sighting_to_send, this->ui->server, &QServer::send_sighting);
     this->connect(this->ui->server, &QServer::sighting_sent,     model, &QSightingModel::mark_sent);
     this->connect(this->ui->server, &QServer::sighting_accepted, model, &QSightingModel::store_sighting);
-    this->connect(this->ui->server, &QServer::sighting_conflict, model, &QSightingModel::discard_sighting);
+    this->connect(this->ui->server, &QServer::sighting_conflict, model, &QSightingModel::quarantine_sighting);
     this->connect(this->ui->server, &QServer::sighting_error,    model, &QSightingModel::defer_sighting);
     this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_allsky,   &QCamera::store_sighting);
     this->connect(model, &QSightingModel::sighting_accepted, this->ui->camera_spectral, &QCamera::store_sighting);
-    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky,   &QCamera::discard_sighting);
-    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::discard_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky,   &QCamera::quarantine_sighting);
+    this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::quarantine_sighting);
 
     this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::send_heartbeat);
 

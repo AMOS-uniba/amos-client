@@ -23,6 +23,7 @@ int main(int argc, char *argv[]) {
     logger.initialize();
 
     main_window = new MainWindow();
+    main_window->resize(2000, 1600);
     main_window->showMaximized();
 
     int ret = a.exec();
