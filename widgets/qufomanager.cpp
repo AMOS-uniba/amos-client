@@ -218,43 +218,59 @@ void QUfoManager::start_ufo_inner(void) {
  * @brief QUfoManager::stop_ufo
  * Stops UFO Capture v2 (three polite attempts by Jozef's method, then kill)
  */
+
 void QUfoManager::stop_ufo(void) {
     if (this->m_process.state() == QProcess::ProcessState::NotRunning) {
         logger.debug(Concern::UFO, QString("UFO-%1: Not running").arg(this->id()));
-    } else {
-        HWND child;
-
-        if (this->is_running()) {
-            logger.info(Concern::UFO, QString("UFO-%1 stopping").arg(this->id()));
-            SendNotifyMessage(this->m_frame, WM_SYSCOMMAND, SC_CLOSE, 0);
-            Sleep(QUfoManager::SleepTime);
-
-            logger.debug(Concern::UFO, "Clicking the dialog button");
-            child = GetLastActivePopup(this->m_frame);
-
-            Sleep(QUfoManager::SleepTime);
-            logger.debug(Concern::UFO, QString("Child dialog's HWND is %1").arg((long long) child));
-
-            if (child == nullptr) {
-                logger.debug_error(Concern::UFO, "Child is null");
-            } else {
-                SetActiveWindow(child);
-                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-                SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-                Sleep(QUfoManager::SleepTime);
-            }
-
-            if (this->is_running()) {
-                logger.warning(Concern::UFO, QString("UFO-%1: Application did not stop, killing the child process").arg(this->id()));
-                this->m_process.kill();
-            }
-
-            emit this->stopped();
-        } else {
-            logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
-        }
+        return;
     }
+
+    if (!this->is_running()) {
+        logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
+        return;
+    }
+
+    logger.info(Concern::UFO, QString("UFO-%1 stopping").arg(this->id()));
+
+    if (!IsWindow(this->m_frame)) {
+        logger.warning(Concern::UFO, QString("UFO-%1: HWND is invalid, killing process").arg(this->id()));
+        this->m_process.kill();
+        emit this->stopped();
+        return;
+    }
+
+    // Request clean close — blocking, waits for WndProc to handle it
+    SendMessage(this->m_frame, WM_CLOSE, 0, 0);
+    Sleep(QUfoManager::SleepTime);
+
+    // Check for a confirmation dialog and click OK (button ID 1)
+    HWND child = GetLastActivePopup(this->m_frame);
+    if (child != nullptr && child != this->m_frame) {
+        logger.debug(Concern::UFO, QString("UFO-%1: Confirmation dialog found, HWND %2, trying to click 'OK'")
+            .arg(this->id()).arg((long long) child));
+        SetForegroundWindow(child);
+        SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
+        Sleep(QUfoManager::SleepTime);
+    } else {
+        logger.debug(Concern::UFO, QString("UFO-%1: No confirmation dialog found").arg(this->id()));
+    }
+
+    // Fall back to WM_QUIT if still running
+    if (this->is_running()) {
+        logger.debug(Concern::UFO, QString("UFO-%1: Still running, sending WM_QUIT").arg(this->id()));
+        PostThreadMessage(GetWindowThreadProcessId(this->m_frame, nullptr), WM_QUIT, 0, 0);
+        Sleep(QUfoManager::SleepTime);
+    }
+
+    // Fall back to killing the process if it is still running
+    /*if (this->is_running()) {
+        logger.warning(Concern::UFO, QString("UFO-%1: Still running, killing the process").arg(this->id()));
+        this->m_process.kill();
+    }*/
+
+    emit this->stopped();
 }
+
 
 void QUfoManager::log_state_change(const UfoState & state) const {
     logger.debug(Concern::UFO, QString("UFO-%1: State changed to \"%2\"").arg(this->id(), state.display_string()));

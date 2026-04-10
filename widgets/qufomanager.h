@@ -37,7 +37,7 @@ private:
     void start_ufo_inner(void);
 
     constexpr static int OpenDelay = 20;
-    constexpr static int SleepTime = 500;
+    constexpr static int SleepTime = 200;
 
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPathAllSky;
