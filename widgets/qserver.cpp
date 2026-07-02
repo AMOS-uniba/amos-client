@@ -171,9 +171,10 @@ void QServer::send_sighting(const Sighting & sighting) const {
     logger.debug(Concern::Server, QString("Sending sighting '%1' to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    multipart->append(sighting.jpg_part());
-    multipart->append(sighting.xml_part());
-    multipart->append(sighting.json());
+
+    for (const auto & part: sighting.assemble()) {
+        multipart->append(part);
+    }
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply * reply = this->m_sighting_manager->post(request, multipart);

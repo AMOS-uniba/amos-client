@@ -315,6 +315,7 @@ QJsonObject QStation::json(void) const {
         {"start", this->m_start_time.toString(Qt::ISODate)},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"st", QString(QChar(this->state().code()))},
+        {"os", QString("%1 %2").arg(QSysInfo::productType()).arg(QSysInfo::productVersion())},
         {"dome", this->dome()->json()},
         {"cas", this->camera_allsky()->json()},
         {"csp", this->camera_spectral()->json()},

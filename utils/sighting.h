@@ -32,13 +32,18 @@ private:
     qint64 m_avi_size;
     QDir m_dir;
     QString m_prefix;
-    QString m_xml, m_pjpg, m_tjpg, m_mbmp, m_pbmp, m_avi, m_full;
+    QStringList m_files;
+    QString m_full;
     QDateTime m_timestamp;
     QDateTime m_deferred_until;
-    QUuid m_uuid;
     Status m_status;
 
     QString try_open(const QString & path, bool required);
+    QHttpPart json(void) const;
+
+    static QDateTime parse_timestamp(const QString & path);
+    static bool should_send(const QString & path);
+    static QHttpPart build_part(const QString & path);
 public:
     Sighting(void);
     Sighting(const QDir & dir, const QString & prefix, bool spectral);
@@ -68,9 +73,7 @@ public:
     QString str(void) const;
     QString status_string(void) const;
 
-    QHttpPart jpg_part(void) const;
-    QHttpPart xml_part(void) const;
-    QHttpPart json(void) const;
+    QList<QHttpPart> assemble(void) const;
 
     void debug(void) const;
 

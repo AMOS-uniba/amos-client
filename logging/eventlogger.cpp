@@ -87,7 +87,7 @@ void EventLogger::write(Level level, Concern concern, const QString & message) c
         item_message->setForeground(EventLogger::Levels[level].colour);
         this->m_display->setItem(this->m_display->rowCount() - 1, 3, item_message);
 
-        if (this->m_display->rowCount() > 256) {
+        if (this->m_display->rowCount() > this->limit) {
             this->m_display->removeRow(0);
         }
         this->m_display->scrollToBottom();

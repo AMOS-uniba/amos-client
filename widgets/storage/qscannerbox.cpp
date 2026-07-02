@@ -25,15 +25,21 @@ void QScannerBox::scan_sightings(void) {
         QString dir = this->m_directory.canonicalPath();
         logger.debug(Concern::Storage, QString("Listing files in %1").arg(dir));
 
-        QStringList xmls = this->m_directory.entryList({"M*.xml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
+        QStringList files = this->m_directory.entryList({"*.*"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
 
-        for (QString & xml: xmls) {
+        QSet<QString> prefixes;
+        for (const QString & file: files) {
+            QFileInfo file_info(QString("%1/%2").arg(dir, file));
+            prefixes.insert(file_info.completeBaseName().left(16));
+        }
+
+        for (const QString & prefix: prefixes) {
             try {
-                QFileInfo xml_info(QString("%1/%2").arg(dir, xml));
-                sightings.append(Sighting(xml_info.absolutePath(), xml_info.completeBaseName(),
-                                          (static_cast<QCamera *>(this->parentWidget()))->is_spectral()));
+                sightings.append(
+                    Sighting(dir, prefix, (static_cast<QCamera *>(this->parentWidget()))->is_spectral())
+                );
             } catch (RuntimeException & e) {
-                logger.error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
+                logger.debug_error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
             }
         }
 
