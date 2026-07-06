@@ -40,10 +40,10 @@ private:
 
     QString try_open(const QString & path, bool required);
     QHttpPart json(void) const;
+    QHttpPart build_part(const QString & filename) const;
 
     static QDateTime parse_timestamp(const QString & path);
     static bool should_send(const QString & path);
-    static QHttpPart build_part(const QString & path);
 public:
     Sighting(void);
     Sighting(const QDir & dir, const QString & prefix, bool spectral);

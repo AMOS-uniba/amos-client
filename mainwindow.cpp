@@ -93,6 +93,11 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(this->ui->camera_allsky, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->camera_spectral, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
 
+    this->connect(this->ui->ac_generate_allsky_ufo, &QAction::triggered, this->ui->camera_allsky, &QCamera::generate_sighting_ufo);
+    this->connect(this->ui->ac_generate_allsky_kvant, &QAction::triggered, this->ui->camera_allsky, &QCamera::generate_sighting_kvant);
+    this->connect(this->ui->ac_generate_spectral_ufo, &QAction::triggered, this->ui->camera_spectral, &QCamera::generate_sighting_ufo);
+    this->connect(this->ui->ac_generate_spectral_kvant, &QAction::triggered, this->ui->camera_spectral, &QCamera::generate_sighting_kvant);
+
     this->connect(qApp, &QApplication::commitDataRequest, this, &MainWindow::set_terminate);
 
     this->on_bt_discard_clicked();

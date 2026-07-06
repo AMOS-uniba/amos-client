@@ -193,7 +193,10 @@ QList<QHttpPart> Sighting::assemble(void) const {
     return out;
 }
 
-QHttpPart Sighting::build_part(const QString & filename) {
+QHttpPart Sighting::build_part(const QString & filename) const {
+    QString path = QString("%1/%2").arg(this->dir_string(), filename);
+    QFileInfo file_info(path);
+
     QHttpPart part;
     part.setHeader(
         QNetworkRequest::ContentTypeHeader,
@@ -201,13 +204,15 @@ QHttpPart Sighting::build_part(const QString & filename) {
     );
     part.setHeader(
         QNetworkRequest::ContentDispositionHeader,
-        QString("form-data; name=\"%1\"; filename=\"%2\"")
-            .arg(filename)
-            .arg(filename)
+        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(file_info.suffix(), path)
     );
-    QFile part_file(filename);
-    part_file.open(QIODevice::ReadOnly);
-    part.setBody(part_file.readAll());
+
+    QFile part_file(path);
+    if (part_file.open(QIODevice::ReadOnly)) {
+        part.setBody(part_file.readAll());
+    } else {
+        logger.warning(Concern::Sightings, QString("Could not open file '%1'").arg(path));
+    }
     return part;
 }
 
