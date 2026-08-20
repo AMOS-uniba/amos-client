@@ -25,22 +25,46 @@ void QScannerBox::scan_sightings(void) {
         QString dir = this->m_directory.canonicalPath();
         logger.debug(Concern::Storage, QString("Listing files in %1").arg(dir));
 
-        QStringList files = this->m_directory.entryList({"*.*"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files);
+        // One sighting per metadata file, named after it in full. Grouping instead by the first
+        // sixteen characters of any file name -- which is a whole UFO name minus the station, but
+        // cuts Kvant's event counter off -- collected two Kvant events recorded in the same second
+        // into a single Sighting, whose parts then went up under the same form field names and
+        // left the server keeping only whichever arrived last.
+        const QStringList metadata = this->m_directory.entryList(
+            {"*.xml", "*.yaml"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files
+        );
 
-        QSet<QString> prefixes;
-        for (const QString & file: files) {
-            QFileInfo file_info(QString("%1/%2").arg(dir, file));
-            prefixes.insert(file_info.completeBaseName().left(16));
-        }
-
-        for (const QString & prefix: prefixes) {
+        for (const QString & file: metadata) {
             try {
                 sightings.append(
-                    Sighting(dir, prefix, (static_cast<QCamera *>(this->parentWidget()))->is_spectral())
+                    Sighting(dir, QFileInfo(file).completeBaseName(),
+                             (static_cast<QCamera *>(this->parentWidget()))->is_spectral())
                 );
             } catch (RuntimeException & e) {
                 logger.debug_error(Concern::Sightings, QString("Could not create a sighting: %1").arg(e.what()));
             }
+        }
+
+        // Files no metadata file claims are left where they are rather than sent without it,
+        // which is also what stops a capture going up twice: once while UFO is still writing its
+        // XML, and again once it has.
+        int loose = 0;
+        for (const QString & file: this->m_directory.entryList(
+                 {"*.*"}, QDir::Filter::NoDotAndDotDot | QDir::Filter::Files)) {
+            bool claimed = false;
+            for (const Sighting & sighting: sightings) {
+                if (file.startsWith(sighting.prefix())) {
+                    claimed = true;
+                    break;
+                }
+            }
+            if (!claimed) {
+                loose += 1;
+            }
+        }
+        if (loose > 0) {
+            logger.debug(Concern::Sightings,
+                         QString("%1 file(s) in %2 belong to no metadata file").arg(loose).arg(dir));
         }
 
         if (sightings.count() > 0) {
