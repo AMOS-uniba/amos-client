@@ -83,10 +83,31 @@ qint64 Sighting::measure_avi(void) const {
 }
 
 /** Decide whether a file should be sent to the server or not.
- *  Currently XML / YAML metadata and JPEG files are to be sent.
+ *  The metadata (XML or YAML) and the composite image are sent. The video is not: it is routinely
+ *  several gigabytes, and only its size is reported. Neither is the thumbnail -- UFO writes both
+ *  "<name>P.jpg" and "<name>T.jpg", and because every part is named after its suffix, sending
+ *  both would leave the server keeping whichever of the two happened to arrive last.
+ *
+ *  The composite is recognised by the metadata file beside it rather than by the sighting prefix,
+ *  which the scanner truncates to sixteen characters and which therefore matches no file in full.
 **/
-bool Sighting::should_send(const QString & path) {
-    return (path.endsWith(".xml") || path.endsWith(".yaml") || path.endsWith(".jpg"));
+bool Sighting::should_send(const QString & path) const {
+    if (path.endsWith(".xml") || path.endsWith(".yaml")) {
+        return true;
+    }
+    if (path.endsWith(".jpg")) {
+        const QString stem = QFileInfo(path).completeBaseName();
+        for (const QString & other: this->m_files) {
+            if (other.endsWith(".xml") || other.endsWith(".yaml")) {
+                // Kvant names the composite exactly as its metadata, UFO appends a "P"
+                const QString base = QFileInfo(other).completeBaseName();
+                if ((stem == base) || (stem == base + "P")) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 QString Sighting::try_open(const QString & suffix, bool required) {

@@ -42,9 +42,10 @@ private:
     QHttpPart json(void) const;
     QHttpPart build_part(const QString & filename) const;
     qint64 measure_avi(void) const;
+    // Not static: which JPEG is the composite depends on the other files in the sighting
+    bool should_send(const QString & path) const;
 
     static QDateTime parse_timestamp(const QString & path);
-    static bool should_send(const QString & path);
 public:
     Sighting(void);
     Sighting(const QDir & dir, const QString & prefix, bool spectral);
