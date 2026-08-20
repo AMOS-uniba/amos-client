@@ -1,6 +1,5 @@
 #include <QFile>
 #include <QDateTime>
-#include <QUuid>
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QDir>
