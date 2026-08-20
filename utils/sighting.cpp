@@ -39,6 +39,7 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
         throw RuntimeException(QString("No files for sighting '%1'").arg(this->prefix()));
     }
 
+    this->m_avi_size = this->measure_avi();
     this->m_timestamp = this->parse_timestamp(*this->m_files.begin());
     this->m_deferred_until = QDateTime();
 
@@ -69,6 +70,18 @@ QDateTime Sighting::parse_timestamp(const QString & path) {
         return QDateTime::fromString(base.left(15), "yyyyMMdd_hhmmss");
     }
 }
+/** Measure the video, which is not sent but whose size is reported.
+ *  Returns -1 when there is none, which is what tells the server not to record a size at all.
+**/
+qint64 Sighting::measure_avi(void) const {
+    for (const QString & filename: this->m_files) {
+        if (filename.endsWith(".avi", Qt::CaseInsensitive)) {
+            return QFileInfo(QString("%1/%2").arg(this->dir_string(), filename)).size();
+        }
+    }
+    return -1;
+}
+
 /** Decide whether a file should be sent to the server or not.
  *  Currently XML / YAML metadata and JPEG files are to be sent.
 **/

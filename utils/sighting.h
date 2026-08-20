@@ -41,6 +41,7 @@ private:
     QString try_open(const QString & path, bool required);
     QHttpPart json(void) const;
     QHttpPart build_part(const QString & filename) const;
+    qint64 measure_avi(void) const;
 
     static QDateTime parse_timestamp(const QString & path);
     static bool should_send(const QString & path);
