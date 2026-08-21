@@ -47,8 +47,18 @@ private:
     static QDateTime parse_timestamp(const QString & path);
 public:
     Sighting(void);
-    Sighting(const QDir & dir, const QString & prefix, bool spectral);
+    Sighting(const QDir & dir, const QString & prefix, bool spectral, const QStringList & files);
     ~Sighting(void) = default;
+
+    /** Suffix tests. Case-insensitive on purpose: the file system is, UFO is not consistent
+     *  about it, and a mismatch here used to mean a sighting was sent with no metadata at all.
+    **/
+    static bool has_suffix(const QString & filename, const QString & suffix);
+    static bool is_metadata(const QString & filename);
+
+    // Whether this sighting carries a metadata file at all; an image delivered before its
+    // reduction has run does not, and is expected to come back with a null filename.
+    bool has_metadata(void) const;
 
     inline QDir dir(void) const { return this->m_dir; }
     inline const QString & prefix(void) const { return this->m_prefix; }

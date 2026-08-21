@@ -17,30 +17,44 @@ Sighting::Sighting(void):
     m_status(Status::Unprocessed)
 {}
 
-Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
+
+/** Build a sighting from a file list the caller has already decided on.
+ *
+ *  Ownership is the scanner's job, not this class's: it holds one directory listing and knows every
+ *  metadata prefix, which is what it takes to decide that a file belongs to the longest prefix
+ *  matching it rather than to every prefix matching it. Claiming files here by `startsWith` meant a
+ *  prefix that was a string-prefix of another swallowed its neighbour's files, metadata included,
+ *  and two metadata files then went up under the same form field name.
+ *
+ *  The checks below are the contract that arrangement rests on, kept because the caller could
+ *  violate it: a sighting must have files, and it must not carry metadata belonging to someone else.
+**/
+Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral, const QStringList & files):
     m_valid(true),
     m_spectral(spectral),
     m_avi_size(-1),
     m_dir(dir),
     m_prefix(prefix),
+    m_files(files),
     m_status(Status::Unprocessed)
 {
     this->m_full = QString("%1/%2").arg(this->m_dir.canonicalPath(), this->m_prefix);
-
-    for (const auto & entry: QDirListing(dir.canonicalPath(),
-                                         QDirListing::IteratorFlag::FilesOnly)) {
-        const QString name = entry.fileName();
-        if (entry.fileName().startsWith(prefix) && name.contains('.')) {
-            this->m_files.append(entry.fileName());
-        }
-    }
 
     if (this->m_files.isEmpty()) {
         throw RuntimeException(QString("No files for sighting '%1'").arg(this->prefix()));
     }
 
+    for (const QString & file: this->m_files) {
+        if (Sighting::is_metadata(file) && (QFileInfo(file).completeBaseName() != prefix)) {
+            throw RuntimeException(QString("Sighting '%1' was given foreign metadata '%2'")
+                                       .arg(prefix, file));
+        }
+    }
+
     this->m_avi_size = this->measure_avi();
-    this->m_timestamp = this->parse_timestamp(*this->m_files.begin());
+    // From the prefix, not from a file: the prefix is the name the sighting is known by and covers
+    // the whole timestamp in both layouts, so the order of the file list cannot matter here.
+    this->m_timestamp = this->parse_timestamp(prefix);
     this->m_deferred_until = QDateTime();
 
     logger.debug(
@@ -58,6 +72,16 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
         );
     }
 }
+
+bool Sighting::has_metadata(void) const {
+    for (const QString & file: this->m_files) {
+        if (Sighting::is_metadata(file)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 QDateTime Sighting::parse_timestamp(const QString & path) {
     const QString base = QFileInfo(path).baseName();
 
@@ -70,12 +94,25 @@ QDateTime Sighting::parse_timestamp(const QString & path) {
         return QDateTime::fromString(base.left(15), "yyyyMMdd_hhmmss");
     }
 }
+/** Suffix tests, both case-insensitive. Windows file systems are, and UFO is not consistent about
+ *  the case it writes: comparing case-sensitively meant a ".XML" sighting was still picked up by
+ *  the scanner, but then went up with neither its metadata nor its composite -- accepted by the
+ *  server and marked stored, with nothing in it.
+**/
+bool Sighting::has_suffix(const QString & filename, const QString & suffix) {
+    return (QFileInfo(filename).suffix().compare(suffix, Qt::CaseInsensitive) == 0);
+}
+
+bool Sighting::is_metadata(const QString & filename) {
+    return (Sighting::has_suffix(filename, "xml") || Sighting::has_suffix(filename, "yaml"));
+}
+
 /** Measure the video, which is not sent but whose size is reported.
  *  Returns -1 when there is none, which is what tells the server not to record a size at all.
 **/
 qint64 Sighting::measure_avi(void) const {
     for (const QString & filename: this->m_files) {
-        if (filename.endsWith(".avi", Qt::CaseInsensitive)) {
+        if (Sighting::has_suffix(filename, "avi")) {
             return QFileInfo(QString("%1/%2").arg(this->dir_string(), filename)).size();
         }
     }
@@ -86,22 +123,30 @@ qint64 Sighting::measure_avi(void) const {
  *  The metadata (XML or YAML) and the composite image are sent. The video is not: it is routinely
  *  several gigabytes, and only its size is reported. Neither is the thumbnail -- UFO writes both
  *  "<name>P.jpg" and "<name>T.jpg", and because every part is named after its suffix, sending
- *  both would leave the server keeping whichever of the two happened to arrive last.
+ *  both would leave the server keeping whichever of the two happened to arrive last. The bitmaps
+ *  ("<name>M.bmp" and "<name>P.bmp") are not sent either.
  *
- *  The composite is recognised by the metadata file beside it rather than by the sighting prefix,
- *  which the scanner truncates to sixteen characters and which therefore matches no file in full.
+ *  The composite is recognised by the metadata file beside it: Kvant names it exactly as its
+ *  metadata, UFO appends a "P".
 **/
 bool Sighting::should_send(const QString & path) const {
-    if (path.endsWith(".xml") || path.endsWith(".yaml")) {
+    if (Sighting::is_metadata(path)) {
         return true;
     }
-    if (path.endsWith(".jpg")) {
+    if (Sighting::has_suffix(path, "jpg")) {
+        // With no metadata to match against, the image is the whole reason this sighting exists
+        // and its group holds exactly one, so send it. The metadata follows as its own delivery
+        // once the reduction has produced it.
+        if (!this->has_metadata()) {
+            return true;
+        }
+
         const QString stem = QFileInfo(path).completeBaseName();
         for (const QString & other: this->m_files) {
-            if (other.endsWith(".xml") || other.endsWith(".yaml")) {
-                // Kvant names the composite exactly as its metadata, UFO appends a "P"
+            if (Sighting::is_metadata(other)) {
                 const QString base = QFileInfo(other).completeBaseName();
-                if ((stem == base) || (stem == base + "P")) {
+                if ((stem.compare(base, Qt::CaseInsensitive) == 0) ||
+                    (stem.compare(base + "P", Qt::CaseInsensitive) == 0)) {
                     return true;
                 }
             }
@@ -238,7 +283,7 @@ QHttpPart Sighting::build_part(const QString & filename) const {
     );
     part.setHeader(
         QNetworkRequest::ContentDispositionHeader,
-        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(file_info.suffix(), path)
+        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(file_info.suffix().toLower(), path)
     );
 
     QFile part_file(path);

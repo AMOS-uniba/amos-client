@@ -151,7 +151,23 @@ void QSightingModel::update_timers(void) {
 
 void QSightingModel::insert_sighting(const Sighting & sighting) {
     if (this->m_sightings.contains(sighting.prefix())) {
-        logger.debug(Concern::Sightings, QString("Sighting '%1' already in model, ignoring").arg(sighting.prefix()));
+        /* A Sighting is a snapshot of the files the scanner decided it owned. While it has never
+         * been sent, the newer snapshot is the better one: it may have picked up a part that arrived
+         * late, and it may equally have lost one, since a file is handed to the longest metadata
+         * prefix matching it and a sibling's metadata appearing shifts that verdict. Once the
+         * sighting has been sent, the snapshot is what the server was told and what move() will look
+         * for, so it is left alone.
+         */
+        Sighting & known = this->m_sightings[sighting.prefix()];
+        if (known.status() == Sighting::Status::Unprocessed) {
+            logger.debug(Concern::Sightings, QString("Refreshing Sighting '%1'").arg(sighting.prefix()));
+            known = sighting;
+            const int row = std::distance(this->sightings().constBegin(),
+                                          this->sightings().constFind(sighting.prefix()));
+            emit this->dataChanged(this->index(row, 0), this->index(row, this->columnCount() - 1));
+        } else {
+            logger.debug(Concern::Sightings, QString("Sighting '%1' already in model, ignoring").arg(sighting.prefix()));
+        }
     } else {
         logger.debug(Concern::Sightings, QString("Adding Sighting '%1").arg(sighting.prefix()));
         this->m_sightings.insert(sighting.prefix(), sighting);
