@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QRegularExpression>
 #include <QJsonObject>
 #include <QJsonDocument>
 
@@ -15,6 +16,7 @@ Sighting::Sighting(void):
     m_avi_size(-1),
     m_dir(QDir()),
     m_prefix(""),
+    m_counter(0),
     m_status(Status::Unprocessed)
 {}
 
@@ -36,6 +38,7 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral, cons
     m_avi_size(-1),
     m_dir(dir),
     m_prefix(prefix),
+    m_counter(0),
     m_files(files),
     m_status(Status::Unprocessed)
 {
@@ -55,7 +58,10 @@ Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral, cons
     this->m_avi_size = this->measure_avi();
     // From the prefix, not from a file: the prefix is the name the sighting is known by and covers
     // the whole timestamp in both layouts, so the order of the file list cannot matter here.
-    this->m_timestamp = this->parse_timestamp(prefix);
+    const Sighting::Name name = Sighting::parse_name(prefix);
+    this->m_timestamp = name.timestamp;
+    this->m_station = name.station;
+    this->m_counter = name.counter;
     this->m_deferred_until = QDateTime();
 
     logger.debug(
@@ -83,17 +89,37 @@ bool Sighting::has_metadata(void) const {
     return false;
 }
 
-QDateTime Sighting::parse_timestamp(const QString & path) {
-    const QString base = QFileInfo(path).baseName();
+/** Take a detector's name apart.
+ *  The counter is the interesting half: Kvant emits one because it can record more than one event in
+ *  the same second, and discarding it meant two such events could not be told apart downstream. UFO
+ *  has none, and reports zero -- which is the truthful answer rather than a missing one, since two
+ *  UFO events in one second genuinely are indistinguishable.
+ *
+ *  Anything that matches neither shape falls back to the old first-fifteen-or-sixteen-characters
+ *  reading, so no name that is ingested today stops being ingested.
+**/
+Sighting::Name Sighting::parse_name(const QString & prefix) {
+    static const QRegularExpression ufo(R"(^M(\d{8}_\d{6})_(.*)_$)");
+    static const QRegularExpression kvant(R"(^(\d{8}_\d{6})[-_](.+)[-_](\d{5})$)");
+    const QString base = QFileInfo(prefix).baseName();
 
-    QDateTime ts = QDateTime::fromString(base.left(16), "'M'yyyyMMdd_hhmmss");
-    // UFO output
-    if (ts.isValid()) {
-        return ts;
-    } else {
-        // Kvant output
-        return QDateTime::fromString(base.left(15), "yyyyMMdd_hhmmss");
+    QRegularExpressionMatch match = ufo.match(prefix);
+    if (match.hasMatch()) {
+        return {QDateTime::fromString(match.captured(1), "yyyyMMdd_hhmmss"), match.captured(2), 0};
     }
+
+    match = kvant.match(prefix);
+    if (match.hasMatch()) {
+        return {QDateTime::fromString(match.captured(1), "yyyyMMdd_hhmmss"),
+                match.captured(2),
+                match.captured(3).toInt()};
+    }
+
+    QDateTime timestamp = QDateTime::fromString(base.left(16), "'M'yyyyMMdd_hhmmss");
+    if (!timestamp.isValid()) {
+        timestamp = QDateTime::fromString(base.left(15), "yyyyMMdd_hhmmss");
+    }
+    return {timestamp, QString(), 0};
 }
 /** Suffix tests, both case-insensitive. Windows file systems are, and UFO is not consistent about
  *  the case it writes: comparing case-sensitively meant a ".XML" sighting was still picked up by
@@ -305,6 +331,10 @@ QHttpPart Sighting::json(void) const {
         {"spectral", this->is_spectral()},
         {"timestamp", this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")},
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
+        // Always sent, zero for UFO. A UFO capture has no counter because UFO cannot distinguish two
+        // events in one second, so zero for both is the honest report of a real collision; omitting
+        // the field would disguise that as "this client does not count".
+        {"counter", this->counter()},
     };
 
     auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);

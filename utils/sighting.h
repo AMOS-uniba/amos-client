@@ -31,6 +31,8 @@ private:
     qint64 m_avi_size;
     QDir m_dir;
     QString m_prefix;
+    QString m_station;
+    int m_counter;
     QStringList m_files;
     QString m_full;
     QDateTime m_timestamp;
@@ -44,7 +46,6 @@ private:
     // Not static: which JPEG is the composite depends on the other files in the sighting
     bool should_send(const QString & path) const;
 
-    static QDateTime parse_timestamp(const QString & path);
 public:
     Sighting(void);
     Sighting(const QDir & dir, const QString & prefix, bool spectral, const QStringList & files);
@@ -56,6 +57,19 @@ public:
     static bool has_suffix(const QString & filename, const QString & suffix);
     static bool is_metadata(const QString & filename);
 
+    /** Everything a detector encodes in the name of its files.
+     *  UFO writes "M<yyyyMMdd_hhmmss>_<station>_" and has no counter, because it cannot tell two
+     *  events in the same second apart. Kvant writes "<yyyyMMdd_hhmmss><sep><station><sep><NNNNN>",
+     *  with either separator being '-' or '_' depending on its version, and the counter is precisely
+     *  how it distinguishes events sharing a second.
+    **/
+    struct Name {
+        QDateTime timestamp;
+        QString station;
+        int counter = 0;
+    };
+    static Name parse_name(const QString & prefix);
+
     // Whether this sighting carries a metadata file at all; an image delivered before its
     // reduction has run does not, and is expected to come back with a null filename.
     bool has_metadata(void) const;
@@ -63,6 +77,8 @@ public:
     inline QDir dir(void) const { return this->m_dir; }
     inline const QString & prefix(void) const { return this->m_prefix; }
     inline QDateTime timestamp(void) const { return this->m_timestamp; }
+    inline const QString & station(void) const { return this->m_station; }
+    inline int counter(void) const { return this->m_counter; }
     inline qint64 avi_size(void) const { return this->m_avi_size; }
     inline QString spectral_string(void) const { return this->is_spectral() ? "spectral" : "all-sky"; };
     inline QString dir_string(void) const { return this->m_dir.canonicalPath(); }

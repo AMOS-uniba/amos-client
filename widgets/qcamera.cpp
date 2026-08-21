@@ -227,6 +227,19 @@ bool QCamera::is_sighting_valid(const Sighting & sighting) const {
         return false;
     }
 
+    if (!sighting.station().isEmpty() &&
+        (sighting.station() != this->m_station->server()->station_id())) {
+        const QString pair = QString("%1|%2").arg(sighting.station(), this->m_station->server()->station_id());
+        if (!this->m_station_mismatches.contains(pair)) {
+            this->m_station_mismatches.insert(pair);
+            logger.warning(Concern::Sightings,
+                           QString("Camera '%1': files are named for station '%2' but this client is "
+                                   "configured as '%3'. Harmless if the detector simply names itself "
+                                   "differently; a misconfiguration if not.")
+                               .arg(this->id(), sighting.station(), this->m_station->server()->station_id()));
+        }
+    }
+
     if (sighting.dir() != this->ui->scanner->directory().absolutePath()) {
         logger.debug_error(Concern::Sightings,
                            QString("Sighting '%1' dir '%2' does not match scanner directory '%3'!").arg(

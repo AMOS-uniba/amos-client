@@ -2,6 +2,7 @@
 #define QCAMERA_H
 
 #include <QGroupBox>
+#include <QSet>
 
 #include "widgets/qconfigurable.h"
 #include "utils/sighting.h"
@@ -36,6 +37,12 @@ private:
     inline QString darkness_key(void) const { return QString("camera_%1/darkness_limit").arg(this->id()); }
 
     bool is_sighting_valid(const Sighting & sighting) const;
+
+    /* Naming conventions already complained about. UFO puts its own detector name in the file name
+     * ("AGO-ALLSKY"), which will never equal the four-character AMOS code, so this has to be said
+     * once per convention rather than once per sighting or it is just noise.
+     */
+    mutable QSet<QString> m_station_mismatches;
 
     constexpr static double DefaultDarknessLimit = -12.0;
     constexpr static bool DefaultEnabled = true;
