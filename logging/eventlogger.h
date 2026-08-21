@@ -57,6 +57,8 @@ private:
     QMap<Concern, bool> debug_visible;
 
     QString format(const QDateTime & timestamp, Level level, const QString & concern, const QString & message) const;
+
+    constexpr static int limit = 1024;
 public:
     const static QMap<Concern, ConcernInfo> Concerns;
 

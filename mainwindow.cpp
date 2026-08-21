@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     auto model = this->ui->sb_sightings->model();
     this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
-    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_spectral, &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
     this->connect(this->ui->camera_allsky,   &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
     this->connect(this->ui->camera_spectral, &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
     this->connect(this->ui->camera_allsky,   &QCamera::sighting_stored,      model, &QSightingModel::mark_stored);
@@ -85,13 +85,18 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky,   &QCamera::quarantine_sighting);
     this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::quarantine_sighting);
 
-    this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::send_heartbeat);
+    this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::heartbeat);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->server, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->camera_allsky, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->camera_spectral, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
+
+    this->connect(this->ui->ac_generate_allsky_ufo, &QAction::triggered, this->ui->camera_allsky, &QCamera::generate_sighting_ufo);
+    this->connect(this->ui->ac_generate_allsky_kvant, &QAction::triggered, this->ui->camera_allsky, &QCamera::generate_sighting_kvant);
+    this->connect(this->ui->ac_generate_spectral_ufo, &QAction::triggered, this->ui->camera_spectral, &QCamera::generate_sighting_ufo);
+    this->connect(this->ui->ac_generate_spectral_kvant, &QAction::triggered, this->ui->camera_spectral, &QCamera::generate_sighting_kvant);
 
     this->connect(qApp, &QApplication::commitDataRequest, this, &MainWindow::set_terminate);
 

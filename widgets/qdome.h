@@ -93,7 +93,6 @@ public:
     const static Command CommandSoftwareReset;
 
     const static ValueFormatter<double> TemperatureValueFormatter, HumidityValueFormatter;
-    const static ColourFormatter<double> TemperatureColourFormatter;
 
     explicit QDome(QWidget * parent = nullptr);
     ~QDome();

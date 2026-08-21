@@ -1,4 +1,6 @@
 #include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include <QTimer>
 
 #include "logging/eventlogger.h"
@@ -171,9 +173,10 @@ void QServer::send_sighting(const Sighting & sighting) const {
     logger.debug(Concern::Server, QString("Sending sighting '%1' to %2").arg(sighting.prefix(), this->m_url_sighting.toString()));
 
     QHttpMultiPart * multipart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    multipart->append(sighting.jpg_part());
-    multipart->append(sighting.xml_part());
-    multipart->append(sighting.json());
+
+    for (const auto & part: sighting.assemble()) {
+        multipart->append(part);
+    }
 
     QNetworkRequest request(this->m_url_sighting);
     QNetworkReply * reply = this->m_sighting_manager->post(request, multipart);
@@ -184,91 +187,120 @@ void QServer::send_sighting(const Sighting & sighting) const {
 }
 
 void QServer::sighting_received(QNetworkReply * reply) {
-    QString sighting_id = reply->property("sighting").toString();
-    QNetworkReply::NetworkError error = reply->error();
+    // Everything that is needed from the reply, read before it is scheduled for deletion
+    const QString sighting_id = reply->property("sighting").toString();
+    const QNetworkReply::NetworkError error = reply->error();
+    const QVariant status_attribute = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    const QString error_string = reply->errorString();
+    const QString response = QString(reply->readAll());
 
-    switch (error) {
-        case QNetworkReply::NoError: {
-            // OK, accepted by the server
+    /* The multipart is parented to the reply and its parts hold every uploaded file in memory,
+     * so a reply that is never deleted leaks the whole payload -- once per attempt.
+     */
+    reply->deleteLater();
+
+    /* No HTTP response at all: the connection was refused, the host could not be resolved, the link
+     * is down, or the transfer was cut mid-flight. Nothing has been said about the sighting itself,
+     * so keep it and try again later.
+     */
+    if (!status_attribute.isValid()) {
+        logger.debug_error(
+            Concern::Server,
+            QString("No response for sighting '%1', will try again (error %2: %3)")
+                .arg(sighting_id)
+                .arg(error)
+                .arg(error_string)
+        );
+        emit this->sighting_error(sighting_id, error);
+        return;
+    }
+
+    /* Otherwise go by the status code, which is the actual contract with the server. Dispatching on
+     * QNetworkReply::NetworkError instead means reading that contract through Qt's statusCodeFromHttp
+     * table, which is how 400 ended up in the default branch, 422 arrived disguised as an "unknown
+     * content error", and branches were kept for 409 and 405 that the server never sends.
+     */
+    const int status = status_attribute.toInt();
+
+    switch (status) {
+        case 200:           // An existing sighting was updated, which is how a duplicate is reported
+            [[fallthrough]];
+        case 201: {         // A new sighting was created
             logger.info(
                 Concern::Server,
-                QString("Sighting '%1' created on the server (HTTP code %2)").arg(
-                    sighting_id,
-                    reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString()
-                )
+                QString("Sighting '%1' created on the server (HTTP code %2)").arg(sighting_id).arg(status)
             );
-            logger.debug(
-                Concern::Server,
-                QString("Response \"%3\"").arg(QString(reply->readAll()))
-            );
-            emit this->sighting_accepted(sighting_id);
+            logger.debug(Concern::Server, QString("Response \"%1\"").arg(response));
+
+            /* The body is a courtesy, not a contract: anything unparseable is still an acceptance.
+             * "filename" is the metadata file the server stored, and null when no xml or yaml part
+             * reached it -- which is the expected answer for an image delivered before its reduction
+             * has run. A missing key means an older server that does not report it at all, and must
+             * keep counting as stored. The warnings are the server's own remarks about the sighting,
+             * and this is the only place an operator would ever see them.
+             */
+            bool metadata_stored = true;
+            const QJsonObject body = QJsonDocument::fromJson(response.toUtf8()).object();
+
+            if (body.contains("filename")) {
+                metadata_stored = !body.value("filename").isNull();
+            }
+
+            for (const QJsonValue & warning: body.value("warnings").toArray()) {
+                logger.warning(Concern::Server,
+                               QString("Sighting '%1': %2").arg(sighting_id, warning.toString()));
+            }
+
+            emit this->sighting_accepted(sighting_id, metadata_stored);
             break;
         }
-        case QNetworkReply::ContentConflictError: {
-            // Explicitly not OK, sighting already exists and can be deleted
+        case 400: {
+            /* The server could not read the report. This client builds the metadata part
+             * mechanically, so it is far more likely that the request never reached the view intact
+             * -- an unlisted host, or a proxy rejecting a truncated body -- than that this sighting
+             * is bad. Keep it and try again; quarantining here would throw away a whole night's
+             * data over a server-side misconfiguration. Note the body may be HTML, not JSON.
+             */
             logger.error(
                 Concern::Server,
-                QString("Sighting '%1' rejected due to conflict (error %2: %3) %4")
-                    .arg(sighting_id)
-                    .arg(reply->error())
-                    .arg(reply->errorString())
-                    .arg(QString(reply->readAll()))
-            );
-            emit this->sighting_conflict(sighting_id, error);
-            break;
-        }
-        case QNetworkReply::ContentOperationNotPermittedError: {
-            logger.error(
-                Concern::Server,
-                QString("Sighting '%1' was partially processed but is faulty (error %2: %3) %4")
-                    .arg(sighting_id)
-                    .arg(reply->error())
-                    .arg(reply->errorString())
-                    .arg(QString(reply->readAll()))
-            );
-            emit this->sighting_conflict(sighting_id, error);
-            break;
-        }
-        case QNetworkReply::UnknownContentError: {
-            // Unknown content: the server read the sighting but does not like it.
-            logger.error(
-                Concern::Server,
-                QString("Sighting '%1' rejected (error %2: %3) %4")
-                    .arg(sighting_id)
-                    .arg(reply->error())
-                    .arg(reply->errorString())
-                    .arg(QString(reply->readAll()))
-            );
-            emit this->sighting_conflict(sighting_id, error);
-            break;
-        }
-        case QNetworkReply::UnknownNetworkError: {
-            // Network error: the server did not respond or something is amiss during transfer,
-            // but there is no explicit comfirmation that this sighting can be discarded.
-            // Attempt again.
-            logger.debug_error(
-                Concern::Server,
-                QString("Timed out on sighting '%1' (%2: %3)")
-                    .arg(sighting_id)
-                    .arg(reply->error())
-                    .arg(reply->errorString())
+                QString("Sighting '%1' was rejected as malformed (HTTP 400), will try again: %2")
+                    .arg(sighting_id, response)
             );
             emit this->sighting_error(sighting_id, error);
+            break;
+        }
+        case 409: {
+            // The sighting already exists on the server and this copy is redundant.
+            logger.error(
+                Concern::Server,
+                QString("Sighting '%1' rejected as a duplicate (HTTP 409): %2").arg(sighting_id, response)
+            );
+            emit this->sighting_conflict(sighting_id, error);
+            break;
+        }
+        case 422: {
+            // The server read the report and will not take it. Retain it, but do not try again.
+            logger.error(
+                Concern::Server,
+                QString("Sighting '%1' could not be processed (HTTP 422), will not be sent again: %2")
+                    .arg(sighting_id, response)
+            );
+            emit this->sighting_conflict(sighting_id, error);
             break;
         }
         default: {
-            // Other error. Attempt again.
+            /* Anything else -- 500 from the server, 413 from a proxy, a status the contract grows
+             * later. None of them say this sighting is unacceptable, so keep it and try again.
+             */
             logger.error(
                 Concern::Server,
-                QString("Unknown error on sighting '%1' (%2: %3)")
-                    .arg(sighting_id)
-                    .arg(reply->error())
-                    .arg(reply->errorString())
+                QString("Sighting '%1' failed with HTTP %2, will try again: %3")
+                    .arg(sighting_id).arg(status).arg(response)
             );
             emit this->sighting_error(sighting_id, error);
             break;
         }
-    };
+    }
 }
 
 void QServer::button_send_heartbeat(void) {

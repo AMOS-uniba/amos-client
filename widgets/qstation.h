@@ -73,8 +73,6 @@ public:
 
     bool is_changed(void) const override;
 
-    static QString temperature_colour(float temperature);
-
     inline const QDateTime & start_time(void) const { return this->m_start_time; }
 
     // Manual control

@@ -12,46 +12,148 @@ extern EventLogger logger;
 Sighting::Sighting(void):
     m_valid(false),
     m_spectral(false),
+    m_avi_size(-1),
     m_dir(QDir()),
     m_prefix(""),
     m_status(Status::Unprocessed)
 {}
 
-Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral):
+
+/** Build a sighting from a file list the caller has already decided on.
+ *
+ *  Ownership is the scanner's job, not this class's: it holds one directory listing and knows every
+ *  metadata prefix, which is what it takes to decide that a file belongs to the longest prefix
+ *  matching it rather than to every prefix matching it. Claiming files here by `startsWith` meant a
+ *  prefix that was a string-prefix of another swallowed its neighbour's files, metadata included,
+ *  and two metadata files then went up under the same form field name.
+ *
+ *  The checks below are the contract that arrangement rests on, kept because the caller could
+ *  violate it: a sighting must have files, and it must not carry metadata belonging to someone else.
+**/
+Sighting::Sighting(const QDir & dir, const QString & prefix, bool spectral, const QStringList & files):
     m_valid(true),
     m_spectral(spectral),
+    m_avi_size(-1),
     m_dir(dir),
     m_prefix(prefix),
+    m_files(files),
     m_status(Status::Unprocessed)
 {
-    this->m_xml  = this->try_open( ".xml",  true);
-    this->m_pjpg = this->try_open("P.jpg", false);
-    this->m_tjpg = this->try_open("T.jpg", false);
-    this->m_mbmp = this->try_open("M.bmp", false);
-    this->m_pbmp = this->try_open("P.bmp", false);
-    this->m_avi  = this->try_open( ".avi", false);
-    auto info = QFileInfo(this->m_avi);
-    this->m_avi_size = info.exists() ? info.size() : 0;
-
     this->m_full = QString("%1/%2").arg(this->m_dir.canonicalPath(), this->m_prefix);
 
-    this->m_timestamp = QDateTime::fromString(QFileInfo(this->m_xml).baseName().left(16), "'M'yyyyMMdd_hhmmss");
+    if (this->m_files.isEmpty()) {
+        throw RuntimeException(QString("No files for sighting '%1'").arg(this->prefix()));
+    }
+
+    for (const QString & file: this->m_files) {
+        if (Sighting::is_metadata(file) && (QFileInfo(file).completeBaseName() != prefix)) {
+            throw RuntimeException(QString("Sighting '%1' was given foreign metadata '%2'")
+                                       .arg(prefix, file));
+        }
+    }
+
+    this->m_avi_size = this->measure_avi();
+    // From the prefix, not from a file: the prefix is the name the sighting is known by and covers
+    // the whole timestamp in both layouts, so the order of the file list cannot matter here.
+    this->m_timestamp = this->parse_timestamp(prefix);
     this->m_deferred_until = QDateTime();
-    this->m_uuid = QUuid::createUuidV5(QUuid{}, this->m_xml);
 
     logger.debug(
         Concern::Sightings,
-        QString("Creating a Sighting from '%1' (%2)")
+        QString("Creating a Sighting '%1' from '%2' (%3), %4 files")
+            .arg(this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss"))
             .arg(this->m_full, this->spectral_string())
+            .arg(this->m_files.length())
     );
 
     if (!this->m_timestamp.isValid()) {
-        throw RuntimeException("Invalid sighting file name");
+        throw RuntimeException(QString("Invalid sighting timestamp '%1' for prefix '%2', ignoring")
+            .arg(this->m_timestamp.toString("yyyy-MM-dd"))
+            .arg(prefix)
+        );
     }
 }
 
-QVector<QString> Sighting::files(void) const {
-    return {this->m_xml, this->m_pjpg, this->m_tjpg, this->m_mbmp, this->m_pbmp, this->m_avi};
+bool Sighting::has_metadata(void) const {
+    for (const QString & file: this->m_files) {
+        if (Sighting::is_metadata(file)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QDateTime Sighting::parse_timestamp(const QString & path) {
+    const QString base = QFileInfo(path).baseName();
+
+    QDateTime ts = QDateTime::fromString(base.left(16), "'M'yyyyMMdd_hhmmss");
+    // UFO output
+    if (ts.isValid()) {
+        return ts;
+    } else {
+        // Kvant output
+        return QDateTime::fromString(base.left(15), "yyyyMMdd_hhmmss");
+    }
+}
+/** Suffix tests, both case-insensitive. Windows file systems are, and UFO is not consistent about
+ *  the case it writes: comparing case-sensitively meant a ".XML" sighting was still picked up by
+ *  the scanner, but then went up with neither its metadata nor its composite -- accepted by the
+ *  server and marked stored, with nothing in it.
+**/
+bool Sighting::has_suffix(const QString & filename, const QString & suffix) {
+    return (QFileInfo(filename).suffix().compare(suffix, Qt::CaseInsensitive) == 0);
+}
+
+bool Sighting::is_metadata(const QString & filename) {
+    return (Sighting::has_suffix(filename, "xml") || Sighting::has_suffix(filename, "yaml"));
+}
+
+/** Measure the video, which is not sent but whose size is reported.
+ *  Returns -1 when there is none, which is what tells the server not to record a size at all.
+**/
+qint64 Sighting::measure_avi(void) const {
+    for (const QString & filename: this->m_files) {
+        if (Sighting::has_suffix(filename, "avi")) {
+            return QFileInfo(QString("%1/%2").arg(this->dir_string(), filename)).size();
+        }
+    }
+    return -1;
+}
+
+/** Decide whether a file should be sent to the server or not.
+ *  The metadata (XML or YAML) and the composite image are sent. The video is not: it is routinely
+ *  several gigabytes, and only its size is reported. Neither is the thumbnail -- UFO writes both
+ *  "<name>P.jpg" and "<name>T.jpg", and because every part is named after its suffix, sending
+ *  both would leave the server keeping whichever of the two happened to arrive last. The bitmaps
+ *  ("<name>M.bmp" and "<name>P.bmp") are not sent either.
+ *
+ *  The composite is recognised by the metadata file beside it: Kvant names it exactly as its
+ *  metadata, UFO appends a "P".
+**/
+bool Sighting::should_send(const QString & path) const {
+    if (Sighting::is_metadata(path)) {
+        return true;
+    }
+    if (Sighting::has_suffix(path, "jpg")) {
+        // With no metadata to match against, the image is the whole reason this sighting exists
+        // and its group holds exactly one, so send it. The metadata follows as its own delivery
+        // once the reduction has produced it.
+        if (!this->has_metadata()) {
+            return true;
+        }
+
+        const QString stem = QFileInfo(path).completeBaseName();
+        for (const QString & other: this->m_files) {
+            if (Sighting::is_metadata(other)) {
+                const QString base = QFileInfo(other).completeBaseName();
+                if ((stem.compare(base, Qt::CaseInsensitive) == 0) ||
+                    (stem.compare(base + "P", Qt::CaseInsensitive) == 0)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
 
 QString Sighting::try_open(const QString & suffix, bool required) {
@@ -69,16 +171,9 @@ QString Sighting::try_open(const QString & suffix, bool required) {
 
 QString Sighting::str(void) const {
     return QString("%1 from %2 (%3, %4 MB)")
-        .arg(this->spectral_string())
-        .arg(this->timestamp().toString("yyyy-MM-dd hh:mm:ss"))
-        .arg(QStringList({
-            (this->m_xml  != "") ?  "XML" :  "---",
-            (this->m_pjpg != "") ? "PJPG" : "----",
-            (this->m_tjpg != "") ? "TJPG" : "----",
-            (this->m_pbmp != "") ? "PBMP" : "----",
-            (this->m_mbmp != "") ? "MBMP" : "----",
-            (this->m_avi  != "") ?  "AVI" :  "---"
-        }).join("+"))
+        .arg(this->spectral_string(),
+             this->timestamp().toString("yyyy-MM-dd hh:mm:ss"),
+             QStringList(this->m_files.cbegin(), this->m_files.cend()).join(" + "))
         .arg(this->avi_size() / (1 << 20));
 }
 
@@ -112,11 +207,12 @@ bool Sighting::move(const QDir & dir) {
 
     bool success = true;
 
-    for (auto & file: this->files()) {
-        if (file.isEmpty()) {
-            logger.debug(Concern::Sightings, QString("File '%1' not present in the sighting, skipping").arg(file));
+    for (auto & filename: this->m_files) {
+        if (filename.isEmpty()) {
+            logger.debug(Concern::Sightings, QString("File '%1' not present in the sighting, skipping").arg(filename));
         } else {
-            QString new_path = QString("%1/%2").arg(dir.canonicalPath(), QFileInfo(file).fileName());
+            QFile file(this->dir().canonicalPath() + "/" + filename);
+            QString new_path = QString("%1/%2").arg(dir.canonicalPath(), QFileInfo(filename).fileName());
 
             if (QFile::exists(new_path)) {
                 logger.warning(Concern::Sightings,
@@ -125,15 +221,18 @@ bool Sighting::move(const QDir & dir) {
                 QFile::remove(new_path);
             }
 
-            bool result = QFile::rename(file, new_path);
+            bool result = file.rename(new_path);
             success &= result;
 
             if (result) {
-                logger.debug(Concern::Sightings, QString("Moved '%3' to '%4'").arg(file, new_path));
+                logger.debug(Concern::Sightings, QString("Moved '%1' to '%2'").arg(filename, new_path));
             } else {
-                logger.error(Concern::Sightings, QString("Could not move file '%3' to '%4'").arg(file, new_path));
+                logger.error(Concern::Sightings,
+                             QString("Could not move file '%1' to '%2': '%3' (%4)")
+                                .arg(filename, new_path, file.errorString())
+                                .arg(file.error()));
             }
-            file = new_path;
+            filename = new_path;
         }
     }
     if (success) {
@@ -163,34 +262,38 @@ double Sighting::deferred_for(void) const {
     }
 }
 
-QHttpPart Sighting::jpg_part(void) const {
-    QHttpPart jpg_part;
-    if (this->m_xml == "") {
-        logger.error(Concern::Sightings, QString("XML file not present in sighting '%1'").arg(this->m_prefix));
-    } else {
-        jpg_part.setHeader(QNetworkRequest::ContentTypeHeader, "image/jpeg");
-        jpg_part.setHeader(
-            QNetworkRequest::ContentDispositionHeader,
-            QString("form-data; name=\"jpg\"; filename=\"%1\"").arg(QFileInfo(this->m_pjpg).fileName())
-        );
-        QFile pjpg_file(this->m_pjpg);
-        pjpg_file.open(QIODevice::ReadOnly);
-        jpg_part.setBody(pjpg_file.readAll());
+QList<QHttpPart> Sighting::assemble(void) const {
+    QList<QHttpPart> out = {};
+    out.append(this->json());
+    for (const auto & file: this->m_files) {
+        if (this->should_send(file)) {
+            out.append(this->build_part(file));
+        }
     }
-    return jpg_part;
+    return out;
 }
 
-QHttpPart Sighting::xml_part(void) const {
-    QHttpPart xml_part;
-    xml_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/xml; charset=utf-8");
-    xml_part.setHeader(
-        QNetworkRequest::ContentDispositionHeader,
-        QString("form-data; name=\"xml\"; filename=\"%1\"").arg(QFileInfo(this->m_xml).fileName())
+QHttpPart Sighting::build_part(const QString & filename) const {
+    QString path = QString("%1/%2").arg(this->dir_string(), filename);
+    QFileInfo file_info(path);
+
+    QHttpPart part;
+    part.setHeader(
+        QNetworkRequest::ContentTypeHeader,
+        "application/octet-stream"
     );
-    QFile xml_file(this->m_xml);
-    xml_file.open(QIODevice::ReadOnly);
-    xml_part.setBody(xml_file.readAll());
-    return xml_part;
+    part.setHeader(
+        QNetworkRequest::ContentDispositionHeader,
+        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(file_info.suffix().toLower(), path)
+    );
+
+    QFile part_file(path);
+    if (part_file.open(QIODevice::ReadOnly)) {
+        part.setBody(part_file.readAll());
+    } else {
+        logger.warning(Concern::Sightings, QString("Could not open file '%1'").arg(path));
+    }
+    return part;
 }
 
 QHttpPart Sighting::json(void) const {
@@ -202,7 +305,6 @@ QHttpPart Sighting::json(void) const {
         {"spectral", this->is_spectral()},
         {"timestamp", this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")},
         {"avi_size", this->avi_size() >= 0 ? this->avi_size() : QJsonValue(QJsonValue::Null)},
-        {"uuid", this->m_uuid.toString(QUuid::WithBraces)}
     };
 
     auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);
@@ -212,37 +314,7 @@ QHttpPart Sighting::json(void) const {
 }
 
 void Sighting::debug(void) const {
-    for (auto & file: this->files()) {
+    for (auto & file: this->m_files) {
         qDebug() << file;
-    }
-}
-
-/**
- * @brief Sighting::hack_Y16 tries to fix faulty "Y16" videos by changing the header.
- *        Did not work very well, currently it is disabled and handled by conversion scripts instead
- * @return
- */
-bool Sighting::hack_Y16(void) const {
-    QFile avi(this->m_avi);
-
-    if (!avi.open(QIODevice::ReadWrite)) {
-        return false;
-    } else {
-        avi.seek(0xBC);
-
-        QByteArray header = avi.read(4);
-        if (header == "Y800") {
-            logger.debug(Concern::Sightings, "Video format header is correct (Y800)");
-        } else {
-            if (header == "Y16 ") {
-                logger.warning(Concern::Sightings, QString("Video format header is faulty (%1), changing to 'Y800'").arg(QString(header)));
-                avi.seek(0xBC);
-                avi.write("Y800", 4);
-            } else {
-                logger.warning(Concern::Sightings, QString("Video format header is unknown (%1), not doing anything").arg(QString(header)));
-            }
-        }
-        avi.close();
-        return true;
     }
 }

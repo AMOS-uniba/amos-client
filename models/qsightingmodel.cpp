@@ -151,7 +151,23 @@ void QSightingModel::update_timers(void) {
 
 void QSightingModel::insert_sighting(const Sighting & sighting) {
     if (this->m_sightings.contains(sighting.prefix())) {
-        logger.debug(Concern::Sightings, QString("Sighting '%1' already in model, ignoring").arg(sighting.prefix()));
+        /* A Sighting is a snapshot of the files the scanner decided it owned. While it has never
+         * been sent, the newer snapshot is the better one: it may have picked up a part that arrived
+         * late, and it may equally have lost one, since a file is handed to the longest metadata
+         * prefix matching it and a sibling's metadata appearing shifts that verdict. Once the
+         * sighting has been sent, the snapshot is what the server was told and what move() will look
+         * for, so it is left alone.
+         */
+        Sighting & known = this->m_sightings[sighting.prefix()];
+        if (known.status() == Sighting::Status::Unprocessed) {
+            logger.debug(Concern::Sightings, QString("Refreshing Sighting '%1'").arg(sighting.prefix()));
+            known = sighting;
+            const int row = std::distance(this->sightings().constBegin(),
+                                          this->sightings().constFind(sighting.prefix()));
+            emit this->dataChanged(this->index(row, 0), this->index(row, this->columnCount() - 1));
+        } else {
+            logger.debug(Concern::Sightings, QString("Sighting '%1' already in model, ignoring").arg(sighting.prefix()));
+        }
     } else {
         logger.debug(Concern::Sightings, QString("Adding Sighting '%1").arg(sighting.prefix()));
         this->m_sightings.insert(sighting.prefix(), sighting);
@@ -189,26 +205,73 @@ void QSightingModel::mark_quarantined(Sighting & sighting) {
     this->set_status(sighting, Sighting::Status::Quarantined);
 }
 
+QMap<QString, Sighting>::iterator QSightingModel::find_sighting(const QString & sighting_id) {
+    auto sighting = this->m_sightings.find(sighting_id);
+    if (sighting == this->m_sightings.end()) {
+        logger.debug_error(Concern::Sightings,
+                           QString("Sighting '%1' is not in the model, ignoring the server's answer")
+                               .arg(sighting_id));
+    }
+    return sighting;
+}
+
 void QSightingModel::mark_sent(const QString & sighting_id) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     this->set_status(sighting, Sighting::Status::Sent);
 }
 
-void QSightingModel::store_sighting(const QString & sighting_id) {
-    auto & sighting = this->sightings()[sighting_id];
+void QSightingModel::store_sighting(const QString & sighting_id, bool metadata_stored) {
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
+
+    /* The server keeps no metadata when no xml or yaml part reached it. For a sighting that had none
+     * to send that is the expected answer: the reduction has not run yet, and its metadata will
+     * follow as a delivery of its own which the server merges onto the same row. For one that did
+     * send metadata it means the part did not arrive under the name the server looks for, which is a
+     * fault on this side -- so do not accept it, or the files are moved to permanent storage while
+     * the row on the server stays empty and nothing is ever retried.
+     */
+    if (sighting.has_metadata() && !metadata_stored) {
+        logger.error(Concern::Sightings,
+                     QString("Sighting '%1' was accepted but its metadata was not stored, will try again")
+                         .arg(sighting_id));
+        this->set_status(sighting, Sighting::Status::Rejected);
+        sighting.defer(QSightingModel::DeferTime);
+        emit this->sighting_deferred(sighting);
+        return;
+    }
+
     this->set_status(sighting, Sighting::Status::Accepted);
     emit this->sighting_accepted(sighting);
 }
 
 void QSightingModel::quarantine_sighting(const QString & sighting_id) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     this->set_status(sighting, Sighting::Status::Rejected);
     emit this->sighting_rejected(sighting);
 }
 
 void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     switch (error) {
+        // HTTP 400: refused, but retried anyway -- see QServer::sighting_received
+        case QNetworkReply::ProtocolInvalidOperationError:
+            [[fallthrough]];
         case QNetworkReply::UnknownContentError: {
             this->set_status(sighting, Sighting::Status::Rejected);
             break;

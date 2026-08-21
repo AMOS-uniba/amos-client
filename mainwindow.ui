@@ -62,11 +62,11 @@
        <number>-9</number>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_station">
        <attribute name="title">
-        <string>Station</string>
+        <string>[&amp;Q] Station</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout">
         <property name="leftMargin">
@@ -287,7 +287,7 @@
       </widget>
       <widget class="QWidget" name="tab_log">
        <attribute name="title">
-        <string>Log</string>
+        <string>[&amp;W] Log</string>
        </attribute>
        <layout class="QGridLayout" name="gl_log">
         <property name="leftMargin">
@@ -455,7 +455,29 @@
     </property>
     <addaction name="action_about"/>
    </widget>
+   <widget class="QMenu" name="menuCameras">
+    <property name="title">
+     <string>Cameras</string>
+    </property>
+    <widget class="QMenu" name="menu_allsky">
+     <property name="title">
+      <string>All-sky</string>
+     </property>
+     <addaction name="ac_generate_allsky_ufo"/>
+     <addaction name="ac_generate_allsky_kvant"/>
+    </widget>
+    <widget class="QMenu" name="menu_spectral">
+     <property name="title">
+      <string>Spectral</string>
+     </property>
+     <addaction name="ac_generate_spectral_ufo"/>
+     <addaction name="ac_generate_spectral_kvant"/>
+    </widget>
+    <addaction name="menu_allsky"/>
+    <addaction name="menu_spectral"/>
+   </widget>
    <addaction name="menuOperation"/>
+   <addaction name="menuCameras"/>
    <addaction name="menu_extras"/>
    <addaction name="menuAbout"/>
   </widget>
@@ -467,6 +489,9 @@
   <action name="action_exit">
    <property name="text">
     <string>Exit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="action_manual">
@@ -529,6 +554,38 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F1</string>
+   </property>
+  </action>
+  <action name="ac_generate_allsky_ufo">
+   <property name="text">
+    <string>Generate an UFO sighting</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+U</string>
+   </property>
+  </action>
+  <action name="ac_generate_allsky_kvant">
+   <property name="text">
+    <string>Generate a Kvant sighting</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+K</string>
+   </property>
+  </action>
+  <action name="ac_generate_spectral_ufo">
+   <property name="text">
+    <string>Generate an UFO sighting</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+U</string>
+   </property>
+  </action>
+  <action name="ac_generate_spectral_kvant">
+   <property name="text">
+    <string>Generate a Kvant sighting</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+Shift+K</string>
    </property>
   </action>
  </widget>

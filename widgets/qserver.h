@@ -87,7 +87,8 @@ signals:
 
     void sighting_sent(const QString & sighting_id) const;
     // Sighting was accepted, store it
-    void sighting_accepted(const QString & sighting_id);
+    // metadata_stored is false when the server explicitly reports it kept no metadata file
+    void sighting_accepted(const QString & sighting_id, bool metadata_stored);
     // Sighting was rejected, quarantine or delete it
     void sighting_conflict(const QString & sighting_id, QNetworkReply::NetworkError error);
     // Sighting could not reach server, defer and try again later

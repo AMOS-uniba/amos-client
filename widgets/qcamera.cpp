@@ -49,7 +49,8 @@ void QCamera::connect_slots(void) {
     this->connect(this->ui->scanner, &QScannerBox::sightings_scanned, this, &QCamera::sightings_scanned);
     this->connect(this->ui->dsb_darkness_limit, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QCamera::settings_changed);
     this->connect(this, &QCamera::darkness_limit_changed, this, &QCamera::update_clocks);
-    this->connect(this->ui->pb_generate, &QPushButton::clicked, this, &QCamera::generate_sighting);
+    this->connect(this->ui->pb_generate_ufo, &QPushButton::clicked, this, &QCamera::generate_sighting_ufo);
+    this->connect(this->ui->pb_generate_kvant, &QPushButton::clicked, this, &QCamera::generate_sighting_kvant);
 }
 
 bool QCamera::is_changed(void) const {
@@ -83,8 +84,80 @@ void QCamera::process_sightings(QVector<Sighting> sightings) {
     }
 }
 
-void QCamera::generate_sighting() {
+void QCamera::generate_sighting_kvant() {
     // Generate a fake sighting at current timestamp and save the corresponding files to the Watcher directory
+    logger.info(
+        Concern::Sightings,
+        QString("Generated a Kvant sighting")
+    );
+    auto timestamp = QDateTime::currentDateTimeUtc();
+
+    QString prefix = QString("%1/%2-%3_%4").arg(
+        this->ui->scanner->directory().canonicalPath(),
+        timestamp.toString("yyyyMMdd_HHmmss"),
+        this->m_station->server()->station_id()
+    ).arg(
+        0, 5, 10, QLatin1Char('0')
+    );
+
+    QFile yaml_file(QString("%1%2.%3").arg(prefix, "", "yaml"));
+    yaml_file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+    // Generate a random number of frames between 10 and 50
+    std::uniform_int_distribution<int> dist_count(10, 50);
+    int frame_count = dist_count(*QRandomGenerator::global());
+
+    QTextStream yaml_stream(&yaml_file);
+    yaml_stream <<
+        QString("EventStartTime: \"%1\"\n").arg(timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")) <<
+        QString("VideoStartTime: \"%1\"\n").arg(timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")) <<
+        QString("Name: %1\n").arg(this->m_station->server()->station_id()) <<
+        QString("Latitude: %1\n").arg(this->m_station->latitude(), 0, 'f', 6) <<
+        QString("Longitude: %1\n").arg(this->m_station->longitude(), 0, 'f', 6) <<
+        QString("Altitude: %1\n").arg(this->m_station->altitude(), 0, 'f', 3) <<
+        QString("FieldOfViewCenter: 180 90\n") <<
+        QString("FieldOfView: 180 140\n") <<
+        QString("Resolution: 1600x1200\n") <<
+        QString("FPS: 20\n") <<
+        QString("PixelSize: 3.4\n") <<
+        QString("IntegrationTime: 1\n") <<
+        QString("MultipleObjects: False\n") <<
+        QString("ObjectOrientationAlignedWithMovement: True\n") <<
+        QString("StableMovement: True\n") <<
+        QString("Trail:\n");
+
+    // Generate some random coordinates and velocities in detector pixel space
+    std::uniform_real_distribution<double> dist_pos(600, 1000);
+    double x0 = dist_pos(*QRandomGenerator::global());
+    double y0 = dist_pos(*QRandomGenerator::global());
+    std::uniform_real_distribution<double> dist_vel(-5, 5);
+    double dx = dist_vel(*QRandomGenerator::global());
+    double dy = dist_vel(*QRandomGenerator::global());
+    std::normal_distribution<double> dist_brightness(128.0, 10.0);
+
+    // For every frame, make up something and add it to the XML file
+    for (int frame = 0; frame < frame_count; ++frame) {
+        int brightness = static_cast<int>(dist_brightness(*QRandomGenerator::global()));
+        yaml_stream << QString("  - {fno: %1, xc: %2, yc: %3, intensity: %4, GaussianHeight: %5, GaussianWidth: %6, GaussianBaseline: %7, NumOversaturatedPixels: %8}\n")
+            .arg(frame)
+            .arg(x0 + frame * dx, 0, 'f', 3)
+            .arg(y0 + frame * dy, 0, 'f', 3)
+            .arg(brightness)
+            .arg(brightness / 10)
+            .arg(1.0)
+            .arg(40)
+            .arg(2);
+    }
+
+    yaml_file.close();
+}
+
+void QCamera::generate_sighting_ufo() {
+    // Generate a fake sighting at current timestamp and save the corresponding files to the Watcher directory
+    logger.info(
+        Concern::Sightings,
+        QString("Generated a UFO sighting")
+    );
     auto timestamp = QDateTime::currentDateTimeUtc();
 
     QString prefix = QString("%1/M%2_%3_").arg(

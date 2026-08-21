@@ -19,27 +19,6 @@ const StationState QStation::RainOrHumid        = StationState('R', "rain or hig
 const StationState QStation::NoMasterPower      = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
 const StationState QStation::Inconsistent       = StationState('I', "inconsistent", Icon::Failure, "inconsistent state");
 
-QString QStation::temperature_colour(float temperature) {
-    float h = 0, s = 0, v = 0;
-    if (temperature < 0.0) {
-        h = 180 - 4.0 * temperature;
-        s = (1 + temperature / 50.0) * 255;
-        v = 200;
-    } else {
-        if (temperature < 15) {
-            h = 180 - 6.0 * temperature;
-        } else {
-            h = 90 - (4.5 * (temperature - 15));
-        }
-        if (h < 0) {
-            h += 360;
-        }
-        s = 255;
-        v = 160;
-    }
-    return QString("hsv(%1, %2, %3)").arg(h, s, v);
-}
-
 QStation::QStation(QWidget * parent):
     QAmosWidget(parent),
     ui(new Ui::QStation),
@@ -315,6 +294,7 @@ QJsonObject QStation::json(void) const {
         {"start", this->m_start_time.toString(Qt::ISODate)},
         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODate)},
         {"st", QString(QChar(this->state().code()))},
+        {"os", QString("%1 %2").arg(QSysInfo::productType()).arg(QSysInfo::productVersion())},
         {"dome", this->dome()->json()},
         {"cas", this->camera_allsky()->json()},
         {"csp", this->camera_spectral()->json()},

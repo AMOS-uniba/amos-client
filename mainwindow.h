@@ -79,6 +79,7 @@ private slots:
     void on_action_open_stat_triggered();
     void on_action_debug_triggered();
     void on_action_about_triggered();
+
     void on_bt_apply_clicked();
     void on_bt_discard_clicked();
     void on_pb_logging_options_clicked();

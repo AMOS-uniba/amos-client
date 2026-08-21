@@ -89,11 +89,15 @@ bool QFileSystemBox::is_enabled(void) const {
 void QFileSystemBox::set_enabled(bool enabled) {
     logger.info(Concern::Storage, this->MessageEnabled().arg(this->full_id(), enabled ? "en" : "dis"));
 
+    // Note the previous value before overwriting it, otherwise the test below always compares
+    // `enabled` against itself and the signal can never be emitted.
+    const bool changed = (enabled != this->m_enabled);
+
     this->m_enabled = enabled;
     this->m_le_path->setEnabled(enabled);
     this->m_cb_enabled->setCheckState(enabled ? Qt::CheckState::Checked : Qt::CheckState::Unchecked);
 
-    if (enabled != this->m_enabled) {
+    if (changed) {
         emit this->toggled(this->m_enabled);
     }
     settings->setValue(this->enabled_key(), enabled);

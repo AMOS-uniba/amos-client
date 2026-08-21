@@ -1,6 +1,5 @@
 #include <QFile>
 #include <QDateTime>
-#include <QUuid>
 #include <QHttpMultiPart>
 #include <QHttpPart>
 #include <QDir>
@@ -32,17 +31,34 @@ private:
     qint64 m_avi_size;
     QDir m_dir;
     QString m_prefix;
-    QString m_xml, m_pjpg, m_tjpg, m_mbmp, m_pbmp, m_avi, m_full;
+    QStringList m_files;
+    QString m_full;
     QDateTime m_timestamp;
     QDateTime m_deferred_until;
-    QUuid m_uuid;
     Status m_status;
 
     QString try_open(const QString & path, bool required);
+    QHttpPart json(void) const;
+    QHttpPart build_part(const QString & filename) const;
+    qint64 measure_avi(void) const;
+    // Not static: which JPEG is the composite depends on the other files in the sighting
+    bool should_send(const QString & path) const;
+
+    static QDateTime parse_timestamp(const QString & path);
 public:
     Sighting(void);
-    Sighting(const QDir & dir, const QString & prefix, bool spectral);
+    Sighting(const QDir & dir, const QString & prefix, bool spectral, const QStringList & files);
     ~Sighting(void) = default;
+
+    /** Suffix tests. Case-insensitive on purpose: the file system is, UFO is not consistent
+     *  about it, and a mismatch here used to mean a sighting was sent with no metadata at all.
+    **/
+    static bool has_suffix(const QString & filename, const QString & suffix);
+    static bool is_metadata(const QString & filename);
+
+    // Whether this sighting carries a metadata file at all; an image delivered before its
+    // reduction has run does not, and is expected to come back with a null filename.
+    bool has_metadata(void) const;
 
     inline QDir dir(void) const { return this->m_dir; }
     inline const QString & prefix(void) const { return this->m_prefix; }
@@ -68,17 +84,13 @@ public:
     QString str(void) const;
     QString status_string(void) const;
 
-    QHttpPart jpg_part(void) const;
-    QHttpPart xml_part(void) const;
-    QHttpPart json(void) const;
+    QList<QHttpPart> assemble(void) const;
 
     void debug(void) const;
 
     bool move(const QDir & dir);
     void defer(float seconds);
     void undefer(void);
-
-    bool hack_Y16(void) const;
 };
 
 #endif // SIGHTING_H

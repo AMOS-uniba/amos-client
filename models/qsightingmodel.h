@@ -43,6 +43,14 @@ public:
 
     inline QMap<QString, Sighting> & sightings(void) { return this->m_sightings; }
     inline const QMap<QString, Sighting> & sightings(void) const { return this->m_sightings; }
+    /* Look a sighting up without creating one. QMap::operator[] default-constructs a value for an
+     * unknown key, and a reply naming a sighting the model no longer holds -- one cleared from the
+     * buffer while its upload was in flight -- used to conjure an empty entry with no prefix, no
+     * files and an invalid timestamp. Being neither deferred nor finished, it was then offered to
+     * the server every minute for as long as the client ran.
+     */
+    QMap<QString, Sighting>::iterator find_sighting(const QString & sighting_id);
+
 private slots:
     void update_timers(void);
     void set_status(Sighting & sighting, Sighting::Status status);
@@ -54,7 +62,7 @@ public slots:
     void mark_quarantined(Sighting & sighting);             // quarantined by camera
 
     void mark_sent(const QString & sighting_id);            // sent by server, but no response so far
-    void store_sighting(const QString & sighting_id);       // accepted by server
+    void store_sighting(const QString & sighting_id, bool metadata_stored);  // accepted by server
     void quarantine_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
 
