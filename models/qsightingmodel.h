@@ -54,7 +54,7 @@ public slots:
     void mark_quarantined(Sighting & sighting);             // quarantined by camera
 
     void mark_sent(const QString & sighting_id);            // sent by server, but no response so far
-    void store_sighting(const QString & sighting_id);       // accepted by server
+    void store_sighting(const QString & sighting_id, bool metadata_stored);  // accepted by server
     void quarantine_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
 

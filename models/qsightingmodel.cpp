@@ -210,8 +210,26 @@ void QSightingModel::mark_sent(const QString & sighting_id) {
     this->set_status(sighting, Sighting::Status::Sent);
 }
 
-void QSightingModel::store_sighting(const QString & sighting_id) {
+void QSightingModel::store_sighting(const QString & sighting_id, bool metadata_stored) {
     auto & sighting = this->sightings()[sighting_id];
+
+    /* The server keeps no metadata when no xml or yaml part reached it. For a sighting that had none
+     * to send that is the expected answer: the reduction has not run yet, and its metadata will
+     * follow as a delivery of its own which the server merges onto the same row. For one that did
+     * send metadata it means the part did not arrive under the name the server looks for, which is a
+     * fault on this side -- so do not accept it, or the files are moved to permanent storage while
+     * the row on the server stays empty and nothing is ever retried.
+     */
+    if (sighting.has_metadata() && !metadata_stored) {
+        logger.error(Concern::Sightings,
+                     QString("Sighting '%1' was accepted but its metadata was not stored, will try again")
+                         .arg(sighting_id));
+        this->set_status(sighting, Sighting::Status::Rejected);
+        sighting.defer(QSightingModel::DeferTime);
+        emit this->sighting_deferred(sighting);
+        return;
+    }
+
     this->set_status(sighting, Sighting::Status::Accepted);
     emit this->sighting_accepted(sighting);
 }
@@ -225,6 +243,9 @@ void QSightingModel::quarantine_sighting(const QString & sighting_id) {
 void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error) {
     auto & sighting = this->sightings()[sighting_id];
     switch (error) {
+        // HTTP 400: refused, but retried anyway -- see QServer::sighting_received
+        case QNetworkReply::ProtocolInvalidOperationError:
+            [[fallthrough]];
         case QNetworkReply::UnknownContentError: {
             this->set_status(sighting, Sighting::Status::Rejected);
             break;
