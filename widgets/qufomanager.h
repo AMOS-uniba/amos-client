@@ -23,7 +23,30 @@ private:
 
     QTimer * m_timer_check;
     QTimer * m_timer_delay;
+    QTimer * m_timer_sequence;
     mutable bool m_start_scheduled;
+
+    /* Starting and stopping UFO used to sleep on the GUI thread -- twice on the way up, up to four
+     * times on the way down, plus a SendMessage(WM_CLOSE) that waits on UFO's own message loop. That
+     * stalls dome telegram processing, the scanner and the display for up to a second, against the
+     * dome's own two-second validity window, and it lands at dusk and dawn. Each step is now driven
+     * from m_timer_sequence instead, and the fixed sleeps become bounded polling, which also handles
+     * the ordering the sleeps were only guessing at.
+     */
+    enum class Step {
+        Idle,
+        FindWindow,         // process started, waiting for UFO's window to appear
+        AwaitPopup,         // WM_CLOSE posted, waiting for the confirmation dialog
+        AwaitExit,          // dialog dealt with, waiting for the process to go away
+        AwaitExitAfterQuit, // WM_QUIT posted, last wait before giving up
+    };
+
+    Step m_step = Step::Idle;
+    int m_attempts = 0;
+
+    void advance(Step step);
+    void run_step(void);
+    inline bool is_stopping(void) const { return (this->m_step != Step::Idle) && (this->m_step != Step::FindWindow); };
 
     mutable HWND m_frame;
     mutable QProcess m_process;
@@ -37,7 +60,10 @@ private:
     void start_ufo_inner(void);
 
     constexpr static int OpenDelay = 20;
-    constexpr static int SleepTime = 200;
+    constexpr static int PollInterval = 200;        // ms between sequence steps
+    constexpr static int FindWindowAttempts = 15;   // 3 s for UFO's window to appear
+    constexpr static int PopupAttempts = 10;        // 2 s for the confirmation dialog
+    constexpr static int ExitAttempts = 15;         // 3 s for the process to exit
 
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPathAllSky;
@@ -48,7 +74,7 @@ private slots:
     void on_bt_change_clicked();
 
 public:
-    const static UfoState Unknown, NotAnExe, NotFound, NotRunning, Starting, Running;
+    const static UfoState Unknown, NotAnExe, NotFound, NotRunning, Starting, Running, Stopping;
 
     explicit QUfoManager(QWidget * parent = nullptr);
     ~QUfoManager();

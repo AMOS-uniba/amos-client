@@ -17,6 +17,7 @@ const UfoState QUfoManager::NotFound     = UfoState('F', "not found", Qt::red, f
 const UfoState QUfoManager::NotRunning   = UfoState('N', "not running", Qt::gray, true, "Start UFO");
 const UfoState QUfoManager::Starting     = UfoState('S', "starting", QColor::fromHsl(60, 255, 255), false, "Starting...");
 const UfoState QUfoManager::Running      = UfoState('R', "running", Qt::darkGreen, true, "Stop UFO");
+const UfoState QUfoManager::Stopping     = UfoState('T', "stopping", QColor::fromHsl(30, 255, 128), false, "Stopping...");
 
 const QString QUfoManager::DefaultPathAllSky = "C:/AMOS/UFO2/UFO2.exe";
 const QString QUfoManager::DefaultPathSpectral = "C:/AMOS/UFOHD2/UFOHD2.exe";
@@ -39,6 +40,16 @@ QUfoManager::QUfoManager(QWidget * parent):
     this->m_timer_check->start();
 
     this->m_timer_delay = new QTimer(this);
+    this->m_timer_delay->setSingleShot(true);
+    // Connected once. It used to be connected on every scheduled start, with no Qt::UniqueConnection,
+    // so the connections accumulated and after a week of dusk starts a single timeout launched UFO
+    // many times over.
+    this->connect(this->m_timer_delay, &QTimer::timeout, this, &QUfoManager::start_ufo_inner);
+
+    this->m_timer_sequence = new QTimer(this);
+    this->m_timer_sequence->setSingleShot(true);
+    this->m_timer_sequence->setInterval(QUfoManager::PollInterval);
+    this->connect(this->m_timer_sequence, &QTimer::timeout, this, &QUfoManager::run_step);
 
     this->connect(this, &QUfoManager::state_changed, this, &QUfoManager::log_state_change);
 }
@@ -47,6 +58,7 @@ QUfoManager::~QUfoManager() {
     this->disconnect(&this->m_process, &QProcess::stateChanged, nullptr, nullptr);
     delete this->m_timer_check;
     delete this->m_timer_delay;
+    delete this->m_timer_sequence;
     delete this->ui;
 }
 
@@ -129,7 +141,8 @@ void QUfoManager::update_state(void) {
     switch (this->m_process.state()) {
         case QProcess::ProcessState::Running: {
             this->connect(this->ui->bt_toggle, &QPushButton::clicked, this, &QUfoManager::stop_ufo);
-            new_ufo_state = QUfoManager::Running;
+            // The one-second poll must not overwrite a stop sequence that is still in flight.
+            new_ufo_state = this->is_stopping() ? QUfoManager::Stopping : QUfoManager::Running;
             break;
         }
         case QProcess::ProcessState::Starting: {
@@ -183,14 +196,25 @@ void QUfoManager::start_ufo(unsigned int delay) const {
                 logger.info(Concern::UFO, QString("UFO-%1 starting with delay %2 s").arg(this->id()).arg(delay));
 
                 this->m_start_scheduled = true;
-                this->m_timer_delay->setInterval(delay * 1000);
-                this->connect(this->m_timer_delay, &QTimer::timeout, this, &QUfoManager::start_ufo_inner);
-                this->m_timer_delay->setSingleShot(true);
-                this->m_timer_delay->start();
-                break;
+                this->m_timer_delay->start(delay * 1000);
             }
+            break;
         }
     }
+}
+
+/**
+ * @brief Schedule the next step of a start or stop sequence.
+ * Resets the attempt counter whenever the step actually changes, so each phase gets its own budget.
+ */
+void QUfoManager::advance(Step step) {
+    if (step != this->m_step) {
+        this->m_step = step;
+        this->m_attempts = 0;
+    } else {
+        this->m_attempts += 1;
+    }
+    this->m_timer_sequence->start(QUfoManager::PollInterval);
 }
 
 /**
@@ -201,32 +225,23 @@ void QUfoManager::start_ufo_inner(void) {
     logger.debug(Concern::UFO, QString("UFO-%1 starting").arg(this->id()));
     this->m_process.setProcessChannelMode(QProcess::ProcessChannelMode::ForwardedChannels);
     this->m_process.setWorkingDirectory(QFileInfo(this->m_path).absoluteDir().path());
-    // this->connect(&this->m_process, &QProcess::stateChanged, this, &QUfoManager::update_state);
     this->m_process.start(this->m_path, {}, QProcess::OpenMode(QProcess::ReadWrite));
 
-    Sleep(QUfoManager::SleepTime);
-    this->m_frame = FindWindowA(nullptr, "UFOCapture");
-    logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2").arg(this->id()).arg((long long) this->m_frame));
-    Sleep(QUfoManager::SleepTime);
-    ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
-    this->m_start_scheduled = false;
-
-    emit this->started();
+    this->advance(Step::FindWindow);
 }
 
 /**
  * @brief QUfoManager::stop_ufo
- * Stops UFO Capture v2 (three polite attempts by Jozef's method, then kill)
+ * Ask UFO to close, politely, without blocking. The sequence continues in run_step().
  */
-
 void QUfoManager::stop_ufo(void) {
-    if (this->m_process.state() == QProcess::ProcessState::NotRunning) {
-        logger.debug(Concern::UFO, QString("UFO-%1: Not running").arg(this->id()));
+    if (!this->is_running()) {
+        logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
         return;
     }
 
-    if (!this->is_running()) {
-        logger.debug(Concern::UFO, QString("UFO-%1: Application is not running, not doing anything").arg(this->id()));
+    if (this->is_stopping()) {
+        logger.debug(Concern::UFO, QString("UFO-%1: already stopping").arg(this->id()));
         return;
     }
 
@@ -239,47 +254,109 @@ void QUfoManager::stop_ufo(void) {
         return;
     }
 
-    // Request clean close — blocking, waits for WndProc to handle it
-    SendMessage(this->m_frame, WM_CLOSE, 0, 0);
-    Sleep(QUfoManager::SleepTime);
-
-    // Check for a confirmation dialog and click OK (button ID 1)
-    HWND child = GetLastActivePopup(this->m_frame);
-    if (child != nullptr && child != this->m_frame) {
-        logger.debug(Concern::UFO, QString("UFO-%1: Confirmation dialog found, HWND %2, trying to click 'OK'")
-            .arg(this->id()).arg((long long) child));
-        SetForegroundWindow(child);
-        SendDlgItemMessage(child, 1, BM_CLICK, 0, 0);
-        Sleep(QUfoManager::SleepTime);
-    } else {
-        logger.debug(Concern::UFO, QString("UFO-%1: No confirmation dialog found").arg(this->id()));
-    }
-
-    // Fall back to WM_QUIT if still running
-    if (this->is_running()) {
-        logger.debug(Concern::UFO, QString("UFO-%1: Still running, sending WM_QUIT").arg(this->id()));
-        PostThreadMessage(GetWindowThreadProcessId(this->m_frame, nullptr), WM_QUIT, 0, 0);
-        Sleep(QUfoManager::SleepTime);
-    }
-
-    // Fall back to killing the process if it is still running
-    /*if (this->is_running()) {
-        logger.warning(Concern::UFO, QString("UFO-%1: Still running, killing the process").arg(this->id()));
-        this->m_process.kill();
-    }*/
-
-    emit this->stopped();
+    // Posted, not sent: SendMessage waits for UFO's own WndProc to finish, which is most of the
+    // freeze this sequence exists to remove.
+    PostMessage(this->m_frame, WM_CLOSE, 0, 0);
+    this->advance(Step::AwaitPopup);
 }
 
+/**
+ * @brief One step of whichever sequence is in flight.
+ * Each phase polls up to its own budget instead of sleeping for a fixed guess, so a slow machine gets
+ * more time and a fast one wastes none.
+ */
+void QUfoManager::run_step(void) {
+    switch (this->m_step) {
+        case Step::Idle: {
+            break;
+        }
+        case Step::FindWindow: {
+            this->m_frame = FindWindowA(nullptr, "UFOCapture");
+            if (this->m_frame != nullptr) {
+                logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2, minimising")
+                                               .arg(this->id()).arg((long long) this->m_frame));
+                ShowWindowAsync(this->m_frame, SW_SHOWMINIMIZED);
+            } else if (this->m_attempts < QUfoManager::FindWindowAttempts) {
+                this->advance(Step::FindWindow);
+                return;
+            } else {
+                // The process is up regardless; without a window we simply cannot minimise it, and
+                // stop_ufo() will fall back to killing it. The old code did not check at all and
+                // handed a null handle to ShowWindowAsync.
+                logger.warning(Concern::UFO, QString("UFO-%1: window did not appear after %2 ms")
+                                                 .arg(this->id())
+                                                 .arg(QUfoManager::FindWindowAttempts * QUfoManager::PollInterval));
+            }
+            this->m_step = Step::Idle;
+            this->m_start_scheduled = false;
+            emit this->started();
+            break;
+        }
+        case Step::AwaitPopup: {
+            HWND child = GetLastActivePopup(this->m_frame);
+            if ((child != nullptr) && (child != this->m_frame)) {
+                logger.debug(Concern::UFO, QString("UFO-%1: confirmation dialog %2, clicking OK")
+                                               .arg(this->id()).arg((long long) child));
+                SetForegroundWindow(child);
+                if (HWND ok = GetDlgItem(child, 1)) {
+                    PostMessage(ok, BM_CLICK, 0, 0);
+                }
+                this->advance(Step::AwaitExit);
+            } else if (this->m_attempts < QUfoManager::PopupAttempts) {
+                this->advance(Step::AwaitPopup);
+            } else {
+                logger.debug(Concern::UFO, QString("UFO-%1: no confirmation dialog appeared").arg(this->id()));
+                this->advance(Step::AwaitExit);
+            }
+            break;
+        }
+        case Step::AwaitExit: {
+            if (!this->is_running()) {
+                logger.info(Concern::UFO, QString("UFO-%1 closed").arg(this->id()));
+                this->m_step = Step::Idle;
+                emit this->stopped();
+            } else if (this->m_attempts < QUfoManager::ExitAttempts) {
+                this->advance(Step::AwaitExit);
+            } else {
+                logger.debug(Concern::UFO, QString("UFO-%1: still running, posting WM_QUIT").arg(this->id()));
+                PostThreadMessage(GetWindowThreadProcessId(this->m_frame, nullptr), WM_QUIT, 0, 0);
+                this->advance(Step::AwaitExitAfterQuit);
+            }
+            break;
+        }
+        case Step::AwaitExitAfterQuit: {
+            if (!this->is_running()) {
+                logger.info(Concern::UFO, QString("UFO-%1 closed after WM_QUIT").arg(this->id()));
+                this->m_step = Step::Idle;
+                emit this->stopped();
+            } else if (this->m_attempts < QUfoManager::ExitAttempts) {
+                this->advance(Step::AwaitExitAfterQuit);
+            } else {
+                // Deliberately not killed: that decision predates this change and is left alone.
+                logger.warning(Concern::UFO, QString("UFO-%1 would not close; leaving it alone").arg(this->id()));
+                this->m_step = Step::Idle;
+                emit this->stopped();
+            }
+            break;
+        }
+    }
+}
 
 void QUfoManager::log_state_change(const UfoState & state) const {
     logger.debug(Concern::UFO, QString("UFO-%1: State changed to \"%2\"").arg(this->id(), state.display_string()));
 }
 
 QJsonObject QUfoManager::json(void) const {
+    /* Stopping exists for the operator's benefit only. The process has not exited yet, and the
+     * server's vocabulary of watcher states is fixed (D/F/E/R/N/S/U), so it is told 'R' exactly as
+     * it was before this state existed -- a new code would leak an unknown value into every
+     * heartbeat for the duration of a stop.
+     */
+    const UfoState & reported = (this->state() == QUfoManager::Stopping) ? QUfoManager::Running : this->state();
+
     return QJsonObject {
         {"auto", this->is_autostart()},
-        {"st", QString(QChar(this->state().code()))},
+        {"st", QString(QChar(reported.code()))},
     };
 }
 
