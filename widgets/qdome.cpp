@@ -132,8 +132,12 @@ QDome::QDome(QWidget * parent):
     this->m_spm = new QSerialPortManager();
     this->m_spm->moveToThread(this->m_thread);
     this->connect(this->m_thread, &QThread::started, this->m_spm, &QSerialPortManager::initialize, Qt::QueuedConnection);
-    this->connect(this->m_thread, &QThread::finished, this->m_spm, &QObject::deleteLater, Qt::QueuedConnection);
-    this->connect(this->m_thread, &QThread::finished, this->m_thread, &QObject::deleteLater, Qt::QueuedConnection);
+    /* The manager is deleted in the destructor, after quit() and wait() have returned and nothing
+     * is running in the worker thread any more, and the thread itself is a child of this widget.
+     * Deleting either of them through QThread::finished as well was a double free: the manager
+     * was destroyed as the thread wound down and then deleted again in the destructor, which
+     * is what crashed on exit.
+     */
     this->m_thread->start();
 }
 
