@@ -566,11 +566,22 @@ void QDome::process_message(const QByteArray & message) {
                 throw MalformedTelegram(QString("Unknown response '%1'").arg(QString(decoded)));
         }
         this->set_data_state("valid data");
-    } catch (MalformedTelegram & e) {
-        logger.error(Concern::SerialPort, QString("Malformed message '%1'").arg(QString(message)));
+    /* Nothing may leave this slot. It is invoked from the event loop, and an exception crossing that
+     * boundary terminates the process -- which is how a single non-hexadecimal byte on the line used
+     * to kill the client: EncodingError comes from Telegram's own decoding, derives from
+     * RuntimeException rather than MalformedTelegram, and so matched neither clause here.
+     * RuntimeException now covers all three of MalformedTelegram, EncodingError and InvalidState;
+     * the two clauses after it exist so that a type nobody anticipated is logged rather than fatal.
+     */
+    } catch (RuntimeException & e) {
+        logger.error(Concern::SerialPort, QString("Bad message '%1': %2").arg(QString(message), e.what()));
         this->set_data_state("invalid data");
-    } catch (InvalidState & e) {
-        logger.error(Concern::SerialPort, QString("Invalid state message: '%1'").arg(e.what()));
+    } catch (const std::exception & e) {
+        logger.error(Concern::SerialPort, QString("Unexpected failure on message '%1': %2")
+                                              .arg(QString(message), e.what()));
+        this->set_data_state("invalid data");
+    } catch (...) {
+        logger.error(Concern::SerialPort, QString("Unknown failure on message '%1'").arg(QString(message)));
         this->set_data_state("invalid data");
     }
 }

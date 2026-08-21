@@ -21,6 +21,18 @@ Telegram::Telegram(const QByteArray & received) {
         throw MalformedTelegram(QString("Telegram has wrong length (%1 bytes)").arg(length));
     }
 
+    /* Frame the message before decoding anything out of it. Every decode_byte() below can throw on a
+     * byte that is not hexadecimal, which is what line noise looks like, so the cheap comparisons
+     * come first: a run of rubbish is then rejected by a mismatched start or end byte instead of by
+     * an exception thrown from inside the length field.
+     */
+    if ((received[0] != Telegram::StartByteSlave) && (received[0] != Telegram::StartByteMaster)) {
+        throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg((int) received[0], 2, 16, QChar('0')));
+    }
+    if (received[length - 1] != Telegram::EndByte) {
+        throw MalformedTelegram(QString("Incorrect end byte 0x%1").arg((int) received[length - 1], 2, 16, QChar('0')));
+    }
+
     // Compare claimed and real length
     const unsigned char payload_length = Telegram::decode_byte(received[3], received[4]);
     if (length != payload_length * 2 + 8) {
@@ -36,14 +48,6 @@ Telegram::Telegram(const QByteArray & received) {
     }
     if (crc_computed != crc_received) {
         throw MalformedTelegram(QString("CRCs do not match (computed %1, received %2)").arg(crc_computed).arg(crc_received));
-    }
-
-    // Check first and last bytes of the message
-    if ((received[0] != Telegram::StartByteSlave) && (received[0] != Telegram::StartByteMaster)) {
-        throw MalformedTelegram(QString("Incorrect start byte 0x%1").arg((int) received[0], 2, 16, QChar('0')));
-    }
-    if (received[length - 1] != Telegram::EndByte) {
-        throw MalformedTelegram(QString("Incorrect end byte 0x%1").arg((int) received[length - 1], 2, 16, QChar('0')));
     }
 
     // Finally extract address and payload

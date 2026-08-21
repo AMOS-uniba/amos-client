@@ -101,7 +101,17 @@ void QSerialPortManager::request_status(void) {
 }
 
 void QSerialPortManager::request(const QByteArray & request) {
-    QByteArray encoded = Telegram(QSerialPortManager::Address, request).compose();
+    QByteArray encoded;
+    try {
+        encoded = Telegram(QSerialPortManager::Address, request).compose();
+    } catch (const std::exception & e) {
+        // This runs on the worker thread, where an escaping exception is just as fatal as on the
+        // main one, and hex_to_char() throws on a value it cannot encode.
+        emit this->log(Concern::SerialPort, Level::Error,
+                       QString("Could not encode request '%1': %2").arg(QString(request), e.what()));
+        return;
+    }
+
     emit this->log(Concern::SerialPort, Level::DebugDetail, QString("Requesting %1 (%2)").arg(request, QString(encoded)));
 
     if (this->m_port->isOpen()) {
