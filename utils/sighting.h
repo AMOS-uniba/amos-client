@@ -81,8 +81,6 @@ public:
     bool move(const QDir & dir);
     void defer(float seconds);
     void undefer(void);
-
-    bool hack_Y16(void) const;
 };
 
 #endif // SIGHTING_H
