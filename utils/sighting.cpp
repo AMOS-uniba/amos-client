@@ -12,6 +12,7 @@ extern EventLogger logger;
 Sighting::Sighting(void):
     m_valid(false),
     m_spectral(false),
+    m_avi_size(-1),
     m_dir(QDir()),
     m_prefix(""),
     m_status(Status::Unprocessed)
