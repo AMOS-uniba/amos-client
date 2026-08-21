@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent):
 
     auto model = this->ui->sb_sightings->model();
     this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
-    this->connect(this->ui->camera_allsky,   &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
+    this->connect(this->ui->camera_spectral, &QCamera::sightings_scanned,    this->ui->sb_sightings, &QSightingBuffer::handle_sightings_scanned);
     this->connect(this->ui->camera_allsky,   &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
     this->connect(this->ui->camera_spectral, &QCamera::sighting_found,       model, &QSightingModel::insert_sighting);
     this->connect(this->ui->camera_allsky,   &QCamera::sighting_stored,      model, &QSightingModel::mark_stored);
