@@ -149,6 +149,7 @@ void QDome::connect_slots(void) {
     for (auto && widget: {this->ui->dsb_humidity_limit_lower, this->ui->dsb_humidity_limit_upper}) {
         this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::settings_changed);
     }
+    this->connect(this->ui->cb_require_humidity, &QCheckBox::toggled, this, &QDome::settings_changed);
 
     this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::set_port, Qt::QueuedConnection);
     this->connect(this, &QDome::command, this->m_spm, &QSerialPortManager::request, Qt::QueuedConnection);
@@ -167,6 +168,7 @@ void QDome::connect_slots(void) {
 }
 
 void QDome::load_defaults(void) {
+    this->m_require_humidity = QDome::DefaultRequireHumidity;
     this->set_humidity_limits(QDome::DefaultHumidityLower, QDome::DefaultHumidityUpper);
     this->handle_serial_port_selected(QDome::DefaultPort);
 }
@@ -180,6 +182,13 @@ void QDome::load_settings_inner(void) {
         this->m_settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
         this->m_settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
     );
+    this->m_require_humidity =
+        this->m_settings->value("dome/require_humidity", QDome::DefaultRequireHumidity).toBool();
+    if (!this->m_require_humidity) {
+        logger.warning(Concern::Configuration,
+                       "Humidity data is not required: the limits will be applied to whatever the "
+                       "last reading was, valid or not");
+    }
     this->handle_serial_port_selected(
         this->m_settings->value("dome/port", QDome::DefaultPort).toString()
     );
@@ -188,13 +197,22 @@ void QDome::load_settings_inner(void) {
 bool QDome::is_changed(void) const {
     return (
         (this->ui->dsb_humidity_limit_lower->value() != this->humidity_limit_lower()) ||
-        (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper())
+        (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper()) ||
+        (this->ui->cb_require_humidity->isChecked() != this->requires_humidity())
     );
 }
 
 void QDome::apply_changes_inner(void) {
     if (this->is_changed()) {
         this->set_humidity_limits(this->ui->dsb_humidity_limit_lower->value(), this->ui->dsb_humidity_limit_upper->value());
+
+        const bool require = this->ui->cb_require_humidity->isChecked();
+        if (require != this->m_require_humidity) {
+            this->m_require_humidity = require;
+            this->m_humidity_guard_engaged = false;   // say the reason again under the new setting
+            logger.warning(Concern::Configuration, QString("Humidity data is now %1")
+                                                       .arg(require ? "required" : "NOT required"));
+        }
     }
     emit this->ui->dsb_humidity_limit_lower->valueChanged(this->humidity_limit_lower());
     emit this->ui->dsb_humidity_limit_upper->valueChanged(this->humidity_limit_upper());
@@ -203,6 +221,7 @@ void QDome::apply_changes_inner(void) {
 void QDome::discard_changes_inner(void) {
     this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
     this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
+    this->ui->cb_require_humidity->setChecked(this->requires_humidity());
 }
 
 void QDome::save_settings_inner(void) const {
@@ -210,6 +229,7 @@ void QDome::save_settings_inner(void) const {
     this->m_settings->setValue("dome/enabled", this->is_enabled());
     this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
+    this->m_settings->setValue("dome/require_humidity", this->requires_humidity());
     this->m_settings->setValue("dome/port", this->ui->co_serial_ports->currentText());
 }
 
@@ -552,6 +572,7 @@ void QDome::process_message(const QByteArray & message) {
                 break;
             case 'T':
                 this->m_state_T = DomeStateT(decoded);
+                this->m_humidity_seen = true;
                 emit this->state_updated_T(this->m_state_T);
                 break;
 #if PROTOCOL == 2015
@@ -673,6 +694,76 @@ void QDome::turn_off_intensifier(void) {
     this->send_command(QDome::CommandIIOff);
 }
 
+/**
+ * @brief Whether the humidity reading may be acted upon.
+ * Three ways it may not: no usable reading has arrived in this session at all, the last one has aged
+ * out of its validity window, or the dome itself reports the SHT31 as failed. The first is treated
+ * separately by the callers -- a station whose sensor has never worked keeps observing rather than
+ * going dark with nobody watching.
+ */
+bool QDome::humidity_trustworthy(void) const {
+    if (!this->m_humidity_seen) {
+        return false;
+    }
+    if (!this->m_state_T.is_valid()) {
+        return false;
+    }
+    if (this->m_state_S.is_valid() && this->m_state_S.error_SHT31()) {
+        return false;
+    }
+    return true;
+}
+
+/**
+ * @brief Whether it is too humid to open.
+ * Refusing to open on an untrustworthy reading costs nothing but a wait, so this one does not wait
+ * out any grace period. A station whose sensor has never produced a reading is exempt: it keeps the
+ * behaviour it has always had, and says so in the log.
+ */
+bool QDome::is_humid(void) const {
+    if (this->requires_humidity() && !this->humidity_trustworthy()) {
+        if (this->m_humidity_seen) {
+            if (!this->m_humidity_guard_engaged) {
+                this->m_humidity_guard_engaged = true;
+                logger.warning(Concern::Automatic,
+                               "Humidity reading is not trustworthy, treating it as too humid to open");
+            }
+            return true;
+        }
+
+        if (!this->m_humidity_guard_engaged) {
+            this->m_humidity_guard_engaged = true;
+            logger.error(Concern::Automatic,
+                         "No humidity reading has ever arrived; observing anyway, but the humidity "
+                         "limits are not being enforced. Check the SHT31, or untick \"Require "
+                         "humidity data\" to silence this.");
+        }
+        return (this->state_T().humidity_sht() >= this->humidity_limit_lower());
+    }
+
+    if (this->m_humidity_guard_engaged) {
+        this->m_humidity_guard_engaged = false;
+        logger.info(Concern::Automatic, "Humidity reading is trustworthy again");
+    }
+    return (this->state_T().humidity_sht() >= this->humidity_limit_lower());
+}
+
+/**
+ * @brief Whether it is humid enough to close a cover that is already open.
+ * Unlike is_humid(), this one waits out HumidityGrace before acting on an untrustworthy reading:
+ * closing on a two-second gap in the telegram stream would cost the rest of the night.
+ */
+bool QDome::is_very_humid(void) const {
+    if (this->state_T().humidity_sht() >= this->humidity_limit_upper()) {
+        return true;
+    }
+
+    if (this->requires_humidity() && this->m_humidity_seen && !this->humidity_trustworthy()) {
+        return (this->m_state_T.age() > QDome::HumidityGrace);
+    }
+    return false;
+}
+
 void QDome::set_humidity_limits(const double new_lower, const double new_upper) {
     if ((new_lower < 0) || (new_lower > 100) || (new_upper < 0) || (new_upper > 100) || (new_lower > new_upper)) {
         throw ConfigurationError(QString("Invalid humidity limits: %1% and %2%").arg(new_lower).arg(new_upper));
@@ -708,5 +799,9 @@ void QDome::on_dsb_humidity_limit_upper_valueChanged(double value) {
 void QDome::on_dsb_humidity_limit_lower_valueChanged(double value) {
     Q_UNUSED(value);
     this->display_changed(this->ui->dsb_humidity_limit_lower, this->ui->dsb_humidity_limit_lower->value(), this->humidity_limit_lower());
+}
+
+void QDome::on_cb_require_humidity_toggled(bool checked) {
+    this->display_changed(this->ui->cb_require_humidity, checked, this->requires_humidity());
 }
 

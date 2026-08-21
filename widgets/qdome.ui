@@ -273,6 +273,16 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0" colspan="2">
+          <widget class="QCheckBox" name="cb_require_humidity">
+           <property name="toolTip">
+            <string>Refuse to open, and close after a minute, when the humidity reading is missing, stale or from a sensor the dome reports as failed. Untick only if the sensor is known to be broken.</string>
+           </property>
+           <property name="text">
+            <string>Require humidity data</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -828,6 +838,7 @@
   <tabstop>co_serial_ports</tabstop>
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>dsb_humidity_limit_lower</tabstop>
+  <tabstop>cb_require_humidity</tabstop>
   <tabstop>bt_cover_open</tabstop>
   <tabstop>bt_cover_close</tabstop>
   <tabstop>pb_sw_reset</tabstop>

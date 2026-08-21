@@ -43,11 +43,23 @@ private:
     double m_humidity_limit_lower = 70.0;
     double m_humidity_limit_upper = 90.0;
 
+    /* Whether a usable humidity reading is a precondition for observing, and whether one has ever
+     * arrived in this session. A station whose sensor has never produced anything keeps working
+     * rather than going dark unattended; one whose sensor worked and then stopped is guarded.
+     */
+    bool m_require_humidity = true;
+    bool m_humidity_seen = false;
+    mutable bool m_humidity_guard_engaged = false;
+
     DomeStateS m_state_S;
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
 
     void process_message(const QByteArray & message);
+
+    // Whether the humidity reading may be acted upon at all: seen at least once, currently fresh,
+    // and not contradicted by the dome's own SHT31 error bit.
+    bool humidity_trustworthy(void) const;
 
     void connect_slots(void) override;
     void load_defaults(void) override;
@@ -58,6 +70,13 @@ private:
 
     constexpr static double DefaultHumidityLower = 75.0;
     constexpr static double DefaultHumidityUpper = 90.0;
+    constexpr static bool DefaultRequireHumidity = true;
+
+    /* How long the humidity may stay untrustworthy before the cover is closed, in seconds. The T
+     * state arrives about every 750 ms against a two-second validity window, so a couple of dropped
+     * telegrams must not slam the cover shut and cost the rest of the night.
+     */
+    constexpr static double HumidityGrace = 60.0;
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPort;
 
@@ -83,6 +102,7 @@ private slots:
 
     void on_dsb_humidity_limit_upper_valueChanged(double value);
     void on_dsb_humidity_limit_lower_valueChanged(double value);
+    void on_cb_require_humidity_toggled(bool checked);
 
 public:
     const static Command CommandNoOp;
@@ -117,8 +137,13 @@ public:
     void set_station(const QStation * const station);
 
     // Humidity getters and setters
-    inline bool is_humid(void) const { return (this->state_T().humidity_sht() >= this->humidity_limit_lower()); };
-    inline bool is_very_humid(void) const { return (this->state_T().humidity_sht() >= this->humidity_limit_upper()); };
+    /* Both fail towards safety when the reading cannot be trusted, but not symmetrically: refusing to
+     * open costs nothing but a wait, whereas forcing a close costs the night, so only the latter
+     * waits out HumidityGrace first.
+     */
+    bool is_humid(void) const;
+    bool is_very_humid(void) const;
+    inline bool requires_humidity(void) const { return this->m_require_humidity; };
     inline double humidity_limit_lower(void) const { return this->m_humidity_limit_lower; };
     inline double humidity_limit_upper(void) const { return this->m_humidity_limit_upper; };
 
