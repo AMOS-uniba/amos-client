@@ -34,27 +34,6 @@ const ValueFormatter<double> QDome::HumidityValueFormatter = [](double value) {
     return QString("%1 %").arg(value, 3, 'f', 1);
 };
 
-const ColourFormatter<double> QDome::TemperatureColourFormatter = [](double temperature) {
-    float h = 0, s = 0, v = 0;
-    if (temperature < 0.0) {
-        h = 180 - 4.0 * temperature;
-        s = (1 + temperature / 50.0) * 255;
-        v = 200;
-    } else {
-        if (temperature < 15) {
-            h = 180 - 6.0 * temperature;
-        } else {
-            h = 90 - (4.5 * (temperature - 15));
-        }
-        if (h < 0) {
-            h += 360;
-        }
-        s = 255;
-        v = 160;
-    }
-    return QColor::fromHsv(h, s, v);
-};
-
 const QString QDome::DefaultPort = QString("COM1");
 
 QDome::QDome(QWidget * parent):
@@ -259,11 +238,11 @@ void QDome::set_formatters(void) {
     this->ui->cl_ii->set_formatters(Qt::darkGreen, Qt::black, "on", "off");
 
     this->ui->fl_t_lens->set_value_formatter(QDome::TemperatureValueFormatter);
-    this->ui->fl_t_lens->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_t_lens->set_colour_formatter(&Formatters::temperature_colour);
     this->ui->fl_t_CPU->set_value_formatter(QDome::TemperatureValueFormatter);
-    this->ui->fl_t_CPU->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_t_CPU->set_colour_formatter(&Formatters::temperature_colour);
     this->ui->fl_t_SHT31->set_value_formatter(QDome::TemperatureValueFormatter);
-    this->ui->fl_t_SHT31->set_colour_formatter(QDome::TemperatureColourFormatter);
+    this->ui->fl_t_SHT31->set_colour_formatter(&Formatters::temperature_colour);
     this->ui->fl_h_SHT31->set_value_formatter(QDome::HumidityValueFormatter);
     this->ui->fl_h_SHT31->set_colour_formatter([this](double humidity) -> QColor {
         return (humidity < this->humidity_limit_lower()) ? Qt::black :

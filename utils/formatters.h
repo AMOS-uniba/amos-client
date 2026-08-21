@@ -12,6 +12,7 @@ namespace Formatters {
     QColor linear_interpolate(QColor first, double stop1, QColor second, double stop2, double value);
     QColor piecewise_linear_interpolator(const QVector<Node> & nodes, double position);
     QColor altitude_colour(double altitude);
+    QColor temperature_colour(double temperature);
 
     QString format_duration(unsigned int seconds);
     QString format_duration_double(double seconds, unsigned int places = 0);

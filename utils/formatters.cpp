@@ -38,6 +38,39 @@ QColor Formatters::altitude_colour(double altitude) {
     }, altitude);
 }
 
+/** Colour scale for temperature displays: cyan around freezing, through green and yellow to red at
+ *  the warm end, and towards blue and violet as it gets colder.
+ *
+ *  The cold end is capped at MaxHue rather than being allowed to run past 360, where it used to
+ *  wrap around and make deep cold look like heat -- and where QColor::fromHsv() rejects the hue
+ *  outright and hands back an invalid colour, which the display lines pass to QColor::name()
+ *  without checking. Saturation is bounded for the same reason: its formula goes negative below
+ *  -50 degrees.
+**/
+QColor Formatters::temperature_colour(double temperature) {
+    constexpr double MaxHue = 330.0;
+    double h, s, v;
+
+    if (temperature < 0.0) {
+        h = qMin(180.0 - 4.0 * temperature, MaxHue);
+        s = (1.0 + temperature / 50.0) * 255.0;
+        v = 200.0;
+    } else {
+        h = (temperature < 15.0) ? (180.0 - 6.0 * temperature) : (90.0 - 4.5 * (temperature - 15.0));
+        if (h < 0.0) {
+            h += 360.0;
+        }
+        s = 255.0;
+        v = 160.0;
+    }
+
+    return QColor::fromHsv(
+        qBound(0, static_cast<int>(h), 359),
+        qBound(0, static_cast<int>(s), 255),
+        qBound(0, static_cast<int>(v), 255)
+    );
+}
+
 QString Formatters::format_duration(unsigned int duration) {
     const unsigned int days = duration / 86400;
     const unsigned int hours = (duration % 86400) / 3600;
