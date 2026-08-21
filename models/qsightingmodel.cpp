@@ -205,13 +205,31 @@ void QSightingModel::mark_quarantined(Sighting & sighting) {
     this->set_status(sighting, Sighting::Status::Quarantined);
 }
 
+QMap<QString, Sighting>::iterator QSightingModel::find_sighting(const QString & sighting_id) {
+    auto sighting = this->m_sightings.find(sighting_id);
+    if (sighting == this->m_sightings.end()) {
+        logger.debug_error(Concern::Sightings,
+                           QString("Sighting '%1' is not in the model, ignoring the server's answer")
+                               .arg(sighting_id));
+    }
+    return sighting;
+}
+
 void QSightingModel::mark_sent(const QString & sighting_id) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     this->set_status(sighting, Sighting::Status::Sent);
 }
 
 void QSightingModel::store_sighting(const QString & sighting_id, bool metadata_stored) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
 
     /* The server keeps no metadata when no xml or yaml part reached it. For a sighting that had none
      * to send that is the expected answer: the reduction has not run yet, and its metadata will
@@ -235,13 +253,21 @@ void QSightingModel::store_sighting(const QString & sighting_id, bool metadata_s
 }
 
 void QSightingModel::quarantine_sighting(const QString & sighting_id) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     this->set_status(sighting, Sighting::Status::Rejected);
     emit this->sighting_rejected(sighting);
 }
 
 void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error) {
-    auto & sighting = this->sightings()[sighting_id];
+    auto found = this->find_sighting(sighting_id);
+    if (found == this->sightings().end()) {
+        return;
+    }
+    Sighting & sighting = *found;
     switch (error) {
         // HTTP 400: refused, but retried anyway -- see QServer::sighting_received
         case QNetworkReply::ProtocolInvalidOperationError:
