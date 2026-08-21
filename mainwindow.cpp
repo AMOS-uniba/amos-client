@@ -85,7 +85,7 @@ MainWindow::MainWindow(QWidget *parent):
     this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_allsky,   &QCamera::quarantine_sighting);
     this->connect(model, &QSightingModel::sighting_rejected, this->ui->camera_spectral, &QCamera::quarantine_sighting);
 
-    this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::send_heartbeat);
+    this->connect(this->ui->server->timer_heartbeat(), &QTimer::timeout, this->ui->station, &QStation::heartbeat);
 
     this->connect(this->ui->dome, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
     this->connect(this->ui->station, &QAmosWidget::settings_changed, this, &MainWindow::slot_settings_changed);
