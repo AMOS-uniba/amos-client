@@ -111,19 +111,30 @@ QDome::QDome(QWidget * parent):
     this->m_spm = new QSerialPortManager();
     this->m_spm->moveToThread(this->m_thread);
     this->connect(this->m_thread, &QThread::started, this->m_spm, &QSerialPortManager::initialize, Qt::QueuedConnection);
-    /* The manager is deleted in the destructor, after quit() and wait() have returned and nothing
-     * is running in the worker thread any more, and the thread itself is a child of this widget.
-     * Deleting either of them through QThread::finished as well was a double free: the manager
-     * was destroyed as the thread wound down and then deleted again in the destructor, which
-     * is what crashed on exit.
+    /* The manager must be destroyed by the thread that owns it. Its request timer is created inside
+     * initialize(), which runs on the worker thread, so deleting the manager from the main thread --
+     * even after quit() and wait() have returned -- kills that timer from the wrong thread and Qt
+     * complains twice, once for the explicit stop() and once for ~QObject. It only shows on a live
+     * station, because an inactive timer is destroyed without complaint and the timer only runs
+     * while the dome is enabled.
+     *
+     * deleteLater() on QThread::finished is the documented way round it. Note the auto connection:
+     * finished is emitted from the worker thread and the manager lives there, so the call is direct,
+     * and QThread flushes pending deferred deletes as it winds down. By the time wait() returns the
+     * manager is gone -- which is why the destructor must not delete it again, as it once did, on
+     * top of a forced-queued version of this same connection. That was the double free.
+     *
+     * The thread itself is a child of this widget and is deleted with it; it gets no deleteLater,
+     * which was the other half of that double free.
      */
+    this->connect(this->m_thread, &QThread::finished, this->m_spm, &QObject::deleteLater);
     this->m_thread->start();
 }
 
 QDome::~QDome() {
+    // wait() returns only once the thread has finished, and finishing is what destroys the manager
     this->m_thread->quit();
     this->m_thread->wait();
-    delete this->m_spm;
     delete this->ui;
 }
 
