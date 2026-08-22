@@ -347,16 +347,16 @@ void QUfoManager::log_state_change(const UfoState & state) const {
 }
 
 QJsonObject QUfoManager::json(void) const {
-    /* Stopping exists for the operator's benefit only. The process has not exited yet, and the
-     * server's vocabulary of watcher states is fixed (D/F/E/R/N/S/U), so it is told 'R' exactly as
-     * it was before this state existed -- a new code would leak an unknown value into every
-     * heartbeat for the duration of a stop.
+    /* 'T' for stopping is new: the server's watcher vocabulary was D/F/E/R/N/S/U, and it needs a
+     * WATCHER_STOPPING to go with it. Reporting it before the server knows it is deliberate and
+     * safe -- the ingest stores the code without validating it against the choices, verified
+     * against the live instance -- so the state simply shows as an unlabelled 'T' until that side
+     * catches up. Telling it 'R' instead would have hidden a station stuck mid-shutdown, which is
+     * exactly what one wants to see.
      */
-    const UfoState & reported = (this->state() == QUfoManager::Stopping) ? QUfoManager::Running : this->state();
-
     return QJsonObject {
         {"auto", this->is_autostart()},
-        {"st", QString(QChar(reported.code()))},
+        {"st", QString(QChar(this->state().code()))},
     };
 }
 
