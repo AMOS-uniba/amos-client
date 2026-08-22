@@ -38,7 +38,13 @@ QSerialPortManager::QSerialPortManager(QObject * parent):
 }
 
 QSerialPortManager::~QSerialPortManager(void) {
-    this->m_request_timer->stop();
+    /* The timer is created in initialize(), which is queued onto this object's thread when the
+     * thread starts. Tear the dome down before that call is delivered -- closing the client moments
+     * after opening it -- and there is no timer to stop, which segfaulted here.
+     */
+    if (this->m_request_timer != nullptr) {
+        this->m_request_timer->stop();
+    }
     delete this->m_request_timer;
     delete this->m_port;
 }
