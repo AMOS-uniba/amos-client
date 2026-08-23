@@ -64,12 +64,14 @@ name so that the metadata, when it appears, forms a second delivery; the server 
 one row by timestamp. Keyed on the metadata's eventual prefix it would look like a sighting already
 delivered and be ignored for good.
 
-Also in this release: the dome no longer deletes its serial port manager twice on shutdown, which
-crashed on exit; the heartbeat timer logs station state again, so `state.log` is written; the
-temperature displays share a single colour formatter whose cold end is clamped instead of running
-past hue 360 and returning an invalid colour below about -45 °C; and a reply naming a sighting the
-model no longer holds no longer conjures an empty one, which used to be offered to the server every
-minute for the rest of the session.
+Also in this release: the dome destroys its serial port manager on the thread that owns it, which
+silences the two `Timers cannot be stopped from another thread` warnings that had been printed on
+every exit of a station with the dome enabled, and it survives being closed before that thread has
+finished starting, which segfaulted; the heartbeat timer logs station state again, so `state.log`
+is written; the temperature displays share a single colour formatter whose cold end is clamped
+instead of running past hue 360 and returning an invalid colour below -45 °C; and a reply naming a
+sighting the model no longer holds no longer conjures an empty one, which used to be offered to the
+server every minute for the rest of the session.
 
 Implementation and review of this release by Claude Opus 5 (Anthropic), working across the station
 client, the server it reports to and the deployed instance together.
