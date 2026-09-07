@@ -57,6 +57,12 @@ file it stored, and a sighting that sent metadata but is told none was stored is
 being marked stored and moved away. Any warnings in the reply are logged. Sighting replies are now
 released after handling; previously each upload leaked its whole payload, once per attempt.
 
+**A file that cannot be read is not sent as an empty one.** A part whose file failed to open used
+to go up anyway: zero bytes, under the file's correct name. The server cannot tell that apart from
+a real upload -- it finds the row by the name the part carries -- so it replaced the file it had
+stored with the empty one and answered 200, naming the file it had just lost. Such a part is now
+left out of the request altogether.
+
 **A capture whose metadata has not arrived is delivered anyway.** The metadata may be produced by a
 separate reduction on the station hours after the event, and the image is worth having in the
 meantime. Once a composite has waited out `MetadataGrace` it goes up on its own, keyed on its own

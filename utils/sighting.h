@@ -41,7 +41,7 @@ private:
 
     QString try_open(const QString & path, bool required);
     QHttpPart json(void) const;
-    QHttpPart build_part(const QString & filename) const;
+    static QHttpPart build_part(const QString & path, const QByteArray & body);
     qint64 measure_avi(void) const;
     // Not static: which JPEG is the composite depends on the other files in the sighting
     bool should_send(const QString & path) const;

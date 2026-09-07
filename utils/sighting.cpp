@@ -288,21 +288,36 @@ double Sighting::deferred_for(void) const {
     }
 }
 
+/** Assemble the request: the metadata JSON, and every file that should be sent and could be read.
+ *
+ *  A file that cannot be opened is left out altogether rather than sent empty. It used to go up as
+ *  a zero-byte part under its correct name, which the server cannot tell apart from a real one: it
+ *  finds the row by the name the part carries and replaces the file already stored there with the
+ *  empty one. The sighting is then reported as delivered while what the server holds is nothing.
+**/
 QList<QHttpPart> Sighting::assemble(void) const {
     QList<QHttpPart> out = {};
     out.append(this->json());
-    for (const auto & file: this->m_files) {
-        if (this->should_send(file)) {
-            out.append(this->build_part(file));
+    for (const QString & filename: this->m_files) {
+        if (!this->should_send(filename)) {
+            continue;
         }
+
+        const QString path = QString("%1/%2").arg(this->dir_string(), filename);
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            logger.error(Concern::Sightings,
+                         QString("Could not open file '%1' (%2), it will not be sent")
+                             .arg(path, file.errorString()));
+            continue;
+        }
+
+        out.append(Sighting::build_part(path, file.readAll()));
     }
     return out;
 }
 
-QHttpPart Sighting::build_part(const QString & filename) const {
-    QString path = QString("%1/%2").arg(this->dir_string(), filename);
-    QFileInfo file_info(path);
-
+QHttpPart Sighting::build_part(const QString & path, const QByteArray & body) {
     QHttpPart part;
     part.setHeader(
         QNetworkRequest::ContentTypeHeader,
@@ -310,15 +325,9 @@ QHttpPart Sighting::build_part(const QString & filename) const {
     );
     part.setHeader(
         QNetworkRequest::ContentDispositionHeader,
-        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(file_info.suffix().toLower(), path)
+        QString("form-data; name=\"%1\"; filename=\"%2\"").arg(QFileInfo(path).suffix().toLower(), path)
     );
-
-    QFile part_file(path);
-    if (part_file.open(QIODevice::ReadOnly)) {
-        part.setBody(part_file.readAll());
-    } else {
-        logger.warning(Concern::Sightings, QString("Could not open file '%1'").arg(path));
-    }
+    part.setBody(body);
     return part;
 }
 
