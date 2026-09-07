@@ -205,13 +205,32 @@ void QSightingModel::mark_quarantined(Sighting & sighting) {
     this->set_status(sighting, Sighting::Status::Quarantined);
 }
 
+/** Find the sighting a server answer concerns, if it is still one this model may act on.
+ *
+ *  A finished sighting is not. Its files have been moved to permanent storage, so there is nothing
+ *  left to do with it and nothing that should be done to it. A second, late answer -- and the
+ *  client re-sends every DeferTime while it waits, so any answer slower than that produces two --
+ *  used to put a stored sighting back to accepted. The camera then refused it for sitting outside
+ *  the scan directory, which left it accepted: neither finished nor deferred, and so picked up
+ *  again by every send pass from then on. What went up each time was read from paths that no
+ *  longer exist, which is to say nothing at all.
+**/
 QMap<QString, Sighting>::iterator QSightingModel::find_sighting(const QString & sighting_id) {
     auto sighting = this->m_sightings.find(sighting_id);
     if (sighting == this->m_sightings.end()) {
         logger.debug_error(Concern::Sightings,
                            QString("Sighting '%1' is not in the model, ignoring the server's answer")
                                .arg(sighting_id));
+        return sighting;
     }
+
+    if (sighting->is_finished()) {
+        logger.debug(Concern::Sightings,
+                     QString("Sighting '%1' is already %2, ignoring the server's answer")
+                         .arg(sighting_id, sighting->status_string()));
+        return this->m_sightings.end();
+    }
+
     return sighting;
 }
 

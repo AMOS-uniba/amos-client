@@ -63,6 +63,13 @@ a real upload -- it finds the row by the name the part carries -- so it replaced
 stored with the empty one and answered 200, naming the file it had just lost. Such a part is now
 left out of the request altogether.
 
+**A sighting that is finished ignores late answers from the server.** The client re-sends every
+minute while it waits, so any answer slower than that produces two, and the second one used to put
+an already stored sighting back to accepted. The camera then refused it for sitting outside the
+scan directory, which left it accepted: neither finished nor deferred, and so picked up again by
+every send pass from then on -- each one reading from paths that no longer existed and posting the
+empty parts above. Answers naming a sighting that has been stored or quarantined are now dropped.
+
 **A capture whose metadata has not arrived is delivered anyway.** The metadata may be produced by a
 separate reduction on the station hours after the event, and the image is worth having in the
 meantime. Once a composite has waited out `MetadataGrace` it goes up on its own, keyed on its own
