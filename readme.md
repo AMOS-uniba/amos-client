@@ -124,6 +124,30 @@ extra cover cycle per restart.
 A sensor that flaps *slower* than the settle time will still cycle the cover, once per settle
 period. Raise the setting on a station whose sensor is known to be unreliable.
 
+**One unusable value in `settings.ini` no longer discards the settings around it.** Each setting is
+validated as it is read, and an unusable one throws; that used to escape the whole load, which was
+answered by resetting the widget to its defaults. So a humidity limit outside 0–100 reset the dome's
+serial port too and took the station offline, and a station id of the wrong length pointed the
+client at `127.0.0.1`. Every setting now falls back on its own, names itself in the log, and leaves
+its neighbours alone.
+
+### 1.7.3
+Follow-ups to the dome work above, and the sighting table stops growing for ever.
+
+**A command is not repeated faster than every two seconds.** The automatic loop is level-triggered:
+it reissues a command on every pass for as long as the state it reads disagrees with the state it
+wants, and it runs several times a second. An opening therefore put dozens of identical open
+commands on the line, and the inconsistent-sensors branch, which has no override escape, floods for
+as long as a sensor is stuck — 703 open commands in thirty seconds, measured. Repeating is
+deliberate and stays, since nothing acknowledges a command and the line drops bytes; only the rate
+is capped, per distinct command, so an emergency close is never held up by an open before it.
+
+**The dome is polled three times as often.** The request timer was 250 ms per request and the round
+is three requests, so each of S, T and Z was refreshed only every 750 ms — two chances inside the
+two-second window a state is valid for, which is how briefly the link had to stumble to flip the
+station to "dome unreachable". The round is now 300 ms, giving six. One round is 94 bytes both ways,
+so this uses about a third of the 9600 baud line against an eighth before.
+
 **The logs are rotated.** `events.log` and `state.log` grew without limit — a station left running
 wrote one file until the disk objected, and `state.log` takes a line per heartbeat for as long as it
 runs. Each is now rolled over at 8 MiB, keeping five older copies as `events.log.1` through
@@ -131,12 +155,17 @@ runs. Each is now rolled over at 8 MiB, keeping five older copies as `events.log
 file opens with a line saying it rolled over, so a log that begins mid-session cannot be mistaken
 for lost data.
 
-**One unusable value in `settings.ini` no longer discards the settings around it.** Each setting is
-validated as it is read, and an unusable one throws; that used to escape the whole load, which was
-answered by resetting the widget to its defaults. So a humidity limit outside 0–100 reset the dome's
-serial port too and took the station offline, and a station id of the wrong length pointed the
-client at `127.0.0.1`. Every setting now falls back on its own, names itself in the log, and leaves
-its neighbours alone.
+**The Clear button removes the sightings that are done, and only those.** Nothing ever took a row
+out of the model, so the table was the whole history of the session and grew for as long as the
+client ran. The button was there but wired to something that emptied the model wholesale, pending
+deliveries included — a sighting still waiting, in flight or deferred has work left to do, and
+dropping it took it out of the send path while its files sat in the scan directory. Quarantined ones
+are kept too, being the only record on screen that a capture went wrong. Row removal itself was
+also repaired: it sought to the parent index's row rather than the requested one, removed a key
+through the iterator it then advanced, and checked neither bound.
+
+Also in this release: a station state that was defined, never assigned and could never have been,
+and an orphaned header shadowed by the real one, are both gone.
 
 ## Talking to the server
 
