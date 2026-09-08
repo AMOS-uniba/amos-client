@@ -66,7 +66,7 @@ private slots:
     void on_dsb_altitude_valueChanged(double value);
 
 public:
-    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, NoMasterPower, Inconsistent;
+    const static StationState NotObserving, Observing, Daylight, Manual, DomeUnreachable, RainOrHumid, Inconsistent;
 
     explicit QStation(QWidget * parent = nullptr);
     ~QStation();

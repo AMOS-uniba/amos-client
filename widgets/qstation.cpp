@@ -16,7 +16,6 @@ const StationState QStation::NotObserving       = StationState('N', "not observi
 const StationState QStation::Manual             = StationState('M', "manual", Icon::Manual, "manual control enabled");
 const StationState QStation::DomeUnreachable    = StationState('U', "dome unreachable", Icon::Failure, "dome is not responding");
 const StationState QStation::RainOrHumid        = StationState('R', "rain or high humidity", Icon::NotObserving, "rain sensor active or humidity too high");
-const StationState QStation::NoMasterPower      = StationState('P', "no master power", Icon::NotObserving, "master power sensor inactive");
 const StationState QStation::Inconsistent       = StationState('I', "inconsistent", Icon::Failure, "inconsistent state");
 
 QStation::QStation(QWidget * parent):
