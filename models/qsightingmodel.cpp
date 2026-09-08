@@ -181,12 +181,35 @@ bool QSightingModel::insertRows(int row, int count, const QModelIndex & index) {
     return true;
 }
 
-bool QSightingModel::removeRows(int row, int count, const QModelIndex & index) {
-    this->beginRemoveRows(index, row, row + count - 1);
-    auto item = std::next(this->sightings().constBegin(), index.row());
-    for (int i = row; i < row + count; ++i) {
-        this->sightings().remove(item.key());
-        item = std::next(item);
+/** Remove count rows starting at row.
+ *
+ *  Nothing calls this yet -- no sighting is ever taken out of the model, which is why it grows for
+ *  as long as the client runs -- but it was wrong in three ways and would have misbehaved the first
+ *  time it was used. It sought to `index.row()` rather than to `row`, and `index` is the *parent*
+ *  index, which for a table model is always invalid: that made it std::next(constBegin(), -1). It
+ *  removed a key through the very iterator it then advanced, and QMap::remove invalidates
+ *  iterators. And it checked neither bound, so a bad range walked off the end of the map.
+ *
+ *  Hence collecting the keys before erasing anything: the walk and the removal no longer overlap.
+**/
+bool QSightingModel::removeRows(int row, int count, const QModelIndex & parent) {
+    if ((row < 0) || (count <= 0) || (row + count > this->rowCount())) {
+        logger.debug_error(Concern::Sightings,
+                           QString("Refusing to remove %1 row(s) from row %2, the model holds %3")
+                               .arg(count).arg(row).arg(this->rowCount()));
+        return false;
+    }
+
+    QStringList keys;
+    keys.reserve(count);
+    auto item = std::next(this->sightings().constBegin(), row);
+    for (int i = 0; i < count; ++i, ++item) {
+        keys.append(item.key());
+    }
+
+    this->beginRemoveRows(parent, row, row + count - 1);
+    for (const QString & key: keys) {
+        this->m_sightings.remove(key);
     }
     this->endRemoveRows();
     return true;
