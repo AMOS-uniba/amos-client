@@ -85,8 +85,11 @@
    </item>
    <item row="0" column="2">
     <widget class="QPushButton" name="pb_clear">
+     <property name="toolTip">
+      <string>Remove the sightings that have already been stored on the server. Anything still waiting, in flight, deferred or quarantined is left listed.</string>
+     </property>
      <property name="text">
-      <string>Clear</string>
+      <string>Clear stored</string>
      </property>
     </widget>
    </item>

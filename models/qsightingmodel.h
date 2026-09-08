@@ -66,7 +66,9 @@ public slots:
     void quarantine_sighting(const QString & sighting_id);     // rejected by server
     void defer_sighting(const QString & sighting_id, QNetworkReply::NetworkError error);
 
-    void clear(void);
+    // Remove the sightings that have been stored, leaving anything with work left to do. The only
+    // thing that ever takes a row out of the model, and only on an explicit button press.
+    void remove_stored(void);
 signals:
     void sighting_to_send(const Sighting & sighting);
     void sighting_stored(Sighting & sighting);

@@ -31,7 +31,7 @@ QSightingBuffer::QSightingBuffer(QWidget * parent):
     this->connect(this->m_reload_timer, &QTimer::timeout, this, &QSightingBuffer::display_time);
     this->m_reload_timer->start();
 
-    this->connect(this->ui->pb_clear, &QPushButton::clicked, this->m_sighting_model, &QSightingModel::clear);
+    this->connect(this->ui->pb_clear, &QPushButton::clicked, this->m_sighting_model, &QSightingModel::remove_stored);
     this->connect(this->ui->pb_send, &QPushButton::clicked, this->m_sighting_model, &QSightingModel::force_send_sightings);
 }
 

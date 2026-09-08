@@ -335,8 +335,34 @@ void QSightingModel::defer_sighting(const QString & sighting_id, QNetworkReply::
     emit this->sighting_deferred(sighting);
 }
 
-void QSightingModel::clear(void) {
-    this->m_sightings.clear();
-    this->beginResetModel();
-    this->endResetModel();
+/** Drop the sightings that are done with. The Clear button is the only thing that calls this, and
+ *  the only thing that ever takes a row out of the model at all -- until it is pressed, the table
+ *  is the whole history of the session.
+ *
+ *  Only the stored ones go. A sighting still unprocessed, in flight, or deferred after a refusal
+ *  has work left to do, and dropping it would take it out of the send path while its files sit in
+ *  the scan directory waiting to be delivered. Quarantined ones stay as well: they are the record
+ *  that something went wrong with a capture, and nothing else on screen says so.
+ *
+ *  This replaces a clear() that emptied the model wholesale -- pending deliveries included -- and
+ *  did it before calling beginResetModel() rather than after, which is the wrong way round.
+**/
+void QSightingModel::remove_stored(void) {
+    int removed = 0;
+
+    /* Backwards, so that removing a row cannot shift the ones not yet looked at. One row at a time
+     * because the stored ones are not necessarily adjacent; this runs on a button press, not in
+     * any loop, so the repeated lookup does not matter.
+     */
+    for (int row = this->rowCount() - 1; row >= 0; --row) {
+        const auto item = std::next(this->sightings().constBegin(), row);
+        if (item->status() == Sighting::Status::Stored) {
+            this->removeRows(row, 1);
+            ++removed;
+        }
+    }
+
+    logger.info(Concern::Sightings,
+                QString("Removed %1 stored sighting(s) from the buffer, %2 still listed")
+                    .arg(removed).arg(this->rowCount()));
 }
