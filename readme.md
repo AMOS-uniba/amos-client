@@ -112,8 +112,14 @@ per station. Closing is never delayed, only opening.
 
 Darkness is deliberately not one of the conditions counted. It changes once a day rather than
 flapping, and including it would reset the wait every dawn and cost the whole settle time at every
-dusk for no gain. A client that has been running through the day therefore opens at dusk with no
-delay; one restarted during the night waits, having no way to know what the weather has been doing.
+dusk for no gain, so a client that has been running through the day opens at dusk with no delay.
+
+Neither does a restart cost a wait. The first weather reading of a session is taken at face value:
+a client that has just started has no history to judge by, and making it sit out the settle time
+would punish the restart rather than the sensor. Only the first reading, and only if it is clear —
+a station restarted while it is raining gets no such credit, which is the case that matters, and
+any bad weather afterwards spends it for good. The most a flapping sensor can buy from this is one
+extra cover cycle per restart.
 
 A sensor that flaps *slower* than the settle time will still cycle the cover, once per settle
 period. Raise the setting on a station whose sensor is known to be unreliable.

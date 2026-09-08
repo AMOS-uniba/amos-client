@@ -520,8 +520,30 @@ void QDome::set_weather_clear_since(void) {
         return;
     }
 
-    if (state.rain_sensor_active() || this->is_humid()) {
+    const bool bad_weather = state.rain_sensor_active() || this->is_humid();
+
+    // The first look of the session decides whether the wait is waived, and it is spent either way.
+    if (!this->m_weather_assessed) {
+        this->m_weather_assessed = true;
+        if (!bad_weather) {
+            this->m_settle_waived = true;
+            logger.info(Concern::Automatic,
+                        "Weather is clear on the first reading of this session, so the cover may "
+                        "open without waiting the settle time out once");
+        } else {
+            logger.info(Concern::Automatic,
+                        "Weather is not clear on the first reading of this session, so the settle "
+                        "time applies before the cover may open");
+        }
+    }
+
+    if (bad_weather) {
         this->m_weather_clear_since = QDateTime();
+        if (this->m_settle_waived) {
+            this->m_settle_waived = false;
+            logger.info(Concern::Automatic,
+                        "Weather has gone bad, the cover must now wait the settle time out");
+        }
         return;
     }
 
@@ -540,6 +562,11 @@ bool QDome::weather_settled(void) const {
         if (this->m_settle_wait_logged) {
             this->m_settle_wait_logged = false;
         }
+        return true;
+    }
+
+    // Granted by the first weather reading of the session, and spent by the first bad one.
+    if (this->m_settle_waived) {
         return true;
     }
 

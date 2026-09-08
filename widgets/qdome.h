@@ -63,6 +63,19 @@ private:
     int m_open_settle_time = 600;
     mutable bool m_settle_wait_logged = false;
 
+    /* Whether the weather has been looked at yet this session, and whether the settle wait has been
+     * waived because the first look found it clear.
+     *
+     * A client restarted during the night has no history to judge by, and making it sit out the
+     * whole settle time punishes the restart rather than the sensor. So the first reading is taken
+     * at face value -- but only the first, and only if it is clear: a station restarted while it is
+     * raining gets no waiver, which is the case that matters, and any bad weather afterwards spends
+     * the waiver for good. The worst a flapping sensor can buy from this is one extra cycle per
+     * restart.
+     */
+    bool m_weather_assessed = false;
+    bool m_settle_waived = false;
+
     DomeStateS m_state_S;
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
