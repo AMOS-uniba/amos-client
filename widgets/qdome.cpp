@@ -104,6 +104,7 @@ QDome::QDome(QWidget * parent):
     this->m_open_timer = new QTimer(this);
     this->m_open_timer->setInterval(100);
     this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::set_open_since);
+    this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::set_weather_clear_since);
     this->connect(this->m_open_timer, &QTimer::timeout, this, &QDome::display_data_state);
     this->m_open_timer->start();
 
@@ -161,6 +162,7 @@ void QDome::connect_slots(void) {
         this->connect(widget, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &QDome::settings_changed);
     }
     this->connect(this->ui->cb_require_humidity, &QCheckBox::toggled, this, &QDome::settings_changed);
+    this->connect(this->ui->sb_open_settle, QOverload<int>::of(&QSpinBox::valueChanged), this, &QDome::settings_changed);
 
     this->connect(this, &QDome::serial_port_selected, this->m_spm, &QSerialPortManager::set_port, Qt::QueuedConnection);
     this->connect(this, &QDome::command, this->m_spm, &QSerialPortManager::request, Qt::QueuedConnection);
@@ -181,6 +183,7 @@ void QDome::connect_slots(void) {
 void QDome::load_defaults(void) {
     this->m_require_humidity = QDome::DefaultRequireHumidity;
     this->set_humidity_limits(QDome::DefaultHumidityLower, QDome::DefaultHumidityUpper);
+    this->set_open_settle_time(QDome::DefaultOpenSettle);
     this->handle_serial_port_selected(QDome::DefaultPort);
 }
 
@@ -200,6 +203,9 @@ void QDome::load_settings_inner(void) {
                        "Humidity data is not required: the limits will be applied to whatever the "
                        "last reading was, valid or not");
     }
+    this->set_open_settle_time(
+        this->m_settings->value("dome/open_settle", QDome::DefaultOpenSettle).toInt()
+    );
     this->handle_serial_port_selected(
         this->m_settings->value("dome/port", QDome::DefaultPort).toString()
     );
@@ -209,7 +215,8 @@ bool QDome::is_changed(void) const {
     return (
         (this->ui->dsb_humidity_limit_lower->value() != this->humidity_limit_lower()) ||
         (this->ui->dsb_humidity_limit_upper->value() != this->humidity_limit_upper()) ||
-        (this->ui->cb_require_humidity->isChecked() != this->requires_humidity())
+        (this->ui->cb_require_humidity->isChecked() != this->requires_humidity()) ||
+        (this->ui->sb_open_settle->value() != this->open_settle_time())
     );
 }
 
@@ -224,15 +231,22 @@ void QDome::apply_changes_inner(void) {
             logger.warning(Concern::Configuration, QString("Humidity data is now %1")
                                                        .arg(require ? "required" : "NOT required"));
         }
+
+        if (this->ui->sb_open_settle->value() != this->open_settle_time()) {
+            this->set_open_settle_time(this->ui->sb_open_settle->value());
+            this->m_settle_wait_logged = false;   // say the reason again under the new setting
+        }
     }
     emit this->ui->dsb_humidity_limit_lower->valueChanged(this->humidity_limit_lower());
     emit this->ui->dsb_humidity_limit_upper->valueChanged(this->humidity_limit_upper());
+    emit this->ui->sb_open_settle->valueChanged(this->open_settle_time());
 }
 
 void QDome::discard_changes_inner(void) {
     this->ui->dsb_humidity_limit_lower->setValue(this->humidity_limit_lower());
     this->ui->dsb_humidity_limit_upper->setValue(this->humidity_limit_upper());
     this->ui->cb_require_humidity->setChecked(this->requires_humidity());
+    this->ui->sb_open_settle->setValue(this->open_settle_time());
 }
 
 void QDome::save_settings_inner(void) const {
@@ -241,6 +255,7 @@ void QDome::save_settings_inner(void) const {
     this->m_settings->setValue("dome/humidity_lower", this->humidity_limit_lower());
     this->m_settings->setValue("dome/humidity_upper", this->humidity_limit_upper());
     this->m_settings->setValue("dome/require_humidity", this->requires_humidity());
+    this->m_settings->setValue("dome/open_settle", this->open_settle_time());
     this->m_settings->setValue("dome/port", this->ui->co_serial_ports->currentText());
 }
 
@@ -486,6 +501,68 @@ void QDome::set_open_since(void) {
         // Otherwise we are not open, set to invalid
         this->m_open_since = QDateTime();
     }
+}
+
+/**
+ * @brief QDome::set_weather_clear_since
+ * Remember since when the weather has been clear, so that the cover does not open the instant a
+ * flapping rain sensor happens to say it is not raining.
+ *
+ * Only a positive reading of bad weather resets the latch. A state that has aged out neither
+ * confirms nor denies anything, and the automatic loop refuses to open on a stale state anyway, so
+ * clearing the latch on one dropped telegram would only cost the whole settle time at dusk for no
+ * gain in safety.
+ */
+void QDome::set_weather_clear_since(void) {
+    const DomeStateS & state = this->state_S();
+
+    if (!state.is_valid()) {
+        return;
+    }
+
+    if (state.rain_sensor_active() || this->is_humid()) {
+        this->m_weather_clear_since = QDateTime();
+        return;
+    }
+
+    if (!this->m_weather_clear_since.isValid()) {
+        this->m_weather_clear_since = QDateTime::currentDateTimeUtc();
+    }
+}
+
+/**
+ * @brief QDome::weather_settled
+ * Whether the weather has been clear long enough for the cover to open. Unlike the humidity guard,
+ * this one only ever delays an opening: closing is never held up by it.
+ */
+bool QDome::weather_settled(void) const {
+    if (this->m_open_settle_time <= 0) {
+        if (this->m_settle_wait_logged) {
+            this->m_settle_wait_logged = false;
+        }
+        return true;
+    }
+
+    const qint64 clear_for = this->m_weather_clear_since.isValid()
+        ? this->m_weather_clear_since.secsTo(QDateTime::currentDateTimeUtc())
+        : -1;
+
+    if (clear_for >= this->m_open_settle_time) {
+        if (this->m_settle_wait_logged) {
+            this->m_settle_wait_logged = false;
+            logger.info(Concern::Automatic,
+                        QString("Weather has been clear for %1 s, the cover may open").arg(clear_for));
+        }
+        return true;
+    }
+
+    if (!this->m_settle_wait_logged) {
+        this->m_settle_wait_logged = true;
+        logger.warning(Concern::Automatic,
+                       QString("Waiting for the weather to stay clear for %1 s before opening")
+                           .arg(this->m_open_settle_time));
+    }
+    return false;
 }
 
 void QDome::set_enabled(int enable) {
@@ -791,6 +868,17 @@ void QDome::set_humidity_limits(const double new_lower, const double new_upper) 
     emit this->humidity_limits_changed(new_lower, new_upper);
 }
 
+void QDome::set_open_settle_time(const int new_settle_time) {
+    if ((new_settle_time < 0) || (new_settle_time > QDome::MaxOpenSettle)) {
+        throw ConfigurationError(QString("Invalid settle time before opening: %1 s").arg(new_settle_time));
+    }
+
+    this->m_open_settle_time = new_settle_time;
+    logger.info(Concern::Configuration,
+                QString("Weather must be clear for %1 s before the cover opens")
+                    .arg(this->m_open_settle_time));
+}
+
 void QDome::on_bt_cover_open_clicked() {
     logger.info(Concern::Operation, "Manual command: open the cover");
     this->open_cover();
@@ -814,5 +902,10 @@ void QDome::on_dsb_humidity_limit_lower_valueChanged(double value) {
 
 void QDome::on_cb_require_humidity_toggled(bool checked) {
     this->display_changed(this->ui->cb_require_humidity, checked, this->requires_humidity());
+}
+
+void QDome::on_sb_open_settle_valueChanged(int value) {
+    Q_UNUSED(value);
+    this->display_changed(this->ui->sb_open_settle, this->ui->sb_open_settle->value(), this->open_settle_time());
 }
 

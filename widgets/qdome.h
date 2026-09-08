@@ -30,6 +30,12 @@ private:
 
     QDateTime m_last_received;
     QDateTime m_open_since;
+    /* When the weather last became clear, or invalid if it is not clear now. Rain and humidity are
+     * the only conditions that can flap, so this latch covers exactly those two and not darkness:
+     * counting the sun would reset it every dawn and delay every dusk opening by the whole settle
+     * time, for nothing.
+     */
+    QDateTime m_weather_clear_since;
     bool m_enabled;
 
     QThread * m_thread;
@@ -50,6 +56,12 @@ private:
     bool m_require_humidity = true;
     bool m_humidity_seen = false;
     mutable bool m_humidity_guard_engaged = false;
+
+    /* How long the weather must have been clear before the cover may open, in seconds. Zero waits
+     * for nothing, which is the behaviour of every release before this one.
+     */
+    int m_open_settle_time = 600;
+    mutable bool m_settle_wait_logged = false;
 
     DomeStateS m_state_S;
     DomeStateT m_state_T;
@@ -77,6 +89,15 @@ private:
      * telegrams must not slam the cover shut and cost the rest of the night.
      */
     constexpr static double HumidityGrace = 60.0;
+
+    /* Default settle time before opening, in seconds, and the largest one that may be configured.
+     * Ten minutes is about what a passing drizzle takes to clear, and a rain sensor flapping faster
+     * than that never satisfies it -- which is the point. Raise it on a station whose sensor is
+     * known to be unreliable.
+     */
+    constexpr static int DefaultOpenSettle = 600;
+    constexpr static int MaxOpenSettle = 3600;
+
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPort;
 
@@ -98,11 +119,13 @@ private slots:
     void on_bt_cover_close_clicked();
 
     void set_open_since(void);
+    void set_weather_clear_since(void);
     void set_enabled(int enable);
 
     void on_dsb_humidity_limit_upper_valueChanged(double value);
     void on_dsb_humidity_limit_lower_valueChanged(double value);
     void on_cb_require_humidity_toggled(bool checked);
+    void on_sb_open_settle_valueChanged(int value);
 
 public:
     const static Command CommandNoOp;
@@ -148,6 +171,19 @@ public:
     inline double humidity_limit_upper(void) const { return this->m_humidity_limit_upper; };
 
     void set_humidity_limits(const double new_humidity_lower, const double new_humidity_upper);
+
+    /* Whether the weather has been clear long enough for the cover to open.
+     *
+     * A faulty rain sensor that flips between raining and not raining used to cycle the cover: the
+     * firmware closes on rain, and the moment the bit cleared the client opened again. Rain is only
+     * ever a gate on opening here -- the client has no close-on-rain of its own -- so requiring the
+     * all-clear to hold for a while is the whole of what this side can do about it, and it is
+     * enough to break the loop.
+     */
+    bool weather_settled(void) const;
+    inline int open_settle_time(void) const { return this->m_open_settle_time; };
+
+    void set_open_settle_time(const int new_settle_time);
 
 public slots:
     void set_formatters(void);

@@ -98,6 +98,26 @@ The server was fixed to match, and now ignores an empty part with a warning rath
 That half matters on its own: a station in the field runs whatever client it runs, and cannot be
 patched retroactively.
 
+### 1.7.2
+**The cover waits for the weather to settle before it opens.** A rain sensor at Mauna Kea began
+flipping between raining and not raining. Humidity was low, so nothing else held the cover shut, and
+the station cycled: the firmware closes on rain, the bit cleared, the client opened again, the bit
+came back. Fast enough to wear the mechanism out.
+
+Rain reaches this client as a gate on opening and nothing else — there is no client-side
+close-on-rain, the firmware does that itself — so requiring the all-clear to have held for a while
+is the whole of what this side can do about it, and it is enough to break the loop. Rain and
+humidity must now both have been clear for `dome/open_settle` seconds, default 600, configurable
+per station. Closing is never delayed, only opening.
+
+Darkness is deliberately not one of the conditions counted. It changes once a day rather than
+flapping, and including it would reset the wait every dawn and cost the whole settle time at every
+dusk for no gain. A client that has been running through the day therefore opens at dusk with no
+delay; one restarted during the night waits, having no way to know what the weather has been doing.
+
+A sensor that flaps *slower* than the settle time will still cycle the cover, once per settle
+period. Raise the setting on a station whose sensor is known to be unreliable.
+
 ## Talking to the server
 
 Heartbeats are posted as JSON to `/station/<id>/heartbeat/`, sightings as multipart to

@@ -242,8 +242,18 @@ void QStation::automatic_cover(void) {
                             logger.debug(Concern::Automatic, "Will not open: humidity is too high");
                             this->set_state(QStation::RainOrHumid);
                         } else {
-                            logger.info(Concern::Automatic, "Opening the cover");
-                            this->dome()->open_cover();
+                            /* Nothing is wrong now, but it must have been right for a while. A rain
+                             * sensor that flips on and off would otherwise cycle the cover: the
+                             * firmware closes on rain, and the next clear reading opens it again.
+                             */
+                            if (!this->dome()->weather_settled()) {
+                                logger.debug(Concern::Automatic,
+                                             "Will not open: waiting for the weather to settle");
+                                this->set_state(QStation::RainOrHumid);
+                            } else {
+                                logger.info(Concern::Automatic, "Opening the cover");
+                                this->dome()->open_cover();
+                            }
                         }
                     }
 

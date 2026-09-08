@@ -283,6 +283,44 @@
            </property>
           </widget>
          </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="lx_open_settle">
+           <property name="text">
+            <string>Settle before opening</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QSpinBox" name="sb_open_settle">
+           <property name="maximumSize">
+            <size>
+             <width>80</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>How long rain and humidity must both stay clear before the cover opens. Stops a faulty rain sensor that flips on and off from cycling the cover open and closed. Does not delay closing, and does not delay the usual opening at dusk. Zero waits for nothing.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+           </property>
+           <property name="showGroupSeparator" stdset="0">
+            <bool>true</bool>
+           </property>
+           <property name="suffix">
+            <string> s</string>
+           </property>
+           <property name="minimum">
+            <number>0</number>
+           </property>
+           <property name="maximum">
+            <number>3600</number>
+           </property>
+           <property name="singleStep">
+            <number>30</number>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -839,6 +877,7 @@
   <tabstop>dsb_humidity_limit_upper</tabstop>
   <tabstop>dsb_humidity_limit_lower</tabstop>
   <tabstop>cb_require_humidity</tabstop>
+  <tabstop>sb_open_settle</tabstop>
   <tabstop>bt_cover_open</tabstop>
   <tabstop>bt_cover_close</tabstop>
   <tabstop>pb_sw_reset</tabstop>
