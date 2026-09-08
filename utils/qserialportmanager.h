@@ -32,6 +32,24 @@ private:
     static constexpr unsigned int WriteTimeout = 200;
     static constexpr unsigned char Address = 0x99;
 
+    /* How long one full S -> T -> Z round takes, in milliseconds, and how many requests make it up
+     * (the size of the vector in request_status). Each state is therefore refreshed once per round.
+     *
+     * Measured against the two-second window DomeState::is_valid() allows: at one round every
+     * 300 ms a state survives six consecutive lost telegrams, where the previous 250 ms *per
+     * request* -- a 750 ms round -- gave it only two, which is how briefly the link had to hiccup
+     * to flip the station to DomeUnreachable.
+     *
+     * The line has room for it. One round is 94 bytes in both directions (three 10-byte requests,
+     * and 24 + 26 + 14 bytes of reply), so at 9600 baud this uses about a third of the available
+     * bandwidth against an eighth before. Requests go out on a timer without waiting for the
+     * answers, but every reply names its own state in its first byte and QSerialBuffer splits on
+     * the end byte, so a dome slower than one request does not confuse anything -- it only means
+     * fewer answers than questions.
+     */
+    static constexpr unsigned int RobinTime = 300;
+    static constexpr unsigned int RequestCount = 3;
+
     const static Request RequestBasic, RequestEnv, RequestShaft;
 
     void clear_port(void);

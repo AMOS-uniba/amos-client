@@ -51,7 +51,7 @@ QSerialPortManager::~QSerialPortManager(void) {
 
 void QSerialPortManager::initialize(void) {
     this->m_request_timer = new QTimer(this);
-    this->m_request_timer->setInterval(250);
+    this->m_request_timer->setInterval(QSerialPortManager::RobinTime / QSerialPortManager::RequestCount);
     this->connect(this->m_request_timer, &QTimer::timeout, this, &QSerialPortManager::request_status);
     emit this->log(Concern::SerialPort, Level::Info, "Dome thread initialized");
 }
@@ -100,10 +100,11 @@ void QSerialPortManager::reset(void) {
 
 void QSerialPortManager::request_status(void) {
     static QVector<Request> requests = {RequestBasic, RequestEnv, RequestShaft};
+    static_assert(QSerialPortManager::RequestCount == 3, "RequestCount must match the requests below");
 
     this->request(requests[this->m_robin].for_telegram());
 
-    this->m_robin = (this->m_robin + 1) % 3;
+    this->m_robin = (this->m_robin + 1) % QSerialPortManager::RequestCount;
 }
 
 void QSerialPortManager::request(const QByteArray & request) {

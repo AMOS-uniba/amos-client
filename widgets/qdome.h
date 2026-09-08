@@ -24,8 +24,6 @@ namespace Ui {
 class QDome: public QAmosWidget {
     Q_OBJECT
 private:
-    constexpr static unsigned int Refresh = 300;    // Robin time in ms
-
     Ui::QDome * ui;
     const QStation * m_station;
 
