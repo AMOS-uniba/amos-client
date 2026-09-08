@@ -10,10 +10,11 @@ QString StateLogger::format(const QDateTime & timestamp, const QString & message
 void StateLogger::log(const QString & message) const {
     QDateTime now = QDateTime::currentDateTimeUtc();
     QString full = this->format(now, message);
-    QTextStream out(this->m_file);
-    //out.setCodec("UTF-8");
 
     if (this->m_file != nullptr) {
+        QTextStream out(this->m_file);
         out << full << Qt::endl;
+        out.flush();
+        this->rotate_if_oversized();
     }
 }

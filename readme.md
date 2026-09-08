@@ -124,6 +124,13 @@ extra cover cycle per restart.
 A sensor that flaps *slower* than the settle time will still cycle the cover, once per settle
 period. Raise the setting on a station whose sensor is known to be unreliable.
 
+**The logs are rotated.** `events.log` and `state.log` grew without limit — a station left running
+wrote one file until the disk objected, and `state.log` takes a line per heartbeat for as long as it
+runs. Each is now rolled over at 8 MiB, keeping five older copies as `events.log.1` through
+`events.log.5`, so a log costs at most 48 MiB and the oldest is dropped rather than kept. The fresh
+file opens with a line saying it rolled over, so a log that begins mid-session cannot be mistaken
+for lost data.
+
 **One unusable value in `settings.ini` no longer discards the settings around it.** Each setting is
 validated as it is read, and an unusable one throws; that used to escape the whole load, which was
 answered by resetting the widget to its defaults. So a humidity limit outside 0–100 reset the dome's

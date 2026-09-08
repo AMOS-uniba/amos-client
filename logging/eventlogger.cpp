@@ -59,11 +59,14 @@ void EventLogger::write(Level level, Concern concern, const QString & message) c
 
     QDateTime now = QDateTime::currentDateTimeUtc();
     QString full = this->format(now, level, EventLogger::Concerns[concern].code, message);
-    QTextStream out(this->m_file);
-//    out.setCodec("UTF-8");
 
+    // The stream is built inside the check, not before it: a QTextStream over a null device is
+    // useless and this used to construct one on every filtered-out line.
     if (this->m_file != nullptr) {
+        QTextStream out(this->m_file);
         out << full << Qt::endl;
+        out.flush();
+        this->rotate_if_oversized();
     }
 
     if (this->m_display != nullptr) {
