@@ -20,6 +20,12 @@ void QAmosWidget::load_settings(void) {
     }
 }
 
+void QAmosWidget::report_setting_error(const QString & what, const QString & why) const {
+    logger.error(Concern::Configuration,
+                 QString("Could not load the %1 (%2), using the default instead. The other settings "
+                         "of this widget are unaffected.").arg(what, why));
+}
+
 void QAmosWidget::save_settings(void) const {
     this->save_settings_inner();
     this->m_settings->sync();

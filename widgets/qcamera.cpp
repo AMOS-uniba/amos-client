@@ -297,7 +297,14 @@ void QCamera::update_clocks(void) {
 
 void QCamera::load_settings_inner(void) {
     this->set_enabled(this->m_settings->value(this->enabled_key(), QCamera::DefaultEnabled).toBool());
-    this->set_darkness_limit(this->m_settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble());
+    this->load_one("darkness limit",
+        [this](void) {
+            this->set_darkness_limit(
+                this->m_settings->value(this->darkness_key(), QCamera::DefaultDarknessLimit).toDouble()
+            );
+        },
+        [this](void) { this->set_darkness_limit(QCamera::DefaultDarknessLimit); }
+    );
 }
 
 void QCamera::load_defaults(void) {

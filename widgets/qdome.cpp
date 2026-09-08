@@ -192,9 +192,16 @@ void QDome::load_settings_inner(void) {
     this->set_enabled(
         this->m_settings->value("dome/enabled", QDome::DefaultEnabled).toBool()
     );
-    this->set_humidity_limits(
-        this->m_settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
-        this->m_settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
+    this->load_one("humidity limits",
+        [this](void) {
+            this->set_humidity_limits(
+                this->m_settings->value("dome/humidity_lower", QDome::DefaultHumidityLower).toDouble(),
+                this->m_settings->value("dome/humidity_upper", QDome::DefaultHumidityUpper).toDouble()
+            );
+        },
+        [this](void) {
+            this->set_humidity_limits(QDome::DefaultHumidityLower, QDome::DefaultHumidityUpper);
+        }
     );
     this->m_require_humidity =
         this->m_settings->value("dome/require_humidity", QDome::DefaultRequireHumidity).toBool();
@@ -203,8 +210,13 @@ void QDome::load_settings_inner(void) {
                        "Humidity data is not required: the limits will be applied to whatever the "
                        "last reading was, valid or not");
     }
-    this->set_open_settle_time(
-        this->m_settings->value("dome/open_settle", QDome::DefaultOpenSettle).toInt()
+    this->load_one("settle time before opening",
+        [this](void) {
+            this->set_open_settle_time(
+                this->m_settings->value("dome/open_settle", QDome::DefaultOpenSettle).toInt()
+            );
+        },
+        [this](void) { this->set_open_settle_time(QDome::DefaultOpenSettle); }
     );
     this->handle_serial_port_selected(
         this->m_settings->value("dome/port", QDome::DefaultPort).toString()

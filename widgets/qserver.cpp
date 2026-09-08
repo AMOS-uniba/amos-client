@@ -51,12 +51,18 @@ void QServer::connect_slots(void) {
 }
 
 void QServer::load_settings_inner(void) {
-    this->set_station_id(
-        this->m_settings->value("station/id", "none").toString()
+    this->load_one("station id",
+        [this](void) { this->set_station_id(this->m_settings->value("station/id", "none").toString()); },
+        [this](void) { this->set_station_id("none"); }
     );
-    this->set_address(
-        this->m_settings->value("server/ip", "127.0.0.1").toString(),
-        this->m_settings->value("server/port", 4805).toInt()
+    this->load_one("server address",
+        [this](void) {
+            this->set_address(
+                this->m_settings->value("server/ip", "127.0.0.1").toString(),
+                this->m_settings->value("server/port", 4805).toInt()
+            );
+        },
+        [this](void) { this->set_address("127.0.0.1", 4805); }
     );
     this->set_heartbeat_interval(
         this->m_settings->value("server/interval", 60).toInt()

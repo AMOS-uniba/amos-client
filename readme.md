@@ -124,6 +124,13 @@ extra cover cycle per restart.
 A sensor that flaps *slower* than the settle time will still cycle the cover, once per settle
 period. Raise the setting on a station whose sensor is known to be unreliable.
 
+**One unusable value in `settings.ini` no longer discards the settings around it.** Each setting is
+validated as it is read, and an unusable one throws; that used to escape the whole load, which was
+answered by resetting the widget to its defaults. So a humidity limit outside 0–100 reset the dome's
+serial port too and took the station offline, and a station id of the wrong length pointed the
+client at `127.0.0.1`. Every setting now falls back on its own, names itself in the log, and leaves
+its neighbours alone.
+
 ## Talking to the server
 
 Heartbeats are posted as JSON to `/station/<id>/heartbeat/`, sightings as multipart to

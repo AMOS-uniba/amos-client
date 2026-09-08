@@ -60,10 +60,18 @@ void QStation::load_settings_inner(void) {
     this->set_manual_control(
         this->m_settings->value("manual", false).toBool()
     );
-    this->set_position(
-        this->m_settings->value("station/latitude", QStation::DefaultLatitude).toDouble(),
-        this->m_settings->value("station/longitude", QStation::DefaultLongitude).toDouble(),
-        this->m_settings->value("station/altitude", QStation::DefaultAltitude).toDouble()
+    this->load_one("station position",
+        [this](void) {
+            this->set_position(
+                this->m_settings->value("station/latitude", QStation::DefaultLatitude).toDouble(),
+                this->m_settings->value("station/longitude", QStation::DefaultLongitude).toDouble(),
+                this->m_settings->value("station/altitude", QStation::DefaultAltitude).toDouble()
+            );
+        },
+        [this](void) {
+            this->set_position(QStation::DefaultLatitude, QStation::DefaultLongitude,
+                               QStation::DefaultAltitude);
+        }
     );
 }
 
