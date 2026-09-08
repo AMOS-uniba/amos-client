@@ -26,6 +26,8 @@ namespace {
     struct MainWindowSearch {
         DWORD pid = 0;
         HWND found = nullptr;
+        bool found_visible = false;
+        long long found_area = 0;
     };
 
     BOOL CALLBACK match_main_window(HWND window, LPARAM parameter) {
@@ -38,17 +40,21 @@ namespace {
         }
 
         /* A process owns far more windows than its main frame, and the frame has to be picked out
-         * of them. Measured against both detectors on a real machine:
+         * of them. Measured against both detectors rather than assumed:
          *
          *   owned windows are tooltips, IME helpers and dialogs, never the frame;
          *   no caption or no system menu rules out tooltips and UFO's five stray ComboLBoxes,
          *     which are unowned and captioned but are list boxes;
-         *   visibility is what finally separates Kvant's frame (titled "AMOS") from its own
-         *     hidden_device_change_window, which has an identical style profile -- unowned,
-         *     captioned, with a system menu.
+         *   of what is left, the frame is far the largest -- Kvant's is 1732x1179 against the
+         *     136x39 of its own hidden_device_change_window, which is otherwise identical in
+         *     every style bit, and UFO's is 2326x1616.
          *
          * Not filtered on WS_POPUP: UFOCapture's main window is of dialog class #32770 and does
          * carry it, so excluding popups would lose the very window this used to find.
+         *
+         * Visibility is preferred but not required. Kvant creates its frame at once and only shows
+         * it once a camera has been found, so insisting on a visible window would mean a station
+         * running Kvant could never be asked to close politely and would always be killed.
          */
         if (GetWindow(window, GW_OWNER) != nullptr) {
             return TRUE;
@@ -59,12 +65,28 @@ namespace {
             return TRUE;
         }
 
-        if (!IsWindowVisible(window)) {
+        RECT rect = {0, 0, 0, 0};
+        if (!GetWindowRect(window, &rect)) {
+            return TRUE;
+        }
+        const long long area = static_cast<long long>(rect.right - rect.left)
+                             * static_cast<long long>(rect.bottom - rect.top);
+        if (area <= 0) {
             return TRUE;
         }
 
-        search->found = window;
-        return FALSE;
+        const bool visible = IsWindowVisible(window);
+
+        // A visible candidate always beats a hidden one; between two of a kind, the larger wins.
+        const bool better = (search->found == nullptr)
+                         || (visible && !search->found_visible)
+                         || ((visible == search->found_visible) && (area > search->found_area));
+        if (better) {
+            search->found = window;
+            search->found_visible = visible;
+            search->found_area = area;
+        }
+        return TRUE;
     }
 }
 
@@ -82,10 +104,10 @@ namespace {
  * cannot follow is a launcher that exits and leaves the real program in another process, which
  * neither UFO2.exe nor AMOS64.exe does.
  *
- * Verified against both: UFOCapture's window is found in about 200 ms, and it is the same window
- * the old title search found. Kvant creates its frame straight away but leaves it hidden on a
- * machine with no camera attached, so there it is not found and the caller carries on without one
- * -- exactly as it does for a UFO that never opened a window.
+ * Verified against both: UFOCapture's window is found in about 200 ms and is the same one the old
+ * title search returned, and Kvant's frame -- titled "AMOS", which is why the old search could
+ * never have found it -- is found on a machine with no camera at all, where it exists but is not
+ * yet shown.
  */
 HWND QUfoManager::main_window_of(qint64 pid) {
     if (pid <= 0) {
