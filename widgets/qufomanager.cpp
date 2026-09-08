@@ -22,6 +22,82 @@ const UfoState QUfoManager::Stopping     = UfoState('T', "stopping", QColor::fro
 const QString QUfoManager::DefaultPathAllSky = "C:/AMOS/UFO2/UFO2.exe";
 const QString QUfoManager::DefaultPathSpectral = "C:/AMOS/UFOHD2/UFOHD2.exe";
 
+namespace {
+    struct MainWindowSearch {
+        DWORD pid = 0;
+        HWND found = nullptr;
+    };
+
+    BOOL CALLBACK match_main_window(HWND window, LPARAM parameter) {
+        MainWindowSearch * search = reinterpret_cast<MainWindowSearch *>(parameter);
+
+        DWORD pid = 0;
+        GetWindowThreadProcessId(window, &pid);
+        if (pid != search->pid) {
+            return TRUE;
+        }
+
+        /* A process owns far more windows than its main frame, and the frame has to be picked out
+         * of them. Measured against both detectors on a real machine:
+         *
+         *   owned windows are tooltips, IME helpers and dialogs, never the frame;
+         *   no caption or no system menu rules out tooltips and UFO's five stray ComboLBoxes,
+         *     which are unowned and captioned but are list boxes;
+         *   visibility is what finally separates Kvant's frame (titled "AMOS") from its own
+         *     hidden_device_change_window, which has an identical style profile -- unowned,
+         *     captioned, with a system menu.
+         *
+         * Not filtered on WS_POPUP: UFOCapture's main window is of dialog class #32770 and does
+         * carry it, so excluding popups would lose the very window this used to find.
+         */
+        if (GetWindow(window, GW_OWNER) != nullptr) {
+            return TRUE;
+        }
+
+        const LONG_PTR style = GetWindowLongPtr(window, GWL_STYLE);
+        if (((style & WS_CAPTION) == 0) || ((style & WS_SYSMENU) == 0)) {
+            return TRUE;
+        }
+
+        if (!IsWindowVisible(window)) {
+            return TRUE;
+        }
+
+        search->found = window;
+        return FALSE;
+    }
+}
+
+/**
+ * @brief Find the main window of a process by its id.
+ *
+ * Not by title. This used to be FindWindowA(nullptr, "UFOCapture"), which only ever worked for
+ * UFOCapture -- and now that a station may run Kvant instead, whose executable is AMOS64.exe and
+ * whose window is titled something else entirely, it would simply never find anything. The station
+ * would still observe, but the window would not be minimised and every stop would fall through to
+ * killing the process.
+ *
+ * The process id is the reliable handle: this class starts the program itself, so it knows which
+ * process to ask about, and nothing has to be configured or guessed per detector. The one case it
+ * cannot follow is a launcher that exits and leaves the real program in another process, which
+ * neither UFO2.exe nor AMOS64.exe does.
+ *
+ * Verified against both: UFOCapture's window is found in about 200 ms, and it is the same window
+ * the old title search found. Kvant creates its frame straight away but leaves it hidden on a
+ * machine with no camera attached, so there it is not found and the caller carries on without one
+ * -- exactly as it does for a UFO that never opened a window.
+ */
+HWND QUfoManager::main_window_of(qint64 pid) {
+    if (pid <= 0) {
+        return nullptr;
+    }
+
+    MainWindowSearch search;
+    search.pid = static_cast<DWORD>(pid);
+    EnumWindows(match_main_window, reinterpret_cast<LPARAM>(&search));
+    return search.found;
+}
+
 QUfoManager::QUfoManager(QWidget * parent):
     QGroupBox(parent),
     ui(new Ui::QUfoManager),
@@ -271,7 +347,7 @@ void QUfoManager::run_step(void) {
             break;
         }
         case Step::FindWindow: {
-            this->m_frame = FindWindowA(nullptr, "UFOCapture");
+            this->m_frame = QUfoManager::main_window_of(this->m_process.processId());
             if (this->m_frame != nullptr) {
                 logger.debug(Concern::UFO, QString("UFO-%1 HWND is %2, minimising")
                                                .arg(this->id()).arg((long long) this->m_frame));

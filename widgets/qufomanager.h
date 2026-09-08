@@ -46,6 +46,11 @@ private:
 
     void advance(Step step);
     void run_step(void);
+
+    /* Find a process's main window by its id rather than by a hardcoded title, so that this works
+     * for Kvant's AMOS64.exe as well as for UFOCapture. See the definition.
+     */
+    static HWND main_window_of(qint64 pid);
     inline bool is_stopping(void) const { return (this->m_step != Step::Idle) && (this->m_step != Step::FindWindow); };
 
     mutable HWND m_frame;
