@@ -2,6 +2,7 @@
 #define QDOME_H
 
 #include <QGroupBox>
+#include <QMap>
 #include <QSerialPort>
 
 #include "utils/domestate.h"
@@ -76,6 +77,11 @@ private:
     bool m_weather_assessed = false;
     bool m_settle_waived = false;
 
+    // When each distinct command was last put on the wire, so that the automatic loop cannot repeat
+    // one faster than CommandRepeat. Keyed on the composed telegram, so different commands never
+    // share a cooldown.
+    QMap<QByteArray, QDateTime> m_command_sent_at;
+
     DomeStateS m_state_S;
     DomeStateT m_state_T;
     DomeStateZ m_state_Z;
@@ -110,6 +116,12 @@ private:
      */
     constexpr static int DefaultOpenSettle = 600;
     constexpr static int MaxOpenSettle = 3600;
+
+    /* How soon the same command may be put on the wire again, in seconds. Long enough that the
+     * automatic loop's five passes a second cannot flood the line, short enough that a command lost
+     * on the way is reissued well inside the cover's travel time.
+     */
+    constexpr static double CommandRepeat = 2.0;
 
     constexpr static bool DefaultEnabled = true;
     const static QString DefaultPort;

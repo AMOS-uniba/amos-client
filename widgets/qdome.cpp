@@ -669,9 +669,48 @@ QJsonObject QDome::json(void) const {
     };
 }
 
+/** Put a command on the wire, unless the very same one has just been sent.
+ *
+ *  The automatic loop is level-triggered: it reissues a command on every pass for as long as the
+ *  state it reads disagrees with the state it wants, and it runs about five times a second -- once
+ *  per incoming S/T/Z telegram plus its own one-second timer. A single opening therefore used to
+ *  put dozens of identical open commands on the line, turning off the intensifier took one per pass
+ *  for as long as the bit stayed set, and the inconsistent-sensors branch, which has no override
+ *  escape, floods for as long as a sensor is stuck.
+ *
+ *  Repeating is not itself wrong and this does not stop it. Nothing acknowledges a command, the
+ *  line drops bytes, and one that never arrived has to be issued again -- edge triggering would
+ *  trade a flood for a cover that stays shut all night because one telegram was lost. It is the
+ *  rate that is wrong. Measured against a stuck closed limit switch, thirty seconds produced 703
+ *  identical open commands, some fifty times what the situation calls for, and unbounded for as
+ *  long as the sensor stays stuck. At 9600 baud that did not in fact starve the 250 ms state
+ *  polling -- the same run answered 114 state requests before and 115 after, so that worry was
+ *  unfounded -- but it does drown the log, and it leaves no headroom on a slower or noisier line.
+ *
+ *  So each distinct command gets its own cooldown. Different commands never share one, so an
+ *  emergency close is never held up by an open that preceded it, and the first send of anything is
+ *  always immediate. Manual commands from the control buttons go through the same gate: a second
+ *  press inside the cooldown asks for something already under way, and the buttons are in any case
+ *  disabled once the matching limit sensor reports the cover has arrived.
+**/
 void QDome::send_command(const Command & command) {
+    const QByteArray telegram = command.for_telegram();
+    const QDateTime now = QDateTime::currentDateTimeUtc();
+
+    const auto last = this->m_command_sent_at.constFind(telegram);
+    if (last != this->m_command_sent_at.constEnd()) {
+        const double since = last->msecsTo(now) / 1000.0;
+        if (since < QDome::CommandRepeat) {
+            logger.detail(Concern::SerialPort,
+                          QString("Not repeating the command '%1', sent %2 s ago")
+                              .arg(command.display_name()).arg(since, 0, 'f', 1));
+            return;
+        }
+    }
+
+    this->m_command_sent_at[telegram] = now;
     logger.debug(Concern::SerialPort, QString("Sending a command '%1'").arg(command.display_name()));
-    emit this->command(command.for_telegram());
+    emit this->command(telegram);
 }
 
 void QDome::process_message(const QByteArray & message) {
