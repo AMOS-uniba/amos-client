@@ -57,19 +57,6 @@ file it stored, and a sighting that sent metadata but is told none was stored is
 being marked stored and moved away. Any warnings in the reply are logged. Sighting replies are now
 released after handling; previously each upload leaked its whole payload, once per attempt.
 
-**A file that cannot be read is not sent as an empty one.** A part whose file failed to open used
-to go up anyway: zero bytes, under the file's correct name. The server cannot tell that apart from
-a real upload -- it finds the row by the name the part carries -- so it replaced the file it had
-stored with the empty one and answered 200, naming the file it had just lost. Such a part is now
-left out of the request altogether.
-
-**A sighting that is finished ignores late answers from the server.** The client re-sends every
-minute while it waits, so any answer slower than that produces two, and the second one used to put
-an already stored sighting back to accepted. The camera then refused it for sitting outside the
-scan directory, which left it accepted: neither finished nor deferred, and so picked up again by
-every send pass from then on -- each one reading from paths that no longer existed and posting the
-empty parts above. Answers naming a sighting that has been stored or quarantined are now dropped.
-
 **A capture whose metadata has not arrived is delivered anyway.** The metadata may be produced by a
 separate reduction on the station hours after the event, and the image is worth having in the
 meantime. Once a composite has waited out `MetadataGrace` it goes up on its own, keyed on its own
@@ -88,6 +75,28 @@ server every minute for the rest of the session.
 
 Implementation and review of this release by Claude Opus 5 (Anthropic), working across the station
 client, the server it reports to and the deployed instance together.
+
+### 1.7.1
+Two more ways in which a sighting could be reported as delivered while the server was left holding
+nothing. Both were reached by the same route, and between them they could destroy data the server
+had already stored.
+
+**A file that cannot be read is not sent as an empty one.** A part whose file failed to open used
+to go up anyway: zero bytes, under the file's correct name. The server cannot tell that apart from
+a real upload -- it finds the row by the name the part carries -- so it replaced the file it had
+stored with the empty one and answered 200, naming the file it had just lost. Such a part is now
+left out of the request altogether.
+
+**A sighting that is finished ignores late answers from the server.** The client re-sends every
+minute while it waits, so any answer slower than that produces two, and the second one used to put
+an already stored sighting back to accepted. The camera then refused it for sitting outside the
+scan directory, which left it accepted: neither finished nor deferred, and so picked up again by
+every send pass from then on -- each one reading from paths that no longer existed and posting the
+empty parts above. Answers naming a sighting that has been stored or quarantined are now dropped.
+
+The server was fixed to match, and now ignores an empty part with a warning rather than storing it.
+That half matters on its own: a station in the field runs whatever client it runs, and cannot be
+patched retroactively.
 
 ## Talking to the server
 
