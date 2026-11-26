@@ -1,3 +1,4 @@
+#include <QCryptographicHash>
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -262,18 +263,31 @@ double Sighting::deferred_for(void) const {
     }
 }
 
-QList<QHttpPart> Sighting::assemble(void) const {
+static QString sha256_hex(const QByteArray & data) {
+    return QString::fromLatin1(QCryptographicHash::hash(data, QCryptographicHash::Sha256).toHex());
+}
+
+QList<QHttpPart> Sighting::assemble(QStringList * content) const {
     QList<QHttpPart> out = {};
-    out.append(this->json());
+    const QByteArray meta = this->meta();
+    out.append(this->json(meta));
+    if (content != nullptr) {
+        content->append(QString("meta:%1").arg(sha256_hex(meta)));
+    }
     for (const auto & file: this->m_files) {
         if (this->should_send(file)) {
-            out.append(this->build_part(file));
+            QByteArray body;
+            out.append(this->build_part(file, &body));
+            if (content != nullptr) {
+                // The part's name, as build_part gives it: the file's suffix in lower case
+                content->append(QString("%1:%2").arg(QFileInfo(file).suffix().toLower(), sha256_hex(body)));
+            }
         }
     }
     return out;
 }
 
-QHttpPart Sighting::build_part(const QString & filename) const {
+QHttpPart Sighting::build_part(const QString & filename, QByteArray * body) const {
     QString path = QString("%1/%2").arg(this->dir_string(), filename);
     QFileInfo file_info(path);
 
@@ -289,18 +303,18 @@ QHttpPart Sighting::build_part(const QString & filename) const {
 
     QFile part_file(path);
     if (part_file.open(QIODevice::ReadOnly)) {
-        part.setBody(part_file.readAll());
+        const QByteArray content = part_file.readAll();
+        part.setBody(content);
+        if (body != nullptr) {
+            *body = content;
+        }
     } else {
         logger.warning(Concern::Sightings, QString("Could not open file '%1'").arg(path));
     }
     return part;
 }
 
-QHttpPart Sighting::json(void) const {
-    QHttpPart text_part;
-    text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
-    text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
-
+QByteArray Sighting::meta(void) const {
     QJsonObject content {
         {"spectral", this->is_spectral()},
         {"timestamp", this->m_timestamp.toString("yyyy-MM-dd hh:mm:ss.zzz")},
@@ -308,8 +322,15 @@ QHttpPart Sighting::json(void) const {
     };
 
     auto text = QJsonDocument(content).toJson(QJsonDocument::Compact);
-    text_part.setBody(text);
     logger.debug(Concern::Sightings, QString("Sighting '%1' has content '%2'").arg(this->prefix(), text));
+    return text;
+}
+
+QHttpPart Sighting::json(const QByteArray & meta) const {
+    QHttpPart text_part;
+    text_part.setHeader(QNetworkRequest::ContentTypeHeader, "application/json; charset=utf-8");
+    text_part.setHeader(QNetworkRequest::ContentDispositionHeader, "form-data; name=\"meta\"");
+    text_part.setBody(meta);
     return text_part;
 }
 

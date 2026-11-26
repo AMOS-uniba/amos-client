@@ -234,22 +234,22 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="lx_token">
+    <widget class="QLabel" name="lx_key">
      <property name="text">
-      <string>Token</string>
+      <string>Station key</string>
      </property>
     </widget>
    </item>
    <item row="1" column="1" colspan="4">
-    <widget class="QLineEdit" name="le_token">
+    <widget class="QLineEdit" name="le_key">
      <property name="toolTip">
-      <string>This station's token, issued in the server's admin. Sent with every heartbeat and sighting.</string>
+      <string>This station's signing key, issued in the server's admin. Every heartbeat and sighting is signed with it; the key itself is never sent.</string>
      </property>
      <property name="echoMode">
       <enum>QLineEdit::EchoMode::Password</enum>
      </property>
      <property name="placeholderText">
-      <string>amos_… (none: the server may refuse reports once it requires tokens)</string>
+      <string>amos1.… (none: the server may refuse reports once it requires signatures)</string>
      </property>
     </widget>
    </item>
@@ -281,7 +281,7 @@
  </widget>
  <tabstops>
   <tabstop>le_station_id</tabstop>
-  <tabstop>le_token</tabstop>
+  <tabstop>le_key</tabstop>
   <tabstop>le_ip</tabstop>
   <tabstop>sb_port</tabstop>
   <tabstop>sb_interval</tabstop>

@@ -38,8 +38,9 @@ private:
     Status m_status;
 
     QString try_open(const QString & path, bool required);
-    QHttpPart json(void) const;
-    QHttpPart build_part(const QString & filename) const;
+    QByteArray meta(void) const;
+    QHttpPart json(const QByteArray & meta) const;
+    QHttpPart build_part(const QString & filename, QByteArray * body = nullptr) const;
     qint64 measure_avi(void) const;
     // Not static: which JPEG is the composite depends on the other files in the sighting
     bool should_send(const QString & path) const;
@@ -84,7 +85,9 @@ public:
     QString str(void) const;
     QString status_string(void) const;
 
-    QList<QHttpPart> assemble(void) const;
+    // The parts to send, and if `content` is given, one "<part name>:<sha256 hex>" line per part for
+    // the signature (QServer::sign), computed from the same bytes the parts carry
+    QList<QHttpPart> assemble(QStringList * content = nullptr) const;
 
     void debug(void) const;
 
