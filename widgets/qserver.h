@@ -27,6 +27,7 @@ private:
     QHostAddress m_address;
     unsigned short m_port;
     QString m_station_id;
+    QString m_token;
     int m_heartbeat_interval;
 
     QUrl m_url_heartbeat;
@@ -40,12 +41,16 @@ private:
     void discard_changes_inner(void) override;
 
     bool is_id_changed(void) const;
+    bool is_token_changed(void) const;
+
+    void authorize(QNetworkRequest & request) const;
     bool is_address_changed(void) const;
     bool is_interval_changed(void) const;
 
 private slots:
     void set_address(const QString & address, const unsigned short port);
     void set_station_id(const QString & station_id);
+    void set_token(const QString & token);
     void set_heartbeat_interval(unsigned int interval);
 
     void heartbeat_error(QNetworkReply::NetworkError error);
@@ -53,6 +58,7 @@ private slots:
     void refresh_urls(void);
 
     void on_le_station_id_textChanged(const QString & text);
+    void on_le_token_textChanged(const QString & text);
     void on_sb_interval_valueChanged(int value);
     void on_le_ip_textChanged(const QString & text);
     void on_sb_port_valueChanged(int value);
@@ -66,6 +72,7 @@ public:
     inline const QHostAddress & address(void) const { return this->m_address; }
     inline const unsigned short & port(void) const { return this->m_port; }
     inline const QString & station_id(void) const { return this->m_station_id; }
+    inline const QString & token(void) const { return this->m_token; }
     inline const int & heartbeat_interval(void) const { return this->m_heartbeat_interval; }
 
     inline const QTimer * timer_heartbeat(void) const { return this->m_timer_heartbeat; }
