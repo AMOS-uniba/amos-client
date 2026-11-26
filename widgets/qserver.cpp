@@ -45,6 +45,7 @@ void QServer::initialize(QSettings * settings) {
 
 void QServer::connect_slots(void) {
     this->connect(this->ui->le_station_id, &QLineEdit::textChanged, this, &QServer::settings_changed);
+    this->connect(this->ui->le_token, &QLineEdit::textChanged, this, &QServer::settings_changed);
     this->connect(this->ui->le_ip, &QLineEdit::textChanged, this, &QServer::settings_changed);
     this->connect(this->ui->sb_port, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
     this->connect(this->ui->sb_interval, QOverload<int>::of(&QSpinBox::valueChanged), this, &QServer::settings_changed);
@@ -53,6 +54,9 @@ void QServer::connect_slots(void) {
 void QServer::load_settings_inner(void) {
     this->set_station_id(
         this->m_settings->value("station/id", "none").toString()
+    );
+    this->set_token(
+        this->m_settings->value("server/token", "").toString()
     );
     this->set_address(
         this->m_settings->value("server/ip", "127.0.0.1").toString(),
@@ -66,12 +70,14 @@ void QServer::load_settings_inner(void) {
 
 void QServer::load_defaults(void) {
     this->set_station_id("none");
+    this->set_token("");
     this->set_address("127.0.0.1", 4805);
     this->set_heartbeat_interval(60);
 }
 
 void QServer::save_settings_inner(void) const {
     this->m_settings->setValue("station/id", this->station_id());
+    this->m_settings->setValue("server/token", this->token());
     this->m_settings->setValue("server/ip", this->address().toString());
     this->m_settings->setValue("server/port", this->port());
     this->m_settings->setValue("server/interval", this->heartbeat_interval());
@@ -100,6 +106,31 @@ void QServer::set_station_id(const QString & id) {
     this->refresh_urls();
 
     logger.info(Concern::Configuration, QString("Station id set to '%1'").arg(this->m_station_id));
+}
+
+/* The station's token, issued by the server (Stations -> "Issue a new token" in its admin) and sent
+ * with every heartbeat and sighting as "Authorization: Bearer amos_...". Empty sends none, which the
+ * server accepts until it is told to require tokens. Never written to the log: it is a credential.
+ */
+void QServer::set_token(const QString & token) {
+    const QString trimmed = token.trimmed();
+    /* Only a warning, never a ConfigurationError: one raised while loading makes QAmosWidget fall
+     * back to the defaults for *every* setting here, station id included, so a mistyped token would
+     * send the station's reports as 'none'. The server judges the token, and refuses it once it
+     * requires tokens.
+     */
+    if (!trimmed.isEmpty() && !trimmed.startsWith("amos_")) {
+        logger.warning(Concern::Configuration, "The station token does not look like one: tokens start with \"amos_\"");
+    }
+    this->m_token = trimmed;
+    logger.info(Concern::Configuration,
+                this->m_token.isEmpty() ? QString("No station token set") : QString("Station token set"));
+}
+
+void QServer::authorize(QNetworkRequest & request) const {
+    if (!this->m_token.isEmpty()) {
+        request.setRawHeader("Authorization", QString("Bearer %1").arg(this->m_token).toUtf8());
+    }
 }
 
 void QServer::set_heartbeat_interval(unsigned int interval) {
@@ -132,6 +163,7 @@ void QServer::send_heartbeat(const QJsonObject & heartbeat) const {
 
     QNetworkRequest request(this->m_url_heartbeat);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
+    this->authorize(request);
 
     QByteArray message = QJsonDocument(heartbeat).toJson(QJsonDocument::Compact);
     logger.debug(Concern::Heartbeat, QString("Heartbeat assembled: '%1'").arg(QString(message)));
@@ -144,6 +176,13 @@ void QServer::send_heartbeat(const QJsonObject & heartbeat) const {
 
 void QServer::heartbeat_error(QNetworkReply::NetworkError error) {
     auto reply = static_cast<QNetworkReply *>(sender());
+    const int status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    if ((status == 401) || (status == 403)) {
+        logger.error(Concern::Server, QString("Heartbeat refused (HTTP %1): the server requires a valid token "
+                                              "for station '%2'; check the token in the server settings")
+                                          .arg(status).arg(this->station_id()));
+        return;
+    }
     logger.error(
         Concern::Server,
         QString("Heartbeat could not be sent: (error %1: %2) %3")
@@ -179,6 +218,7 @@ void QServer::send_sighting(const Sighting & sighting) const {
     }
 
     QNetworkRequest request(this->m_url_sighting);
+    this->authorize(request);
     QNetworkReply * reply = this->m_sighting_manager->post(request, multipart);
     reply->setProperty("sighting", sighting.prefix());
     multipart->setParent(reply); // delete the multipart with the reply
@@ -278,6 +318,22 @@ void QServer::sighting_received(QNetworkReply * reply) {
             emit this->sighting_conflict(sighting_id, error);
             break;
         }
+        case 401:
+            [[fallthrough]];
+        case 403: {
+            /* The server wants a valid token of this station (401), or got another station's (403).
+             * Nothing is wrong with the sighting, so keep it and try again: it goes through once the
+             * token in the server settings is right.
+             */
+            logger.error(
+                Concern::Server,
+                QString("Sighting '%1' refused (HTTP %2): the server requires a valid token for station '%3'; "
+                        "check the token in the server settings. Will try again.")
+                    .arg(sighting_id).arg(status).arg(this->station_id())
+            );
+            emit this->sighting_error(sighting_id, error);
+            break;
+        }
         case 422: {
             // The server read the report and will not take it. Retain it, but do not try again.
             logger.error(
@@ -314,11 +370,15 @@ void QServer::display_countdown(void) {
 }
 
 bool QServer::is_changed(void) const {
-    return (this->is_id_changed() || this->is_address_changed() || this->is_interval_changed());
+    return (this->is_id_changed() || this->is_token_changed() || this->is_address_changed() || this->is_interval_changed());
 }
 
 bool QServer::is_id_changed(void) const {
     return (this->ui->le_station_id->text() != this->station_id());
+}
+
+bool QServer::is_token_changed(void) const {
+    return (this->ui->le_token->text().trimmed() != this->token());
 }
 
 bool QServer::is_address_changed(void) const {
@@ -336,6 +396,9 @@ void QServer::apply_changes_inner(void) {
     if (this->is_id_changed()) {
         this->set_station_id(this->ui->le_station_id->text());
     }
+    if (this->is_token_changed()) {
+        this->set_token(this->ui->le_token->text());
+    }
     if (this->is_address_changed()) {
         this->set_address(this->ui->le_ip->text(), this->ui->sb_port->value());
     }
@@ -343,6 +406,7 @@ void QServer::apply_changes_inner(void) {
         this->set_heartbeat_interval(this->ui->sb_interval->value());
     }
     emit this->ui->le_station_id->textChanged(this->station_id());
+    emit this->ui->le_token->textChanged(this->token());
     emit this->ui->le_ip->textChanged(this->address().toString());
     emit this->ui->sb_port->valueChanged(this->port());
     emit this->ui->sb_interval->valueChanged(this->heartbeat_interval());
@@ -352,12 +416,18 @@ void QServer::discard_changes_inner(void) {
     this->ui->le_ip->setText(this->address().toString());
     this->ui->sb_port->setValue(this->port());
     this->ui->le_station_id->setText(this->station_id());
+    this->ui->le_token->setText(this->token());
     this->ui->sb_interval->setValue(this->heartbeat_interval());
 }
 
 void QServer::on_le_station_id_textChanged(const QString & text) {
     Q_UNUSED(text);
     this->display_changed(this->ui->le_station_id, this->ui->le_station_id->text(), this->station_id());
+}
+
+void QServer::on_le_token_textChanged(const QString & text) {
+    Q_UNUSED(text);
+    this->display_changed(this->ui->le_token, this->ui->le_token->text().trimmed(), this->token());
 }
 
 void QServer::on_sb_interval_valueChanged(int value) {
